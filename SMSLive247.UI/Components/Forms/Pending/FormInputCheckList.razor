@@ -1,0 +1,19 @@
+﻿@using System.Linq.Expressions
+@inherits InputText
+
+<div class="row my-3">
+    <label class="form-label col-@Column">@Label</label>
+    <div class="col-@(12 - Column)">
+        <input class="form-control"
+               @bind="CurrentValueAsString"
+               @attributes=AdditionalAttributes />
+        @* <ValidationMessage For=@For /> *@
+    </div>
+</div>
+
+@code {
+    // [Parameter] public string? Id { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public int? Column { get; set; } = 4;
+    [Parameter] public Expression<Func<string>>? For { get; set; }
+}

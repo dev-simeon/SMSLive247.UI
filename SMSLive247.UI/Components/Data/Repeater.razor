@@ -1,0 +1,25 @@
+﻿@attribute [CascadingTypeParameter(nameof(TItem))]
+@typeparam TItem
+
+@if (Items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (Items.Count == 0)
+{
+    <p><em>No items found</em></p>
+}
+else
+{
+    @foreach (TItem item in Items)
+    {
+        <CascadingValue Value="item">
+            @ChildContent(item)
+        </CascadingValue>
+    }
+}
+
+@code {
+    [Parameter] public IList<TItem>? Items { get; set; }
+    [Parameter] public RenderFragment<TItem?>? ChildContent { get; set; }
+}

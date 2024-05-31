@@ -1,0 +1,34 @@
+﻿<div class="card mb-4">
+    @if (!HideHeader())
+    {
+        <div class="card-header d-flex flex-column flex-md-row gap-3">
+        <div class="d-flex gap-3 me-md-auto">
+            <h5 class="card-title mb-0" hidden="@string.IsNullOrEmpty(HeaderTitle)">@HeaderTitle</h5>
+        </div>
+        <div clas55s="d-flex gap-3">
+            @Header
+        </div>
+    </div>
+    }
+    <div class="card-body p-@BodyPadding bg-light-subtle">
+        <h5 class="card-title pb-2" hidden="@string.IsNullOrEmpty(Title)">@Title</h5>
+        @Body
+    </div>
+    <div class="card-footer p-3" hidden="@(Footer == null)">
+        @Footer
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? HeaderTitle { get; set; }  
+    [Parameter] public int BodyPadding { get; set; } = 3;
+    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? Body { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+
+    private bool HideHeader()
+    {
+        return string.IsNullOrEmpty(HeaderTitle) && (Header == null);
+    }
+}

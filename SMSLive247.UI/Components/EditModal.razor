@@ -1,0 +1,109 @@
+﻿@typeparam TItem where TItem : class, new()
+
+<EditForm Model="Model" OnValidSubmit="Submit" FormName="@formName">
+    <Modal Title="@title" Hidden="@(!showModal)" Size="@Size">
+        <Body>
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            @ChildContent(Model)
+        </Body>
+        <Footer>
+            <Button Type="@buttonStyle">@buttonText</Button>
+        </Footer>
+    </Modal>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired] public string? LabelText { get; set; }
+    [Parameter, EditorRequired] public RenderFragment<TItem?>? ChildContent { get; set; }
+
+    [Parameter] public EventCallback OnDelete { get; set; }
+    [Parameter] public EventCallback OnUpdate { get; set; }
+    [Parameter] public EventCallback OnCreate { get; set; }
+    [Parameter] public Modal.ModalSize Size { get; set; } = Modal.ModalSize.MEDIUM;
+
+    protected override void OnParametersSet()
+    {
+        formName = LabelText + "Form";
+    }
+
+    private int isEdit = 0; //0=create ,1=edit ,2=delete
+    public TItem Model = new();
+    private bool showModal = false;
+    private string? title, buttonText, formName;
+    private Button.Style buttonStyle = Button.Style.SAVE;
+
+    public bool ForEdit => isEdit > 0;
+
+    public void Show(TItem? item = null)
+    {
+        isEdit = item == null ? 0 : 1;
+        Model = item != null ? item : new();
+
+        title = $"Create New {LabelText}";
+        buttonText = $"Create {LabelText}";
+        buttonStyle = Button.Style.SAVE;
+
+        if (isEdit > 0)
+        {
+            title = $"Edit {LabelText}";
+            buttonText = $"Update {LabelText}";
+        }
+        showModal = true;
+        StateHasChanged();
+    }
+
+    public void Delete(TItem item)
+    {
+        isEdit = 2;
+        Model = item;
+        title = $"Delete {LabelText}";
+        buttonText = $"Delete {LabelText}";
+        buttonStyle = Button.Style.DELETE;
+        showModal = true;
+        StateHasChanged();
+    }
+
+    private async Task Submit()
+    {
+        try
+        {
+            if (isEdit == 0)
+                await TryInvokeAsync(OnCreate, "Create");
+
+            else if (isEdit == 1)
+                await TryInvokeAsync(OnUpdate, "Update");
+
+            else
+                await TryInvokeAsync(OnDelete, "Delete");
+
+            await alert.Success($"Operation was successful", "Success");
+            showModal = false;
+        }
+        catch (ApiException<ProblemDetails> ex)
+        {
+            var message =  $"<h5>{ex.Message}</h5><hr/>";
+            var items = ex.Result.AdditionalProperties;
+
+            foreach (var item in items)
+            {
+                message += $"<p><em>{item.Key}</em>: {item.Value}</p>";
+            }
+            await alert.Error(message, "Error");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private async Task TryInvokeAsync(EventCallback callback, string name)
+    {
+        if (!callback.HasDelegate)
+        {
+            await alert.Info($"On{name} Delegate is missing", "Error");
+            return;
+        }
+        await callback.InvokeAsync();
+    }
+}

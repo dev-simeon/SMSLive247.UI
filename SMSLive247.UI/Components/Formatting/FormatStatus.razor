@@ -1,0 +1,32 @@
+﻿@typeparam TStatus
+@if (IsValid())
+{
+    <i class="bi bi-check-circle-fill text-success"></i>
+}
+else
+{
+    <i class="bi bi-x-circle-fill text-danger"></i>
+}
+
+@code {
+    [Parameter] public TStatus? Status { get; set; }
+    [Parameter] public string? ValidText { get; set; } = "true";
+
+    private bool IsValid()
+    {
+        switch (Status)
+        {
+            case bool boolValue:
+                return boolValue;
+
+            case int intValue:
+                return intValue != 0;
+
+            default:
+                return string.Equals(Status?.ToString(), ValidText,
+                    StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+
+}

@@ -1,0 +1,76 @@
+﻿<CascadingValue Value="this">
+	<ul class="@GetNavCss() mb-4" role="tablist">
+		@foreach (TabPage p in pages)
+		{
+		<li class="nav-item">
+			<button type="button"
+					class="nav-link @GetActiveCss(p)"
+					@onclick="e => SetActivePage(p)">
+				@p.Title
+			</button>
+		</li>
+		}
+	</ul>
+	@* <p class="bg-white mb-4 rounded-bottom border border-top-0">&nbsp;</p> *@
+	@* <div class="bg-white mb-0 border-top-0 border-secondary" style="height:15px"></div> *@
+    @ChildContent
+</CascadingValue>
+
+@code {
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public TabStyleEnum Style { get; set; } = TabStyleEnum.PILL;
+	[Parameter] public TabAlignEnum Align { get; set; } = TabAlignEnum.LEFT;
+	[Parameter] public string? CurrentRoute { get; set; }
+
+	public enum TabStyleEnum { TAB, PILL }
+	public enum TabAlignEnum { LEFT, CENTER, RIGHT }
+
+	private List<TabPage> pages = [];
+	private TabPage? activePage;
+
+	public void AddPage(TabPage page)
+	{
+		pages.Add(page);
+
+		if (pages.Count == 1)
+			activePage = page;
+
+		if (CurrentRoute != null && 
+			CurrentRoute == page.Route)
+			activePage = page;
+
+		StateHasChanged();
+	}
+
+	public bool IsActive(TabPage page)
+	{
+		return activePage == page;
+	}
+
+	private string GetNavCss()
+	{
+		var styleCss = "nav nav-tabs";
+		var alignCss = "";
+
+		if (Style == TabStyleEnum.PILL)
+			styleCss = "nav nav-pills";
+
+		if (Align == TabAlignEnum.RIGHT)
+			alignCss = " justify-content-end";
+
+		if (Align == TabAlignEnum.CENTER)
+			alignCss = " justify-content-center";
+
+		return styleCss + alignCss;
+	}
+
+	private string GetActiveCss(TabPage page)
+	{
+		return page == activePage ? "active" : "";
+	}
+
+	private void SetActivePage(TabPage page)
+	{
+		activePage = page;
+	}
+}

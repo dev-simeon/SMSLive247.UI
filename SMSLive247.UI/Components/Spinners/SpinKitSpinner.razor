@@ -1,0 +1,126 @@
+﻿@if (SpinnerType == SpinkitTypeEnum.Plane)
+{
+    <div class="sk-plane"></div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Chase)
+{
+    <div class="sk-chase">
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+        <div class="sk-chase-dot"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Bounce)
+{
+    <div class="sk-bounce">
+        <div class="sk-bounce-dot"></div>
+        <div class="sk-bounce-dot"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Wave)
+{
+    <div class="sk-wave">
+        <div class="sk-wave-rect"></div>
+        <div class="sk-wave-rect"></div>
+        <div class="sk-wave-rect"></div>
+        <div class="sk-wave-rect"></div>
+        <div class="sk-wave-rect"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Pulse)
+{
+    <div class="sk-pulse"></div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Flow)
+{
+    <div class="sk-flow">
+        <div class="sk-flow-dot"></div>
+        <div class="sk-flow-dot"></div>
+        <div class="sk-flow-dot"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Swing)
+{
+    <div class="sk-swing">
+        <div class="sk-swing-dot"></div>
+        <div class="sk-swing-dot"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Circle)
+{
+    <div class="sk-circle">
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+        <div class="sk-circle-dot"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.CircleFade)
+{
+    <div class="sk-circle-fade">
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+        <div class="sk-circle-fade-dot"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Grid)
+{
+    <div class="sk-grid">
+        <div class="sk-grid-cube"></div>
+        <div class="sk-grid-cube"></div>
+        <div class="sk-grid-cube"></div>
+        <div class="sk-grid-cube"></div>
+        <div class="sk-grid-cube"></div>
+        <div class="sk-grid-cube"></div>
+        <div class="sk-grid-cube"></div>
+        <div class="sk-grid-cube"></div>
+        <div class="sk-grid-cube"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Fold)
+{
+    <div class="sk-fold">
+        <div class="sk-fold-cube"></div>
+        <div class="sk-fold-cube"></div>
+        <div class="sk-fold-cube"></div>
+        <div class="sk-fold-cube"></div>
+    </div>
+}
+else if (SpinnerType == SpinkitTypeEnum.Wander)
+{
+    <div class="sk-wander">
+        <div class="sk-wander-cube"></div>
+        <div class="sk-wander-cube"></div>
+        <div class="sk-wander-cube"></div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public SpinkitTypeEnum SpinnerType { get; set; } = SpinkitTypeEnum.Circle;
+
+    public enum SpinkitTypeEnum
+    {
+        Plane, Chase, Bounce, Wave, Pulse, Flow, Swing, Circle, CircleFade, Grid, Fold, Wander
+    }
+}

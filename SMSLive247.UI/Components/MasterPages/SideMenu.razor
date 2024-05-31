@@ -1,0 +1,98 @@
+﻿<nav class="sb">
+    <header class="sb-header">
+        <a href="#">
+            <span class="sb-brand">GIBS Enterprise 7</span>
+            <span class="sb-brand-icon">GE7</span>
+        </a>
+    </header>
+
+    <ul class="sb-menu flex-column">
+        @foreach (var group in navItems.Where(x => x.Name == currentMenu || currentMenu == "Index").ToList())
+        {
+            <li class="sb-group">@group.Name?.ToUpper()</li>
+            @foreach (var item in group.Items)
+            {
+                @if (item.Items.Count > 0)
+                {
+                <li class="@item.Css">
+                    <a href="#" title="@group.Name / @item.Name" 
+                        @onclick="@item.ToggleOpen" 
+                        @onclick:preventDefault>
+                        <i class="@item.Icon"></i>
+                        <span>@item.Name</span>
+                    </a>
+                    <ul>
+                        @foreach (var inner in item.Items)
+                        {
+                        <li>
+                            <NavLink href="@inner.Link" Match="NavLinkMatch.Prefix">
+                                <i class="@inner.Icon" title="@group.Name / @item.Name / @inner.Name"></i>
+                                <span>@inner.Name</span>
+                            </NavLink>
+                        </li>
+                        }
+                    </ul>
+                </li>
+                }
+                else
+                {
+                <li>
+                    <NavLink href="@item.Link" Match="NavLinkMatch.Prefix">
+                        <i class="@item.Icon" title="@group.Name - @item.Name"></i>
+                        <span>@item.Name</span>
+                    </NavLink>
+                </li>
+                }
+            }
+        }
+    </ul>
+</nav>
+
+<style>
+    .sb-menu .active span {
+        color: yellow;
+    }
+</style>
+
+@code {
+    private MenuItem[] navItems = [];
+    private string currentMenu = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        navItems = await httpClient.GetFromJsonAsync<MenuItem[]>
+        ($"{nav.BaseUri}/config/side-menu.json?9") ?? [];
+
+        nav.LocationChanged += HandleLocationChanged;
+        base.OnInitialized();
+    }
+
+    private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        var oldMenu = currentMenu;
+        var path = e.Location.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        if (path.Length > 2)
+            currentMenu = path[2];
+
+        if (currentMenu != oldMenu)
+            StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        nav.LocationChanged -= HandleLocationChanged;
+    }
+
+
+    public class MenuItem
+    {
+        public string? Name { get; set; }
+        public string? Icon { get; set; }
+        public string? Link { get; set; }
+        public List<MenuItem> Items { get; set; } = [];
+        public string? Css { get; private set; } = "open";
+
+        public void ToggleOpen() => Css = Css == null ? "open" : null;
+    }
+}

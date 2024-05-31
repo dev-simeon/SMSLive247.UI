@@ -1,0 +1,67 @@
+﻿<div class="modal-backdrop fade show" hidden="@isHidden" style="z-index:99;"></div>
+<div class="modal " tabindex="-1" hidden="@isHidden" style="z-index:100;display:block;">
+    <div class="modal-dialog @GetVAlignCss() @GetSizeCss() modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" hidden="@string.IsNullOrEmpty(Title)">@Title</h5>
+                <button class="btn-close" type="button" @onclick="Close" />
+                @Header
+            </div>
+            <div class="modal-body">
+                @Body
+            </div>
+            <div class="modal-footer">
+                @Footer
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public bool Hidden { get; set; } = false;
+
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public RenderFragment? Body { get; set; }
+    [Parameter] public RenderFragment? Header { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public ModalVAlign VAlign { get; set; } = ModalVAlign.CENTER;
+    [Parameter] public ModalSize Size { get; set; } = ModalSize.MEDIUM;
+
+    public enum ModalVAlign {TOP, CENTER}
+    public enum ModalSize { SMALL, MEDIUM, LARGE, XLARGE }
+
+    private bool isHidden => Hidden;
+
+    public void Close()
+    {
+        Hidden = true;
+        StateHasChanged();
+    }
+
+    private string GetVAlignCss()
+    {
+        switch (VAlign)
+        {
+            case ModalVAlign.CENTER:
+                return "modal-dialog-centered";
+            default:
+                return "";
+        }
+    }
+
+    private string GetSizeCss()
+    {
+        switch (Size)
+        {
+            case ModalSize.SMALL:
+                return "modal-sm";
+            case ModalSize.LARGE:
+                return "modal-lg";
+            case ModalSize.XLARGE:
+                return "modal-xl";
+            default:
+                return "";
+        }
+    }
+
+}

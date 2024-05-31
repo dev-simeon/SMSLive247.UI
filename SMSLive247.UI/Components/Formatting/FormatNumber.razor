@@ -1,0 +1,59 @@
+﻿@typeparam TValue where TValue : struct
+
+@if (!Currency.Equals(default(TValue)))
+{
+    <div class="text-end text-nowrap">
+        @FormatValueAsString(Currency, $"{Symbol} {Format}")
+    </div>
+}
+@if (!Percent.Equals(default(TValue)))
+{
+    <div class="text-end text-nowrap">
+        @FormatValueAsString(Percent, "P")
+    </div>
+}
+@if (!Number.Equals(default(TValue)))
+{
+    <div class="text-end text-nowrap">
+        @FormatValueAsString(Number, "G")
+    </div>
+}
+
+@code {
+    [Parameter] public TValue Currency { get; set; }
+    [Parameter] public TValue Percent { get; set; }
+    [Parameter] public TValue Number { get; set; }
+
+    [Parameter] public string? Format { get; set; } = "#,##0";
+    [Parameter] public string? Symbol { get; set; } = "₦";
+
+    private static string? FormatValueAsString(TValue? value, string? format)
+    {
+        switch (value)
+        {
+            case null:
+                return null;
+
+            case int @int:
+                return @int.ToString(format);
+
+            case long @long:
+                return @long.ToString(format);
+
+            case short @short:
+                return @short.ToString(format);
+
+            case float @float:
+                return @float.ToString(format);
+
+            case double @double:
+                return @double.ToString(format);
+
+            case decimal @decimal:
+                return @decimal.ToString(format);
+
+            default:
+                throw new InvalidOperationException($"Unsupported type {value.GetType()}");
+        }
+    }
+}

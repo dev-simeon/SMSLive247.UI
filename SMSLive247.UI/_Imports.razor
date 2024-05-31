@@ -1,0 +1,40 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using System.Diagnostics.CodeAnalysis
+@using System.ComponentModel.DataAnnotations
+
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Sections
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Components.WebAssembly.Http
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+
+@using SMSLive247.UI
+@* @using SMSLive247.OpenApi *@
+@using SMSLive247.ApiClient.OpenAPIService
+@using SMSLive247.UI.Services
+@using SMSLive247.UI.Components
+@using SMSLive247.UI.Components.Data
+@using SMSLive247.UI.Components.Forms
+@using SMSLive247.UI.Components.Forms.Input
+@using SMSLive247.UI.Components.Forms.Select
+@using SMSLive247.UI.Components.Forms.Pending
+@using SMSLive247.UI.Components.MasterPages
+@using SMSLive247.UI.Components.Display
+@using SMSLive247.UI.Components.Layouts
+@using SMSLive247.UI.Components.Spinners
+@using SMSLive247.UI.Components.Formatting
+@using SMSLive247.UI.Components.Sections
+
+
+@inject IJSRuntime js
+@* @inject ApiClientFactory apiClient *@
+@inject Client apiClient
+@inject HttpClient httpClient
+@inject NavigationManager nav
+@inject AlertService alert

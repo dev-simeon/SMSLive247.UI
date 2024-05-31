@@ -1,0 +1,199 @@
+html {
+    font-size: 95%;
+}
+
+.sb {
+    background-color: var(--bs-dark);
+    transition: width .2s linear;
+    overflow-x: hidden;
+    position: fixed;
+    height: 100%;
+    width: 260px;
+    left: 0;
+}
+
+.sb-main {
+    margin-left: 260px;
+    transition: margin-left .2s linear;
+}
+
+::-6666-webkit-scrollbar {
+    width: 8px;
+    display: none;
+}
+/*
+::-webkit-scrollbar-track {
+    --background: orange;  
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: white;  
+    border-radius: 20px;  
+    border: 2px solid var(--bs-gray-800);  
+}
+*/
+
+.sb-header a {
+    --position: fixed;
+}
+
+.sb-header a {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    padding: 14px;
+    color: var(--bs-white);
+}
+
+.sb-brand-icon {
+    display: none;
+}
+
+.sb-menu {
+    --margin-top: 50px;
+    padding: 10px 10px 10px 20px;
+}
+
+.sb-group {
+    letter-spacing: 1px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 10px 0px;
+    color: var(--bs-gray-400);
+}
+
+.sb-menu li {
+    list-style-type: none;
+}
+
+.sb-menu i {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 0.7rem;
+    min-width: 20px;
+}
+
+.sb-menu a {
+    color: var(--bs-gray-500);
+    display: block;
+    /*font-size: 15px;*/
+    padding: 7px 7px;
+    text-decoration: none;
+}
+
+    .sb-menu a:hover {
+        color: var(--bs-white);
+    }
+
+    .sb-menu .active > a,
+    .sb-menu a:active {
+        color: var(--bs-white);
+    }
+
+ul.sb-menu ul {
+    padding: 0px;
+    padding-bottom: 10px;
+    padding-left: 30px; /*40px*/
+    overflow-y: hidden;
+    transition: max-height .2s ease;
+    max-height: 0;
+}
+
+ul.sb-menu .open ul {
+    max-height: 200px;
+    /*
+        not a real solution.
+        if too large, animation is akward
+        if too small, content is clipped
+    */
+}
+
+ul.sb-menu ul a {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+ul.sb-menu li:has(ul) > a span::after {
+    float: right;
+    content: '\F285'; /*caret-right*/
+    font-size: 70%;
+    font-weight: bold;
+    font-family: 'bootstrap-icons';
+    transition: transform .2s linear;
+    margin: 5px 10px 0px 0px;
+}
+
+ul.sb-menu li:has(ul).open a span::after {
+    transform: rotate(90deg);
+}
+
+
+@media screen and (max-width: 767px) {
+    body:not(.override) .sb-main {
+        margin-left: 0px !important;
+    }
+
+    body:not(.override) .sb {
+        width: 0px;
+    }
+
+    body:not(.override) .sb-menu,
+    body:not(.override) .sb-header a {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1400px) {
+    body:not(.override) .sb-main {
+        margin-left: 70px !important;
+    }
+
+    body:not(.override) .sb {
+        width: 70px;
+    }
+
+    body:not(.override) .sb-menu i {
+        font-weight: bold;
+        font-size: larger;
+    }
+
+    body:not(.override) .sb-brand-icon {
+        display: block;
+    }
+
+    body:not(.override) .sb-group,
+    body:not(.override) .sb-brand,
+    body:not(.override) .sb-menu span,
+    body:not(.override) ul.sb-menu ul {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1401px) {
+    .override .sb-main {
+        margin-left: 70px !important;
+    }
+
+    .override .sb {
+        width: 70px;
+    }
+
+    .override .sb-menu i {
+        font-weight: bold;
+        font-size: larger;
+        color: var(--bs-white);
+    }
+
+    .override .sb-brand-icon {
+        display: block;
+    }
+
+    .override .sb-group,
+    .override .sb-brand,
+    .override .sb-menu span,
+    .override ul.sb-menu ul {
+        display: none;
+    }
+}

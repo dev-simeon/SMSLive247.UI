@@ -1,0 +1,11 @@
+@page "/Logout"
+@page "/Logoff"
+@inject AuthenticationStateProvider auth;
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ((Authentication.GibsAuthProvider)auth).ClearAuthenticationState();
+        nav.NavigateTo("Login");
+    }
+}

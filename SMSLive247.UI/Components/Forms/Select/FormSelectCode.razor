@@ -1,0 +1,41 @@
+﻿@using System.Linq.Expressions
+@using System.Linq;
+@inherits InputBase<string>
+
+<div class="row my-3">
+    <label class="form-label col-@Column">@displayLabel</label>
+    <div class="col-@(12 - Column)">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-gear"></i></span>
+            <SelectCode Type="@Type" For="@For" OnChange="@OnChange" @bind-Value="@Value"></SelectCode>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public int? Column { get; set; } = 4;
+    [Parameter] public Expression<Func<string>>? For { get; set; }
+    [Parameter, EditorRequired] public Style Type { get; set; } 
+    [Parameter] public EventCallback<ChangeEventArgs> OnChange { get; set; }
+
+    private string displayLabel = "Label";
+
+    protected override void OnParametersSet()
+    {
+        displayLabel = Type.ToString().ToLower();
+
+        if (!string.IsNullOrEmpty(Label))
+            displayLabel = Label;
+    }
+
+    protected override bool TryParseValueFromString(string? value,
+    [MaybeNullWhen(false)] out string result,
+    [NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = value ?? string.Empty;
+        validationErrorMessage = null;
+        return true;
+    }
+
+}

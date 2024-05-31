@@ -1,0 +1,17 @@
+﻿<div class="row my-3">
+    <label class="form-label col-4">@Label</label>
+    <div class="col-8">
+        <div class="input-group">
+            <span class="form-control bg-warning">
+                @(string.IsNullOrWhiteSpace(Text) ? "~" : Text)
+            </span>
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter, EditorRequired] public string? Text { get; set; }
+    [Parameter, EditorRequired] public string? Label { get; set; }
+}

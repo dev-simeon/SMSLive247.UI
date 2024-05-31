@@ -1,0 +1,13 @@
+﻿<div class="row">
+    <div class="col-6 pe-4 border-end">
+        @Column1
+    </div>
+    <div class="col-6 ps-4">
+        @Column2
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? Column1 { get; set; }
+    [Parameter] public RenderFragment? Column2 { get; set; }
+}

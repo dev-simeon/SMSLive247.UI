@@ -1,0 +1,20 @@
+﻿<div hidden="@(!Parent?.IsActive(this))">
+	@ChildContent
+</div>
+
+@code {
+	[CascadingParameter] private Tabs? Parent { get; set; } 
+	[Parameter] public RenderFragment? ChildContent { get; set; }
+	[Parameter] public string? Route { get; set; }
+	[Parameter] public string? Title { get; set; }
+
+	protected override void OnInitialized()
+	{
+		if (Parent == null)
+			throw new ArgumentNullException(nameof(Parent), 
+			"TabPage must exist within a TabControl");
+
+		base.OnInitialized();
+		Parent.AddPage(this);
+	}
+}

@@ -1,0 +1,27 @@
+﻿@typeparam TItem
+
+@if (Loading)
+{
+    <td>
+        <p class="placeholder-glow">
+            <span class="placeholder col-9"></span>
+        </p>
+    </td>
+}
+else if (Item == null)
+{
+    <th style="width: @Width">@Header</th>
+}
+else 
+{
+    <td>@ChildContent</td>
+}
+
+@code {
+    [CascadingParameter(Name = "IsLoading")] private bool Loading { get; set; }
+
+    [CascadingParameter] public TItem? Item { get; set; }
+    [Parameter] public string? Header { get; set; }
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

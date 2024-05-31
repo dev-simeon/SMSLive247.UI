@@ -1,0 +1,28 @@
+﻿@typeparam TValue
+@using System.Linq.Expressions
+@inherits InputNumber<TValue>
+
+<div class="row my-3">
+    <label class="form-label col-@Column">@Label</label>
+    <div class="col-@(12 - Column)">
+        <div class="input-group">
+            <span class="input-group-text">₦</span>
+            <select class="form-select">
+                <option selected>Naira</option>
+                <option value="1">Dollar</option>
+                <option value="2">Pounds</option>
+                <option value="3">Euro</option>
+            </select>
+            <span class="input-group-text">Fx Rate:</span>
+            <input class="form-control text-end"
+                   @bind="CurrentValueAsString"
+                   @attributes=AdditionalAttributes />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public int? Column { get; set; } = 4;
+    [Parameter] public Expression<Func<TValue>>? For { get; set; }
+}

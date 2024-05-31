@@ -1,0 +1,30 @@
+﻿@inject NavigationManager nav
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        @for (int i = 0; i < parts.Length; i++)
+        {
+            string title = parts[i];
+            string url = string.Join('/', parts, 0, i + 1);
+
+            if (i == 0)
+            {
+                title = "Home";
+            }
+
+            if (i == parts.Length - 1)
+            {
+                <li class="breadcrumb-item active">@title</li>
+            }
+            else
+            {
+                <li class="breadcrumb-item"><a href="/@url">@title</a></li>
+            }
+        }
+    </ol>
+</nav>
+
+@code {
+    private StringSplitOptions x = StringSplitOptions.RemoveEmptyEntries;
+    private string[] parts => nav.Uri.Replace(nav.BaseUri, "").Split('/', x);
+}

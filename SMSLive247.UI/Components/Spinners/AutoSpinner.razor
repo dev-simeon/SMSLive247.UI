@@ -1,0 +1,57 @@
+﻿@inject Gibs.UI.Services.SpinnerService spinner
+
+@if (isVisible)
+{
+    <div class="modal-backdrop fade show"></div>
+
+@*     <div class="spinner">
+        <div class="spinner-border text-warning"></div>
+    </div>
+ *@
+    <style>
+        .spinner {
+            z-index: 1001;
+            position: absolute;
+            margin-top: -20px;
+            margin-left: -25px;
+            top: 50%;
+            left: 50%;
+            --width: 50px;
+            --height: 40px;
+            text-align: center;
+            --font-size: 10px;
+        }
+    </style>
+    <div class="spinner spinner-container">
+        <SpinKitSpinner SpinnerType="SpinKitSpinner.SpinkitTypeEnum.Grid" />
+    </div>
+}
+
+@code
+{
+    private bool isVisible; 
+
+    protected override void OnInitialized()
+    {
+        spinner.OnShow += Show;
+        spinner.OnHide += Hide;
+    }
+
+    public void Show()
+    {
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        spinner.OnShow -= Show;
+        spinner.OnHide -= Hide;
+    }
+}

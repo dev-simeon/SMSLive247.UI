@@ -1,0 +1,120 @@
+﻿@inject Gibs.UI.Services.AlertService alert
+
+<div class="modal-backdrop fade show" hidden="@isHidden" style="z-index:999;"></div>
+<div class="modal" tabindex="-1" hidden="@isHidden" style="z-index:1000;display:block">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-0 shadow">
+            <div class="modal-header rounded-0 text-bg-@color py-2">
+                <h5 class="modal-title" hidden="@string.IsNullOrEmpty(title)">@title</h5>
+                <button class="btn-close btn-close-white" type="button" @onclick="Cancel" />
+            </div>
+            <div class="modal-body d-flex">
+                <div>
+                    <i class="fs-1 @icon text-@color"></i>
+                </div>
+                <div class="ms-3 my-auto">
+                    @message
+                </div>
+            </div>
+            <div class="modal-footer rounded-0 text-bg-light py-2">
+                @if (isConfirmBox)
+                {
+                <button type="button" 
+                        class="btn btn-@color" 
+                        style="min-width: 120px" 
+                        @onclick="Okay">OK</button>
+                <button type="button"
+                        class="btn btn-secondary"
+                        style="min-width: 120px"
+                        @onclick="Cancel">Cancel</button>
+                }
+                else
+                {
+                <button type="button"
+                        class="btn btn-@color"
+                        style="min-width: 120px"
+                        @onclick="Cancel">OK</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private TaskCompletionSource<bool>? taskSource;
+    private string title = "Alert Box";
+    private bool isConfirmBox = false;
+    private bool isHidden = true;
+    private RenderFragment? message;
+    private string? color;
+    private string? icon;
+
+    protected override void OnInitialized()
+    {
+        alert.OnInfo += Info;
+        alert.OnError += Error;
+        alert.OnSuccess += Success;
+        alert.OnConfirm += Confirm;
+    }
+
+    public Task Info(string message, string title)
+    {
+        Open("info", "bi bi-info-circle-fill", message, title);
+        return taskSource.Task;
+    }
+
+    public Task Error(string message, string title)
+    {
+        Open("danger", "bi bi-sign-stop-fill", message, title);
+        return taskSource.Task;
+    }
+
+    public Task Success(string message, string title)
+    {
+        Open("success", "bi bi-check-circle-fill", message, title);
+        return taskSource.Task;
+    }
+
+    public Task<bool> Confirm(string message, string title)
+    {
+        Open("warning", "bi bi-question-circle-fill", message, title, true);
+        return taskSource.Task;
+    }
+
+    [MemberNotNull(nameof(taskSource))]
+    private void Open(string color, string icon, string message, string title, bool confirm = false)
+    {
+        taskSource = new();
+        isConfirmBox = confirm;
+        isHidden = false;
+
+        this.icon = icon;
+        this.color = color;
+        this.title = title;
+        this.message = new RenderFragment(x => x.AddMarkupContent(0, message)); 
+        StateHasChanged();
+    }
+
+    private void Cancel()
+    {
+        isHidden = true;
+        taskSource?.SetResult(false);
+        StateHasChanged();
+    }
+
+    private void Okay()
+    {
+        isHidden = true;
+        taskSource?.SetResult(true);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        alert.OnInfo -= Info;
+        alert.OnError -= Error;
+        alert.OnSuccess -= Success;
+        alert.OnConfirm -= Confirm;
+    }
+}

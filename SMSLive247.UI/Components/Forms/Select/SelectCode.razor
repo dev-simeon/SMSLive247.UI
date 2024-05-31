@@ -1,0 +1,254 @@
+﻿@using System.Linq.Expressions
+@using System.Linq;
+@inherits InputBase<string>
+
+@if (canModalSearch)
+{
+<input class="form-control"
+        @bind="CurrentValueAsString"
+        @attributes=AdditionalAttributes />
+}
+else
+{
+    @if (showCodeNumber)
+    {
+    <span class="input-group-text w-25">ABCDEFG</span>
+    }
+    <select class="form-select" @onchange="OnChange">
+        @if(groupNames.Count() > 0)
+        {
+            @foreach (var group in groupNames)
+            {
+                <optgroup label="@group">
+                    @foreach (var item in selectItems.Where(x => string.Equals(x.GroupText, group)))
+                    {
+                        <option value="@item.ItemId">@item.ItemText</option>
+                    }
+                </optgroup>
+            }
+        }
+        else
+        {
+            @foreach (var item in selectItems)
+            {
+                <option value="@item.ItemId">@item.ItemText</option>
+            }
+        }
+    </select>
+}
+
+@code {
+    [Parameter] public Expression<Func<string>>? For { get; set; }
+    [Parameter, EditorRequired] public Style Type { get; set; } = Style.REGION;
+    [Parameter] public EventCallback<ChangeEventArgs> OnChange { get; set; }
+
+    private List<SelectItem> selectItems = [];
+    private List<string> groupNames = [];
+    private bool canModalSearch = false;
+    private bool showCodeNumber = false;
+    private bool canOptionGroup = false;
+
+    private string searchText = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        selectItems = await GetSelectItems(apiClient, Type);
+        groupNames = selectItems.Where(x => x.GroupText != null).Select(x => x.GroupText!).Distinct().ToList();
+
+        Style[] searchStyles = [Style.MARKETER, Style.PARTNER, Style.INSURED, Style.POLICY, Style.DNOTE, Style.CNOTE, Style.USER];
+        Style[] groupStyles = [Style.BRANCH, Style.LGA, Style.PRODUCT, Style.CHANNEL, Style.VEHICLE];
+        Style[] codeStyles = [];
+
+        canModalSearch = searchStyles.Contains(Type);
+        canOptionGroup = groupStyles.Contains(Type);
+        showCodeNumber = searchStyles.Contains(Type) || codeStyles.Contains(Type);
+    }
+
+    private static async Task<List<SelectItem>> GetSelectItems(ApiClient apiClient, Style style, string? searchText = null)
+    {
+        List<SelectItem> res = new();
+
+        switch (style)
+        {
+            case Style.MARKETER:
+                {
+                    var response = await apiClient.ListMarketersAsync(1, 100, searchText);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.MarketerID, item.FullName));
+                    break;
+                }
+            case Style.PARTNER:
+                {
+                    var response = await apiClient.ListPartnersAsync(1, 500, searchText, "");
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.PartnerID, item.Fullname));
+                    break;
+                }
+            case Style.INSURED:
+                {
+                    var response = await apiClient.ListCustomersAsync(1, 500, searchText);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.CustomerID, item.FullName));
+                    break;
+                }
+            case Style.POLICY:
+            case Style.DNOTE:
+            case Style.CNOTE:
+                {
+                    var response = await apiClient.ListPoliciesAsync(1, 500, 
+                        searchText, null, null, null, null, null, null, null);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.PolicyNo, item.CustomerName));
+                    break;
+                }
+            case Style.USER:
+                {
+                    var response = await apiClient.ListUsersAsync(1, 500, searchText);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.UserID, item.FirstName));
+                    break;
+                }
+
+            case Style.INDUSTRY://todo
+                break;
+            case Style.PRODUCT:
+                {
+                    var response = await apiClient.ListProductsAsync(1, 500, null);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.ProductID, item.ProductName));
+                    break;
+                }
+            case Style.CHANNEL:
+                {
+                    var response = await apiClient.ListChannelsAsync(1, 500, null);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.ChannelID, item.ChannelName, item.BranchID));
+                    break;
+                }
+            case Style.VEHICLE://todo
+                {
+                    var response = await apiClient.ListChannelsAsync(1, 500, null);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.ChannelID, item.ChannelName, item.BranchID));
+                    break;
+                }
+            case Style.COUNTRY://todo
+                {
+                    res.Add(new("NG", "Nigeria"));
+                    res.Add(new("GH", "Ghana"));
+                    break;
+                }
+            case Style.REGION:
+                {
+                    var response = await apiClient.ListRegionsAsync(1, 500, null);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.RegionID, item.RegionName));
+                    break;
+                }
+            case Style.BRANCH:
+                {
+                    var response = await apiClient.ListBranchesAsync(1, 500, null);
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.BranchID, item.BranchName, item.RegionID));
+                    break;
+                }
+            case Style.STATE://todo
+                {
+                    res.Add(new("LA", "Lagos"));
+                    res.Add(new("AB", "Abuja"));
+                    break;
+                }
+            case Style.LGA://todo
+                {
+                    res.Add(new("IKJ", "Ikeja"));
+                    res.Add(new("GGE", "Agege"));
+                    break;
+                }
+            case Style.RISK:
+                {
+                    var response = await apiClient.ListRisksAsync();
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.RiskID, item.RiskName));
+                    break;
+                }
+            case Style.MID_RISK://todo
+                {
+                    var response = await apiClient.ListMidRisksAsync("V");
+
+                    if (response.StatusCode == 200)
+                        foreach (var item in response.Result)
+                            res.Add(new(item.MidRiskID, item.MidRiskName, item.RiskID));
+                    break;
+                }
+            case Style.PARTNER_TYPE://todo
+                {
+                    res.Add(new("AG", "Agent"));
+                    res.Add(new("BR", "Broker"));
+                    break;
+                }
+
+            case Style.KYC_TYPE:
+                {
+                    res.Add(new("NOT_AVAILABLE", "Not Available"));
+                    res.Add(new("NATIONAL_ID_CARD", "National ID"));
+                    res.Add(new("DRIVERS_LICENSE", "Drivers License"));
+                    res.Add(new("PASSPORT", "Passport"));
+                    res.Add(new("COMPANY_REG_NO", "Company Registration"));
+                    break;
+                }
+
+            default:
+                break;
+        }
+
+        return res;
+    }
+
+    protected override bool TryParseValueFromString(string? value,
+        [MaybeNullWhen(false)] out string result,
+        [NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = value ?? string.Empty;
+        validationErrorMessage = null;
+        return true;
+    }
+
+
+    private class SelectItem
+    {
+        public SelectItem(string itemId, string itemText, string? groupId = null, string? groupText = null)
+        {
+            ItemId = itemId;
+            ItemText = itemText.Capitalize();
+            GroupId = groupId;
+            GroupText = groupText?.Capitalize();
+        }
+
+        public string ItemId { get; }
+        public string ItemText { get; }
+        public string? GroupId { get; }
+        public string? GroupText { get; }
+    }
+}

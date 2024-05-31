@@ -1,0 +1,136 @@
+@page "/Login"
+@layout EmptyLayout;
+@inject AuthenticationStateProvider auth;
+
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Net.Http.Headers;
+
+<PageTitle>Gibs Login</PageTitle>
+<AutoSpinner />
+<Alert />
+
+<main class="d-flex vh-100">
+    <aside class="col-12 col-md-6 col-lg-5 col-xl-4 p-5 shadow">
+        <header class="mb-3 fs-3">
+            GIBS Enterprise
+        </header>
+        <EditForm Model="Model" OnValidSubmit="LoginAsync" FormName="login" hidden="@toggleView">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="mb-3">
+                <label class="form-label" for="Username">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                    <InputText @bind-Value="Model.Username" 
+                        class="form-control" type="text" />
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="Password">Password</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa fa-key"></i></span>
+                    <InputText @bind-Value="Model.Password" 
+                        class="form-control" type="password" />
+                </div>
+            </div>
+            <button class="btn btn-primary mt-4 w-100" type="submit">
+                Login<i class="fa fa-sign-in-alt ms-2"></i>
+            </button>
+            <p class="mt-3">
+                Forgot your password?
+                <a class="text-decoration-none"
+                   @onclick="Toggle" href=""
+                   @onclick:preventDefault>Reset it here</a>
+            </p>
+        </EditForm>
+
+        <EditForm Model="Model" OnValidSubmit="Reset" FormName="reset" hidden="@(!toggleView)">
+            <p class="mb-3">
+                To Reset your password, please enter your Username
+                below and click the Reset Password button.
+                An email will be sent to you with instructions.
+            </p>
+            <div class="mb-3">
+                <label class="form-label" for="username">Username</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                    <InputText class="form-control" @bind-Value="Model.Username" type="text" />
+                </div>
+            </div>
+            <button class="btn btn-primary mt-4 w-100" type="submit">
+                Reset Password<i class="fa fa-unlock ms-2"></i>
+            </button>
+            <p class="mt-3">
+                Go back to
+                <a class="text-decoration-none text-info"
+                   @onclick="Toggle" href=""
+                   @onclick:preventDefault>Login page</a>
+            </p>
+        </EditForm>
+    </aside>
+
+    <aside class="col-md-6 col-lg-7 col-xl-8 d-none d-md-block bg-light">
+        @* <img class="img-fluid h-100 w-100 p-md-3 p-lg-4 p-xl-5"
+             src="images/undraw_login_re_4vu2.svg" /> *@
+    </aside>
+</main>
+
+@code {
+    private bool toggleView = false;
+
+    [SupplyParameterFromForm]
+    public LoginRequest Model { get; set; } = new() { Username = "ict", Password = "Gibs321." };
+
+    private async Task LoginAsync()
+    {
+        try
+        {
+            var response = await apiClient.LoginAsync(Model);
+
+            if (response.StatusCode == 200)
+            {
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", response.Result.AccessToken);
+
+                await ((Authentication.GibsAuthProvider)auth)
+                    .SaveAuthenticationState(response.Result);
+
+                nav.NavigateTo("/");
+                return;
+            }
+
+            if (response.StatusCode == 401) //unauthorized
+            {
+                await alert.Error("Access denied!", "Error");
+            }
+        }
+        catch (Gibs.OpenApi.ApiException ex)
+        {
+            await alert.Error(ex.Message, "Api Error");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private async Task Reset()
+    {
+        var res = await alert.Confirm($"Reset instructions have been sent to your email at {Model.Username}", "Reset Instruction");
+
+        if (res)
+        {
+            //
+        }
+        // var result = true;
+        // alert.Info(result.ToString(), "Result");
+        // await Task.Delay(10000);
+        // alert.Error(result.ToString(), "Result2");
+    }
+
+    private void Toggle()
+    {
+        toggleView = !toggleView;
+    }
+
+}

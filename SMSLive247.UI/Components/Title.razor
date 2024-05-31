@@ -1,0 +1,15 @@
+﻿<SectionContent SectionName="title">
+    <div class="d-flex">
+        <a class="link-underline me-3
+                  link-underline-opacity-0 
+                  link-underline-opacity-75-hover"
+           href="javascript:history.back();"
+           hidden="@(!CanGoBack)">&lt; Return </a>
+        <h5 class="fw-bold">@ChildContent</h5>
+    </div>
+</SectionContent>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool? CanGoBack { get; set; } = false;
+}

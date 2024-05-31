@@ -1,0 +1,15 @@
+﻿<div class="input-group">
+    <input type="text" class="form-control" placeholder="Search..." @bind-value="Text" />
+    @ChildContent
+    <button class="btn btn-primary" type="button" @onclick="OnClick">
+        <i class="bi bi-search"></i>
+    </button>
+</div>
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter] public EventCallback<string> TextChanged { get; set; }
+
+}

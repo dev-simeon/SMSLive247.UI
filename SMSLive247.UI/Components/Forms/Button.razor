@@ -1,0 +1,63 @@
+﻿@if (string.IsNullOrEmpty(HRef))
+{
+<button class="@GetButtonCss()" type="submit" @onclick="OnClick">
+    <i class="@GetIconCss()"></i>@ChildContent
+</button>
+}
+else
+{
+<a class="@GetButtonCss()" href="@HRef">
+    <i class="@GetIconCss()"></i>@ChildContent
+</a>
+}
+
+@code {
+    [Parameter] public string? HRef { get; set; } 
+    [Parameter] public string? CustomIcon { get; set; }
+    [Parameter] public Style Type { get; set; } = Style.DEFAULT;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    public enum Style {DEFAULT, ADD, EDIT, SAVE, DELETE, CANCEL, CUSTOM }
+
+    private string? GetIconCss()
+    {
+        var me = ChildContent != null ? " me-2" : "";
+
+        switch (Type)
+        {
+            case Style.ADD:
+                return $"fa fa-plus-circle{me}";
+
+            case Style.EDIT:
+                return $"fa fa-edit{me}";
+
+            case Style.SAVE:
+                return $"fa fa-save{me}";
+
+            case Style.DELETE:
+                return $"fa fa-trash{me}";
+
+            case Style.CANCEL:
+                return $"fa fa-close{me}";
+
+            default:
+                return CustomIcon;
+        }
+    }
+
+    private string GetButtonCss()
+    {
+        switch (Type)
+        {
+            case Style.CANCEL:
+                return "btn btn-secondary";
+
+            case Style.DELETE:
+                return "btn btn-danger";
+
+            default:
+                return "btn btn-primary";
+        }
+    }
+}

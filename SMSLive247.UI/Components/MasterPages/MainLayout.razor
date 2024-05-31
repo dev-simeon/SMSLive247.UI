@@ -1,0 +1,113 @@
+﻿@inherits LayoutComponentBase
+@inject AuthenticationStateProvider auth;
+@attribute [Authorize]
+
+<PageTitle>Gibs 7</PageTitle>
+
+<body class="vh-100 hideMenuClass @(hideMainMenu ? "override" : "")">
+    <AutoSpinner />
+    <SideMenu />
+    <Alert />
+
+    <main class="sb-main pb-3 h-100">
+        <header class="navbar py-2 bg-primary-subtle shadow">
+            <div class="container-fluid">
+                <left class="d-flex gap-2">
+                    <button class="btn btn-toolbar" @onclick="ToggleMenu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Support/Enquiries">CSU</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Underwriting/Dashboard">Underwriting</a>
+                        </li>
+@*                         <li class="nav-item">
+                            <a class="nav-link" href="/Claims/Dashboard">Claims</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Reinsurance/Dashboard">Reinsurance</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Accounting/Dashboard">Accounting</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Analytics/Dashboard">Analytics</a>
+                        </li>
+ *@                        <li class="nav-item">
+                            <a class="nav-link" href="/Admin/Dashboard">Admin</a>
+                        </li>
+                    </ul>
+                </left>
+                <right class="d-flex gap-3 align-items-center">
+                    <a class="nav-link" href="/Admin/Tickets">
+                        <i class="bi bi-bell-fill fs-4"></i>
+                    </a>
+                    <div class="dropdown">
+                        <a class="dropdown-toggle nav-link d-flex gap-3 align-items-center"
+                                 @onclick="ToggleDropdown" @onclick:preventDefault 
+                                 EEonblur="ToggleDropdown" href="#">
+                            <img class="rounded-circle" src="@avatarUrl" width="28">
+                            <span>@fullName</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end @(hideDropdown ? "" : "show")">
+                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
+                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
+                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
+                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
+                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
+                            <hr class="dropdown-divider" />
+                            <a class="dropdown-item" href="/Logout">Logout</a>
+                        </div>
+                    </div>
+                </right>
+            </div>
+        </header>
+
+        <section class="p-4">
+            <header class="d-flex justify-content-between pb-2">
+                <SectionOutlet SectionName="title" />
+                <nav>
+                    <Breadcrumb />
+                </nav>
+            </header>
+            @Body
+        </section>
+    </main>
+</body>
+
+@code {
+    private bool hideMainMenu = false;
+    private bool hideDropdown = true;
+
+    private string? avatarUrl;
+    private string? fullName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // try
+        // {
+           var claims = await ((Authentication.GibsAuthProvider)auth).GetUserClaims();
+
+            if (claims != null)
+            {
+                fullName = claims.Email?.ToLower();
+                avatarUrl = claims.AvatarUrl;
+            }
+        // }
+        // catch (Exception)
+        // {
+            
+        //     throw;
+        // }
+    }
+
+    private void ToggleMenu() => hideMainMenu = !hideMainMenu;
+
+    private void ToggleDropdown() => hideDropdown = !hideDropdown;
+
+}

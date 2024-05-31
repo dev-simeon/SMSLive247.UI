@@ -1,0 +1,70 @@
+﻿@if (PageState != null && PageState.TotalPages != null)
+{
+<div class="d-flex justify-content-between">
+    <div class="my-auto">
+        <select class="me-2" @onchange="SelectPageSize">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span>@GetPagerText()</span>
+    </div>
+    @if (PageState.TotalPages.Value > 1)
+    {
+    <div class="btn-44group">
+        @*<button class="btn btn-secondary" disabled="@(!PageState.HasPrevious)"
+            @onclick="e => SelectPage(PageState.PageNumber - 1)">Prev
+        </button> *@
+        @for (int i = 1; i <= Math.Min(10, PageState.TotalPages.Value); i++)
+        {
+            int captured = i;
+            <button @onclick="e => SelectPageNumber(captured)"
+                    class="btn @GetActiveCss(captured) mx-1">@captured
+            </button>
+        }
+        @*<button class="btn btn-secondary" disabled="@(!PageState.HasNext)"
+            @onclick="e => SelectPage(PageState.PageNumber + 1)">Next
+        </button> *@   
+    </div>
+    }
+</div>
+}
+
+@code {
+    [Parameter, EditorRequired] public required PageState PageState { get; set; }
+    [Parameter] public EventCallback<PageState> OnPageChange { get; set; }
+
+    private Task SelectPageNumber(int pageNumber)
+    {
+        var args = new PageState(PageState.PageSize, pageNumber);
+        return OnPageChange.InvokeAsync(args);
+    }
+
+    private Task SelectPageSize(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int pageSize))
+        {
+            var args = new PageState(pageSize, PageState.PageNumber);
+            return OnPageChange.InvokeAsync(args);
+        }
+        return Task.CompletedTask;
+    }
+
+    private string GetPagerText()
+    {
+        var p = PageState; string format = "#,##0";
+        var endIndex = p.PageNumber * p.PageSize;
+        var startIndex = (p.PageNumber - 1) * p.PageSize;
+        if (endIndex > p.TotalCount) endIndex = p.TotalCount.Value;
+        return $"{startIndex + 1} to {endIndex} of {p.TotalCount?.ToString(format)}";
+    }
+
+    private string? GetActiveCss(int pageNumber)
+    {
+        if (PageState.PageNumber == pageNumber)
+            return "btn-primary";
+
+        return "btn-outline-secondary";
+    }
+}

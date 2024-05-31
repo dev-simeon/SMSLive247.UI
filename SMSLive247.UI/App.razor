@@ -1,0 +1,37 @@
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <Authorizing>
+                    <span>Your spinner goes here</span>
+                </Authorizing>
+                <NotAuthorized>
+                    @if (!IsAuthenticated(context))
+                    {
+                        //not Authenticated
+                        <SMSLive247.UI.Pages.Logout />
+                    }
+                    else
+                    {
+                        //not Authorised
+                        <p>You are not authorized to access this resource.</p>
+                    }
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    private bool IsAuthenticated(AuthenticationState state)
+    {
+       return state.User.Identity.IsAuthenticated;
+    } 
+}

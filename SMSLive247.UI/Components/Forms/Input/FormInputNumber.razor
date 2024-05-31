@@ -1,0 +1,18 @@
+﻿@typeparam TValue
+@using System.Linq.Expressions
+@inherits InputNumber<TValue>
+
+<div class="row my-3">
+    <label class="form-label col-@Column">@Label</label>
+    <div class="col-@(12 - Column)">
+        <input class="form-control"
+               @bind="@CurrentValueAsString"
+               @attributes=AdditionalAttributes />
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public int? Column { get; set; } = 4;
+    [Parameter] public Expression<Func<TValue>>? For { get; set; }
+}
