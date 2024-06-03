@@ -80,17 +80,18 @@
             await alert.Success($"Operation was successful", "Success");
             showModal = false;
         }
-        catch (ApiException<ProblemDetails> ex)
-        {
-            var message =  $"<h5>{ex.Message}</h5><hr/>";
-            var items = ex.Result.AdditionalProperties;
+        // Todo
+        // catch (ApiException<ProblemDetails> ex)
+        // {
+        //     var message =  $"<h5>{ex.Message}</h5><hr/>";
+        //     var items = ex.Result.AdditionalProperties;
 
-            foreach (var item in items)
-            {
-                message += $"<p><em>{item.Key}</em>: {item.Value}</p>";
-            }
-            await alert.Error(message, "Error");
-        }
+        //     foreach (var item in items)
+        //     {
+        //         message += $"<p><em>{item.Key}</em>: {item.Value}</p>";
+        //     }
+        //     await alert.Error(message, "Error");
+        // }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");

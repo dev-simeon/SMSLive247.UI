@@ -2,8 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Blazored.LocalStorage;
-//using SMSLive247.OpenApi;
-using SMSLive247.ApiClient.OpenAPIService;
+using SMSLive247.OpenApi;
 
 namespace SMSLive247.Authentication
 {

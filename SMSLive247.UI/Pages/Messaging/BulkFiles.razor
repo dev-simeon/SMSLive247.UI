@@ -1,0 +1,186 @@
+﻿@page "/Messaging/BulkFiles"
+@attribute [Authorize]
+
+<PageTitle>Contacts - Bulk Files</PageTitle>
+
+<h3>Bulk Files</h3>
+
+@* @if (!string.IsNullOrWhiteSpace(PageAlertMessage))
+{
+    <SmsLive247Alert Message="@PageAlertMessage" />
+}
+
+<div class="d-flex flex-column gap-2">
+    <div class="d-flex justify-content-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactUploadModal">New Bulk File</button>
+    </div>
+    <div class="table-responsive bg-white rounded-3 px-4 py-3">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th style="min-width: 350px">Description</th>
+                    <th class="text-end">Total In File</th>
+                    <th class="text-end">Def Code</th>
+                    <th style="min-width: 125px">Uploaded Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @if (UserBulkFiles == null)
+                {
+                    <tr class="text-center text-secondary">
+                        <td colspan="5" class="text-center text-secondary border-0">
+                            <span class="spinner-border spinner-border-sm text-secondary"></span>
+                            Loading...
+                        </td>
+                    </tr>
+                }else{
+                    @if (UserBulkFiles.Any())
+                    {
+                        var i = 1;
+                        foreach (var b in UserBulkFiles)
+                        {
+                            var radioId = $"radItem{i}";
+                            <tr>
+                                <td>@b.Description</td>
+                                <td class="text-end">@b.TotalItems</td>
+                                <td class="text-end">
+                                    @b.FileType
+                                </td>
+                                <td class="text-small text-secondary">@b.CreateDate.ToString("yyyy-MM-dd hh:mm tt")</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-light"><i class="fa fa-download"></i></button>
+                                        <button class="btn btn-light"><i class="fa fa-trash-o text-danger"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr class="text-center text-secondary">
+                            <td colspan="5" class="text-center text-secondary border-0">
+                                No record found.
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- New Contact Modal -->
+<div class="modal fade" id="contactUploadModal" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Bulk File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form enctype="multipart/form-data" class="d-flex flex-column gap-2">
+                    <div class="text-center @(FormValidationSuccess ? "text-success": "text-danger")">@FormMessage</div>
+                    <fieldset class="border rounded-1 p-2">
+                        <div class="form-check">
+                            <input id="uploadType1"  class="form-check-input" type="radio" @onchange="ChangeBulkFileFieldType" name="bulkFileType" value="0" checked>
+                            <label class="form-check-label" for="uploadType1">
+                                Select Bulk File
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input id="uploadType2" class="form-check-input" type="radio" @onchange="ChangeBulkFileFieldType" name="bulkFileType" value="1">
+                            <label class="form-check-label" for="uploadType2">
+                                Paste Bulk Numbers
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    @if (!_pasteNumber)
+                    {
+                        <div>
+                            <label class="form-label mb-1" for="UploadedFile">Bulk File</label>
+                            <InputFile class="form-control" OnChange="OnSelectBulkFileChange" required />
+                            <span class="text-danger text-small" asp-validation-for="UploadedFile"></span>
+                        </div>
+                    }else{
+                        <div id="pasteNumbersContainer">
+                            <label class="form-label mb-1" for="BulkNumbers">Bulk Numbers</label>
+                            <textarea class="form-control" @bind="BulkNumbers" rows="7" required></textarea>
+                            <span class="text-danger text-small" asp-validation-for="BulkNumbers"></span>
+                        </div>
+                    }
+                        
+                    <div>
+                        <label class="form-label mb-1" asp-for="FileName">File Name</label>
+                        <input type="text" 
+                            class="form-control" 
+                            @bind="FileName"
+                            @bind:event="oninput"
+                            required ="@_pasteNumber" />
+                        <span class="text-danger text-small" asp-validation-for="FileName"></span>
+                    </div>
+
+                    <div class="mt-1 d-flex align-items-center gap-1">
+                        <button type="button" class="btn btn-primary" @onclick="HandleFormSubmit">Upload</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private bool _pasteNumber = false;
+
+    private IBrowserFile UploadedFile { get; set; }
+    private string FileName { get; set; }
+    private string? BulkNumbers { get; set; }
+
+    private ICollection<BatchFileResponse> UserBulkFiles { get; set; } = new List<BatchFileResponse>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var res = await apiClient.BatchFileListAsync(PageNo, PageSize, "txt");
+            UserBulkFiles = res.Data;
+        }
+        catch (Exception ex)
+        {
+            PageAlertMessage = ex.Message;
+        }
+    }
+
+    private void ChangeBulkFileFieldType(ChangeEventArgs e)
+    {
+        _pasteNumber = (e.Value.ToString() == "1") ? true : false;
+    }
+
+    private void OnSelectBulkFileChange(InputFileChangeEventArgs e)
+    {
+        UploadedFile = e.File;
+    }
+
+    private void HandleFormSubmit(){
+
+        if (_pasteNumber && string.IsNullOrWhiteSpace(FileName)){
+            FormMessage = "Please paste the bulk numbers you'd like to upload.";
+            return;
+        }
+
+        if (_pasteNumber && string.IsNullOrWhiteSpace(FileName))
+        {
+            FormMessage = "Please enter a file name for the file that'll be generated to save your bulk numbers into.";
+            return;
+        }
+    }
+} *@

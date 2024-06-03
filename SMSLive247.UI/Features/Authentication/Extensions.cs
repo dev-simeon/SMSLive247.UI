@@ -4,9 +4,9 @@ namespace SMSLive247.Authentication
 {
     public static class AuthExtensions
     {
-        public static IServiceCollection AddGibsAuthProvider(this IServiceCollection services)
+        public static IServiceCollection AddSmsAuthProvider(this IServiceCollection services)
         {
-            return services.AddScoped<AuthenticationStateProvider, GibsAuthProvider>();
+            return services.AddScoped<AuthenticationStateProvider, SmsAuthProvider>();
         }
     }
 }

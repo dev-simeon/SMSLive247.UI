@@ -1,0 +1,62 @@
+﻿@page "/Messaging/Contacts"
+@attribute [Authorize]
+
+<PageTitle>Contacts</PageTitle>
+
+<h3>Bulk Files</h3>
+
+<section class="d-flex flex-column gap-3 px-4 py-4">
+   <nav class="nav gap-3 border-bottom">
+        <p class="mb-0 @(ContactsTabs.PHONE_BOOK == CurrentTab ? "fw-bold" : "")"
+           @onclick="@(e => HandleTabChange(ContactsTabs.PHONE_BOOK))"
+        >
+            Phone Book
+        </p>
+        <p class="mb-0 @(ContactsTabs.BULK_FILES == CurrentTab ? "fw-bold" : "")"
+          @onclick="@(e => HandleTabChange(ContactsTabs.BULK_FILES))"
+        >
+          Bulk Files
+        </p>
+        <p class="mb-0 @(ContactsTabs.CSV_FILES == CurrentTab ? "fw-bold" : "")"
+           @onclick="@(e => HandleTabChange(ContactsTabs.CSV_FILES))"
+        >
+            CSV Files
+        </p>
+   </nav>
+
+   @if (CurrentTab == ContactsTabs.BULK_FILES)
+   {
+        <BulkFiles />
+   }
+
+    @if (CurrentTab == ContactsTabs.CSV_FILES)
+    {
+        <CsvFiles />
+    }
+   
+</section>
+
+@code {
+    private ContactsTabs CurrentTab = ContactsTabs.PHONE_BOOK;
+
+    protected override void OnInitialized()
+    { 
+        //LayoutPage.PageNavTitle = GetPageName();
+    }
+
+    private void HandleTabChange(ContactsTabs clickedTab)
+    {
+        CurrentTab = clickedTab;
+    }
+
+    private string GetPageName(){
+        return CurrentTab.ToString().Replace('_', ' ');
+    }
+
+    protected enum ContactsTabs
+    {
+        PHONE_BOOK,
+        BULK_FILES,
+        CSV_FILES
+    }
+}

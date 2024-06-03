@@ -1,0 +1,141 @@
+﻿@page "/Messaging/SenderIds"
+@attribute [Authorize]
+
+<PageTitle>Sender Ids</PageTitle>
+
+<h3>Sender Ids</h3>
+
+@* <section class="d-flex flex-column gap-3 px-4 py-4">
+    @if (!string.IsNullOrWhiteSpace(PageAlertMessage)){
+        <SmsLive247Alert Message="@PageAlertMessage" />
+    }
+    
+    <h5 class="mb-0 fw-bold d-block d-sm-none"><PageTitle>Sender Ids</PageTitle></h5>
+    <div class="d-flex flex-column gap-2">
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#senderIdModal">New Sender Id</button>
+        </div>
+        <div class="table-responsive bg-white rounded-3 px-4 py-3">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" class="form-check-input" />
+                        </th>
+                        <th>Sender Id</th>
+                        <th style="min-width: 350px">Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    @if (UserSenderIds == null)
+                    {
+                        <tr class="text-center text-secondary">
+                            <td colspan="4" class="text-center text-secondary border-0">
+                                <span class="spinner-border spinner-border-sm text-secondary"></span>
+                                Loading...
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        if (UserSenderIds.Any())
+                        {
+                            foreach (var senderId in UserSenderIds)
+                            {
+                                var textColor = (senderId.Status == "APPROVED") ? "text-success" : "text-warning";
+                                <tr>
+                                    <td><input type="checkbox" class="form-check-input" /></td>
+                                    <td>@senderId.SenderID</td>
+                                    <td class="@textColor">@senderId.Status</td>
+                                    <td>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr class="text-center text-secondary">
+                                <td colspan="4" class="text-center text-secondary border-0">
+                                    No sender id's found.
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Register New Sender Id Modal -->
+<div class="modal fade" id="senderIdModal" data-bs-backdrop="static">
+    <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">New Sender Id</h5>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form method="post" class="d-flex flex-column gap-2">
+                    <div class="text-center @(FormValidationSuccess ? "text-success": "text-danger")">@FormMessage</div>
+                    <div>
+                        <label class="form-label mb-1" for="SenderId">Sender Id</label>
+                        <input id="SenderId" class="form-control" @bind="SenderId" maxlength="11" required />
+                    </div>
+
+                    <div>
+                        <label class="form-label mb-1" for="MessagePurpose">Message Purpose</label>
+                        <input id="MessagePurpose" class="form-control" @bind="MessagePurpose" minlength="5" required />
+                    </div>
+
+                    <div>
+                        <label class="form-label mb-1" for="MessageSample">
+                            Sample Of Your Message
+                        </label>
+                        <textarea id="MessageSample" class="form-control" rows="7"
+                            @bind="MessageSample"></textarea>
+                    </div>
+
+                    <div class="mt-1 d-flex align-items-center gap-1">
+                        <button type="button" class="btn btn-primary">Send</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    public string SenderId { get; set; }
+    public string MessagePurpose { get; set; }
+    public string MessageSample { get; set; }
+
+    public ICollection<SenderIdResponse> UserSenderIds { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var apiClient = new SMSLive247ApiClient(httpClient);
+
+            //get the currUser SenderIds
+            var res = await apiClient.SenderIdListAsync(PageNo, PageSize);
+            UserSenderIds = res.Data;
+        }
+        catch (Exception ex)
+        {
+            if (UserSenderIds == null)
+                UserSenderIds = new List<SenderIdResponse>();
+            PageAlertMessage = ex.Message;
+        }
+    }
+
+}
+ *@

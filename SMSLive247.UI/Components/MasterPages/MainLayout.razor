@@ -91,12 +91,13 @@
     {
         // try
         // {
-           var claims = await ((Authentication.GibsAuthProvider)auth).GetUserClaims();
+           var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
 
-            if (claims != null)
+            if (member != null)
             {
-                fullName = claims.Email?.ToLower();
-                avatarUrl = claims.AvatarUrl;
+                fullName = member.Email?.ToLower();
+                //Todo
+                // avatarUrl = member.AvatarUrl;
             }
         // }
         // catch (Exception)

@@ -5,7 +5,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await ((Authentication.GibsAuthProvider)auth).ClearAuthenticationState();
+        await ((Authentication.SmsAuthProvider)auth).ClearAuthenticationState();
         nav.NavigateTo("Login");
     }
 }

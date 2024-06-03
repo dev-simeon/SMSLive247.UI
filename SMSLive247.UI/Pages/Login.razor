@@ -83,6 +83,13 @@
 
     private async Task LoginAsync()
     {
+        // var response = await apiClient.LoginAsync(LoginRequestDto);
+        // var apiKey = $"MA-{response.Data.AccessToken}";
+        // var member = new Member(LoginRequestDto.Username, apiKey);
+        // apiClient.SetApikey(apiKey);
+
+        // await ((SmsAuthProvider)auth).SaveAuthenticationState(member);
+        // Nav.NavigateTo("/Accounts/Dashboard");
         try
         {
             var response = await apiClient.LoginAsync(Model);
@@ -92,8 +99,11 @@
                 httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("Bearer", response.Result.AccessToken);
 
-                await ((Authentication.GibsAuthProvider)auth)
-                    .SaveAuthenticationState(response.Result);
+                var apiKey = $"MA-{response.Result.AccessToken}";
+                var member = new Member(Model.Username, apiKey);
+
+                await ((Authentication.SmsAuthProvider)auth)
+                    .SaveAuthenticationState(member);
 
                 nav.NavigateTo("/");
                 return;
@@ -104,7 +114,7 @@
                 await alert.Error("Access denied!", "Error");
             }
         }
-        catch (Gibs.OpenApi.ApiException ex)
+        catch (SMSLive247.OpenApi.ApiException ex)
         {
             await alert.Error(ex.Message, "Api Error");
         }

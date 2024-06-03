@@ -1,0 +1,147 @@
+﻿@page "/Messaging/CsvFiles"
+@attribute [Authorize]
+
+<PageTitle>Contacts - CSV Files</PageTitle>
+
+<h3>CSV Files</h3>
+
+@* @if (!string.IsNullOrWhiteSpace(PageAlertMessage))
+{
+    <SmsLive247Alert Message="@PageAlertMessage" />
+}
+
+<div class="d-flex flex-column gap-2">
+    <div class="d-flex justify-content-end">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#csvUploadModal">New CSV File</button>
+    </div>
+    <div class="table-responsive bg-white rounded-3 px-4 py-3">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th style="min-width: 350px">Description</th>
+                    <th class="text-end">Total In File</th>
+                    <th class="text-end">Def Code</th>
+                    <th style="min-width: 125px">Uploaded Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider">
+                @if (UserCsvFiles == null)
+                {
+                    <tr class="text-center text-secondary">
+                        <td colspan="5" class="text-center text-secondary border-0">
+                            <span class="spinner-border spinner-border-sm text-secondary"></span>
+                            Loading...
+                        </td>
+                    </tr>
+                }else{
+                    if (UserCsvFiles.Any())
+                    {
+                        var i = 1;
+                        foreach (var b in UserCsvFiles)
+                        {
+                            var radioId = $"radItem{i}";
+                            <tr>
+                                <td>@b.Description</td>
+                                <td class="text-end">@b.TotalItems</td>
+                                <td class="text-end">
+                                    @b.FileType
+                                </td>
+                                <td class="text-small text-secondary">@b.CreateDate.ToString("yyyy-MM-dd hh:mm tt")</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-light"><i class="fa fa-download"></i></button>
+                                        <button class="btn btn-light"><i class="fa fa-trash-o text-danger"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr class="text-center text-secondary">
+                            <td colspan="5" class="text-center text-secondary border-0">
+                                No record found.
+                            </td>
+                        </tr>
+                    }
+                }
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- New Contact Modal -->
+<div class="modal fade" id="csvUploadModal" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Upload CSV File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body pt-2">
+                <form enctype="multipart/form-data" class="d-flex flex-column gap-2">
+                    <div class="text-center @(FormValidationSuccess ? "text-success": "text-danger")">@FormMessage</div>
+                    <div>
+                        <label class="form-label mb-1" for="UploadedFile">CSV File</label>
+                        <InputFile class="form-control" OnChange="OnSelectCSVFileChange" required />
+                        <span class="text-danger text-small" asp-validation-for="UploadedFile"></span>
+                    </div>
+
+                    <div>
+                        <label class="form-label mb-1" asp-for="FileName">File Name</label>
+                        <input type="text"
+                               class="form-control"
+                               @bind="FileName"
+                               @bind:event="oninput"/>
+                        <span class="text-danger text-small" asp-validation-for="FileName"></span>
+                    </div>
+
+                    <div class="mt-1 d-flex align-items-center gap-1">
+                        <button type="button" class="btn btn-primary" @onclick="HandleFormSubmit">Upload</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private IBrowserFile UploadedFile { get; set; }
+    private string FileName { get; set; }
+
+    private ICollection<BatchFileResponse> UserCsvFiles { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var res = await apiClient.BatchFileListAsync(PageNo, PageSize, "csv");
+            UserCsvFiles = res.Data;
+        }
+        catch (Exception ex)
+        {
+            UserCsvFiles = new List<BatchFileResponse>();
+            PageAlertMessage = ex.Message;
+        }
+    }
+
+    private void OnSelectCSVFileChange(InputFileChangeEventArgs e)
+    {
+        UploadedFile = e.File;
+    }
+
+    private void HandleFormSubmit()
+    {
+
+        
+    }
+} *@

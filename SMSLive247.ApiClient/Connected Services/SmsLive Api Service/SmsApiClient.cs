@@ -4,6 +4,8 @@
 // </auto-generated>
 //----------------------
 
+#nullable enable
+
 #pragma warning disable 108 // Disable "CS0108 '{derivedDto}.ToJson()' hides inherited member '{dtoBase}.ToJson()'. Use the new keyword if hiding was intended."
 #pragma warning disable 114 // Disable "CS0114 '{derivedDto}.RaisePropertyChanged(String)' hides inherited member 'dtoBase.RaisePropertyChanged(String)'. To make the current member override that implementation, add the override keyword. Otherwise add the new keyword."
 #pragma warning disable 472 // Disable "CS0472 The result of the expression is always 'false' since a value of type 'Int32' is never equal to 'null' of type 'Int32?'
@@ -14,18 +16,18 @@
 #pragma warning disable 3016 // Disable "CS3016 Arrays as attribute arguments is not CLS-compliant"
 #pragma warning disable 8603 // Disable "CS8603 Possible null reference return"
 
-namespace SMSLive247.ApiClient.OpenAPIService
+namespace SMSLive247.OpenApi
 {
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
-    public partial class Client 
+    public partial class ApiClient 
     {
         private string _baseUrl = "https://api.smslive247.com";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<System.Text.Json.JsonSerializerOptions> _settings;
 
-        public Client(System.Net.Http.HttpClient httpClient)
+        public ApiClient(System.Net.Http.HttpClient httpClient)
         {
             _httpClient = httpClient;
             _settings = new System.Lazy<System.Text.Json.JsonSerializerOptions>(CreateSerializerSettings);
@@ -215,7 +217,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<LoginResponse>> LoginAsync(LoginRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<LoginResponse>> LoginAsync(LoginRequest? body)
         {
             return LoginAsync(body, System.Threading.CancellationToken.None);
         }
@@ -223,7 +225,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<LoginResponse>> LoginAsync(LoginRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<LoginResponse>> LoginAsync(LoginRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/auth");
@@ -293,7 +295,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse> ResetPasswordAsync(string accountId)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse> ResetPasswordAsync(string? accountId)
         {
             return ResetPasswordAsync(accountId, System.Threading.CancellationToken.None);
         }
@@ -301,7 +303,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse> ResetPasswordAsync(string accountId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse> ResetPasswordAsync(string? accountId, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/auth/reset?");
@@ -435,7 +437,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<BatchFileResponse>>> BatchFileListAsync(int? pageNumber, int? pageSize, string searchText)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<BatchFileResponse>>> BatchFileListAsync(int? pageNumber, int? pageSize, string? searchText)
         {
             return BatchFileListAsync(pageNumber, pageSize, searchText, System.Threading.CancellationToken.None);
         }
@@ -443,7 +445,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<BatchFileResponse>>> BatchFileListAsync(int? pageNumber, int? pageSize, string searchText, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<BatchFileResponse>>> BatchFileListAsync(int? pageNumber, int? pageSize, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/batchfiles?");
@@ -522,7 +524,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileCreateAsync(BatchFileRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileCreateAsync(BatchFileRequest? body)
         {
             return BatchFileCreateAsync(body, System.Threading.CancellationToken.None);
         }
@@ -530,7 +532,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileCreateAsync(BatchFileRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileCreateAsync(BatchFileRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/batchfiles");
@@ -744,7 +746,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse> BatchFileUpdateAsync(string fileId, BatchFileRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse> BatchFileUpdateAsync(string fileId, BatchFileRequest? body)
         {
             return BatchFileUpdateAsync(fileId, body, System.Threading.CancellationToken.None);
         }
@@ -752,7 +754,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse> BatchFileUpdateAsync(string fileId, BatchFileRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse> BatchFileUpdateAsync(string fileId, BatchFileRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
@@ -1570,7 +1572,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactCreateAsync(ContactRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactCreateAsync(ContactRequest? body)
         {
             return ContactCreateAsync(body, System.Threading.CancellationToken.None);
         }
@@ -1578,7 +1580,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactCreateAsync(ContactRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactCreateAsync(ContactRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/phonebook");
@@ -1648,7 +1650,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactUpdateAsync(string phoneNoQuery, string phoneNoPath, ContactRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactUpdateAsync(string? phoneNoQuery, string phoneNoPath, ContactRequest? body)
         {
             return ContactUpdateAsync(phoneNoQuery, phoneNoPath, body, System.Threading.CancellationToken.None);
         }
@@ -1656,7 +1658,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactUpdateAsync(string phoneNoQuery, string phoneNoPath, ContactRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactUpdateAsync(string? phoneNoQuery, string phoneNoPath, ContactRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             if (phoneNoPath == null)
                 throw new System.ArgumentNullException("phoneNoPath");
@@ -1735,7 +1737,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactDeleteAsync(string phoneNoQuery, string phoneNoPath)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactDeleteAsync(string? phoneNoQuery, string phoneNoPath)
         {
             return ContactDeleteAsync(phoneNoQuery, phoneNoPath, System.Threading.CancellationToken.None);
         }
@@ -1743,7 +1745,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactDeleteAsync(string phoneNoQuery, string phoneNoPath, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactDeleteAsync(string? phoneNoQuery, string phoneNoPath, System.Threading.CancellationToken cancellationToken)
         {
             if (phoneNoPath == null)
                 throw new System.ArgumentNullException("phoneNoPath");
@@ -1901,7 +1903,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupCreateAsync(string groupIdQuery, string groupIdPath, System.Collections.Generic.IEnumerable<string> body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupCreateAsync(string? groupIdQuery, string groupIdPath, System.Collections.Generic.IEnumerable<string>? body)
         {
             return ContactGroupCreateAsync(groupIdQuery, groupIdPath, body, System.Threading.CancellationToken.None);
         }
@@ -1909,7 +1911,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupCreateAsync(string groupIdQuery, string groupIdPath, System.Collections.Generic.IEnumerable<string> body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupCreateAsync(string? groupIdQuery, string groupIdPath, System.Collections.Generic.IEnumerable<string>? body, System.Threading.CancellationToken cancellationToken)
         {
             if (groupIdPath == null)
                 throw new System.ArgumentNullException("groupIdPath");
@@ -1988,7 +1990,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupUpdateAsync(string groupIdQuery, string groupIdPath, System.Collections.Generic.IEnumerable<string> body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupUpdateAsync(string? groupIdQuery, string groupIdPath, System.Collections.Generic.IEnumerable<string>? body)
         {
             return ContactGroupUpdateAsync(groupIdQuery, groupIdPath, body, System.Threading.CancellationToken.None);
         }
@@ -1996,7 +1998,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupUpdateAsync(string groupIdQuery, string groupIdPath, System.Collections.Generic.IEnumerable<string> body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupUpdateAsync(string? groupIdQuery, string groupIdPath, System.Collections.Generic.IEnumerable<string>? body, System.Threading.CancellationToken cancellationToken)
         {
             if (groupIdPath == null)
                 throw new System.ArgumentNullException("groupIdPath");
@@ -2075,7 +2077,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupDeleteAsync(string groupIdQuery, string groupIdPath)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupDeleteAsync(string? groupIdQuery, string groupIdPath)
         {
             return ContactGroupDeleteAsync(groupIdQuery, groupIdPath, System.Threading.CancellationToken.None);
         }
@@ -2083,7 +2085,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupDeleteAsync(string groupIdQuery, string groupIdPath, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactGroupDeleteAsync(string? groupIdQuery, string groupIdPath, System.Threading.CancellationToken cancellationToken)
         {
             if (groupIdPath == null)
                 throw new System.ArgumentNullException("groupIdPath");
@@ -2241,7 +2243,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdCreateAsync(SenderIdRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdCreateAsync(SenderIdRequest? body)
         {
             return SenderIdCreateAsync(body, System.Threading.CancellationToken.None);
         }
@@ -2249,7 +2251,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdCreateAsync(SenderIdRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdCreateAsync(SenderIdRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/senderids");
@@ -2319,7 +2321,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdDeleteAsync(string senderIdQuery, string senderIdPath)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdDeleteAsync(string? senderIdQuery, string senderIdPath)
         {
             return SenderIdDeleteAsync(senderIdQuery, senderIdPath, System.Threading.CancellationToken.None);
         }
@@ -2327,7 +2329,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdDeleteAsync(string senderIdQuery, string senderIdPath, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdDeleteAsync(string? senderIdQuery, string senderIdPath, System.Threading.CancellationToken cancellationToken)
         {
             if (senderIdPath == null)
                 throw new System.ArgumentNullException("senderIdPath");
@@ -2402,7 +2404,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageSendAsync(SmsMessageRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageSendAsync(SmsMessageRequest? body)
         {
             return SmsMessageSendAsync(body, System.Threading.CancellationToken.None);
         }
@@ -2410,7 +2412,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageSendAsync(SmsMessageRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageSendAsync(SmsMessageRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/sms");
@@ -2649,7 +2651,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCreateAsync(SmsBatchRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCreateAsync(SmsBatchRequest? body)
         {
             return SmsBatchCreateAsync(body, System.Threading.CancellationToken.None);
         }
@@ -2657,7 +2659,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCreateAsync(SmsBatchRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCreateAsync(SmsBatchRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/sms/batch");
@@ -2818,7 +2820,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCsvCreateAsync(SmsBatchCsvRequest body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCsvCreateAsync(SmsBatchCsvRequest? body)
         {
             return SmsBatchCsvCreateAsync(body, System.Threading.CancellationToken.None);
         }
@@ -2826,7 +2828,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCsvCreateAsync(SmsBatchCsvRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCsvCreateAsync(SmsBatchCsvRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v4/sms/batch/template");
@@ -3313,7 +3315,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
         {
             if (response == null || response.Content == null)
             {
-                return new ObjectResponseResult<T>(default(T), string.Empty);
+                return new ObjectResponseResult<T>(default(T)!, string.Empty);
             }
 
             if (ReadResponseAsString)
@@ -3322,7 +3324,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
                 try
                 {
                     var typedBody = System.Text.Json.JsonSerializer.Deserialize<T>(responseText, JsonSerializerSettings);
-                    return new ObjectResponseResult<T>(typedBody, responseText);
+                    return new ObjectResponseResult<T>(typedBody!, responseText);
                 }
                 catch (System.Text.Json.JsonException exception)
                 {
@@ -3337,7 +3339,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
                     using (var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     {
                         var typedBody = await System.Text.Json.JsonSerializer.DeserializeAsync<T>(responseStream, JsonSerializerSettings, cancellationToken).ConfigureAwait(false);
-                        return new ObjectResponseResult<T>(typedBody, string.Empty);
+                        return new ObjectResponseResult<T>(typedBody!, string.Empty);
                     }
                 }
                 catch (System.Text.Json.JsonException exception)
@@ -3348,7 +3350,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
             }
         }
 
-        private string ConvertToString(object value, System.Globalization.CultureInfo cultureInfo)
+        private string ConvertToString(object? value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -3401,22 +3403,22 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("accountID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string AccountID { get; set; }
+        public string AccountID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("accountName")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string AccountName { get; set; }
+        public string AccountName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("creditBalance")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double CreditBalance { get; set; }
+        public double CreditBalance { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public int Status { get; set; }
+        public int Status { get; set; } = default!;
 
     }
 
@@ -3428,24 +3430,24 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string BatchFileID { get; set; }
+        public string BatchFileID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string Description { get; set; }
+        public string Description { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("rawContents")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string RawContents { get; set; }
+        public string RawContents { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("countryCode")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
-        public int CountryCode { get; set; }
+        public int CountryCode { get; set; } = default!;
 
     }
 
@@ -3456,27 +3458,27 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("createDate")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset CreateDate { get; set; }
+        public System.DateTimeOffset CreateDate { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("batchFileID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string BatchFileID { get; set; }
+        public string BatchFileID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("description")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Description { get; set; }
+        public string Description { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("fileType")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string FileType { get; set; }
+        public string FileType { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalItems")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public int TotalItems { get; set; }
+        public int TotalItems { get; set; } = default!;
 
     }
 
@@ -3488,18 +3490,18 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string ContactName { get; set; }
+        public string ContactName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("phoneNumber")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("groups")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.Collections.Generic.ICollection<string> Groups { get; set; }
+        public System.Collections.Generic.ICollection<string>? Groups { get; set; } = default!;
 
     }
 
@@ -3510,22 +3512,22 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("createDate")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset CreateDate { get; set; }
+        public System.DateTimeOffset CreateDate { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("contactName")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string ContactName { get; set; }
+        public string ContactName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("phoneNumber")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("groups")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.Collections.Generic.ICollection<string> Groups { get; set; }
+        public System.Collections.Generic.ICollection<string>? Groups { get; set; } = default!;
 
     }
 
@@ -3536,17 +3538,17 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("status")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Status { get; set; }
+        public string Status { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("smscID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string SmscID { get; set; }
+        public string SmscID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("reportDate")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset? ReportDate { get; set; }
+        public System.DateTimeOffset? ReportDate { get; set; } = default!;
 
     }
 
@@ -3557,19 +3559,19 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("parentId")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string ParentId { get; set; }
+        public string? ParentId { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("username")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string Username { get; set; }
+        public string Username { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("password")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string Password { get; set; }
+        public string Password { get; set; } = default!;
 
     }
 
@@ -3580,17 +3582,17 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("accessToken")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string AccessToken { get; set; }
+        public string AccessToken { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("tokenType")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string TokenType { get; set; }
+        public string TokenType { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("expiresIn")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public int ExpiresIn { get; set; }
+        public int ExpiresIn { get; set; } = default!;
 
     }
 
@@ -3602,19 +3604,19 @@ namespace SMSLive247.ApiClient.OpenAPIService
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string SenderID { get; set; }
+        public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("purpose")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string Purpose { get; set; }
+        public string Purpose { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("sampleText")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required]
-        public string SampleText { get; set; }
+        public string SampleText { get; set; } = default!;
 
     }
 
@@ -3625,32 +3627,32 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("requestDate")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset RequestDate { get; set; }
+        public System.DateTimeOffset RequestDate { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("approvedDate")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset? ApprovedDate { get; set; }
+        public System.DateTimeOffset? ApprovedDate { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string SenderID { get; set; }
+        public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Status { get; set; }
+        public string Status { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("purpose")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Purpose { get; set; }
+        public string? Purpose { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("sampleText")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string SampleText { get; set; }
+        public string? SampleText { get; set; } = default!;
 
     }
 
@@ -3661,32 +3663,32 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string SenderID { get; set; }
+        public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageText")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string MessageText { get; set; }
+        public string MessageText { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("deliveryTime")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset? DeliveryTime { get; set; }
+        public System.DateTimeOffset? DeliveryTime { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("route")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Route { get; set; }
+        public string Route { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("batchFileID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string BatchFileID { get; set; }
+        public string BatchFileID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("mobileNumberColumn")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public int MobileNumberColumn { get; set; }
+        public int MobileNumberColumn { get; set; } = default!;
 
     }
 
@@ -3697,37 +3699,37 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string SenderID { get; set; }
+        public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageText")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string MessageText { get; set; }
+        public string MessageText { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("deliveryTime")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset? DeliveryTime { get; set; }
+        public System.DateTimeOffset? DeliveryTime { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("route")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Route { get; set; }
+        public string Route { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("rawNumbers")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string RawNumbers { get; set; }
+        public string? RawNumbers { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("mobileNumbers")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.Collections.Generic.ICollection<string> MobileNumbers { get; set; }
+        public System.Collections.Generic.ICollection<string>? MobileNumbers { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("batchFileIDs")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.Collections.Generic.ICollection<string> BatchFileIDs { get; set; }
+        public System.Collections.Generic.ICollection<string>? BatchFileIDs { get; set; } = default!;
 
     }
 
@@ -3738,47 +3740,47 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("batchID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public long BatchID { get; set; }
+        public long BatchID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string SenderID { get; set; }
+        public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageText")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string MessageText { get; set; }
+        public string MessageText { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageParts")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public int MessageParts { get; set; }
+        public int MessageParts { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalProcessed")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public long TotalProcessed { get; set; }
+        public long TotalProcessed { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("totalFailed")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public long TotalFailed { get; set; }
+        public long TotalFailed { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("charged")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double Charged { get; set; }
+        public double Charged { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("submitDate")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset SubmitDate { get; set; }
+        public System.DateTimeOffset SubmitDate { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Status { get; set; }
+        public string Status { get; set; } = default!;
 
     }
 
@@ -3789,27 +3791,27 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string SenderID { get; set; }
+        public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageText")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string MessageText { get; set; }
+        public string MessageText { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("deliveryTime")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset? DeliveryTime { get; set; }
+        public System.DateTimeOffset? DeliveryTime { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("mobileNumber")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string MobileNumber { get; set; }
+        public string MobileNumber { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("route")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Route { get; set; }
+        public string Route { get; set; } = default!;
 
     }
 
@@ -3820,42 +3822,42 @@ namespace SMSLive247.ApiClient.OpenAPIService
         [System.Text.Json.Serialization.JsonPropertyName("batchID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public long BatchID { get; set; }
+        public long BatchID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string MessageID { get; set; }
+        public string MessageID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string SenderID { get; set; }
+        public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageText")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string MessageText { get; set; }
+        public string MessageText { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("mobileNumber")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string MobileNumber { get; set; }
+        public string MobileNumber { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("submitDate")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset SubmitDate { get; set; }
+        public System.DateTimeOffset SubmitDate { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("charged")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double Charged { get; set; }
+        public double Charged { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("reports")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.Collections.Generic.ICollection<DeliveryReportResponse> Reports { get; set; }
+        public System.Collections.Generic.ICollection<DeliveryReportResponse>? Reports { get; set; } = default!;
 
     }
 
@@ -3892,11 +3894,11 @@ namespace SMSLive247.ApiClient.OpenAPIService
     {
         public int StatusCode { get; private set; }
 
-        public string Response { get; private set; }
+        public string? Response { get; private set; }
 
         public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
 
-        public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception innerException)
+        public ApiException(string message, int statusCode, string? response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception? innerException)
             : base(message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null) ? "(null)" : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
         {
             StatusCode = statusCode;
@@ -3915,7 +3917,7 @@ namespace SMSLive247.ApiClient.OpenAPIService
     {
         public TResult Result { get; private set; }
 
-        public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception innerException)
+        public ApiException(string message, int statusCode, string? response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception? innerException)
             : base(message, statusCode, response, headers, innerException)
         {
             Result = result;

@@ -1,278 +1,96 @@
 [
   {
+    "Name": "Messaging",
+    "Items": [
+      {
+        "Name": "Messages",
+        "Icon": "fa fa-calculator",
+        "Link": "/Messaging/Messages"
+      },
+      {
+        "Name": "Sender Ids",
+        "Icon": "fa fa-search",
+        "Link": "/Messaging/SenderIds"
+      },
+      {
+        "Name": "Contacts",
+        "Icon": "fa fa-users",
+        "Link": "/Messaging/Contacts"
+      },
+      {
+        "Name": "Bulk Files",
+        "Icon": "fa fa-network-wired",
+        "Link": "/Messaging/BulkFiles"
+      },
+      {
+        "Name": "Csv Files",
+        "Icon": "fa fa-envelope",
+        "Link": "/Messaging/CsvFiles"
+      },
+      {
+        "Name": "Settings",
+        "Icon": "fa fa-wrench",
+        "Link": "/Messaging/Settings"
+      }
+    ]
+  },
+  {
+    "Name": "Accounts",
+    "Items": [
+      {
+        "Name": "Dashboard",
+        "Icon": "fa fa-chart-bar",
+        "Link": "/Accounts/Dashboard"
+      },
+      {
+        "Name": "Profile",
+        "Icon": "fa fa-history",
+        "Link": "/Accounts/Profile"
+      },
+      {
+        "Name": "Sub Accounts",
+        "Icon": "fa fa-stamp",
+        "Link": "/Accounts/SubAccounts"
+      }
+    ]
+  },
+  {
+    "Name": "Wallet",
+    "Items": [
+      {
+        "Name": "Buy",
+        "Icon": "fa fa-file-invoice",
+        "Link": "/Wallet/Buy"
+      },
+      {
+        "Name": "Deposits",
+        "Icon": "fa fa-money-bill-wave",
+        "Link": "/Wallet/Deposit"
+      },
+      {
+        "Name": "Transfers",
+        "Icon": "fa fa-file-invoice-dollar",
+        "Link": "/Wallet/Transfer"
+      }
+    ]
+  },
+  {
     "Name": "Support",
     "Items": [
       {
-        "Name": "Enquiries",
-        "Icon": "fa fa-search",
-        "Link": "/Support/Enquiries"
-      },
-      {
-        "Name": "Customers",
-        "Icon": "fa fa-users",
-        "Link": "/Support/Customers"
-      },
-      {
-        "Name": "Partners",
-        "Icon": "fa fa-briefcase",
-        "Link": "/Support/Partners"
-      },
-      {
-        "Name": "Messaging",
-        "Icon": "fa fa-envelope",
-        "Link": "/Support/Messaging"
-      },
-      {
         "Name": "Tickets",
-        "Icon": "fa fa-ticket-alt",
-        "Link": "/Support/Messaging"
-      }
-    ]
-  },
-  {
-    "Name": "Underwriting",
-    "Items": [
-      {
-        "Name": "Dashboard",
-        "Icon": "fa fa-chart-bar",
-        "Link": "/Underwriting/Dashboard"
-      },
-      {
-        "Name": "Process",
-        "Icon": "fa fa-cog",
-        "Items": [
-          {
-            "Name": "Motor",
-            "Icon": "fa fa-shield-alt",
-            "Link": "/Underwriting/Process/V"
-          },
-          {
-            "Name": "Marine",
-            "Icon": "fa fa-history",
-            "Link": "/Underwriting/Process/M"
-          },
-          {
-            "Name": "Accident",
-            "Icon": "fa fa-stamp",
-            "Link": "/Underwriting/Process/G"
-          },
-          {
-            "Name": "Fire",
-            "Icon": "fa fa-shield-alt",
-            "Link": "/Underwriting/Process/F"
-          },
-          {
-            "Name": "Engineering",
-            "Icon": "fa fa-history",
-            "Link": "/Underwriting/Process/E"
-          },
-          {
-            "Name": "Aviation",
-            "Icon": "fa fa-stamp",
-            "Link": "/Underwriting/Process/A"
-          },
-          {
-            "Name": "Bond",
-            "Icon": "fa fa-stamp",
-            "Link": "/Underwriting/Process/B"
-          },
-          {
-            "Name": "Oil & Gas",
-            "Icon": "fa fa-stamp",
-            "Link": "/Underwriting/Process/O"
-          }
-        ]
-      },
-      {
-        "Name": "Enquiries",
-        "Icon": "fa fa-search",
-        "Link": "/Underwriting/Enquiries"
-      },
-      {
-        "Name": "Maintenance",
-        "Icon": "fa fa-wrench",
-        "Items": [
-          {
-            "Name": "Approval Limits",
-            "Icon": "fa fa-percentage",
-            "Link": "/Underwriting/Settings/Approvals"
-          },
-          {
-            "Name": "Commission Rates",
-            "Icon": "fa fa-percentage",
-            "Link": "/Underwriting/Settings/Rates"
-          },
-          {
-            "Name": "Documents",
-            "Icon": "fa fa-file-pdf",
-            "Link": "/Underwriting/Settings/Documents"
-          },
-          {
-            "Name": "Clauses",
-            "Icon": "fa fa-file",
-            "Link": "/Underwriting/Settings/Clauses"
-          },
-          {
-            "Name": "Partners",
-            "Icon": "fa fa-briefcase",
-            "Link": "/Underwriting/Settings/Partners"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "Name": "Claims",
-    "Items": [
-      {
-        "Name": "Dashboard",
-        "Icon": "fa fa-chart-bar",
-        "Link": "/Claims/Dashboard"
-      },
-      {
-        "Name": "Process",
-        "Icon": "fa fa-cog",
-        "Link": "/Claims/Process"
-      },
-      {
-        "Name": "Settlements",
-        "Icon": "fa fa-money-bill-wave",
-        "Link": "/Claims/Payments"
-      },
-      {
-        "Name": "Recoveries",
-        "Icon": "fa fa-file-invoice-dollar",
-        "Link": "/Claims/Recovery"
-      },
-      {
-        "Name": "Settings",
-        "Icon": "fa fa-wrench",
-        "Link": "/Claims/Settings"
-      },
-      {
-        "Name": "Naicom",
-        "Icon": "fa fa-code",
-        "Link": "/Claims/Naicom"
-      }
-    ]
-  },
-  {
-    "Name": "Reinsurance",
-    "Items": [
-      {
-        "Name": "Dashboard",
-        "Icon": "fa fa-chart-bar",
-        "Link": "/Reinsurance/Dashboard"
-      },
-      {
-        "Name": "Fac Ins",
         "Icon": "fa fa-arrow-right",
-        "Link": "/Reinsurance/Dashboard"
-      },
-      {
-        "Name": "Fac Outs",
-        "Icon": "fa fa-arrow-left",
-        "Link": "/Reinsurance/Dashboard"
-      },
-      {
-        "Name": "Treaties",
-        "Icon": "fa fa-handshake",
-        "Link": "/Reinsurance/Dashboard"
-      },
-      {
-        "Name": "Approvals",
-        "Icon": "fa fa-clipboard-check",
-        "Link": "/Reinsurance/Dashboard"
-      },
-      {
-        "Name": "Settings",
-        "Icon": "fa fa-wrench",
-        "Link": "/Reinsurance/Dashboard"
+        "Link": "/Support/Tickets"
       }
     ]
   },
   {
-    "Name": "Accounting",
+    "Name": "Developers",
     "Items": [
       {
-        "Name": "Dashboard",
-        "Icon": "fa fa-chart-bar",
-        "Link": "/Accounting/Dashboard"
-      },
-      {
-        "Name": "Journals",
+        "Name": "Api Keys",
         "Icon": "fa fa-scroll",
-        "Link": "/Accounting/Journals"
-      },
-      {
-        "Name": "Payments",
-        "Icon": "fa fa-hand-holding-usd",
-        "Link": "/Accounting/Payments"
-      },
-      {
-        "Name": "Reciepts",
-        "Icon": "fa fa-file-invoice",
-        "Link": "/Accounting/Reciepts"
-      },
-      {
-        "Name": "Assets",
-        "Icon": "fa fa-briefcase",
-        "Link": "/Accounting/Assets"
-      },
-      {
-        "Name": "Ledger",
-        "Icon": "fa fa-book",
-        "Link": "/Accounting/Ledger"
-      },
-      {
-        "Name": "Settings",
-        "Icon": "fa fa-wrench",
-        "Link": "/Accounting/Settings"
-      }
-    ]
-  },
-  {
-    "Name": "Analytics",
-    "Items": [
-      {
-        "Name": "Dashboards",
-        "Icon": "fa fa-chart-bar",
-        "Link": "/Analytics/Dashboard"
-      },
-      {
-        "Name": "Reports",
-        "Icon": "fa fa-file-alt",
-        "Link": "/Analytics/Dashboard"
-      }
-    ]
-  },
-  {
-    "Name": "Admin",
-    "Items": [
-      {
-        "Name": "Dashboard",
-        "Icon": "fa fa-chart-bar",
-        "Link": "/Admin/Dashboard"
-      },
-      {
-        "Name": "Security",
-        "Icon": "fa fa-user",
-        "Link": "/Admin/Security"
-      },
-      {
-        "Name": "Products",
-        "Icon": "fa fa-layer-group",
-        "Link": "/Admin/Products"
-      },
-      {
-        "Name": "Features",
-        "Icon": "fa fa-toggle-on",
-        "Link": "/Admin/Features"
-      },
-      {
-        "Name": "Settings",
-        "Icon": "fa fa-wrench",
-        "Link": "/Admin/Company"
+        "Link": "/Developers/ApiKeys"
       }
     ]
   }

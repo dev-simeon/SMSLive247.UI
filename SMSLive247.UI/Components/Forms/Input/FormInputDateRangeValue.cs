@@ -1,4 +1,4 @@
-﻿namespace Gibs.UI.Components.Forms.Input
+﻿namespace SMSLive247.UI.Components.Forms.Input
 {
     public class FormInputDateRangeValue
     {

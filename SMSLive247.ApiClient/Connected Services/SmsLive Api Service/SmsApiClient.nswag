@@ -4,7 +4,7 @@
   "documentGenerator": {
     "fromDocument": {
       "url": "https://api.smslive247.com/api-docs/v4/openapi.json",
-      "output": "OpenAPI.nswag.json",
+      "output": "SmsApiClient.nswag.json",
       "newLineBehavior": "Auto"
     }
   },
@@ -32,7 +32,7 @@
       "clientClassAccessModifier": "public",
       "typeAccessModifier": "public",
       "generateContractsOutput": false,
-      "contractsNamespace": null,
+      "contractsNamespace": "SMSLive247.OpenApi.Contracts",
       "contractsOutputFilePath": null,
       "parameterDateTimeFormat": "s",
       "parameterDateFormat": "yyyy-MM-dd",
@@ -40,7 +40,7 @@
       "useRequestAndResponseSerializationSettings": false,
       "serializeTypeInformation": false,
       "queryNullValue": "",
-      "className": "{controller}Client",
+      "className": "ApiClient",
       "operationGenerationMode": "SingleClientFromOperationId",
       "additionalNamespaceUsages": [],
       "additionalContractNamespaceUsages": [],
@@ -55,7 +55,7 @@
       "wrapResponseMethods": [],
       "generateResponseClasses": true,
       "responseClass": "SwaggerResponse",
-      "namespace": "SMSLive247.ApiClient.OpenAPIService",
+      "namespace": "SMSLive247.OpenApi",
       "requiredPropertiesMustBeDefined": true,
       "dateType": "System.DateTimeOffset",
       "jsonConverters": null,
@@ -85,14 +85,14 @@
       "inlineNamedAny": false,
       "generateDtoTypes": true,
       "generateOptionalPropertiesAsNullable": false,
-      "generateNullableReferenceTypes": false,
+      "generateNullableReferenceTypes": true,
       "templateDirectory": null,
       "typeNameGeneratorType": null,
       "propertyNameGeneratorType": null,
       "enumNameGeneratorType": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": "OpenAPI.cs",
+      "output": "SmsApiClient.cs",
       "newLineBehavior": "Auto"
     }
   }
