@@ -4,17 +4,11 @@
             <LeftRight>
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                        <select class="form-select">
-                            <option selected>Active</option>
-                        </select>
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.SAVE">
-                        Download Messages
-                    </Button>
-                    <Button Type="Button.Style.SAVE">
-                        Delivery Reports
+                    <Button Type="Button.Style.SAVE" @onclick="OpenDownloadFilter">
+                        Download
                     </Button>
                 </Right>
             </LeftRight>
@@ -32,10 +26,9 @@
                 <Column Header="Time">
                     <FormatDate DateTime="@context.SubmitDate"></FormatDate>
                 </Column>
-                <Column>
-                    @* <Actions OnEdit="e => branchEdit.Show(context)"
-                             OnDelete="e => branchEdit.Delete(context)">
-                    </Actions> *@
+                <Column Header="Action">
+                    <Actions OnDelete="e => DeleteMessage(context.BatchID)">
+                    </Actions>
                 </Column>
             </Columns>
         </Table>
@@ -45,14 +38,26 @@
     </Footer>
 </Card>
 
-
-
-
+<Modal Title="Download" Hidden="@(!showDownloadFilterModal)">
+    <Body>
+        <FormInputDateRange Label="Select Period" @bind-Value="dateRange"></FormInputDateRange>
+        <FormInputText Label="Sender ID" @bind-Value="senderId"></FormInputText>
+        <FormInputRadioList Name="downloadType" Label="Download Type" Options="@radioOptions" @bind-Value="downloadType" />
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.SAVE" @onclick="HandleFilterApply">
+            Download
+        </Button>
+    </Footer>
+</Modal>
 
 @code {
     private SearchBox searchBox = new();
     private ApiDataSource<SmsBatchResponse> ds = new();
-
+    private bool showDownloadFilterModal = false;
+    private FormInputDateRangeValue dateRange = new();
+    private string? senderId;
+    private string downloadType;
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,4 +68,29 @@
 
         await ds.LoadData(alert);
     }
+
+    private Task DeleteMessage(long batchId)
+    {
+        return apiClient.SmsBatchDeleteAsync((int)batchId);
+    }
+
+    private void OpenDownloadFilter()
+    {
+        showDownloadFilterModal = true;
+        StateHasChanged();
+    }
+
+    private void HandleFilterApply()
+    {
+        // Handle the filter data here and perform the download operation
+        Console.WriteLine($"From Date: {dateRange.StartDate}, To Date: {dateRange.EndDate}, Sender ID: {senderId}, Download Type: {downloadType}");
+        showDownloadFilterModal = false;
+        StateHasChanged();
+    }
+
+    private List<FormInputRadioList.RadioOption> radioOptions = new()
+    {
+        new FormInputRadioList.RadioOption { Value = "messages", Label = "Messages" },
+        new FormInputRadioList.RadioOption { Value = "deliveryReports", Label = "Delivery Reports" }
+    };
 }

@@ -25,9 +25,8 @@
                     <FormatDate DateTime="@context.CreateDate"></FormatDate>
                 </Column> 
                 <Column>
-                   @*  <Actions OnEdit="e => productEdit.Show(context)"
-                             OnDelete="e => productEdit.Delete(context)">
-                    </Actions> *@
+                    <Actions OnEdit="OnEdit" OnDelete="OnDelete">
+                    </Actions>
                 </Column>
             </Columns>
         </Table>
@@ -39,7 +38,9 @@
 
 <Modal Title="Upload Bulk File" Hidden="@(!showModal)">
     <Body>
-        <FormInputFile Label="Select File" @bind-Value="UploadedFile" OnChange="HandleFileSelected"></FormInputFile>
+        <FormInputFile Label="Select File" @bind-Value="UploadedFile"></FormInputFile>
+        <FormInputRadioList Name="organizeInto" Label="Organize File" Options="@radioOptions" @bind-Value="organizeFile" />
+        <p class="mt-5">Note: while merging into existing group duplicates will be removed.</p>
     </Body>
     <Footer>
         <Button Type="Button.Style.SAVE">Upload</Button>
@@ -52,6 +53,7 @@
 @code {
     private SearchBox searchBox = new();
     private string? UploadedFile;
+    private string? organizeFile;
     private ApiDataSource<BatchFileResponse> ds = new();
     private bool showModal = false;
 
@@ -73,10 +75,19 @@
         }
     }
 
-    void HandleFileSelected(ChangeEventArgs e)
+    void OnEdit()
     {
-        
+
     }
 
+    void OnDelete()
+    {
 
+    }
+
+    private List<FormInputRadioList.RadioOption> radioOptions = new()
+    {
+        new FormInputRadioList.RadioOption { Value = "newGroup", Label = "Save as new group" },
+        new FormInputRadioList.RadioOption { Value = "mergeGroup", Label = "Merge into an existing Group" }
+    };
 }

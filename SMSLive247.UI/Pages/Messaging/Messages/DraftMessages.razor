@@ -4,19 +4,8 @@
             <LeftRight>
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                        <select class="form-select">
-                            <option selected>Active</option>
-                        </select>
                     </SearchBox>
                 </Left>
-                <Right>
-                    <Button Type="Button.Style.SAVE">
-                        Download Messages
-                    </Button>
-                    <Button Type="Button.Style.SAVE">
-                        Delivery Reports
-                    </Button>
-                </Right>
             </LeftRight>
         </SearchArea>
         <Table DataSource="ds">
@@ -28,9 +17,8 @@
                     <FormatDate DateTime="@context.SubmitDate"></FormatDate>
                 </Column>
                 <Column>
-                    @* <Actions OnEdit="e => branchEdit.Show(context)"
-                    OnDelete="e => branchEdit.Delete(context)">
-                    </Actions> *@
+                    <Actions OnDelete="e => DeleteMessage(context.BatchID)">
+                    </Actions>
                 </Column>
             </Columns>
         </Table>
@@ -56,5 +44,10 @@
         });
 
         await ds.LoadData(alert);
+    }
+
+    private Task DeleteMessage(long batchId)
+    {
+        return apiClient.SmsBatchDeleteAsync((int)batchId);
     }
 }

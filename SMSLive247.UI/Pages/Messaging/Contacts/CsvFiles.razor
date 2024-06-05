@@ -25,9 +25,8 @@
                     <FormatDate DateTime="@context.CreateDate"></FormatDate>
                 </Column>
                 <Column>
-                    @*  <Actions OnEdit="e => productEdit.Show(context)"
-                    OnDelete="e => productEdit.Delete(context)">
-                    </Actions> *@
+                    <Actions OnEdit="OnEdit" OnDelete="OnDelete">
+                    </Actions>
                 </Column>
             </Columns>
         </Table>
@@ -39,7 +38,10 @@
 
 <Modal Title="Upload CSV/Excel File" Hidden="@(!showModal)">
     <Body>
-        <FormInputFile Label="Select File" @bind-Value="UploadedFile" OnChange="HandleFileSelected"></FormInputFile>
+        <FormInputFile Label="Select File" @bind-Value="UploadedFile"></FormInputFile>
+        <div class="row my-3">
+            <label class="form-label col-4">Sample Message</label>
+        </div>
     </Body>
     <Footer>
         <Button Type="Button.Style.SAVE">Upload</Button>
@@ -54,6 +56,7 @@
     private string? UploadedFile;
     private ApiDataSource<BatchFileResponse> ds = new();
     private bool showModal = false;
+    private bool saveAsNewGroup = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,7 +76,12 @@
         }
     }
 
-    void HandleFileSelected(ChangeEventArgs e)
+    void OnEdit()
+    {
+
+    }
+
+    void OnDelete()
     {
 
     }

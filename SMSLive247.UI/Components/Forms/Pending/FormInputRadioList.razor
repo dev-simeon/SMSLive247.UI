@@ -1,7 +1,61 @@
 ﻿@using System.Linq.Expressions
-@inherits InputText
+@inherits InputBase<string>
 
 <div class="row my-3">
+    <label class="form-label col-@Column">@Label</label>
+    <div class="col-@(12 - Column)">
+        @foreach (var option in Options)
+        {
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="@Name" id="@option.Id" value="@option.Value"
+                       @onchange="HandleChange" checked="@option.Value == CurrentValue">
+                <label class="form-check-label" for="@option.Id">@option.Label</label>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public int Column { get; set; } = 4;
+    [Parameter] public List<RadioOption> Options { get; set; } = new();
+    [Parameter] public string Name { get; set; } = Guid.NewGuid().ToString();
+    
+    private void HandleChange(ChangeEventArgs e)
+    {
+        CurrentValue = e.Value?.ToString();
+    }
+
+    public class RadioOption
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Value { get; set; } = string.Empty;
+        public string Label { get; set; } = string.Empty;
+    }
+    
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrEmpty(CurrentValue) && Options.Any())
+        {
+            CurrentValue = Options.First().Value;
+        }
+    }
+
+    protected override bool TryParseValueFromString(string? value,
+        [MaybeNullWhen(false)] out string result,
+        [NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = value ?? string.Empty;
+        validationErrorMessage = null;
+        return true;
+    }
+}
+
+
+
+
+
+@* <div class="row my-3">
     <label class="form-label col-@Column">@Label</label>
     <div class="col-@(12 - Column)">
         <div class="form-check form-check-inline">
@@ -21,4 +75,4 @@
     [Parameter] public string? Label { get; set; }
     [Parameter] public int? Column { get; set; } = 4;
     [Parameter] public Expression<Func<string>>? For { get; set; }
-}
+} *@

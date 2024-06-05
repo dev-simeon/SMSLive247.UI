@@ -3,6 +3,8 @@
 
 <PageTitle>Sender Ids</PageTitle>
 
+<h3 class="mb-4">Sender IDs</h3>
+
 <Card HeaderTitle="Sender IDs">
     <Body>
         <SearchArea>
@@ -10,12 +12,14 @@
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
                         <select class="form-select">
-                            <option selected>Active</option>
+                            <option selected>All</option>
+                            <option>Approved</option>
+                            <option>Pending Approval</option>
                         </select>
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DEFAULT">
+                    <Button Type="Button.Style.DEFAULT" @onclick="ToggleModalVisibility">
                         New Sender ID Registration
                     </Button>
                 </Right>
@@ -23,15 +27,23 @@
         </SearchArea>
         <Table DataSource="ds">
             <Columns>
+                
                 <Column Header="#"><input class="form-check-input" type="checkbox" /></Column>
                 <Column Header="SenderID">@context.SenderID</Column>
                 <Column Header="Status">
-                    @context.Status
+                    @if (context.Status == "APPROVED")
+                    {
+                        <span class="badge text-bg-success">@context.Status</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-warning">@context.Status</span>
+                    }
                 </Column>
                 <Column>
-                    @* <Actions OnEdit="e => branchEdit.Show(context)"
-                    OnDelete="e => branchEdit.Delete(context)">
-                    </Actions> *@
+                    <Actions
+                        OnDelete="e => DeleteSenderId(context.SenderID)">
+                    </Actions>
                 </Column>
             </Columns>
         </Table>
@@ -43,9 +55,32 @@
 
 
 
+<Modal Title="Register Sender ID" Hidden="@(!isModalVisible)">
+    <Body>
+        <FormInputText Label="Sender ID" @bind-Value="senderId"></FormInputText>
+        <FormInputText Label="Message Purpose" @bind-Value="messagePurpose"></FormInputText>
+        <div class="row my-3">
+            <label class="form-label col-4">Sample Message</label>
+            <div class="col-8">
+                <InputTextArea class="form-control" @bind-Value="sampleMessage" rows="5"></InputTextArea>
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.CUSTOM" @onclick=SubmitSenderIdForRegisteration>
+            Submit
+        </Button>
+    </Footer>
+</Modal>
+
+
 
 @code {
     private SearchBox searchBox = new();
+    private bool isModalVisible = false;
+    private string senderId = string.Empty;
+    private string messagePurpose = string.Empty;
+    private string sampleMessage = string.Empty;
     private ApiDataSource<SenderIdResponse> ds = new();
 
 
@@ -57,6 +92,30 @@
         });
 
         await ds.LoadData(alert);
+    }
+
+    private void ToggleModalVisibility()
+    {
+        isModalVisible = true;
+        StateHasChanged();
+    }
+
+    void DeleteSenderId(string senderId)
+    {
+
+
+    }
+
+    Task SubmitSenderIdForRegisteration()
+    {
+        var request = new SenderIdRequest()
+        {
+            SenderID = senderId,
+            Purpose = messagePurpose,
+            SampleText = sampleMessage
+        };
+
+        return apiClient.SenderIdCreateAsync(request);
     }
 }
 
