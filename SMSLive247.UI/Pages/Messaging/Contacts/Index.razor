@@ -1,0 +1,19 @@
+﻿@using SMSLive247.UI.Pages.Messaging.Contacts
+
+@page "/Messaging/Contacts"
+@attribute [Authorize]
+
+<PageTitle>Contacts</PageTitle>
+
+<Tabs>
+    <TabPage Title="Bulk Files">
+        <BulkFiles></BulkFiles>
+    </TabPage>
+    <TabPage Title="CSV/Excel Files">
+       <CsvFiles></CsvFiles>
+    </TabPage>
+</Tabs>
+
+@code{
+
+}

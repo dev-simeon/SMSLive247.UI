@@ -5,14 +5,14 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using System.Net.Http.Headers;
 
-<PageTitle>Gibs Login</PageTitle>
+<PageTitle>SmsLive247 Login</PageTitle>
 <AutoSpinner />
 <Alert />
 
 <main class="d-flex vh-100">
     <aside class="col-12 col-md-6 col-lg-5 col-xl-4 p-5 shadow">
         <header class="mb-3 fs-3">
-            GIBS Enterprise
+            SmsLive247
         </header>
         <EditForm Model="Model" OnValidSubmit="LoginAsync" FormName="login" hidden="@toggleView">
             <DataAnnotationsValidator />
@@ -79,7 +79,7 @@
     private bool toggleView = false;
 
     [SupplyParameterFromForm]
-    public LoginRequest Model { get; set; } = new() { Username = "ict", Password = "Gibs321." };
+    public LoginRequest Model { get; set; } = new() { Username = "omomowosymeon45@gmail.com", Password = "dharmey16003" };
 
     private async Task LoginAsync()
     {

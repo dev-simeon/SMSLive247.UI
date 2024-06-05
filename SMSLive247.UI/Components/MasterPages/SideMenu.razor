@@ -1,8 +1,8 @@
 ﻿<nav class="sb">
     <header class="sb-header">
         <a href="#">
-            <span class="sb-brand">GIBS Enterprise 7</span>
-            <span class="sb-brand-icon">GE7</span>
+            <span class="sb-brand">SMSLive247</span>
+            <span class="sb-brand-icon">247</span>
         </a>
     </header>
 
@@ -61,7 +61,7 @@
     protected override async Task OnInitializedAsync()
     {
         navItems = await httpClient.GetFromJsonAsync<MenuItem[]>
-        ($"{nav.BaseUri}/config/side-menu.json") ?? [];
+        ($"{nav.BaseUri}/config/side-menu.json?ss") ?? [];
 
         nav.LocationChanged += HandleLocationChanged;
         base.OnInitialized();

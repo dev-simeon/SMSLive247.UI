@@ -1,0 +1,22 @@
+﻿@using SMSLive247.UI.Pages.Messaging.Messages
+
+@page "/Messaging/Messages"
+@attribute [Authorize]
+
+<PageTitle>Messages</PageTitle>
+
+<Tabs>
+    <TabPage Title="Sent Messages">
+        <SentMessages></SentMessages>
+    </TabPage>
+    <TabPage Title="Draft Messages">
+        <DraftMessages></DraftMessages>
+    </TabPage>
+    <TabPage Title="Currently Sending">
+        <CurrentlySending></CurrentlySending>
+    </TabPage>
+</Tabs>
+
+@code{
+
+}

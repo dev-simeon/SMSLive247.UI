@@ -3,14 +3,14 @@
     "Name": "Messaging",
     "Items": [
       {
+        "Name": "Compose",
+        "Icon": "fa fa-calculator",
+        "Link": "/Messaging/Compose"
+      },
+      {
         "Name": "Messages",
         "Icon": "fa fa-calculator",
         "Link": "/Messaging/Messages"
-      },
-      {
-        "Name": "Sender Ids",
-        "Icon": "fa fa-search",
-        "Link": "/Messaging/SenderIds"
       },
       {
         "Name": "Contacts",
@@ -18,14 +18,9 @@
         "Link": "/Messaging/Contacts"
       },
       {
-        "Name": "Bulk Files",
-        "Icon": "fa fa-network-wired",
-        "Link": "/Messaging/BulkFiles"
-      },
-      {
-        "Name": "Csv Files",
-        "Icon": "fa fa-envelope",
-        "Link": "/Messaging/CsvFiles"
+        "Name": "Sender IDs",
+        "Icon": "fa fa-search",
+        "Link": "/Messaging/SenderIds"
       },
       {
         "Name": "Settings",

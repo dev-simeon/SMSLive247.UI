@@ -2,7 +2,7 @@
 @inject AuthenticationStateProvider auth;
 @attribute [Authorize]
 
-<PageTitle>Gibs 7</PageTitle>
+<PageTitle>SmsLive247</PageTitle>
 
 <body class="vh-100 hideMenuClass @(hideMainMenu ? "override" : "")">
     <AutoSpinner />
@@ -21,30 +21,24 @@
                             <a class="nav-link" href="/Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Support/Enquiries">CSU</a>
+                            <a class="nav-link" href="/Messaging/Messages">Messaging</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Underwriting/Dashboard">Underwriting</a>
-                        </li>
-@*                         <li class="nav-item">
-                            <a class="nav-link" href="/Claims/Dashboard">Claims</a>
+                            <a class="nav-link" href="/Accounts/Dashboard">Accounts</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Reinsurance/Dashboard">Reinsurance</a>
+                            <a class="nav-link" href="/Wallet/Buy">Walllet</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Accounting/Dashboard">Accounting</a>
+                            <a class="nav-link" href="/Support/Tickets">Support</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Analytics/Dashboard">Analytics</a>
-                        </li>
- *@                        <li class="nav-item">
-                            <a class="nav-link" href="/Admin/Dashboard">Admin</a>
+                            <a class="nav-link" href="/Developers/ApiKeys">Developers</a>
                         </li>
                     </ul>
                 </left>
                 <right class="d-flex gap-3 align-items-center">
-                    <a class="nav-link" href="/Admin/Tickets">
+                    <a class="nav-link" href="/Support/Tickets">
                         <i class="bi bi-bell-fill fs-4"></i>
                     </a>
                     <div class="dropdown">
@@ -55,11 +49,7 @@
                             <span>@fullName</span>
                         </a>
                         <div class="dropdown-menu dropdown-menu-end @(hideDropdown ? "" : "show")">
-                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
-                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
-                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
-                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
-                            <a class="dropdown-item" href="/Admin/Company">Settings</a>
+                            <a class="dropdown-item" href="/Accounts/Profile">Account Profile</a>
                             <hr class="dropdown-divider" />
                             <a class="dropdown-item" href="/Logout">Logout</a>
                         </div>

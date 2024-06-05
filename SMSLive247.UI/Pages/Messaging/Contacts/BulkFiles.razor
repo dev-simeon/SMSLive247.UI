@@ -1,0 +1,82 @@
+﻿<Card HeaderTitle="Bulk Files">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
+                        <select class="form-select">
+                            <option selected>Active</option>
+                        </select>
+                    </SearchBox>
+                </Left>
+                <Right>
+                    <Button Type="Button.Style.ADD" @onclick=toggleModal>
+                        New Bulk File
+                    </Button>
+                </Right>
+            </LeftRight>
+        </SearchArea>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Description">@context.Description</Column>
+                <Column Header="Total In File">@context.TotalItems</Column>
+                <Column Header="Def Code">@context.FileType</Column>
+                <Column Header="Date Added">
+                    <FormatDate DateTime="@context.CreateDate"></FormatDate>
+                </Column> 
+                <Column>
+                   @*  <Actions OnEdit="e => productEdit.Show(context)"
+                             OnDelete="e => productEdit.Delete(context)">
+                    </Actions> *@
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
+</Card>
+
+<Modal Title="Upload Bulk File" Hidden="@(!showModal)">
+    <Body>
+        <FormInputFile Label="Select File" @bind-Value="UploadedFile" OnChange="HandleFileSelected"></FormInputFile>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.SAVE">Upload</Button>
+    </Footer>
+</Modal>
+
+
+
+ 
+@code {
+    private SearchBox searchBox = new();
+    private string? UploadedFile;
+    private ApiDataSource<BatchFileResponse> ds = new();
+    private bool showModal = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.BatchFileListAsync(p.PageNumber, p.PageSize, "23 Nov 23");
+        });
+
+        await ds.LoadData(alert);
+    }
+
+    void toggleModal()
+    {
+        if (showModal == false)
+        {
+            showModal = !showModal;
+        }
+    }
+
+    void HandleFileSelected(ChangeEventArgs e)
+    {
+        
+    }
+
+
+}
