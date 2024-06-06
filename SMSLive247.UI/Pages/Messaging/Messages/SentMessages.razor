@@ -7,8 +7,8 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.SAVE" @onclick="OpenDownloadFilter">
-                        Download
+                    <Button Type="Button.Style.SAVE" @onclick="OpenDownloadModal">
+                        Download Messages
                     </Button>
                 </Right>
             </LeftRight>
@@ -27,7 +27,7 @@
                     <FormatDate DateTime="@context.SubmitDate"></FormatDate>
                 </Column>
                 <Column Header="Action">
-                    <Actions OnDelete="e => DeleteMessage(context.BatchID)">
+                    <Actions OnDelete="() => ConfirmDeleteMessage(context.BatchID)">
                     </Actions>
                 </Column>
             </Columns>
@@ -42,10 +42,24 @@
     <Body>
         <FormInputDateRange Label="Select Period" @bind-Value="dateRange"></FormInputDateRange>
         <FormInputText Label="Sender ID" @bind-Value="senderId"></FormInputText>
-        <FormInputRadioList Name="downloadType" Label="Download Type" Options="@radioOptions" @bind-Value="downloadType" />
+        <div class="row my-3">
+            <label class="form-label col-4">Download Type</label>
+            <div class="col-8">
+                <InputRadioGroup @bind-Value="downloadType">
+                    @foreach (var option in radioOptions)
+                    {
+                        var radioId = $"radio-{option}";
+                        <div class="form-check form-check-inline">
+                            <InputRadio class="form-check-input" id="@radioId" Value="@option" />
+                            <label class="form-check-label" for="@radioId">@option</label>
+                        </div>
+                    }
+                </InputRadioGroup>
+            </div>
+        </div>
     </Body>
     <Footer>
-        <Button Type="Button.Style.SAVE" @onclick="HandleFilterApply">
+        <Button Type="Button.Style.SAVE" @onclick="Download">
             Download
         </Button>
     </Footer>
@@ -54,10 +68,11 @@
 @code {
     private SearchBox searchBox = new();
     private ApiDataSource<SmsBatchResponse> ds = new();
+    private List<string> radioOptions = new List<string> { "Messages", "Delivery Reports" };
     private bool showDownloadFilterModal = false;
     private FormInputDateRangeValue dateRange = new();
     private string? senderId;
-    private string downloadType;
+    private string downloadType = "Messages";
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,28 +84,33 @@
         await ds.LoadData(alert);
     }
 
-    private Task DeleteMessage(long batchId)
+    private async Task ConfirmDeleteMessage(long batchId)
     {
-        return apiClient.SmsBatchDeleteAsync((int)batchId);
+        bool confirmed = await alert.Confirm("Are you sure you want to delete this message?", "Confirm Deletion");
+        if (confirmed)
+        {
+            await DeleteMessage(batchId);
+        }
     }
 
-    private void OpenDownloadFilter()
+    private async Task DeleteMessage(long batchId)
+    {
+        await apiClient.SmsBatchDeleteAsync((int)batchId);
+        await ds.LoadData(alert);
+    }
+
+    private void OpenDownloadModal()
     {
         showDownloadFilterModal = true;
         StateHasChanged();
     }
 
-    private void HandleFilterApply()
+    private void Download()
     {
+        //Todo
         // Handle the filter data here and perform the download operation
         Console.WriteLine($"From Date: {dateRange.StartDate}, To Date: {dateRange.EndDate}, Sender ID: {senderId}, Download Type: {downloadType}");
         showDownloadFilterModal = false;
         StateHasChanged();
     }
-
-    private List<FormInputRadioList.RadioOption> radioOptions = new()
-    {
-        new FormInputRadioList.RadioOption { Value = "messages", Label = "Messages" },
-        new FormInputRadioList.RadioOption { Value = "deliveryReports", Label = "Delivery Reports" }
-    };
 }

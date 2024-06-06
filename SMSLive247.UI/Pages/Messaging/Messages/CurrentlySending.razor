@@ -1,13 +1,16 @@
-﻿<Card HeaderTitle="Currently Sending Messages">
+﻿@page "/currently-sending-messages"
+@inject SMSLive247.UI.Services.AlertService alert
+
+<Card HeaderTitle="Currently Sending Messages">
     <Body>
         <SearchArea>
             <LeftRight>
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                        <select class="form-select">
-                            <option selected>All</option>
-                            <option>Pending</option>
-                            <option>Aborted</option>
+                        <select class="form-select" @onchange="FilterStatusChanged">
+                            <option value="All" selected>All</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Aborted">Aborted</option>
                         </select>
                     </SearchBox>
                 </Left>
@@ -17,13 +20,19 @@
             <Columns>
                 <Column Header="#"><input class="form-check-input" type="checkbox" /></Column>
                 <Column Header="Sender ID">
-                   @context.SenderID
+                    @context.SenderID
                 </Column>
                 <Column Header="Message">
                     @context.MessageText
                 </Column>
                 <Column Header="Time of Schedule">
                     <FormatDate DateTime="@context.SubmitDate"></FormatDate>
+                </Column>
+                <Column>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-success" @onclick="() => ConfirmSendNow(context.BatchID)">Send Now</button>
+                        <button type="button" class="btn btn-danger" @onclick="() => ConfirmAbortMessage(context.BatchID)">Abort</button>
+                    </div>
                 </Column>
             </Columns>
         </Table>
@@ -33,18 +42,10 @@
     </Footer>
 </Card>
 
-
-
-
-
-
-
-
-
 @code {
     private SearchBox searchBox = new();
     private ApiDataSource<SmsBatchResponse> ds = new();
-
+    private string selectedStatus = "All";
 
     protected override async Task OnInitializedAsync()
     {
@@ -53,6 +54,49 @@
             return apiClient.SmsBatchPendingListAsync(p.PageNumber, p.PageSize, null, null);
         });
 
+        await ds.LoadData(alert);
+    }
+
+    private async Task ConfirmAbortMessage(long batchId)
+    {
+        bool confirmed = await alert.Confirm("Are you sure you want to abort this message?", "Confirm Abortion");
+        if (confirmed)
+        {
+            await AbortMessage(batchId);
+        }
+    }
+
+    private async Task AbortMessage(long batchId)
+    {
+        await apiClient.SmsBatchPendingAbortAsync((int)batchId);
+    }
+
+    private async Task ConfirmSendNow(long batchId)
+    {
+        bool confirmed = await alert.Confirm("Are you sure you want to send this message now?", "Confirm Send Now");
+        if (confirmed)
+        {
+            await SendNow(batchId);
+        }
+    }
+
+    private async Task SendNow(long batchId)
+    {
+        //Todo
+        // var response = await apiClient.SmsBatchGetAsync((int)batchId);
+        // var requestBody = new SmsMessageRequest
+        // {
+        //     SenderID = response.Result.SenderID,
+        //     MessageText = response.Result.MessageText,
+        //     DeliveryTime = DateTime.UtcNow,
+        // };
+        // await apiClient.SmsMessageSendAsync(requestBody);
+        await ds.LoadData(alert);
+    }
+
+    private async Task FilterStatusChanged(ChangeEventArgs e)
+    {
+        selectedStatus = e.Value.ToString();
         await ds.LoadData(alert);
     }
 }

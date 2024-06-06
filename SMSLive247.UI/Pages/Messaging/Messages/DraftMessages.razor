@@ -17,7 +17,8 @@
                     <FormatDate DateTime="@context.SubmitDate"></FormatDate>
                 </Column>
                 <Column>
-                    <Actions OnDelete="e => DeleteMessage(context.BatchID)">
+                    <Actions OnEdit="e => EditMessage(context)"
+                             OnDelete="e => ConfirmDeleteMessage(context.BatchID)">
                     </Actions>
                 </Column>
             </Columns>
@@ -28,13 +29,31 @@
     </Footer>
 </Card>
 
-
-
+<Modal Title="Edit Draft Message" Hidden="@(!showEditModal)">
+    <Body>
+        <FormInputText Label="Sender ID" @bind-Value="editDraftMessage.SenderID"></FormInputText>
+        <div class="row my-3">
+            <label class="form-label col-4">Message</label>
+            <div class="col-8">
+                <InputTextArea class="form-control" @bind-Value="editDraftMessage.MessageText" rows="5"></InputTextArea>
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.SAVE" @onclick="SaveEdit">
+            Save
+        </Button>
+        <Button Type="Button.Style.CANCEL" @onclick="CancelEdit">
+            Cancel
+        </Button>
+    </Footer>
+</Modal>
 
 @code {
     private SearchBox searchBox = new();
     private ApiDataSource<SmsMessageResponse> ds = new();
-
+    private bool showEditModal = false;
+    private SmsMessageResponse editDraftMessage = new SmsMessageResponse();
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,8 +65,40 @@
         await ds.LoadData(alert);
     }
 
-    private Task DeleteMessage(long batchId)
+    private void EditMessage(SmsMessageResponse message)
     {
-        return apiClient.SmsBatchDeleteAsync((int)batchId);
+        editDraftMessage = message;
+        showEditModal = true;
+        StateHasChanged();
+    }
+
+    private async Task SaveEdit()
+    {
+        //Todo
+        // Implement the logic to save the edited message
+        //await apiClient.UpdateSmsMessageAsync(editDraftMessage);
+        showEditModal = false;
+        await ds.LoadData(alert); 
+    }
+
+    private void CancelEdit()
+    {
+        showEditModal = false;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmDeleteMessage(long batchId)
+    {
+        bool confirmed = await alert.Confirm("Are you sure you want to delete this draft message?", "Confirm Deletion");
+        if (confirmed)
+        {
+            await DeleteMessage(batchId);
+        }
+    }
+
+    private async Task DeleteMessage(long batchId)
+    {
+        await apiClient.SmsBatchDeleteAsync((int)batchId);
+        await ds.LoadData(alert);
     }
 }

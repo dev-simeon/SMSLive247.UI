@@ -11,10 +11,10 @@
             <LeftRight>
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                        <select class="form-select">
-                            <option selected>All</option>
-                            <option>Approved</option>
-                            <option>Pending Approval</option>
+                        <select class="form-select" @onchange="FilterStatusChanged">
+                            <option value="All" selected>All</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Pending Approval">Pending Approval</option>
                         </select>
                     </SearchBox>
                 </Left>
@@ -27,7 +27,6 @@
         </SearchArea>
         <Table DataSource="ds">
             <Columns>
-                
                 <Column Header="#"><input class="form-check-input" type="checkbox" /></Column>
                 <Column Header="SenderID">@context.SenderID</Column>
                 <Column Header="Status">
@@ -41,8 +40,7 @@
                     }
                 </Column>
                 <Column>
-                    <Actions
-                        OnDelete="e => DeleteSenderId(context.SenderID)">
+                    <Actions OnDelete="() => ConfirmDeleteSenderId(context.SenderID)">
                     </Actions>
                 </Column>
             </Columns>
@@ -52,8 +50,6 @@
         <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
     </Footer>
 </Card>
-
-
 
 <Modal Title="Register Sender ID" Hidden="@(!isModalVisible)">
     <Body>
@@ -67,13 +63,11 @@
         </div>
     </Body>
     <Footer>
-        <Button Type="Button.Style.CUSTOM" @onclick=SubmitSenderIdForRegisteration>
+        <Button Type="Button.Style.CUSTOM" @onclick="SubmitSenderIdForRegistration">
             Submit
         </Button>
     </Footer>
 </Modal>
-
-
 
 @code {
     private SearchBox searchBox = new();
@@ -81,8 +75,8 @@
     private string senderId = string.Empty;
     private string messagePurpose = string.Empty;
     private string sampleMessage = string.Empty;
+    private string selectedStatus = "All";
     private ApiDataSource<SenderIdResponse> ds = new();
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -100,22 +94,39 @@
         StateHasChanged();
     }
 
-    void DeleteSenderId(string senderId)
+    private async Task FilterStatusChanged(ChangeEventArgs e)
     {
-
-
+        selectedStatus = e.Value.ToString();
+        await ds.LoadData(alert);
     }
 
-    Task SubmitSenderIdForRegisteration()
+    private async Task ConfirmDeleteSenderId(string senderId)
+    {
+        bool confirmed = await alert.Confirm("Are you sure you want to delete this Sender ID?", "Confirm Deletion");
+        if (confirmed)
+        {
+            await DeleteSenderId(senderId);
+        }
+    }
+
+    private async Task DeleteSenderId(string senderId)
+    {
+        //Todo
+        // await apiClient.SenderIdDeleteAsync(senderId);
+        await ds.LoadData(alert);
+    }
+
+    private async Task SubmitSenderIdForRegistration()
     {
         var request = new SenderIdRequest()
-        {
-            SenderID = senderId,
-            Purpose = messagePurpose,
-            SampleText = sampleMessage
-        };
+            {
+                SenderID = senderId,
+                Purpose = messagePurpose,
+                SampleText = sampleMessage
+            };
 
-        return apiClient.SenderIdCreateAsync(request);
+        await apiClient.SenderIdCreateAsync(request);
+        isModalVisible = false;
+        await ds.LoadData(alert);
     }
 }
-
