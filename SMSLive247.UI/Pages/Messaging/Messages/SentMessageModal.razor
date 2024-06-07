@@ -1,0 +1,84 @@
+﻿<EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Messages"
+           OnCreate="OnDownload"
+           OnDelete="OnDelete">
+    @if (Mode == "download")
+    {
+        <FormInputDateRange Label="Select Period" @bind-Value="dateRange"></FormInputDateRange>
+        <FormField Label="Sender ID">
+            <select class="form-select" @bind=context.SenderID>
+                <option value="" selected></option>
+                @foreach (var item in senderIds)
+                {
+                    <option value="@item.SenderID">@item.SenderID</option>
+                }
+            </select>
+        </FormField>
+        <FormField Label="Download Type">
+            <InputRadioGroup @bind-Value="downloadType">
+                @foreach (var option in radioOptions)
+                {
+                    var radioId = $"radio-{option}";
+                    <div class="form-check form-check-inline">
+                        <InputRadio class="form-check-input" id="@radioId" Value="@option" />
+                        <label class="form-check-label" for="@radioId">@option</label>
+                    </div>
+                }
+            </InputRadioGroup>
+        </FormField>
+    }
+    else if (Mode == "delete")
+    {
+        <FormInputText Label="Sender ID" @bind-Value="editor.Model.SenderID" Disabled="true"></FormInputText>
+        <FormField Label="Message">
+            <InputTextArea class="form-control" @bind-Value="editor.Model.MessageText" Disabled="true" rows="5"></InputTextArea>
+        </FormField>
+    }
+    
+</EditModal>
+
+@code {
+    private EditModal<SmsBatchResponse> editor = new();
+    public string Mode { get; set; } = "download";
+    private FormInputDateRangeValue dateRange = new();
+    private List<string> radioOptions = new List<string> { "Messages", "Delivery Reports" };
+    private List<SenderIdResponse> senderIds = new();
+    private string downloadType = "Messages";
+
+
+    public void Show(SmsBatchResponse? item = null, string mode = "download")
+    {
+        Mode = mode;
+        editor.Show(item);
+    }
+
+    public void Delete(SmsBatchResponse item)
+    {
+        Mode = "delete";
+        editor.Delete(item);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await apiClient.SenderIdListAsync(1, 500);
+
+        if (response.StatusCode == 200)
+        {
+            senderIds = response.Result.Where(i => i.Status == "APPROVED").ToList();
+        }
+    }
+
+    private async Task OnDownload()
+    {
+        Console.WriteLine($"From Date: {dateRange.StartDate}, To Date: {dateRange.EndDate}, Sender ID: {editor.Model.SenderID}, Download Type: {downloadType}");
+        await apiClient.BatchFileDownloadAsync(editor.Model.BatchID.ToString());
+    }
+
+    private async Task OnDelete()
+    {
+        bool confirmed = await alert.Confirm("Are you sure you want to delete this message?", "Confirm Deletion");
+        if (confirmed)
+        {
+            await apiClient.SmsBatchDeleteAsync((int)editor.Model.BatchID);
+        }
+    }
+}

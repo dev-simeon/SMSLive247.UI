@@ -3,7 +3,34 @@
 
 <PageTitle>Settings</PageTitle>
 
-<h3>Settings</h3>
+<h3 class="mb-4">Settings</h3>
+
+<Card>
+    <Body>
+        <MultiColumn>
+            <Column1>
+                <StaticText Label="Company Name" Text="Name" />
+                <StaticText Label="Company Address" Text="Address" />
+                <StaticText Label="Company Website" Text="Website" />
+                <StaticText Label="Company Abbreviation" Text="Abbreviation" />
+            </Column1>
+            <Column2>
+                <StaticText Label="Lock Ledger Suppress" Text="LockTransaction" />
+                <StaticText Label="Lock User (Disable Days)" Text="LockUserDays" />
+                <StaticText Label="Close Acct Period Permanently" Text="CloseAccount" />
+                <StaticText Label="Session Timeout (Mins)" Text="Timeout" />
+            </Column2>     
+        </MultiColumn>
+    </Body>
+    <Footer>
+        <div class="btn-group">
+            <button class="btn btn-outline-primary">Edit Company</button>
+            <button class="btn btn-outline-primary">Password Setting</button>
+            <button class="btn btn-outline-primary">SMS Setting</button>
+            <button class="btn btn-outline-primary">Email Setting</button>
+        </div>
+    </Footer>
+</Card>
 
 @code {
 

@@ -26,6 +26,7 @@
     [Parameter] public RenderFragment? Footer { get; set; }
     [Parameter] public ModalVAlign VAlign { get; set; } = ModalVAlign.CENTER;
     [Parameter] public ModalSize Size { get; set; } = ModalSize.MEDIUM;
+    [Parameter] public EventCallback<bool> HiddenChanged { get; set; }
 
     public enum ModalVAlign {TOP, CENTER}
     public enum ModalSize { SMALL, MEDIUM, LARGE, XLARGE }
@@ -35,6 +36,7 @@
     public void Close()
     {
         Hidden = true;
+        HiddenChanged.InvokeAsync(true);
         StateHasChanged();
     }
 

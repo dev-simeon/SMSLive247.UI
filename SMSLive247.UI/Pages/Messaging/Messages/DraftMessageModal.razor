@@ -1,0 +1,38 @@
+﻿<EditModal TItem="SmsMessageResponse" @ref="editor" LabelText="Draft Message"
+           OnUpdate="OnUpdate"
+           OnDelete="OnDelete">
+    <FormInputText Label="Sender ID" @bind-Value="editor.Model.SenderID"></FormInputText>
+    <FormField Label="Message">
+        <InputTextArea class="form-control" @bind-Value="editor.Model.MessageText" rows="5"></InputTextArea>
+    </FormField>
+</EditModal>
+
+@code {
+    private EditModal<SmsMessageResponse> editor = new();
+
+    public void Show(SmsMessageResponse? item = null) => editor.Show(item);
+
+    public void Delete(SmsMessageResponse item) => editor.Delete(item);
+
+    private async Task OnUpdate()
+    {
+        // Todo
+        // var request = new SmsMessageUpdateRequest()
+        // {
+        //     BatchID = editor.Model.BatchID,
+        //     SenderID = editor.Model.SenderID,
+        //     MessageText = editor.Model.MessageText
+        // };
+
+        // await apiClient.UpdateSmsMessageAsync(request);
+    }
+
+    private async Task OnDelete()
+    {
+        bool confirmed = await alert.Confirm("Are you sure you want to delete this message?", "Confirm Deletion");
+        if (confirmed)
+        {
+            await apiClient.SmsBatchDeleteAsync((int)editor.Model.BatchID);
+        }
+    }
+}
