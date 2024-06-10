@@ -9,6 +9,7 @@
 
 @code {
     private EditModal<SmsMessageResponse> editor = new();
+    public string Mode { get; set; } = "edit";
 
     public void Show(SmsMessageResponse? item = null) => editor.Show(item);
 

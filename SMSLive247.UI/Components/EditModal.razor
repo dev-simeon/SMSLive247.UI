@@ -20,6 +20,7 @@
     [Parameter] public EventCallback OnDelete { get; set; }
     [Parameter] public EventCallback OnUpdate { get; set; }
     [Parameter] public EventCallback OnCreate { get; set; }
+    [Parameter] public EventCallback OnDownload { get; set; }
     [Parameter] public Modal.ModalSize Size { get; set; } = Modal.ModalSize.MEDIUM;
 
     protected override void OnParametersSet()
@@ -27,7 +28,7 @@
         formName = LabelText + "Form";
     }
 
-    private int isEdit = 0; //0=create ,1=edit ,2=delete
+    private int isEdit = 0; // 0=create, 1=edit, 2=delete, 3=download
     public TItem Model = new();
     private bool showModal = false;
     private string? title, buttonText, formName;
@@ -64,18 +65,29 @@
         StateHasChanged();
     }
 
+    public void Download(TItem? item = null)
+    {
+        isEdit = 3;
+        Model = item != null ? item : new();
+        title = $"Download {LabelText}";
+        buttonText = $"Download {LabelText}";
+        buttonStyle = Button.Style.SAVE;
+        showModal = true;
+        StateHasChanged();
+    }
+
     private async Task Submit()
     {
         try
         {
             if (isEdit == 0)
                 await TryInvokeAsync(OnCreate, "Create");
-
             else if (isEdit == 1)
                 await TryInvokeAsync(OnUpdate, "Update");
-
-            else
+            else if (isEdit == 2)
                 await TryInvokeAsync(OnDelete, "Delete");
+            else if (isEdit == 3)
+                await TryInvokeAsync(OnDownload, "Download");
 
             await alert.Success($"Operation was successful", "Success");
             showModal = false;

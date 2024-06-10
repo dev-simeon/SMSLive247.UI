@@ -7,7 +7,7 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.ADD" @onclick="toggleModal">
+                    <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
                         New CSV File
                     </Button>
                 </Right>
@@ -22,83 +22,38 @@
                     <FormatDate DateTime="@context.CreateDate"></FormatDate>
                 </Column>
                 <Column>
-                    <Actions OnView="() => OnView(context)" OnDelete="() => ConfirmDeleteFile(context.BatchFileID)">
+                    <Actions OnView="() => OnView(context)" OnDelete="() => csvFileModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
         </Table>
     </Body>
     <Footer>
-        <NavLink href="#">Click here for step-by-step instruction on how to setup a template SMS.</NavLink>
         <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
     </Footer>
 </Card>
 
-<Modal Title="Upload CSV/Excel File" Hidden="@(!showModal)">
-    <Body>
-        <FormInputFile Label="Select File" @bind-Value="UploadedFile"></FormInputFile>
-        <div class="row my-3">
-            <label class="form-label col-4" for="saveAsNewGroupCheckbox">Save As New Group</label>
-            <div class="col-8">
-                <InputCheckbox class="form-check-input" @bind-Value="saveAsNewGroup" id="saveAsNewGroupCheckbox" />
-            </div>
-        </div>
-    </Body>
-    <Footer>
-        <Button Type="Button.Style.SAVE" @onclick="UploadFile">Upload</Button>
-        <Button Type="Button.Style.CANCEL" @onclick="toggleModal">Cancel</Button>
-    </Footer>
-</Modal>
+<BulkFileModal @ref="csvFileModal" DisableMergeOption="true"></BulkFileModal>
 
 @code {
     private SearchBox searchBox = new();
-    private string? UploadedFile;
-    private bool showModal = false;
-    private bool saveAsNewGroup = true;
+    private BulkFileModal csvFileModal = new();
     private ApiDataSource<BatchFileResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ds.Callback = new((PageState p, FilterState? f) =>
+        ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            return apiClient.BatchFileListAsync(p.PageNumber, p.PageSize, null);
+            var response = await apiClient.BatchFileListAsync(p.PageNumber, p.PageSize, searchBox.Text);
+            return response;
         });
 
         await ds.LoadData(alert);
     }
 
-    void toggleModal()
-    {
-        showModal = !showModal;
-    }
-
-    private async Task ConfirmDeleteFile(string batchId)
-    {
-        bool confirmed = await alert.Confirm("Are you sure you want to delete this CSV/Excel file?", "Confirm Deletion");
-        if (confirmed)
-        {
-            await DeleteFile(batchId);
-        }
-    }
-
-    private async Task DeleteFile(string batchId)
-    {
-        await apiClient.BatchFileDeleteAsync(batchId);
-        await ds.LoadData(alert);
-    }
-
     private void OnView(BatchFileResponse file)
     {
-        //Todo
-        // Implement view functionality here
-    }
 
-    private async Task UploadFile()
-    {
-        //Todo
-        // Implement file upload functionality here
-
-        showModal = false;
-        await ds.LoadData(alert);
+        // Todo: Implement view functionality here
     }
 }

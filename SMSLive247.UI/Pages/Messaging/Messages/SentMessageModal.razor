@@ -1,11 +1,11 @@
 ﻿<EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Messages"
-           OnCreate="OnDownload"
+           OnDownload="OnDownload"
            OnDelete="OnDelete">
     @if (Mode == "download")
     {
         <FormInputDateRange Label="Select Period" @bind-Value="dateRange"></FormInputDateRange>
         <FormField Label="Sender ID">
-            <select class="form-select" @bind=context.SenderID>
+            <select class="form-select" @bind="editor.Model.SenderID">
                 <option value="" selected></option>
                 @foreach (var item in senderIds)
                 {
@@ -33,7 +33,6 @@
             <InputTextArea class="form-control" @bind-Value="editor.Model.MessageText" Disabled="true" rows="5"></InputTextArea>
         </FormField>
     }
-    
 </EditModal>
 
 @code {
@@ -44,11 +43,10 @@
     private List<SenderIdResponse> senderIds = new();
     private string downloadType = "Messages";
 
-
-    public void Show(SmsBatchResponse? item = null, string mode = "download")
+    public void Download()
     {
-        Mode = mode;
-        editor.Show(item);
+        Mode = "download";
+        editor.Download();
     }
 
     public void Delete(SmsBatchResponse item)

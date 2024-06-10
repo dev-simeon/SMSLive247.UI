@@ -7,7 +7,7 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.ADD" @onclick="toggleModal">
+                    <Button Type="Button.Style.ADD" @onclick="e => bulkFileModal.Show()">
                         New Bulk File
                     </Button>
                 </Right>
@@ -22,7 +22,7 @@
                     <FormatDate DateTime="@context.CreateDate"></FormatDate>
                 </Column>
                 <Column>
-                    <Actions OnView="() => OnView(context)" OnDelete="() => ConfirmDeleteFile(context.BatchFileID)">
+                    <Actions OnDelete="() => bulkFileModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -33,82 +33,21 @@
     </Footer>
 </Card>
 
-<Modal Title="Upload Bulk File" Hidden="@(!showModal)">
-    <Body>
-        <FormInputFile Label="Select File" @bind-Value="UploadedFile"></FormInputFile>
-        <div class="row my-3">
-            <label class="form-label col-4">Organize File</label>
-            <div class="col-8">
-                <InputRadioGroup @bind-Value="organizeFile">
-                    @foreach (var option in radioOptions)
-                    {
-                        var radioId = $"radio-{option}";
-                        <div class="form-check form-check-inline">
-                            <InputRadio class="form-check-input" id="@radioId" Value="@option" />
-                            <label class="form-check-label" for="@radioId">@option</label>
-                        </div>
-                    }
-                </InputRadioGroup>
-            </div>
-        </div>
-        <p class="mt-5">Note: while merging into existing group duplicates will be removed.</p>
-    </Body>
-    <Footer>
-        <Button Type="Button.Style.SAVE" @onclick="UploadFile">Upload</Button>
-        <Button Type="Button.Style.CANCEL" @onclick="toggleModal">Cancel</Button>
-    </Footer>
-</Modal>
+<BulkFileModal @ref="bulkFileModal"></BulkFileModal>
 
 @code {
     private SearchBox searchBox = new();
-    private string? UploadedFile;
-    private List<string> radioOptions = new List<string> { "Save as new group", "Merge into existing groups" };
-    private string organizeFile = "Save as new group";
+    private BulkFileModal bulkFileModal = new();
     private ApiDataSource<BatchFileResponse> ds = new();
-    private bool showModal = false;
 
     protected override async Task OnInitializedAsync()
     {
-        ds.Callback = new((PageState p, FilterState? f) =>
+        ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            return apiClient.BatchFileListAsync(p.PageNumber, p.PageSize, searchBox.Text);
+            var response = await apiClient.BatchFileListAsync(p.PageNumber, p.PageSize, searchBox.Text);
+            return response;
         });
 
-        await ds.LoadData(alert);
-    }
-
-    void toggleModal()
-    {
-        showModal = !showModal;
-    }
-
-    private async Task ConfirmDeleteFile(string batchId)
-    {
-        bool confirmed = await alert.Confirm("Are you sure you want to delete this bulk file?", "Confirm Deletion");
-        if (confirmed)
-        {
-            await DeleteFile(batchId);
-        }
-    }
-
-    private async Task DeleteFile(string batchId)
-    {
-        await apiClient.BatchFileDeleteAsync(batchId);
-        await ds.LoadData(alert);
-    }
-
-    private void OnView(BatchFileResponse file)
-    {
-        //Todo
-        // Implement view functionality here
-    }
-
-    private async Task UploadFile()
-    {
-        //Todo
-        // Implement file upload functionality here
-
-        showModal = false;
         await ds.LoadData(alert);
     }
 }
