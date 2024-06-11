@@ -3,17 +3,17 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="ApplyFilter">
+                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.SAVE" @onclick="e => sentMessageModal.Download()">
+                    <Button Type="Button.Style.SAVE" @onclick="e => downloadModal.Download()">
                         Download Messages
                     </Button>
                 </Right>
             </LeftRight>
         </SearchArea>
-        <Table Items="filteredItems">
+        <Table DataSource="ds">
             <Columns>
                 <Column Header="#"><input class="form-check-input" type="checkbox" /></Column>
                 <Column Header="Sender">@context.SenderID</Column>
@@ -27,7 +27,7 @@
                     <FormatDate DateTime="@context.SubmitDate"></FormatDate>
                 </Column>
                 <Column Header="Action">
-                    <Actions OnDelete="() => sentMessageModal.Delete(context)">
+                    <Actions OnView="() => sentMessageView.Show((int)context.BatchID)" OnDelete="() => messageModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -38,43 +38,39 @@
     </Footer>
 </Card>
 
-<SentMessageModal @ref="sentMessageModal"></SentMessageModal>
+<DownloadModal @ref="downloadModal"></DownloadModal>
+<SentMessageModal @ref="messageModal"></SentMessageModal>
+<SentMessageView @ref="sentMessageView"></SentMessageView>
 
 @code {
     private SearchBox searchBox = new();
-    private SentMessageModal sentMessageModal = new();
+    private DownloadModal downloadModal = new();
+    private SentMessageModal messageModal = new();
+    private SentMessageView sentMessageView = new();
     private ApiDataSource<SmsBatchResponse> ds = new();
-    private List<SmsBatchResponse> items = new();
-    private List<SmsBatchResponse> filteredItems = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ds.Callback = new(async (PageState p, FilterState? f) =>
+        ds.Callback = new((PageState p, FilterState? f) =>
         {
-            var response = await apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null);
-            if (response.StatusCode == 200)
-            {
-                items = response.Result.ToList();
-                ApplyFilter();
-            }
-            return response;
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null);
         });
 
         await ds.LoadData(alert);
     }
 
-    private void ApplyFilter()
-    {
-        if (string.IsNullOrWhiteSpace(searchBox.Text))
-        {
-            filteredItems = items;
-        }
-        else
-        {
-            filteredItems = items
-                .Where(i => i.MessageText.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase) ||
-                            i.SenderID.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-    }
+    // private void ApplyFilter()
+    // {
+    //     if (string.IsNullOrWhiteSpace(searchBox.Text))
+    //     {
+    //         filteredItems = items;
+    //     }
+    //     else
+    //     {
+    //         filteredItems = items
+    //             .Where(i => i.MessageText.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase) ||
+    //                         i.SenderID.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase))
+    //             .ToList();
+    //     }
+    // }
 }

@@ -1,0 +1,63 @@
+﻿<EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Messages"
+           OnDownload="OnDownload">
+    <FormInputDateRange Label="Select Period" @bind-Value="dateRange"></FormInputDateRange>
+    <FormField Label="Sender ID">
+        <div class="input-group">
+            <input type="text" class="form-control" @bind="editor.Model.SenderID" placeholder="Type or select" />
+            <select class="form-select" @onchange="HandleSenderIdSelectChange">
+                <option value="" selected></option>
+                @foreach (var item in senderIds)
+                {
+                    <option value="@item.SenderID">@item.SenderID</option>
+                }
+            </select>
+        </div>
+    </FormField>
+    <FormField Label="Download Type">
+        <InputRadioGroup @bind-Value="downloadType">
+            @foreach (var option in radioOptions)
+            {
+                var radioId = $"radio-{option}";
+                <div class="form-check form-check-inline">
+                    <InputRadio class="form-check-input" id="@radioId" Value="@option" />
+                    <label class="form-check-label" for="@radioId">@option</label>
+                </div>
+            }
+        </InputRadioGroup>
+    </FormField>
+</EditModal>
+
+@code {
+    private EditModal<SmsBatchResponse> editor = new();
+    private FormInputDateRangeValue dateRange = new();
+    private List<string> radioOptions = new List<string> { "Messages", "Delivery Reports" };
+    private List<SenderIdResponse> senderIds = new();
+    private string downloadType = "Messages";
+
+    public void Download() => editor.Download();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await apiClient.SenderIdListAsync(1, 500);
+
+        if (response.StatusCode == 200)
+        {
+            senderIds = response.Result.Where(i => i.Status == "APPROVED").ToList();
+        }
+    }
+
+    private async Task OnDownload()
+    {
+        Console.WriteLine($"From Date: {dateRange.StartDate}, To Date: {dateRange.EndDate}, Sender ID: {editor.Model.SenderID}, Download Type: {downloadType}");
+        await apiClient.BatchFileDownloadAsync(editor.Model.BatchID.ToString());
+    }
+
+    private void HandleSenderIdSelectChange(ChangeEventArgs e)
+    {
+        var selectedValue = e.Value.ToString();
+        if (!string.IsNullOrEmpty(selectedValue))
+        {
+            editor.Model.SenderID = selectedValue;
+        }
+    }
+}

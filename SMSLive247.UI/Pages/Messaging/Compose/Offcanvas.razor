@@ -1,0 +1,162 @@
+﻿<div class="offcanvas offcanvas-end @canvasClass" tabindex="-1" style="width: 300px;" id="offcanvasContactSelection" aria-labelledby="offcanvasContactSelectionLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasContactSelectionLabel">Select Contacts</h5>
+        <button type="button" class="btn-close" @onclick="CloseCanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        @if (loading)
+        {
+            <p>Loading...</p>
+        }
+        else
+        {
+            @if (contactSelection == "Bulk Files")
+            {
+                <h6>Bulk Files</h6>
+                <div>
+                    @foreach (var bulkFile in BulkFileContact.Items)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="@bulkFile.BatchFileID" @onchange="e => OnBulkFileSelected(e, bulkFile.BatchFileID)">
+                            <label class="form-check-label">@bulkFile.Description</label>
+                        </div>
+                    }
+                </div>
+            }
+            else if (contactSelection == "Groups")
+            {
+                <h6>Groups</h6>
+                <div>
+                    @foreach (var group in PhoneBookContact.Items)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="@group.ContactName" @onchange="e => OnGroupSelected(e, group.ContactName)">
+                            <label class="form-check-label">@group.ContactName</label>
+                        </div>
+                    }
+                </div>
+            }
+            else if (contactSelection == "All Contacts")
+            {
+                <h6>All Contacts</h6>
+                <div>
+                    @foreach (var contact in allContacts)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="@contact" @onchange="e => OnContactSelected(e, contact)">
+                            <label class="form-check-label">@contact</label>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string contactSelection { get; set; }
+    [Parameter] public EventCallback<string> OnPhoneNumbersSelected { get; set; }
+
+    private PhoneBook<OpenApi.ContactResponse> PhoneBookContact { get; set; }
+    private PhoneBook<BatchFileResponse> BulkFileContact { get; set; }
+    private List<string> allContacts = new();
+    private bool loading = true;
+    private string canvasClass = "";
+    private int _phoneBookPageSize = 50;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loading = true;
+        if (contactSelection == "Bulk Files" || contactSelection == "All Contacts")
+        {
+            await LoadBulkFilesFromDbAsync(1);
+        }
+
+        if (contactSelection == "Groups" || contactSelection == "All Contacts")
+        {
+            await LoadPhoneBookContactsFromDbAsync(1);
+        }
+
+        if (contactSelection == "All Contacts")
+        {
+            allContacts = BulkFileContact.Items.Select(b => b.BatchFileID)
+                                    .Concat(PhoneBookContact.Items.Select(g => g.ContactName))
+                                    .Distinct()
+                                    .ToList();
+        }
+
+        loading = false;
+    }
+
+    private void OnBulkFileSelected(ChangeEventArgs e, string batchFileId)
+    {
+        if ((bool)e.Value)
+        {
+            //var numbers = BulkFileContact.Items;
+            OnPhoneNumbersSelected.InvokeAsync(numbers);
+        }
+    }
+
+    private void OnGroupSelected(ChangeEventArgs e, string groupName)
+    {
+        if ((bool)e.Value)
+        {
+            //var numbers = PhoneBookContact.Items;
+            OnPhoneNumbersSelected.InvokeAsync(numbers);
+        }
+    }
+
+    private void OnContactSelected(ChangeEventArgs e, string contact)
+    {
+        if ((bool)e.Value)
+        {
+            OnPhoneNumbersSelected.InvokeAsync(contact);
+        }
+    }
+
+    private async Task LoadPhoneBookContactsFromDbAsync(int pageNo)
+    {
+        if (pageNo < 1)
+            pageNo = 1;
+
+        var res = await apiClient.ContactListAsync(pageNo, _phoneBookPageSize);
+        if (pageNo > 1)
+        {
+            PhoneBookContact.Items.AddRange(res.Result);
+            PhoneBookContact.PageNo += 1;
+            return;
+        }
+
+        PhoneBookContact = new(res.Result, res.Result.Count());
+    }
+
+    private async Task LoadBulkFilesFromDbAsync(int pageNo, string? searchText = null)
+    {
+        searchText = string.IsNullOrWhiteSpace(searchText) ? "txt" : searchText;
+        if (pageNo < 1)
+            pageNo = 1;
+
+        var res = await apiClient.BatchFileListAsync(pageNo, _phoneBookPageSize, searchText);
+        if (pageNo > 1)
+        {
+            BulkFileContact.Items.AddRange(res.Result);
+            BulkFileContact.PageNo += 1;
+            return;
+        } 
+
+        BulkFileContact = new(res.Result, res.Result.Count());
+    }
+
+    public void Show(string contactSelection)
+    {
+        this.contactSelection = contactSelection;
+        canvasClass = "show";
+        StateHasChanged();
+    }
+
+    public void CloseCanvas()
+    {
+        canvasClass = "";
+        StateHasChanged();
+    }
+}

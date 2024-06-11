@@ -22,7 +22,7 @@
                     <FormatDate DateTime="@context.CreateDate"></FormatDate>
                 </Column>
                 <Column>
-                    <Actions OnView="() => OnView(context)" OnDelete="() => csvFileModal.Delete(context)">
+                    <Actions OnDelete="() => csvFileModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -49,11 +49,5 @@
         });
 
         await ds.LoadData(alert);
-    }
-
-    private void OnView(BatchFileResponse file)
-    {
-
-        // Todo: Implement view functionality here
     }
 }

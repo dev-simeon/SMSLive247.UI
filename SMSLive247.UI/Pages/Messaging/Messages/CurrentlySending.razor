@@ -27,8 +27,8 @@
                 </Column>
                 <Column>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-success" @onclick="() => ConfirmSendNow(context.BatchID)">Send Now</button>
-                        <button type="button" class="btn btn-danger" @onclick="() => ConfirmAbortMessage(context.BatchID)">Abort</button>
+                        <button type="button" class="btn btn-success" @onclick="() => SendNow(context.BatchID)">Send Now</button>
+                        <button type="button" class="btn btn-danger" @onclick="() => AbortMessage(context.BatchID)">Abort</button>
                     </div>
                 </Column>
             </Columns>
@@ -54,41 +54,30 @@
         await ds.LoadData(alert);
     }
 
-    private async Task ConfirmAbortMessage(long batchId)
+    private async Task AbortMessage(long batchId)
     {
         bool confirmed = await alert.Confirm("Are you sure you want to abort this message?", "Confirm Abortion");
         if (confirmed)
         {
-            await AbortMessage(batchId);
-        }
-    }
-
-    private async Task AbortMessage(long batchId)
-    {
-        await apiClient.SmsBatchPendingAbortAsync((int)batchId);
-    }
-
-    private async Task ConfirmSendNow(long batchId)
-    {
-        bool confirmed = await alert.Confirm("Are you sure you want to send this message now?", "Confirm Send Now");
-        if (confirmed)
-        {
-            await SendNow(batchId);
+            await apiClient.SmsBatchPendingAbortAsync((int)batchId);
         }
     }
 
     private async Task SendNow(long batchId)
     {
-        //Todo
-        // var response = await apiClient.SmsBatchGetAsync((int)batchId);
-        // var requestBody = new SmsMessageRequest
-        // {
-        //     SenderID = response.Result.SenderID,
-        //     MessageText = response.Result.MessageText,
-        //     DeliveryTime = DateTime.UtcNow,
-        // };
-        // await apiClient.SmsMessageSendAsync(requestBody);
-        await ds.LoadData(alert);
+        bool confirmed = await alert.Confirm("Are you sure you want to send this message now?", "Confirm Send Now");
+        if (confirmed)
+        {
+            //Todo
+            // var response = await apiClient.SmsBatchGetAsync((int)batchId);
+            // var requestBody = new SmsMessageRequest
+            // {
+            //     SenderID = response.Result.SenderID,
+            //     MessageText = response.Result.MessageText,
+            //     DeliveryTime = DateTime.UtcNow,
+            // };
+            // await apiClient.SmsMessageSendAsync(requestBody);
+        }
     }
 
     private async Task FilterStatusChanged(ChangeEventArgs e)

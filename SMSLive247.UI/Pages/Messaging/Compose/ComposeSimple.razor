@@ -1,5 +1,123 @@
-﻿<h3>Composing</h3>
+﻿<Card HeaderTitle="Compose SMS">
+    <Body>
+        <EditForm Model="model" OnValidSubmit="SubmitSms">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <FormField Label="Sender ID">
+                <select class="form-select" @bind="model.SenderID" required>
+                    <option value="" selected>Select Sender ID</option>
+                    @foreach (var sender in senderIds)
+                    {
+                        <option value="@sender.SenderID">@sender.SenderID</option>
+                    }
+                </select>
+            </FormField>
+
+            <FormField Label="Message">
+                <InputTextArea class="form-control" @bind-Value="model.MessageText" rows="5" required></InputTextArea>
+                <div class="mt-1">
+                    <Button Type="Button.Style.DEFAULT" @onclick="ClearMessage">Clear Message</Button>
+                </div>
+            </FormField>
+
+            <FormField Label="Recipient Phone Numbers">
+                <InputTextArea class="form-control" @bind-Value="model.MobileNumber" rows="5" placeholder="Comma separated list"></InputTextArea>
+                <div class="mt-1 d-flex justify-content-between">
+                    <label class="form-label">Select Contact From</label>
+                    <div>
+                        <InputRadioGroup @bind-Value="contactSelection" @onchange="ShowOffCanvas">
+                            @foreach (var option in contactOptions)
+                            {
+                                var radioId = $"radio-{option}";
+                                <div class="form-check form-check-inline">
+                                    <InputRadio class="form-check-input" id="@radioId" Value="@option" />
+                                    <label class="form-check-label" for="@radioId">@option</label>
+                                </div>
+                            }
+                        </InputRadioGroup>
+                    </div>
+                </div>
+            </FormField>
+
+            <FormField Label="Send Options">
+                <InputRadioGroup @bind-Value="sendOption">
+                    @foreach (var option in sendOptions)
+                    {
+                        var radioId = $"radio-{option}";
+                        <div class="form-check form-check-inline">
+                            <InputRadio class="form-check-input" id="@radioId" Value="@option" />
+                            <label class="form-check-label" for="@radioId">@option</label>
+                        </div>
+                    }
+                </InputRadioGroup>
+            </FormField>
+
+            @if (sendOption == "Schedule for Later")
+            {
+                <FormField Label="Schedule Date and Time">
+                    <InputDate class="form-control" @bind-Value="model.DeliveryTime" required />
+                </FormField>
+            }
+
+            <Button Type="Button.Style.SAVE">Send SMS</Button>
+        </EditForm>
+    </Body>
+</Card>
+
+<Offcanvas @ref="offCanvas" OnPhoneNumbersSelected="AddPhoneNumbers"></Offcanvas>
 
 @code {
+    private SmsMessageRequest model = new();
+    private List<SenderIdResponse> senderIds = new();
+    private List<string> contactOptions = new List<string> { "Bulk Files", "Groups", "All Contacts" };
+    private string contactSelection;
+    private List<string> sendOptions = new List<string> { "Send Immediately", "Schedule for Later" };
+    private string sendOption = "Send Immediately";
+    private Offcanvas offCanvas = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        var senderResponse = await apiClient.SenderIdListAsync(1, 500);
+        if (senderResponse.StatusCode == 200)
+        {
+            senderIds = senderResponse.Result.ToList();
+        }
+    }
+
+    private async Task SubmitSms()
+    {
+        if (sendOption == "Send Immediately")
+        {
+            model.DeliveryTime = DateTime.UtcNow;
+        }
+        else if (sendOption == "Schedule for Later")
+        {
+            model.DeliveryTime = model.DeliveryTime;
+        }
+
+        await apiClient.SmsMessageSendAsync(model);
+    }
+
+    private void ClearMessage()
+    {
+        model.MessageText = string.Empty;
+    }
+
+    private void ShowOffCanvas(ChangeEventArgs e)
+    {
+        contactSelection = e.Value.ToString();
+        offCanvas.Show(contactSelection);
+    }
+
+    private void AddPhoneNumbers(string numbers)
+    {
+        if (!string.IsNullOrWhiteSpace(numbers))
+        {
+            var currentNumbers = model.MobileNumber?.Split(',').Select(n => n.Trim()).ToList() ?? new List<string>();
+            var newNumbers = numbers.Split(',').Select(n => n.Trim()).ToList();
+            currentNumbers.AddRange(newNumbers);
+            model.MobileNumber = string.Join(", ", currentNumbers.Distinct());
+        }
+    }
 }
