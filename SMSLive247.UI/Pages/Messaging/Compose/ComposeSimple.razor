@@ -22,11 +22,14 @@
             </FormField>
 
             <FormField Label="Recipient Phone Numbers">
-                <InputTextArea class="form-control" @bind-Value="model.MobileNumber" rows="5" placeholder="Comma separated list"></InputTextArea>
+                <InputTextArea class="form-control" @bind-Value="model.MobileNumber" rows="5" placeholder="Comma separated list" @oninput="OnPhoneNumberInput"></InputTextArea>
                 <div class="mt-1 d-flex justify-content-between">
                     <label class="form-label">Select Contact From</label>
                     <div>
-                        <InputRadioGroup @bind-Value="contactSelection" @onchange="ShowOffCanvas">
+                        <InputRadioGroup 
+                            Value="contactSelection"
+                            ValueExpression="@(() => contactSelection)"
+                            ValueChanged="@((string value) => ShowOffCanvas(value))">
                             @foreach (var option in contactOptions)
                             {
                                 var radioId = $"radio-{option}";
@@ -65,7 +68,7 @@
     </Body>
 </Card>
 
-<Offcanvas @ref="offCanvas" OnPhoneNumbersSelected="AddPhoneNumbers"></Offcanvas>
+<SelectContactModal @ref="offCanvas" OnPhoneNumbersSelected="AddPhoneNumbers"></SelectContactModal>
 
 @code {
     private SmsMessageRequest model = new();
@@ -74,7 +77,7 @@
     private string contactSelection;
     private List<string> sendOptions = new List<string> { "Send Immediately", "Schedule for Later" };
     private string sendOption = "Send Immediately";
-    private Offcanvas offCanvas = new();
+    private SelectContactModal offCanvas = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,10 +107,11 @@
         model.MessageText = string.Empty;
     }
 
-    private void ShowOffCanvas(ChangeEventArgs e)
+    private void ShowOffCanvas(string value)
     {
-        contactSelection = e.Value.ToString();
-        offCanvas.Show(contactSelection);
+        contactSelection = value;
+        offCanvas.Show(contactSelection, new HashSet<string>(model.MobileNumber?.Split(',').Select(n => n.Trim()) ?? Enumerable.Empty<string>()));
+        contactSelection = string.Empty;
     }
 
     private void AddPhoneNumbers(string numbers)
@@ -119,5 +123,11 @@
             currentNumbers.AddRange(newNumbers);
             model.MobileNumber = string.Join(", ", currentNumbers.Distinct());
         }
+    }
+
+    private void OnPhoneNumberInput(ChangeEventArgs e)
+    {
+        var currentNumbers = model.MobileNumber?.Split(',').Select(n => n.Trim()).ToList() ?? new List<string>();
+        offCanvas.UpdateSelectedItems(new HashSet<string>(currentNumbers));
     }
 }
