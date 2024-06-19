@@ -1,4 +1,6 @@
-﻿<Modal Title="Select Contacts" Hidden="@(!isModalVisible)">
+﻿@typeparam TItem
+
+<Modal Title="Select Contacts" Hidden="@(!isModalVisible)">
     <Body>
         @if (loading)
         {
@@ -6,14 +8,17 @@
         }
         else
         {
+            <input type="text" class="form-control mb-2" placeholder="Search..." @bind="searchQuery" @oninput="OnSearchChanged" />
+
             <div class="form-check mb-1">
-                <input class="form-check-input" type="checkbox" @onchange="SelectAll" checked="@selectAllChecked">
+                <input class="form-check-input" type="checkbox" @onchange="SelectAllChanged" checked="@selectAllChecked">
                 <label class="form-check-label">Select All</label>
             </div>
+
             <div>
                 @if (contactSelection == "Bulk Files")
                 {
-                    @foreach (var bulkFile in BulkFileContact.Items)
+                    @foreach (var bulkFile in PagedItems.OfType<BatchFileResponse>())
                     {
                         <div class="form-check mb-1">
                             <input class="form-check-input" type="checkbox" value="@bulkFile.Description" @onchange="e => OnItemSelected(e, bulkFile.Description)" checked="@selectedItems.Contains(bulkFile.Description)">
@@ -23,15 +28,30 @@
                 }
                 else if (contactSelection == "All Contacts")
                 {
-                    @foreach (var contact in PhoneBookContact.Items)
+                    @foreach (var contact in PagedItems.OfType<OpenApi.ContactResponse>())
                     {
                         <div class="form-check mb-1">
                             <input class="form-check-input" type="checkbox" value="@contact.PhoneNumber" @onchange="e => OnItemSelected(e, contact.PhoneNumber)" checked="@selectedItems.Contains(contact.PhoneNumber)">
-                            <label class="form-check-label" for="group_@contact.ContactName">@contact.ContactName<span> (@contact.PhoneNumber)</span></label>
+                            <label class="form-check-label" for="contact_@contact.ContactName">@contact.ContactName<span> (@contact.PhoneNumber)</span></label>
+                        </div>
+                    }
+                }
+                else if (contactSelection == "Groups")
+                {
+                    @foreach (var group in PagedItems.OfType<string>())
+                    {
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" value="@group" @onchange="e => OnItemSelected(e, group)" checked="@selectedItems.Contains(group)">
+                            <label class="form-check-label">@group</label>
                         </div>
                     }
                 }
             </div>
+
+            @if (HasMoreItems)
+            {
+                <button class="btn btn-link" @onclick="LoadMore">Load More</button>
+            }
         }
     </Body>
     <Footer>
@@ -41,64 +61,61 @@
 
 @code {
     [Parameter] public string contactSelection { get; set; }
-    [Parameter] public EventCallback<string> OnPhoneNumbersSelected { get; set; }
+    [Parameter] public EventCallback<HashSet<string>> OnPhoneNumbersSelected { get; set; }
+    [Parameter] public EventCallback<HashSet<string>> OnGroupOrBulkSelected { get; set; }
 
-    private PhoneBook<OpenApi.ContactResponse> PhoneBookContact { get; set; } = new PhoneBook<OpenApi.ContactResponse>(new List<OpenApi.ContactResponse>(), 0);
-    private PhoneBook<BatchFileResponse> BulkFileContact { get; set; } = new PhoneBook<BatchFileResponse>(new List<BatchFileResponse>(), 0);
+    private List<object> allItems = new();
+    private List<object> filteredItems = new();
+    private List<object> PagedItems => filteredItems.Take(currentPage * pageSize).ToList();
     private bool loading = true;
     private bool isModalVisible = false;
-    private int _phoneBookPageSize = 50;
+    private string searchQuery = "";
+    private int currentPage = 1;
+    private const int pageSize = 20;
     private HashSet<string> selectedItems = new HashSet<string>();
     private bool selectAllChecked = false;
 
     protected override async Task OnParametersSetAsync()
     {
         loading = true;
+
+        allItems.Clear();
+
+        // Simulate loading data
         if (contactSelection == "Bulk Files")
         {
-            await LoadBulkFilesFromDbAsync(1);
+            for (int i = 1; i <= 50; i++)
+            {
+                allItems.Add(new BatchFileResponse
+                {
+                    BatchFileID = $"BulkFile{i}",
+                    Description = $"Bulk File {i}",
+                    FileType = "txt",
+                    TotalItems = i * 10
+                });
+            }
         }
-
-        if (contactSelection == "All Contacts")
+        else if (contactSelection == "All Contacts")
         {
-            await LoadPhoneBookContactsFromDbAsync(1);
+            for (int i = 1; i <= 500; i++)
+            {
+                allItems.Add(new OpenApi.ContactResponse
+                {
+                    ContactName = $"Contact {i}",
+                    PhoneNumber = $"+123456789{i:D3}"
+                });
+            }
+        }
+        else if (contactSelection == "Groups")
+        {
+            for (int i = 1; i <= 20; i++)
+            {
+                allItems.Add($"Group {i}");
+            }
         }
 
+        filteredItems = allItems;
         loading = false;
-        selectAllChecked = CheckIfAllSelected();
-    }
-
-    private async Task LoadPhoneBookContactsFromDbAsync(int pageNo)
-    {
-        if (pageNo < 1)
-            pageNo = 1;
-
-        var res = await apiClient.ContactListAsync(pageNo, _phoneBookPageSize);
-        if (pageNo > 1)
-        {
-            PhoneBookContact.Items.AddRange(res.Result);
-            PhoneBookContact.PageNo += 1;
-            return;
-        }
-
-        PhoneBookContact = new(res.Result, res.Result.Count());
-    }
-
-    private async Task LoadBulkFilesFromDbAsync(int pageNo, string? searchText = null)
-    {
-        searchText = string.IsNullOrWhiteSpace(searchText) ? "txt" : searchText;
-        if (pageNo < 1)
-            pageNo = 1;
-
-        var res = await apiClient.BatchFileListAsync(pageNo, _phoneBookPageSize, searchText);
-        if (pageNo > 1)
-        {
-            BulkFileContact.Items.AddRange(res.Result);
-            BulkFileContact.PageNo += 1;
-            return;
-        }
-
-        BulkFileContact = new(res.Result, res.Result.Count());
     }
 
     private void OnItemSelected(ChangeEventArgs e, string item)
@@ -114,18 +131,11 @@
         }
     }
 
-    private void SelectAll(ChangeEventArgs e)
+    private void SelectAllChanged(ChangeEventArgs e)
     {
         if ((bool)e.Value)
         {
-            if (contactSelection == "Bulk Files")
-            {
-                selectedItems = new HashSet<string>(BulkFileContact.Items.Select(b => b.Description));
-            }
-            else if (contactSelection == "All Contacts")
-            {
-                selectedItems = new HashSet<string>(PhoneBookContact.Items.Select(g => g.PhoneNumber));
-            }
+            selectedItems = new HashSet<string>(filteredItems.Select(item => item.ToString()));
         }
         else
         {
@@ -136,20 +146,19 @@
 
     private bool CheckIfAllSelected()
     {
-        if (contactSelection == "Bulk Files")
-        {
-            return BulkFileContact.Items.All(b => selectedItems.Contains(b.Description));
-        }
-        else if (contactSelection == "All Contacts")
-        {
-            return PhoneBookContact.Items.All(g => selectedItems.Contains(g.PhoneNumber));
-        }
-        return false;
+        return filteredItems.All(item => selectedItems.Contains(item.ToString()));
     }
 
     private void AppendSelectedContacts()
     {
-        OnPhoneNumbersSelected.InvokeAsync(string.Join(", ", selectedItems));
+        if (contactSelection == "All Contacts")
+        {
+            OnPhoneNumbersSelected.InvokeAsync(selectedItems);
+        }
+        else
+        {
+            OnGroupOrBulkSelected.InvokeAsync(selectedItems);
+        }
         Close();
     }
 
@@ -173,4 +182,21 @@
         selectAllChecked = CheckIfAllSelected();
         StateHasChanged();
     }
+
+    private void OnSearchChanged(ChangeEventArgs e)
+    {
+        searchQuery = e.Value.ToString();
+        filteredItems = allItems.Where(item => item.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        Console.WriteLine(filteredItems);
+        Console.WriteLine(searchQuery);
+        currentPage = 1;
+        selectAllChecked = CheckIfAllSelected();
+    }
+
+    private void LoadMore()
+    {
+        currentPage++;
+    }
+
+    private bool HasMoreItems => filteredItems.Count > PagedItems.Count;
 }

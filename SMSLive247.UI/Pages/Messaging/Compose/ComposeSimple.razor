@@ -1,36 +1,55 @@
-﻿<Card HeaderTitle="Compose SMS">
-    <Body>
-        <EditForm Model="model" OnValidSubmit="SubmitSms">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+﻿<section class="d-flex gap-4">
+    <div class="w-50">
+        <Card HeaderTitle="Compose SMS">
+            <Body>
+                <EditForm Model="model" OnValidSubmit="SubmitSms">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-            <FormField Label="Sender ID">
-                <select class="form-select" @bind="model.SenderID" required>
-                    <option value="" selected>Select Sender ID</option>
-                    @foreach (var sender in senderIds)
-                    {
-                        <option value="@sender.SenderID">@sender.SenderID</option>
-                    }
-                </select>
-            </FormField>
+                    <div class="mb-3">
+                        <label for="senderId" class="form-label">Sender ID</label>
+                        <InputSelect id="senderId" class="form-select w-75" @bind-Value="model.SenderID">
+                            <option value="" selected>Select Sender ID</option>
+                            @foreach (var sender in senderIds)
+                            {
+                                <option value="@sender.SenderID">@sender.SenderID</option>
+                            }
+                        </InputSelect>
+                    </div>
 
-            <FormField Label="Message">
-                <InputTextArea class="form-control" @bind-Value="model.MessageText" rows="5" required></InputTextArea>
-                <div class="mt-1">
-                    <Button Type="Button.Style.DEFAULT" @onclick="ClearMessage">Clear Message</Button>
-                </div>
-            </FormField>
+                    <div class="mb-3">
+                        <label for="numbers" class="form-label">Recipient Phone Numbers</label>
+                        <InputTextArea id="numbers" class="form-control w-75" @bind-Value="model.MobileNumber" rows="5" placeholder="Comma separated list"></InputTextArea>
+                        <div class="mt-1 d-flex gap-4">
+                            <label class="form-label">Select From</label>
+                            <div>
+                                <InputRadioGroup Value="contactSelection"
+                                                 ValueExpression="@(() => contactSelection)"
+                                                 ValueChanged="@((string value) => ShowOffCanvas(value))">
+                                    @foreach (var option in contactOptions)
+                                    {
+                                        var radioId = $"radio-{option}";
+                                        <div class="form-check form-check-inline">
+                                            <InputRadio class="form-check-input" id="@radioId" Value="@option" />
+                                            <label class="form-check-label" for="@radioId">@option</label>
+                                        </div>
+                                    }
+                                </InputRadioGroup>
+                            </div>
+                        </div>
+                    </div>
 
-            <FormField Label="Recipient Phone Numbers">
-                <InputTextArea class="form-control" @bind-Value="model.MobileNumber" rows="5" placeholder="Comma separated list" @oninput="OnPhoneNumberInput"></InputTextArea>
-                <div class="mt-1 d-flex justify-content-between">
-                    <label class="form-label">Select Contact From</label>
-                    <div>
-                        <InputRadioGroup 
-                            Value="contactSelection"
-                            ValueExpression="@(() => contactSelection)"
-                            ValueChanged="@((string value) => ShowOffCanvas(value))">
-                            @foreach (var option in contactOptions)
+                    <div class="mb-3 w-75">
+                        <div class="d-flex justify-content-between">
+                            <label for="message" class="form-label">Message</label>
+                            <button class="btn btn-link btn-sm text-decoration-none" @onclick="ClearMessage">Clear Message</button>
+                        </div>
+                        <InputTextArea id="message" class="form-control" @bind-Value="model.MessageText" rows="5"></InputTextArea>
+                    </div>
+
+                    <div class="mb-3">
+                        <InputRadioGroup @bind-Value="sendOption">
+                            @foreach (var option in sendOptions)
                             {
                                 var radioId = $"radio-{option}";
                                 <div class="form-check form-check-inline">
@@ -40,35 +59,45 @@
                             }
                         </InputRadioGroup>
                     </div>
-                </div>
-            </FormField>
 
-            <FormField Label="Send Options">
-                <InputRadioGroup @bind-Value="sendOption">
-                    @foreach (var option in sendOptions)
+                    @if (sendOption == "Schedule for Later")
                     {
-                        var radioId = $"radio-{option}";
-                        <div class="form-check form-check-inline">
-                            <InputRadio class="form-check-input" id="@radioId" Value="@option" />
-                            <label class="form-check-label" for="@radioId">@option</label>
+                        <div class="mb-3">
+                            <label for="schedule" class="form-label">Delivery Time</label>
+                            <InputDate id="schedule" Type="InputDateType.DateTimeLocal" class="form-control w-75" @bind-Value="model.DeliveryTime" required />
                         </div>
                     }
-                </InputRadioGroup>
-            </FormField>
 
-            @if (sendOption == "Schedule for Later")
-            {
-                <FormField Label="Schedule Date and Time">
-                    <InputDate class="form-control" @bind-Value="model.DeliveryTime" required />
-                </FormField>
-            }
+                    <Button Type="Button.Style.CUSTOM">Send SMS</Button>
+                </EditForm>
+            </Body>
+        </Card>
+    </div>
+    <!-- Selected Contacts Badges -->
+    @if (selectedGroupsAndBulkFiles.Count > 0)
+    {
+        <div class="w-50">
+            <Card HeaderTitle="Selected Contacts">
+                <Body>
+                    <div class="row g-1">
+                        @foreach (var item in selectedGroupsAndBulkFiles)
+                        {
+                            <div class="col-auto">
+                                <span class="d-flex align-items-center badge bg-primary m-1">
+                                    @item
+                                    <button type="button" class="btn-close btn-close-white btn-sm" aria-label="Close" @onclick="() => RemoveGroupOrBulk(item)"></button>
+                                </span>
+                            </div>
+                        }
+                    </div>
+                </Body>
+            </Card>
+        </div>
+        
+    }
+</section>
 
-            <Button Type="Button.Style.SAVE">Send SMS</Button>
-        </EditForm>
-    </Body>
-</Card>
-
-<SelectContactModal @ref="offCanvas" OnPhoneNumbersSelected="AddPhoneNumbers"></SelectContactModal>
+<SelectContactModal TItem="string" @ref="modal" OnPhoneNumbersSelected="AddPhoneNumbers" OnGroupOrBulkSelected="AddGroupOrBulkFiles"></SelectContactModal>
 
 @code {
     private SmsMessageRequest model = new();
@@ -77,7 +106,9 @@
     private string contactSelection;
     private List<string> sendOptions = new List<string> { "Send Immediately", "Schedule for Later" };
     private string sendOption = "Send Immediately";
-    private SelectContactModal offCanvas = new();
+    private SelectContactModal<string> modal;
+    private HashSet<string> selectedContacts = new();
+    private HashSet<string> selectedGroupsAndBulkFiles = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,24 +141,28 @@
     private void ShowOffCanvas(string value)
     {
         contactSelection = value;
-        offCanvas.Show(contactSelection, new HashSet<string>(model.MobileNumber?.Split(',').Select(n => n.Trim()) ?? Enumerable.Empty<string>()));
+        modal.Show(contactSelection, contactSelection == "All Contacts" ? selectedContacts : selectedGroupsAndBulkFiles);
+    }
+
+    private void AddPhoneNumbers(HashSet<string> numbers)
+    {
+        selectedContacts = numbers;
+        model.MobileNumber = string.Join(", ", selectedContacts);
         contactSelection = string.Empty;
+        StateHasChanged();
     }
 
-    private void AddPhoneNumbers(string numbers)
+    private void AddGroupOrBulkFiles(HashSet<string> items)
     {
-        if (!string.IsNullOrWhiteSpace(numbers))
-        {
-            var currentNumbers = model.MobileNumber?.Split(',').Select(n => n.Trim()).ToList() ?? new List<string>();
-            var newNumbers = numbers.Split(',').Select(n => n.Trim()).ToList();
-            currentNumbers.AddRange(newNumbers);
-            model.MobileNumber = string.Join(", ", currentNumbers.Distinct());
-        }
+        selectedGroupsAndBulkFiles = items;
+        contactSelection = string.Empty;
+        StateHasChanged();
     }
 
-    private void OnPhoneNumberInput(ChangeEventArgs e)
+    private void RemoveGroupOrBulk(string item)
     {
-        var currentNumbers = model.MobileNumber?.Split(',').Select(n => n.Trim()).ToList() ?? new List<string>();
-        offCanvas.UpdateSelectedItems(new HashSet<string>(currentNumbers));
+        selectedGroupsAndBulkFiles.Remove(item);
+        modal.UpdateSelectedItems(selectedGroupsAndBulkFiles);
+        StateHasChanged();
     }
 }
