@@ -42,7 +42,7 @@
 
         if (response.StatusCode == 200)
         {
-            senderIds = response.Result.Where(i => i.Status == "APPROVED").ToList();
+            senderIds = response.Result.Where(i => i.Approved == true).ToList();
         }
     }
 

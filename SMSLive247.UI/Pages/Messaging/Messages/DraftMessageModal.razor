@@ -1,4 +1,4 @@
-﻿<EditModal TItem="SmsMessageResponse" @ref="editor" LabelText="Draft Message"
+﻿<EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Draft Message"
            OnUpdate="OnUpdate"
            OnDelete="OnDelete">
     <FormInputText Label="Sender ID" @bind-Value="editor.Model.SenderID"></FormInputText>
@@ -8,12 +8,12 @@
 </EditModal>
 
 @code {
-    private EditModal<SmsMessageResponse> editor = new();
+    private EditModal<SmsBatchResponse> editor = new();
 
 
-    public void Show(SmsMessageResponse? item = null) => editor.Show(item);
+    public void Show(SmsBatchResponse? item = null) => editor.Show(item);
 
-    public void Delete(SmsMessageResponse item) => editor.Delete(item);
+    public void Delete(SmsBatchResponse item) => editor.Delete(item);
 
     private async Task OnUpdate()
     {

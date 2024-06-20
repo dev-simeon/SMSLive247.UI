@@ -19,7 +19,7 @@
 
                     <div class="mb-3">
                         <label for="numbers" class="form-label">Recipient Phone Numbers</label>
-                        <InputTextArea id="numbers" class="form-control w-75" @bind-Value="model.MobileNumber" rows="5" placeholder="Comma separated list"></InputTextArea>
+                        <InputTextArea id="numbers" class="form-control w-75" @bind-Value="model.PhoneNumber" rows="5" placeholder="Comma separated list"></InputTextArea>
                         <div class="mt-1 d-flex gap-4">
                             <label class="form-label">Select From</label>
                             <div>
@@ -42,7 +42,7 @@
                     <div class="mb-3 w-75">
                         <div class="d-flex justify-content-between">
                             <label for="message" class="form-label">Message</label>
-                            <button class="btn btn-link btn-sm text-decoration-none" @onclick="ClearMessage">Clear Message</button>
+                            <button type="button" class="btn btn-link btn-sm text-decoration-none" @onclick="ClearMessage">Clear Message</button>
                         </div>
                         <InputTextArea id="message" class="form-control" @bind-Value="model.MessageText" @oninput="HandleMessageInput" rows="5"></InputTextArea>
                         <div>@_messageCounter</div>
@@ -147,7 +147,7 @@
     private void AddPhoneNumbers(HashSet<string> numbers)
     {
         selectedContacts = numbers;
-        model.MobileNumber = string.Join(", ", selectedContacts);
+        model.PhoneNumber = string.Join(", ", selectedContacts);
         contactSelection = string.Empty;
         StateHasChanged();
     }
@@ -155,7 +155,7 @@
     private void RemoveContact(string contact)
     {
         selectedContacts.Remove(contact);
-        model.MobileNumber = string.Join(", ", selectedContacts);
+        model.PhoneNumber = string.Join(", ", selectedContacts);
         modal.UpdateSelectedItems(selectedContacts);
         StateHasChanged();
     }

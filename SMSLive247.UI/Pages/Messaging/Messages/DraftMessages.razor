@@ -14,7 +14,7 @@
                 <Column Header="Sender">@context.SenderID</Column>
                 <Column Header="Message">@context.MessageText</Column>
                 <Column Header="Time">
-                    <FormatDate DateTime="@context.SubmitDate"></FormatDate>
+                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
                 </Column>
                 <Column>
                     <Actions OnEdit="() => draftMessageModal.Show(context)"
@@ -36,13 +36,13 @@
 @code {
     private SearchBox searchBox = new();
     private DraftMessageModal draftMessageModal = new();
-    private ApiDataSource<SmsMessageResponse> ds = new();
+    private ApiDataSource<SmsBatchResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.SmsMessageListAsync(p.PageNumber, p.PageSize, null, null);
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
         });
 
         await ds.LoadData(alert);

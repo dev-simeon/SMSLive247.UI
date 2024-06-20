@@ -10,7 +10,7 @@
         </FormField>
         <FormInputNumber Label="Total Processed" @bind-Value="message.TotalProcessed" disabled></FormInputNumber>
         <FormInputNumber Label="Total Failed" @bind-Value="message.TotalFailed" disabled></FormInputNumber>
-        <FormInputNumber Label="Unit Charged" @bind-Value="message.Charged" disabled></FormInputNumber>
+        <FormInputNumber Label="Unit Charged" @bind-Value="message.CreditsCharged" disabled></FormInputNumber>
     </Body>
     <Footer>
         <Button Type="Button.Style.CANCEL" @onclick="@(e => showModal = !showModal)">Cancel</Button>

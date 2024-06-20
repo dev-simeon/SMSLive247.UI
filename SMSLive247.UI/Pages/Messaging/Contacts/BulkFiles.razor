@@ -3,8 +3,8 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                    </SearchBox>
+                    @* <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
+                    </SearchBox> *@
                 </Left>
                 <Right>
                     <Button Type="Button.Style.ADD" @onclick="e => bulkFileModal.Show()">
@@ -13,13 +13,13 @@
                 </Right>
             </LeftRight>
         </SearchArea>
-        <Table DataSource="ds">
+        <Table Items="items">
             <Columns>
                 <Column Header="Description">@context.Description</Column>
-                <Column Header="Total In File">@context.TotalItems</Column>
+                <Column Header="Total In File">@context.TotalNumbers</Column>
                 <Column Header="Def Code">@context.FileType</Column>
                 <Column Header="Date Added">
-                    <FormatDate DateTime="@context.CreateDate"></FormatDate>
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column>
                     <Actions OnDelete="() => bulkFileModal.Delete(context)">
@@ -28,9 +28,6 @@
             </Columns>
         </Table>
     </Body>
-    <Footer>
-        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
-    </Footer>
 </Card>
 
 <BulkFileModal @ref="bulkFileModal"></BulkFileModal>
@@ -38,16 +35,12 @@
 @code {
     private SearchBox searchBox = new();
     private BulkFileModal bulkFileModal = new();
-    private ApiDataSource<BatchFileResponse> ds = new();
+    private List<BatchFileResponse> items = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ds.Callback = new(async (PageState p, FilterState? f) =>
-        {
-            var response = await apiClient.BatchFileListAsync(p.PageNumber, p.PageSize, searchBox.Text);
-            return response;
-        });
+        var response = await apiClient.BatchFileListAsync();
 
-        await ds.LoadData(alert);
+        items = response.Result.ToList();
     }
 }

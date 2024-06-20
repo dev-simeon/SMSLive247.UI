@@ -30,13 +30,13 @@
                 <Column Header="#"><input class="form-check-input" type="checkbox" /></Column>
                 <Column Header="SenderID">@context.SenderID</Column>
                 <Column Header="Status">
-                    @if (context.Status == "APPROVED")
+                    @if (context.Approved == true)
                     {
-                        <span class="badge text-bg-success">@context.Status</span>
+                        <span class="badge text-bg-success">APPROVED</span>
                     }
                     else
                     {
-                        <span class="badge text-bg-warning">@context.Status</span>
+                        <span class="badge text-bg-warning">PENDING</span>
                     }
                 </Column>
                 <Column>
@@ -70,9 +70,9 @@
 
     private void SearchSenderId()
     {
-        filteredItems = items
-            .Where(i => (string.IsNullOrWhiteSpace(selectedStatus) || i.Status == selectedStatus) &&
-                        (string.IsNullOrWhiteSpace(searchBox.Text) || i.SenderID.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)))
-            .ToList();
+        // filteredItems = items
+        //     .Where(i => (string.IsNullOrWhiteSpace(selectedStatus) || i.Approved == selectedStatus) &&
+        //                 (string.IsNullOrWhiteSpace(searchBox.Text) || i.SenderID.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)))
+        //     .ToList();
     }
 }

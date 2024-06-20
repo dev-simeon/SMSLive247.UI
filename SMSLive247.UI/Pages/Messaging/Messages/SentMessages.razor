@@ -20,11 +20,11 @@
                 <Column Header="Message">@context.MessageText</Column>
                 <Column Header="Delivery Report">
                     @(context.TotalProcessed)/@(context.TotalProcessed + context.TotalFailed)<br />
-                    @(context.Charged + "ç")<br />
+                    @(context.CreditsCharged + "ç")<br />
                     @context.MessageParts page(@context.MessageText.Length)
                 </Column>
                 <Column Header="Time">
-                    <FormatDate DateTime="@context.SubmitDate"></FormatDate>
+                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
                 </Column>
                 <Column Header="Action">
                     <Actions OnView="() => sentMessageView.Show((int)context.BatchID)" OnDelete="() => messageModal.Delete(context)">
@@ -53,7 +53,7 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null);
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
         });
 
         await ds.LoadData(alert);

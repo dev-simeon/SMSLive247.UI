@@ -1,19 +1,8 @@
 ﻿{
   "openapi": "3.0.1",
   "info": {
-    "title": "SMSLive247 API v4",
-    "description": "SMS, OTP and Voice API for Nigeria",
-    "termsOfService": "http://portal.smslive247.com/Public/Legal/Agreement.txt",
-    "contact": {
-      "name": "iDevWorks",
-      "url": "http://portal.smslive247.com",
-      "email": "info@smslive247.com"
-    },
-    "license": {
-      "name": "Privacy Policy",
-      "url": "http://portal.smslive247.com/Public/Legal/Privacy.txt"
-    },
-    "version": "v4"
+    "title": "SMSLive247 API v5",
+    "version": "v5"
   },
   "servers": [
     {
@@ -21,7 +10,7 @@
     }
   ],
   "paths": {
-    "/api/v4/accounts": {
+    "/api/v5/accounts": {
       "get": {
         "tags": [
           "Accounts"
@@ -66,7 +55,7 @@
         }
       }
     },
-    "/api/v4/accounts/{accountId}": {
+    "/api/v5/accounts/{accountId}": {
       "get": {
         "tags": [
           "Accounts"
@@ -97,7 +86,7 @@
         }
       }
     },
-    "/api/v4/auth": {
+    "/api/v5/auth": {
       "post": {
         "tags": [
           "Auth"
@@ -136,7 +125,7 @@
         }
       }
     },
-    "/api/v4/auth/reset": {
+    "/api/v5/auth/reset": {
       "post": {
         "tags": [
           "Auth"
@@ -144,7 +133,7 @@
         "operationId": "ResetPassword",
         "parameters": [
           {
-            "name": "accountId",
+            "name": "email",
             "in": "query",
             "schema": {
               "type": "string"
@@ -158,7 +147,7 @@
         }
       }
     },
-    "/api/v4/auth/current": {
+    "/api/v5/auth/current": {
       "delete": {
         "tags": [
           "Auth"
@@ -171,41 +160,12 @@
         }
       }
     },
-    "/api/v4/batchfiles": {
+    "/api/v5/batch-files": {
       "get": {
         "tags": [
           "BatchFiles"
         ],
         "operationId": "BatchFileList",
-        "parameters": [
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 1000.0,
-              "minimum": 1.0
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 500.0,
-              "minimum": 5.0
-            }
-          },
-          {
-            "name": "SearchText",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -260,7 +220,7 @@
         }
       }
     },
-    "/api/v4/batchfiles/schedule-debug/{batchId}": {
+    "/api/v5/batch-files/schedule-debug/{batchId}": {
       "get": {
         "tags": [
           "BatchFiles"
@@ -284,7 +244,7 @@
         }
       }
     },
-    "/api/v4/batchfiles/{fileId}": {
+    "/api/v5/batch-files/{fileId}": {
       "get": {
         "tags": [
           "BatchFiles"
@@ -342,7 +302,14 @@
         },
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchFileResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -368,12 +335,12 @@
         }
       }
     },
-    "/api/v4/credits/purchase": {
+    "/api/v5/phone-book/groups": {
       "get": {
         "tags": [
-          "Credits"
+          "ContactGroups"
         ],
-        "operationId": "PurchaseList",
+        "operationId": "GroupList",
         "responses": {
           "200": {
             "description": "Success",
@@ -382,188 +349,163 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/SenderIdResponse"
+                    "$ref": "#/components/schemas/ContactResponse"
                   }
                 }
               }
             }
           }
         }
-      },
+      }
+    },
+    "/api/v5/phone-book/groups/{groupId}": {
       "post": {
         "tags": [
-          "Credits"
+          "ContactGroups"
         ],
-        "operationId": "PurchaseInit",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SenderIdResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v4/credits/purchase/complete": {
-      "post": {
-        "tags": [
-          "Credits"
-        ],
-        "operationId": "PurchaseComplete",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SenderIdResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v4/credits/transfer": {
-      "get": {
-        "tags": [
-          "Credits"
-        ],
-        "operationId": "TransferList",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SenderIdResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Credits"
-        ],
-        "operationId": "TransferSend",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SenderIdResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v4/credits/coverage": {
-      "get": {
-        "tags": [
-          "Credits"
-        ],
-        "operationId": "CoverageList",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SenderIdResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v4/credits/pricing": {
-      "get": {
-        "tags": [
-          "Credits"
-        ],
-        "operationId": "PricingList",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SenderIdResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v4/credits/pricing/calc": {
-      "get": {
-        "tags": [
-          "Credits"
-        ],
-        "operationId": "PricingCalc",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SenderIdResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v4/phonebook": {
-      "get": {
-        "tags": [
-          "Phonebook"
-        ],
-        "operationId": "ContactList",
+        "operationId": "GroupCreate",
         "parameters": [
           {
-            "name": "PageNumber",
-            "in": "query",
+            "name": "groupId",
+            "in": "path",
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 1000.0,
-              "minimum": 1.0
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 500.0,
-              "minimum": 5.0
+              "type": "string"
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ContactGroups"
+        ],
+        "operationId": "GroupUpdate",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ContactGroups"
+        ],
+        "operationId": "GroupDelete",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book": {
+      "get": {
+        "tags": [
+          "Contacts"
+        ],
+        "operationId": "ContactList",
         "responses": {
           "200": {
             "description": "Success",
@@ -582,7 +524,7 @@
       },
       "post": {
         "tags": [
-          "Phonebook"
+          "Contacts"
         ],
         "operationId": "ContactCreate",
         "requestBody": {
@@ -618,20 +560,13 @@
         }
       }
     },
-    "/api/v4/phonebook/{phoneNo}": {
+    "/api/v5/phone-book/{phoneNo}": {
       "put": {
         "tags": [
-          "Phonebook"
+          "Contacts"
         ],
         "operationId": "ContactUpdate",
         "parameters": [
-          {
-            "name": "phoneNo",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "phoneNo",
             "in": "path",
@@ -675,17 +610,10 @@
       },
       "delete": {
         "tags": [
-          "Phonebook"
+          "Contacts"
         ],
         "operationId": "ContactDelete",
         "parameters": [
-          {
-            "name": "phoneNo",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "phoneNo",
             "in": "path",
@@ -709,12 +637,12 @@
         }
       }
     },
-    "/api/v4/phonebook/groups": {
+    "/api/v5/credits/purchase": {
       "get": {
         "tags": [
-          "Phonebook"
+          "Credits"
         ],
-        "operationId": "ContactGroups",
+        "operationId": "PurchaseList",
         "parameters": [
           {
             "name": "PageNumber",
@@ -745,7 +673,180 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContactResponse"
+                    "$ref": "#/components/schemas/PurchaseResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Credits"
+        ],
+        "operationId": "PurchaseBegin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PurchaseRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PurchaseRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PurchaseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/purchase/complete/{transactionId}": {
+      "get": {
+        "tags": [
+          "Credits"
+        ],
+        "operationId": "PurchaseComplete",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/transfer": {
+      "get": {
+        "tags": [
+          "Credits"
+        ],
+        "operationId": "TransferList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransferResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Credits"
+        ],
+        "operationId": "TransferCredit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/pricing": {
+      "get": {
+        "tags": [
+          "Credits"
+        ],
+        "operationId": "PriceList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PriceResponse"
                   }
                 }
               }
@@ -754,152 +855,29 @@
         }
       }
     },
-    "/api/v4/phonebook/groups/{groupId}": {
-      "post": {
+    "/api/v5/credits/pricing/calc": {
+      "get": {
         "tags": [
-          "Phonebook"
+          "Credits"
         ],
-        "operationId": "ContactGroupCreate",
+        "operationId": "PriceCalculate",
         "parameters": [
           {
-            "name": "groupId",
+            "name": "amount",
             "in": "query",
             "schema": {
-              "type": "string"
+              "type": "number",
+              "format": "double",
+              "default": 0
             }
           },
           {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Phonebook"
-        ],
-        "operationId": "ContactGroupUpdate",
-        "parameters": [
-          {
-            "name": "groupId",
+            "name": "quantity",
             "in": "query",
             "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Phonebook"
-        ],
-        "operationId": "ContactGroupDelete",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
+              "type": "number",
+              "format": "double",
+              "default": 0
             }
           }
         ],
@@ -909,7 +887,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
+                  "$ref": "#/components/schemas/CalculatorResponse"
                 }
               }
             }
@@ -917,10 +895,10 @@
         }
       }
     },
-    "/api/v4/senderids": {
+    "/api/v5/sender-ids": {
       "get": {
         "tags": [
-          "SenderIds"
+          "SenderIDs"
         ],
         "operationId": "SenderIdList",
         "parameters": [
@@ -963,7 +941,7 @@
       },
       "post": {
         "tags": [
-          "SenderIds"
+          "SenderIDs"
         ],
         "operationId": "SenderIdCreate",
         "requestBody": {
@@ -999,20 +977,13 @@
         }
       }
     },
-    "/api/v4/senderids/{senderId}": {
+    "/api/v5/sender-ids/{senderId}": {
       "delete": {
         "tags": [
-          "SenderIds"
+          "SenderIDs"
         ],
         "operationId": "SenderIdDelete",
         "parameters": [
-          {
-            "name": "senderId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "senderId",
             "in": "path",
@@ -1036,7 +1007,7 @@
         }
       }
     },
-    "/api/v4/sms": {
+    "/api/v5/sms": {
       "post": {
         "tags": [
           "Sms"
@@ -1115,6 +1086,13 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1134,7 +1112,7 @@
         }
       }
     },
-    "/api/v4/sms/{messageId}": {
+    "/api/v5/sms/{messageId}": {
       "get": {
         "tags": [
           "Sms"
@@ -1164,7 +1142,7 @@
         }
       }
     },
-    "/api/v4/sms/batch": {
+    "/api/v5/sms/batch": {
       "post": {
         "tags": [
           "SmsBatch"
@@ -1243,6 +1221,13 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1262,7 +1247,7 @@
         }
       }
     },
-    "/api/v4/sms/batch/template": {
+    "/api/v5/sms/batch/template": {
       "post": {
         "tags": [
           "SmsBatch"
@@ -1301,50 +1286,12 @@
         }
       }
     },
-    "/api/v4/sms/batch/pending": {
+    "/api/v5/sms/batch/pending": {
       "get": {
         "tags": [
           "SmsBatch"
         ],
         "operationId": "SmsBatchPendingList",
-        "parameters": [
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 1000.0,
-              "minimum": 1.0
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 500.0,
-              "minimum": 5.0
-            }
-          },
-          {
-            "name": "DateFrom",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "DateTo",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -1362,7 +1309,7 @@
         }
       }
     },
-    "/api/v4/sms/batch/{batchId}": {
+    "/api/v5/sms/batch/{batchId}": {
       "get": {
         "tags": [
           "SmsBatch"
@@ -1415,7 +1362,7 @@
         }
       }
     },
-    "/api/v4/sms/batch/pending/{batchId}": {
+    "/api/v5/sms/batch/pending/{batchId}": {
       "delete": {
         "tags": [
           "SmsBatch"
@@ -1439,7 +1386,7 @@
         }
       }
     },
-    "/api/v4/sms/batch/{batchId}/reports": {
+    "/api/v5/sms/batch/{batchId}/reports": {
       "get": {
         "tags": [
           "SmsBatch"
@@ -1500,6 +1447,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
           "accountID": {
             "type": "string",
             "readOnly": true
@@ -1508,39 +1460,29 @@
             "type": "string",
             "readOnly": true
           },
-          "creditBalance": {
+          "credits": {
             "type": "number",
             "readOnly": true,
             "format": "double"
           },
-          "status": {
-            "type": "integer",
-            "readOnly": true,
-            "format": "int32"
+          "active": {
+            "type": "boolean",
+            "readOnly": true
           }
         }
       },
       "BatchFileRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "batchFileID",
-          "countryCode",
-          "description",
-          "rawContents"
-        ],
         "properties": {
           "batchFileID": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
-          "rawContents": {
-            "type": "string",
-            "minLength": 1
+          "rawNumbers": {
+            "type": "string"
           },
           "countryCode": {
             "type": "integer",
@@ -1552,7 +1494,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "createDate": {
+          "dateCreated": {
             "type": "string",
             "readOnly": true,
             "format": "date-time"
@@ -1569,28 +1511,41 @@
             "type": "string",
             "readOnly": true
           },
-          "totalItems": {
+          "totalNumbers": {
             "type": "integer",
             "readOnly": true,
             "format": "int32"
           }
         }
       },
+      "CalculatorResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "amount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          }
+        }
+      },
       "ContactRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "contactName",
-          "phoneNumber"
-        ],
         "properties": {
-          "contactName": {
-            "type": "string",
-            "minLength": 1
-          },
           "phoneNumber": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
+          },
+          "contactName": {
+            "type": "string"
           },
           "groups": {
             "type": "array",
@@ -1605,7 +1560,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "createDate": {
+          "dateCreated": {
             "type": "string",
             "readOnly": true,
             "format": "date-time"
@@ -1651,22 +1606,16 @@
       "LoginRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "password",
-          "username"
-        ],
         "properties": {
-          "parentId": {
+          "parentID": {
             "type": "string",
             "nullable": true
           },
           "username": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "password": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -1687,26 +1636,95 @@
           }
         }
       },
+      "PriceResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minQuantity": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "maxQuantity": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "price": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          }
+        }
+      },
+      "PurchaseRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "providerID": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "PurchaseResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "providerID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "reference": {
+            "type": "string",
+            "readOnly": true
+          },
+          "quantity": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "price": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fees": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "amount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "status": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
       "SenderIdRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "purpose",
-          "sampleText",
-          "senderID"
-        ],
         "properties": {
           "senderID": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "purpose": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "sampleText": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -1714,12 +1732,12 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "requestDate": {
+          "dateRequested": {
             "type": "string",
             "readOnly": true,
             "format": "date-time"
           },
-          "approvedDate": {
+          "dateApproved": {
             "type": "string",
             "readOnly": true,
             "format": "date-time",
@@ -1729,8 +1747,8 @@
             "type": "string",
             "readOnly": true
           },
-          "status": {
-            "type": "string",
+          "approved": {
+            "type": "boolean",
             "readOnly": true
           },
           "purpose": {
@@ -1760,13 +1778,14 @@
             "format": "date-time",
             "nullable": true
           },
-          "route": {
-            "type": "string"
+          "routeID": {
+            "type": "string",
+            "nullable": true
           },
           "batchFileID": {
             "type": "string"
           },
-          "mobileNumberColumn": {
+          "phoneNumberColumn": {
             "type": "integer",
             "format": "int32"
           }
@@ -1787,14 +1806,15 @@
             "format": "date-time",
             "nullable": true
           },
-          "route": {
-            "type": "string"
+          "routeID": {
+            "type": "string",
+            "nullable": true
           },
           "rawNumbers": {
             "type": "string",
             "nullable": true
           },
-          "mobileNumbers": {
+          "phoneNumbers": {
             "type": "array",
             "nullable": true,
             "items": {
@@ -1842,12 +1862,12 @@
             "readOnly": true,
             "format": "int64"
           },
-          "charged": {
+          "creditsCharged": {
             "type": "number",
             "readOnly": true,
             "format": "double"
           },
-          "submitDate": {
+          "dateSubmitted": {
             "type": "string",
             "readOnly": true,
             "format": "date-time"
@@ -1868,16 +1888,17 @@
           "messageText": {
             "type": "string"
           },
+          "phoneNumber": {
+            "type": "string"
+          },
           "deliveryTime": {
             "type": "string",
             "format": "date-time",
             "nullable": true
           },
-          "mobileNumber": {
-            "type": "string"
-          },
-          "route": {
-            "type": "string"
+          "routeID": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -1902,16 +1923,16 @@
             "type": "string",
             "readOnly": true
           },
-          "mobileNumber": {
+          "phoneNumber": {
             "type": "string",
             "readOnly": true
           },
-          "submitDate": {
+          "dateSubmitted": {
             "type": "string",
             "readOnly": true,
             "format": "date-time"
           },
-          "charged": {
+          "creditsCharged": {
             "type": "number",
             "readOnly": true,
             "format": "double"
@@ -1923,6 +1944,60 @@
             "items": {
               "$ref": "#/components/schemas/DeliveryReportResponse"
             }
+          }
+        }
+      },
+      "TransferRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "recipientID": {
+            "type": "string"
+          },
+          "credits": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "remarks": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TransferResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "senderID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "senderName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "recipientID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "recipientName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "credits": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "remarks": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
           }
         }
       }
