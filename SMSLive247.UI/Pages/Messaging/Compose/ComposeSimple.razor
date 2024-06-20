@@ -2,7 +2,7 @@
     <div class="w-50">
         <Card HeaderTitle="Compose SMS">
             <Body>
-                <EditForm Model="model" OnValidSubmit="SubmitSms">
+                <EditForm Model="model" OnSubmit="SubmitSms">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
@@ -25,7 +25,7 @@
                             <div>
                                 <InputRadioGroup Value="contactSelection"
                                                  ValueExpression="@(() => contactSelection)"
-                                                 ValueChanged="@((string value) => ShowOffCanvas(value))">
+                                                 ValueChanged="@((string value) => ShowModal(value))">
                                     @foreach (var option in contactOptions)
                                     {
                                         var radioId = $"radio-{option}";
@@ -44,7 +44,8 @@
                             <label for="message" class="form-label">Message</label>
                             <button class="btn btn-link btn-sm text-decoration-none" @onclick="ClearMessage">Clear Message</button>
                         </div>
-                        <InputTextArea id="message" class="form-control" @bind-Value="model.MessageText" rows="5"></InputTextArea>
+                        <InputTextArea id="message" class="form-control" @bind-Value="model.MessageText" @oninput="HandleMessageInput" rows="5"></InputTextArea>
+                        <div>@_messageCounter</div>
                     </div>
 
                     <div class="mb-3">
@@ -74,41 +75,43 @@
         </Card>
     </div>
     <!-- Selected Contacts Badges -->
-    @if (selectedGroupsAndBulkFiles.Count > 0)
+    @if (selectedContacts.Count > 0)
     {
         <div class="w-50">
             <Card HeaderTitle="Selected Contacts">
                 <Body>
-                    <div class="row g-1">
-                        @foreach (var item in selectedGroupsAndBulkFiles)
+                    <div class="row g-1 row-gap-1">
+                        @foreach (var contact in selectedContacts)
                         {
                             <div class="col-auto">
-                                <span class="d-flex align-items-center badge bg-primary m-1">
-                                    @item
-                                    <button type="button" class="btn-close btn-close-white btn-sm" aria-label="Close" @onclick="() => RemoveGroupOrBulk(item)"></button>
+                                <span class="d-flex align-items-center gap-1 badge bg-primary">
+                                    @contact
+                                    <button type="button" class="btn-close btn-close-white btn-sm" aria-label="Close" @onclick="() => RemoveContact(contact)"></button>
                                 </span>
                             </div>
                         }
                     </div>
+
                 </Body>
             </Card>
         </div>
-        
     }
 </section>
-
-<SelectContactModal TItem="string" @ref="modal" OnPhoneNumbersSelected="AddPhoneNumbers" OnGroupOrBulkSelected="AddGroupOrBulkFiles"></SelectContactModal>
+<SelectContactModal TItem="string" @ref="modal" OnPhoneNumbersSelected="AddPhoneNumbers"></SelectContactModal>
 
 @code {
     private SmsMessageRequest model = new();
     private List<SenderIdResponse> senderIds = new();
     private List<string> contactOptions = new List<string> { "Bulk Files", "Groups", "All Contacts" };
-    private string contactSelection;
+    private string contactSelection = string.Empty;
     private List<string> sendOptions = new List<string> { "Send Immediately", "Schedule for Later" };
     private string sendOption = "Send Immediately";
-    private SelectContactModal<string> modal;
+    private SelectContactModal<string> modal = new();
     private HashSet<string> selectedContacts = new();
     private HashSet<string> selectedGroupsAndBulkFiles = new();
+    private string _messageCounter = "";
+    private const int _smsMaxLength = 1600; // Max SMS length
+    private const int _smsAdLength = 0; // Any additional characters added to SMS (e.g., footer)
 
     protected override async Task OnInitializedAsync()
     {
@@ -125,10 +128,6 @@
         {
             model.DeliveryTime = DateTime.UtcNow;
         }
-        else if (sendOption == "Schedule for Later")
-        {
-            model.DeliveryTime = model.DeliveryTime;
-        }
 
         await apiClient.SmsMessageSendAsync(model);
     }
@@ -136,12 +135,13 @@
     private void ClearMessage()
     {
         model.MessageText = string.Empty;
+        _messageCounter = string.Empty;
     }
 
-    private void ShowOffCanvas(string value)
+    private void ShowModal(string value)
     {
         contactSelection = value;
-        modal.Show(contactSelection, contactSelection == "All Contacts" ? selectedContacts : selectedGroupsAndBulkFiles);
+        modal.Show(contactSelection, selectedContacts);
     }
 
     private void AddPhoneNumbers(HashSet<string> numbers)
@@ -152,17 +152,55 @@
         StateHasChanged();
     }
 
-    private void AddGroupOrBulkFiles(HashSet<string> items)
+    private void RemoveContact(string contact)
     {
-        selectedGroupsAndBulkFiles = items;
-        contactSelection = string.Empty;
+        selectedContacts.Remove(contact);
+        model.MobileNumber = string.Join(", ", selectedContacts);
+        modal.UpdateSelectedItems(selectedContacts);
         StateHasChanged();
     }
 
-    private void RemoveGroupOrBulk(string item)
+    private async Task HandleMessageInput(ChangeEventArgs e)
     {
-        selectedGroupsAndBulkFiles.Remove(item);
-        modal.UpdateSelectedItems(selectedGroupsAndBulkFiles);
-        StateHasChanged();
+        var strSmsText = e.Value?.ToString();
+        int intSMSLen = strSmsText!.GetValidGsmTextLength() + _smsAdLength;
+
+        if (strSmsText?.Length < 1)
+        {
+            _messageCounter = "";
+            return;
+        }
+
+        if (intSMSLen > _smsMaxLength)
+        {
+            model.MessageText = strSmsText!.Substring(0, _smsMaxLength - _smsAdLength);
+            await alert.Info("Maximum SMS characters reached!", "alert");
+            return;
+        }
+
+        int intNextMax, intSmsParts, intPrevMax;
+        if (intSMSLen <= 160)
+        {
+            intSmsParts = 1; intNextMax = 160; intPrevMax = 0;
+        }
+        else
+        {
+            intSmsParts = (int)Math.Ceiling(intSMSLen / 153m);
+            intNextMax = intSmsParts * 153;
+            intPrevMax = intNextMax - 153;
+            if (intPrevMax < 160)
+            {
+                intPrevMax = 160;
+            }
+        }
+
+        if (intSMSLen > 0)
+        {
+            _messageCounter = intSMSLen + "/" + intNextMax + " . . . Cost: " + intSmsParts + " SMS";
+            if ((intPrevMax > 0) && (intSMSLen == (intPrevMax + 1)))
+            {
+                await alert.Info($"You have just exceeded {intPrevMax}. You will be charged {intSmsParts} credits for this message!", "alert");
+            }
+        }
     }
 }

@@ -62,7 +62,6 @@
 @code {
     [Parameter] public string contactSelection { get; set; }
     [Parameter] public EventCallback<HashSet<string>> OnPhoneNumbersSelected { get; set; }
-    [Parameter] public EventCallback<HashSet<string>> OnGroupOrBulkSelected { get; set; }
 
     private List<object> allItems = new();
     private List<object> filteredItems = new();
@@ -151,14 +150,7 @@
 
     private void AppendSelectedContacts()
     {
-        if (contactSelection == "All Contacts")
-        {
-            OnPhoneNumbersSelected.InvokeAsync(selectedItems);
-        }
-        else
-        {
-            OnGroupOrBulkSelected.InvokeAsync(selectedItems);
-        }
+        OnPhoneNumbersSelected.InvokeAsync(selectedItems);
         Close();
     }
 
@@ -187,8 +179,6 @@
     {
         searchQuery = e.Value.ToString();
         filteredItems = allItems.Where(item => item.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
-        Console.WriteLine(filteredItems);
-        Console.WriteLine(searchQuery);
         currentPage = 1;
         selectAllChecked = CheckIfAllSelected();
     }
