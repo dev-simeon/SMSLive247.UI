@@ -3,8 +3,8 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    @* <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                    </SearchBox> *@
+                    <SearchBox @ref="searchBox" @onclick="SearchCsvFile">
+                    </SearchBox>
                 </Left>
                 <Right>
                     <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
@@ -13,7 +13,7 @@
                 </Right>
             </LeftRight>
         </SearchArea>
-        <Table Items="items">
+        <Table Items="filteredItems">
             <Columns>
                 <Column Header="Description">@context.Description</Column>
                 <Column Header="Total In File">@context.TotalNumbers</Column>
@@ -36,10 +36,20 @@
     private SearchBox searchBox = new();
     private BulkFileModal csvFileModal = new();
     private List<BatchFileResponse> items = new();
+    private List<BatchFileResponse> filteredItems = new();
 
     protected override async Task OnInitializedAsync()
     {
         var response = await apiClient.BatchFileListAsync();
         items = response.Result.ToList();
+        filteredItems = items;
+    }
+
+    private void SearchCsvFile()
+    {
+        filteredItems = items
+            .Where(i => string.IsNullOrWhiteSpace(searchBox.Text) ||
+                        i.Description.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
     }
 }

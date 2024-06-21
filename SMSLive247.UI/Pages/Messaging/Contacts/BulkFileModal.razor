@@ -76,7 +76,16 @@
 
     private async Task OnCreate()
     {
-        //Todo
-        // Implement logic to create a new bulk file
+        var request = new BatchFileRequest
+        {
+
+        };
+
+        var response = await apiClient.BatchFileCreateAsync(request);
+
+        if(response.StatusCode == 200)
+        {
+            await alert.Success("Batch file was uploaded successfully.", "Upload Success");
+        }
     }
 }
