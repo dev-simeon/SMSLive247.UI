@@ -89,7 +89,7 @@
     "/api/v5/auth": {
       "post": {
         "tags": [
-          "Auth"
+          "Authentication"
         ],
         "operationId": "Login",
         "requestBody": {
@@ -128,7 +128,7 @@
     "/api/v5/auth/reset": {
       "post": {
         "tags": [
-          "Auth"
+          "Authentication"
         ],
         "operationId": "ResetPassword",
         "parameters": [
@@ -150,7 +150,7 @@
     "/api/v5/auth/current": {
       "delete": {
         "tags": [
-          "Auth"
+          "Authentication"
         ],
         "operationId": "Logout",
         "responses": {
@@ -163,7 +163,7 @@
     "/api/v5/batch-files": {
       "get": {
         "tags": [
-          "BatchFiles"
+          "Batch Files"
         ],
         "operationId": "BatchFileList",
         "responses": {
@@ -184,24 +184,32 @@
       },
       "post": {
         "tags": [
-          "BatchFiles"
+          "Batch Files"
         ],
         "operationId": "BatchFileCreate",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/BatchFileRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchFileRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchFileRequest"
+                "type": "object",
+                "properties": {
+                  "countryCode": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "countryCode": {
+                  "style": "form"
+                },
+                "file": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -220,34 +228,10 @@
         }
       }
     },
-    "/api/v5/batch-files/schedule-debug/{batchId}": {
-      "get": {
-        "tags": [
-          "BatchFiles"
-        ],
-        "operationId": "BatchFileDownload2",
-        "parameters": [
-          {
-            "name": "batchId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success"
-          }
-        }
-      }
-    },
     "/api/v5/batch-files/{fileId}": {
       "get": {
         "tags": [
-          "BatchFiles"
+          "Batch Files"
         ],
         "operationId": "BatchFileDownload",
         "parameters": [
@@ -268,7 +252,7 @@
       },
       "put": {
         "tags": [
-          "BatchFiles"
+          "Batch Files"
         ],
         "operationId": "BatchFileUpdate",
         "parameters": [
@@ -283,19 +267,27 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/BatchFileRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchFileRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/BatchFileRequest"
+                "type": "object",
+                "properties": {
+                  "countryCode": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "countryCode": {
+                  "style": "form"
+                },
+                "file": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -315,7 +307,7 @@
       },
       "delete": {
         "tags": [
-          "BatchFiles"
+          "Batch Files"
         ],
         "operationId": "BatchFileDelete",
         "parameters": [
@@ -335,12 +327,12 @@
         }
       }
     },
-    "/api/v5/phone-book/groups": {
+    "/api/v5/credits/pricing": {
       "get": {
         "tags": [
-          "ContactGroups"
+          "Credit Pricing"
         ],
-        "operationId": "GroupList",
+        "operationId": "PriceList",
         "responses": {
           "200": {
             "description": "Success",
@@ -349,7 +341,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ContactResponse"
+                    "$ref": "#/components/schemas/PriceResponse"
                   }
                 }
               }
@@ -358,268 +350,29 @@
         }
       }
     },
-    "/api/v5/phone-book/groups/{groupId}": {
-      "post": {
-        "tags": [
-          "ContactGroups"
-        ],
-        "operationId": "GroupCreate",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "ContactGroups"
-        ],
-        "operationId": "GroupUpdate",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "ContactGroups"
-        ],
-        "operationId": "GroupDelete",
-        "parameters": [
-          {
-            "name": "groupId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/phone-book": {
+    "/api/v5/credits/pricing/calc": {
       "get": {
         "tags": [
-          "Contacts"
+          "Credit Pricing"
         ],
-        "operationId": "ContactList",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ContactResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Contacts"
-        ],
-        "operationId": "ContactCreate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContactRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContactRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContactRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/phone-book/{phoneNo}": {
-      "put": {
-        "tags": [
-          "Contacts"
-        ],
-        "operationId": "ContactUpdate",
+        "operationId": "PriceCalculate",
         "parameters": [
           {
-            "name": "phoneNo",
-            "in": "path",
-            "required": true,
+            "name": "amount",
+            "in": "query",
             "schema": {
-              "type": "string"
+              "type": "number",
+              "format": "double",
+              "default": 0
             }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContactRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContactRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ContactRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Contacts"
-        ],
-        "operationId": "ContactDelete",
-        "parameters": [
+          },
           {
-            "name": "phoneNo",
-            "in": "path",
-            "required": true,
+            "name": "quantity",
+            "in": "query",
             "schema": {
-              "type": "string"
+              "type": "integer",
+              "format": "int64",
+              "default": 0
             }
           }
         ],
@@ -629,7 +382,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ContactResponse"
+                  "$ref": "#/components/schemas/PriceCalcResponse"
                 }
               }
             }
@@ -640,7 +393,7 @@
     "/api/v5/credits/purchase": {
       "get": {
         "tags": [
-          "Credits"
+          "Credit Purchase"
         ],
         "operationId": "PurchaseList",
         "parameters": [
@@ -683,7 +436,7 @@
       },
       "post": {
         "tags": [
-          "Credits"
+          "Credit Purchase"
         ],
         "operationId": "PurchaseBegin",
         "requestBody": {
@@ -722,7 +475,7 @@
     "/api/v5/credits/purchase/complete/{transactionId}": {
       "get": {
         "tags": [
-          "Credits"
+          "Credit Purchase"
         ],
         "operationId": "PurchaseComplete",
         "parameters": [
@@ -753,7 +506,7 @@
     "/api/v5/credits/transfer": {
       "get": {
         "tags": [
-          "Credits"
+          "Credit Transfer"
         ],
         "operationId": "TransferList",
         "parameters": [
@@ -796,7 +549,7 @@
       },
       "post": {
         "tags": [
-          "Credits"
+          "Credit Transfer"
         ],
         "operationId": "TransferCredit",
         "requestBody": {
@@ -832,320 +585,10 @@
         }
       }
     },
-    "/api/v5/credits/pricing": {
-      "get": {
-        "tags": [
-          "Credits"
-        ],
-        "operationId": "PriceList",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PriceResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/credits/pricing/calc": {
-      "get": {
-        "tags": [
-          "Credits"
-        ],
-        "operationId": "PriceCalculate",
-        "parameters": [
-          {
-            "name": "amount",
-            "in": "query",
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "default": 0
-            }
-          },
-          {
-            "name": "quantity",
-            "in": "query",
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "default": 0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CalculatorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/sender-ids": {
-      "get": {
-        "tags": [
-          "SenderIDs"
-        ],
-        "operationId": "SenderIdList",
-        "parameters": [
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 1000.0,
-              "minimum": 1.0
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 500.0,
-              "minimum": 5.0
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SenderIdResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "SenderIDs"
-        ],
-        "operationId": "SenderIdCreate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SenderIdRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SenderIdRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SenderIdRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SenderIdResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/sender-ids/{senderId}": {
-      "delete": {
-        "tags": [
-          "SenderIDs"
-        ],
-        "operationId": "SenderIdDelete",
-        "parameters": [
-          {
-            "name": "senderId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SenderIdResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/sms": {
-      "post": {
-        "tags": [
-          "Sms"
-        ],
-        "operationId": "SmsMessageSend",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SmsMessageRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SmsMessageRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SmsMessageRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SmsMessageResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "Sms"
-        ],
-        "operationId": "SmsMessageList",
-        "parameters": [
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 1000.0,
-              "minimum": 1.0
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 500.0,
-              "minimum": 5.0
-            }
-          },
-          {
-            "name": "DateFrom",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "DateTo",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "SearchText",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SmsMessageResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/sms/{messageId}": {
-      "get": {
-        "tags": [
-          "Sms"
-        ],
-        "operationId": "SmsMessageGet",
-        "parameters": [
-          {
-            "name": "messageId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SmsMessageResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v5/sms/batch": {
       "post": {
         "tags": [
-          "SmsBatch"
+          "Messages"
         ],
         "operationId": "SmsBatchCreate",
         "requestBody": {
@@ -1182,7 +625,7 @@
       },
       "get": {
         "tags": [
-          "SmsBatch"
+          "Messages"
         ],
         "operationId": "SmsBatchList",
         "parameters": [
@@ -1250,7 +693,7 @@
     "/api/v5/sms/batch/template": {
       "post": {
         "tags": [
-          "SmsBatch"
+          "Messages"
         ],
         "operationId": "SmsBatchCsvCreate",
         "requestBody": {
@@ -1289,7 +732,7 @@
     "/api/v5/sms/batch/pending": {
       "get": {
         "tags": [
-          "SmsBatch"
+          "Messages"
         ],
         "operationId": "SmsBatchPendingList",
         "responses": {
@@ -1312,7 +755,7 @@
     "/api/v5/sms/batch/{batchId}": {
       "get": {
         "tags": [
-          "SmsBatch"
+          "Messages"
         ],
         "operationId": "SmsBatchGet",
         "parameters": [
@@ -1341,7 +784,7 @@
       },
       "delete": {
         "tags": [
-          "SmsBatch"
+          "Messages"
         ],
         "operationId": "SmsBatchDelete",
         "parameters": [
@@ -1365,7 +808,7 @@
     "/api/v5/sms/batch/pending/{batchId}": {
       "delete": {
         "tags": [
-          "SmsBatch"
+          "Messages"
         ],
         "operationId": "SmsBatchPendingAbort",
         "parameters": [
@@ -1389,7 +832,7 @@
     "/api/v5/sms/batch/{batchId}/reports": {
       "get": {
         "tags": [
-          "SmsBatch"
+          "Messages"
         ],
         "operationId": "SmsBatchReportsList",
         "parameters": [
@@ -1439,6 +882,578 @@
           }
         }
       }
+    },
+    "/api/v5/sms": {
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "SmsMessageSend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsMessageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsMessageRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmsMessageResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "SmsMessageList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SmsMessageResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/drafts": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "SmsDraftList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SmsMessageResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/{messageId}": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "SmsMessageGet",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmsMessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book": {
+      "get": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "ContactList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContactResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "ContactCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactCreateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactCreateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book/{phoneNo}": {
+      "put": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "ContactUpdate",
+        "parameters": [
+          {
+            "name": "phoneNo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUpdateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUpdateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "ContactDelete",
+        "parameters": [
+          {
+            "name": "phoneNo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book/groups": {
+      "get": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "GroupList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book/groups/{groupId}": {
+      "post": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "GroupCreate",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "GroupUpdate",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "GroupDelete",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sender-ids": {
+      "get": {
+        "tags": [
+          "Sender IDs"
+        ],
+        "operationId": "SenderIdList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SenderIdResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sender IDs"
+        ],
+        "operationId": "SenderIdCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenderIdRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenderIdRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenderIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SenderIdResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sender-ids/{senderId}": {
+      "delete": {
+        "tags": [
+          "Sender IDs"
+        ],
+        "operationId": "SenderIdDelete",
+        "parameters": [
+          {
+            "name": "senderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SenderIdResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1471,25 +1486,6 @@
           }
         }
       },
-      "BatchFileRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "batchFileID": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "rawNumbers": {
-            "type": "string"
-          },
-          "countryCode": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
-      },
       "BatchFileResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -1518,26 +1514,7 @@
           }
         }
       },
-      "CalculatorResponse": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "price": {
-            "type": "number",
-            "format": "double"
-          },
-          "quantity": {
-            "type": "number",
-            "format": "double"
-          },
-          "amount": {
-            "type": "number",
-            "readOnly": true,
-            "format": "double"
-          }
-        }
-      },
-      "ContactRequest": {
+      "ContactCreateRequest": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -1549,7 +1526,6 @@
           },
           "groups": {
             "type": "array",
-            "nullable": true,
             "items": {
               "type": "string"
             }
@@ -1583,6 +1559,27 @@
           }
         }
       },
+      "ContactUpdateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          },
+          "groups": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "DeliveryReportResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -1603,19 +1600,36 @@
           }
         }
       },
+      "GroupResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "groupName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "members": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/ContactResponse"
+            }
+          }
+        }
+      },
       "LoginRequest": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "parentID": {
-            "type": "string",
-            "nullable": true
-          },
           "username": {
             "type": "string"
           },
           "password": {
             "type": "string"
+          },
+          "parentID": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -1633,6 +1647,25 @@
           "expiresIn": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "PriceCalcResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantity": {
+            "type": "number",
+            "format": "double"
+          },
+          "amount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
           }
         }
       },

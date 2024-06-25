@@ -24,16 +24,20 @@
                             <label class="form-label">Select From</label>
                             <div>
                                 <InputRadioGroup Value="contactSelection"
-                                                 ValueExpression="@(() => contactSelection)"
-                                                 ValueChanged="@((string value) => ShowModal(value))">
-                                    @foreach (var option in contactOptions)
-                                    {
-                                        var radioId = $"radio-{option}";
-                                        <div class="form-check form-check-inline">
-                                            <InputRadio class="form-check-input" id="@radioId" Value="@option" />
-                                            <label class="form-check-label" for="@radioId">@option</label>
-                                        </div>
-                                    }
+                                            ValueExpression="()"
+                                            ValueChanged="((string value) => ShowModal(value))">
+                                    <div class="form-check form-check-inline">
+                                        <InputRadio class="form-check-input" id="bulkFile" Value='@("Bulk Files")' />
+                                        <label class="form-check-label" for="bulkFile">Bulk files</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <InputRadio class="form-check-input" id="group" Value='@("Groups")' />
+                                        <label class="form-check-label" for="group">Groups</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <InputRadio class="form-check-input" id="allContact" Value='@("All Contacts")' />
+                                        <label class="form-check-label" for="allContact">All Contact</label>
+                                    </div>
                                 </InputRadioGroup>
                             </div>
                         </div>
@@ -45,7 +49,7 @@
                             <button type="button" class="btn btn-link btn-sm text-decoration-none" @onclick="ClearMessage">Clear Message</button>
                         </div>
                         <InputTextArea id="message" class="form-control" @bind-Value="model.MessageText" @oninput="HandleMessageInput" rows="5"></InputTextArea>
-                        <div>@_messageCounter</div>
+                        <div>@_counterText</div>
                     </div>
 
                     <div class="mb-3">
@@ -101,17 +105,15 @@
 
 @code {
     private SmsMessageRequest model = new();
-    private List<SenderIdResponse> senderIds = new();
-    private List<string> contactOptions = new List<string> { "Bulk Files", "Groups", "All Contacts" };
+    private List<SenderIdResponse> senderIds = [];
     private string contactSelection = string.Empty;
-    private List<string> sendOptions = new List<string> { "Send Immediately", "Schedule for Later" };
+    private List<string> sendOptions = ["Send Immediately", "Schedule for Later"];
     private string sendOption = "Send Immediately";
     private SelectContactModal<string> modal = new();
-    private HashSet<string> selectedContacts = new();
-    private HashSet<string> selectedGroupsAndBulkFiles = new();
-    private string _messageCounter = "";
-    private const int _smsMaxLength = 1600; // Max SMS length
-    private const int _smsAdLength = 0;
+    private List<string> selectedContacts = [];
+    private List<string> selectedGroupsAndBulkFiles = [];
+    private string _counterText = "";
+    private const int _smsMaxParts = 6; // Max SMS length
 
     protected override async Task OnInitializedAsync()
     {
@@ -135,7 +137,7 @@
     private void ClearMessage()
     {
         model.MessageText = string.Empty;
-        _messageCounter = string.Empty;
+        _counterText = string.Empty;
     }
 
     private void ShowModal(string value)
@@ -144,7 +146,7 @@
         modal.Show(contactSelection, selectedContacts);
     }
 
-    private void AddPhoneNumbers(HashSet<string> numbers)
+    private void AddPhoneNumbers(List<string> numbers)
     {
         selectedContacts = numbers;
         model.PhoneNumber = string.Join(", ", selectedContacts);
@@ -163,44 +165,46 @@
     private async Task HandleMessageInput(ChangeEventArgs e)
     {
         var strSmsText = e.Value?.ToString();
-        int intSMSLen = strSmsText!.GetValidGsmTextLength() + _smsAdLength;
+        int intSMSLen = strSmsText!.GetValidGsmTextLength();
 
         if (strSmsText?.Length < 1)
         {
-            _messageCounter = "";
+            _counterText = "";
             return;
         }
 
-        if (intSMSLen > _smsMaxLength)
+        int intSmsParts = GetMessageParts(strSmsText);
+
+        if (intSmsParts > _smsMaxParts)
         {
-            model.MessageText = strSmsText!.Substring(0, _smsMaxLength - _smsAdLength);
+            // model.MessageText = strSmsText!.Substring(0, _smsMaxParts);
             await alert.Info("Maximum SMS characters reached!", "alert");
             return;
         }
+        
+        int intNextMax = intSmsParts == 1 ? 160 : intSmsParts * 153;
 
-        int intNextMax, intSmsParts, intPrevMax;
-        if (intSMSLen <= 160)
+        _counterText = intSMSLen + "/" + intNextMax + " . . . Cost: " + intSmsParts + " SMS";
+        // if ((intPrevMax > 0) && (intSMSLen == (intPrevMax + 1)))
+        // {
+        //     await alert.Info($"You have just exceeded {intPrevMax}. You will be charged {intSmsParts} credits for this message!", "alert");
+        // }
+    }
+
+    private int GetMessageParts(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
         {
-            intSmsParts = 1; intNextMax = 160; intPrevMax = 0;
-        }
-        else
-        {
-            intSmsParts = (int)Math.Ceiling(intSMSLen / 153m);
-            intNextMax = intSmsParts * 153;
-            intPrevMax = intNextMax - 153;
-            if (intPrevMax < 160)
-            {
-                intPrevMax = 160;
-            }
+            return 0;
         }
 
-        if (intSMSLen > 0)
+        var length = input.GetValidGsmTextLength();
+
+        if(length <= 160)
         {
-            _messageCounter = intSMSLen + "/" + intNextMax + " . . . Cost: " + intSmsParts + " SMS";
-            if ((intPrevMax > 0) && (intSMSLen == (intPrevMax + 1)))
-            {
-                await alert.Info($"You have just exceeded {intPrevMax}. You will be charged {intSmsParts} credits for this message!", "alert");
-            }
+            return 1;
         }
+        
+        return (int)Math.Ceiling(length / 153m);
     }
 }

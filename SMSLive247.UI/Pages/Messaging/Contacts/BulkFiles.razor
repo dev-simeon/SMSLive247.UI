@@ -22,7 +22,7 @@
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column>
-                    <Actions OnDelete="() => bulkFileModal.Delete(context)">
+                    <Actions OnSave="() => bulkFileModal.Download(context)" OnDelete="() => bulkFileModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>

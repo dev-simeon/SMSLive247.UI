@@ -61,17 +61,17 @@
 
 @code {
     [Parameter] public string contactSelection { get; set; }
-    [Parameter] public EventCallback<HashSet<string>> OnPhoneNumbersSelected { get; set; }
+    [Parameter] public EventCallback<List<string>> OnPhoneNumbersSelected { get; set; }
 
-    private List<object> allItems = new();
-    private List<object> filteredItems = new();
+    private List<object> allItems = [];
+    private List<object> filteredItems = [];
     private List<object> PagedItems => filteredItems.Take(currentPage * pageSize).ToList();
     private bool loading = true;
     private bool isModalVisible = false;
     private string searchQuery = "";
     private int currentPage = 1;
     private const int pageSize = 20;
-    private HashSet<string> selectedItems = new HashSet<string>();
+    private List<string> selectedItems = [];
     private bool selectAllChecked = false;
 
     protected override async Task OnParametersSetAsync()
@@ -134,7 +134,7 @@
     {
         if ((bool)e.Value)
         {
-            selectedItems = new HashSet<string>(filteredItems.Select(item => item.ToString()));
+            selectedItems = new List<string>(filteredItems.Select(item => item.ToString()));
         }
         else
         {
@@ -154,7 +154,7 @@
         Close();
     }
 
-    public void Show(string contactSelection, HashSet<string> currentSelectedItems)
+    public void Show(string contactSelection, List<string> currentSelectedItems)
     {
         this.contactSelection = contactSelection;
         selectedItems = currentSelectedItems;
@@ -168,7 +168,7 @@
         StateHasChanged();
     }
 
-    public void UpdateSelectedItems(HashSet<string> currentSelectedItems)
+    public void UpdateSelectedItems(List<string> currentSelectedItems)
     {
         selectedItems = currentSelectedItems;
         selectAllChecked = CheckIfAllSelected();
