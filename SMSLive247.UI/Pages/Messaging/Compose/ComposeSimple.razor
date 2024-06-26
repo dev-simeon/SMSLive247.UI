@@ -1,4 +1,7 @@
-﻿<section class="d-flex gap-4">
+﻿@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<section class="d-flex gap-4">
     <div class="w-50">
         <Card HeaderTitle="Compose SMS">
             <Body>
@@ -24,8 +27,8 @@
                             <label class="form-label">Select From</label>
                             <div>
                                 <InputRadioGroup Value="contactSelection"
-                                            ValueExpression="()"
-                                            ValueChanged="((string value) => ShowModal(value))">
+                                                 ValueExpression="@(() => contactSelection)"
+                                                 ValueChanged="@((string value) => ShowModal(value))">
                                     <div class="form-check form-check-inline">
                                         <InputRadio class="form-check-input" id="bulkFile" Value='@("Bulk Files")' />
                                         <label class="form-check-label" for="bulkFile">Bulk files</label>
@@ -48,20 +51,20 @@
                             <label for="message" class="form-label">Message</label>
                             <button type="button" class="btn btn-link btn-sm text-decoration-none" @onclick="ClearMessage">Clear Message</button>
                         </div>
-                        <InputTextArea id="message" class="form-control" @bind-Value="model.MessageText" @oninput="HandleMessageInput" rows="5"></InputTextArea>
+                        <textarea @ref="messageInput" id="message" class="form-control" @bind="model.MessageText" @oninput="HandleMessageInput" rows="5"></textarea>
                         <div>@_counterText</div>
                     </div>
 
                     <div class="mb-3">
                         <InputRadioGroup @bind-Value="sendOption">
-                            @foreach (var option in sendOptions)
-                            {
-                                var radioId = $"radio-{option}";
-                                <div class="form-check form-check-inline">
-                                    <InputRadio class="form-check-input" id="@radioId" Value="@option" />
-                                    <label class="form-check-label" for="@radioId">@option</label>
-                                </div>
-                            }
+                            <div class="form-check form-check-inline">
+                                <InputRadio class="form-check-input" id="sendNow" Value='@("Send Immediately")' />
+                                <label class="form-check-label" for="sendNow">Send Immediately</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <InputRadio class="form-check-input" id="sendLater" Value='@("Schedule for Later")' />
+                                <label class="form-check-label" for="sendLater">Schedule for Later</label>
+                            </div>
                         </InputRadioGroup>
                     </div>
 
@@ -107,13 +110,12 @@
     private SmsMessageRequest model = new();
     private List<SenderIdResponse> senderIds = [];
     private string contactSelection = string.Empty;
-    private List<string> sendOptions = ["Send Immediately", "Schedule for Later"];
     private string sendOption = "Send Immediately";
     private SelectContactModal<string> modal = new();
     private List<string> selectedContacts = [];
-    private List<string> selectedGroupsAndBulkFiles = [];
     private string _counterText = "";
     private const int _smsMaxParts = 6; // Max SMS length
+    private ElementReference messageInput;
 
     protected override async Task OnInitializedAsync()
     {
@@ -177,18 +179,28 @@
 
         if (intSmsParts > _smsMaxParts)
         {
-            // model.MessageText = strSmsText!.Substring(0, _smsMaxParts);
+            await JS.InvokeVoidAsync("preventInput", messageInput, 918);
             await alert.Info("Maximum SMS characters reached!", "alert");
             return;
         }
-        
+
         int intNextMax = intSmsParts == 1 ? 160 : intSmsParts * 153;
 
-        _counterText = intSMSLen + "/" + intNextMax + " . . . Cost: " + intSmsParts + " SMS";
-        // if ((intPrevMax > 0) && (intSMSLen == (intPrevMax + 1)))
-        // {
-        //     await alert.Info($"You have just exceeded {intPrevMax}. You will be charged {intSmsParts} credits for this message!", "alert");
-        // }
+        _counterText = $"{intSMSLen}/{intNextMax} . . . Cost: {intSmsParts} SMS";
+
+        if (intSmsParts >= 2)
+        {
+            if (intSMSLen == 161)
+            {
+                await alert.Info($"You have just exceeded 160 characters. You will be charged {intSmsParts} credits for this message!", "alert");
+            }
+
+            if (intSMSLen == intNextMax - 153 + 1)
+            {
+                await alert.Info($"You have just exceeded {intNextMax - 153} characters. You will be charged {intSmsParts} credits for this message!", "alert");
+            }
+        }
+
     }
 
     private int GetMessageParts(string? input)
@@ -208,3 +220,14 @@
         return (int)Math.Ceiling(length / 153m);
     }
 }
+
+
+
+@* Inline JavaScript *@
+<script>
+    window.preventInput = function (element, maxLength) {
+        if (element.value.length >= maxLength) {
+            element.value = element.value.substring(0, maxLength);
+        }
+    };
+</script>

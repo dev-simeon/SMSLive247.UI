@@ -1,6 +1,6 @@
 ﻿@typeparam TItem
 
-<Modal Title="Select Contacts" Hidden="@(!isModalVisible)">
+<Modal Size="Modal.ModalSize.LARGE" Title="Select Contacts" Hidden="@(!isModalVisible)">
     <Body>
         @if (loading)
         {
@@ -8,19 +8,19 @@
         }
         else
         {
-            <input type="text" class="form-control mb-2" placeholder="Search..." @bind="searchQuery" @oninput="OnSearchChanged" />
+            <input type="text" class="form-control mb-2 w-50" placeholder="Search..." @bind="searchQuery" @oninput="OnSearchChanged" />
 
             <div class="form-check mb-1">
                 <input class="form-check-input" type="checkbox" @onchange="SelectAllChanged" checked="@selectAllChecked">
                 <label class="form-check-label">Select All</label>
             </div>
 
-            <div>
+            <div class="d-flex gap-2 flex-wrap">
                 @if (contactSelection == "Bulk Files")
                 {
                     @foreach (var bulkFile in PagedItems.OfType<BatchFileResponse>())
                     {
-                        <div class="form-check mb-1">
+                        <div style="width: 385px" class="form-check">
                             <input class="form-check-input" type="checkbox" value="@bulkFile.Description" @onchange="e => OnItemSelected(e, bulkFile.Description)" checked="@selectedItems.Contains(bulkFile.Description)">
                             <label class="form-check-label" for="bulkFile_@bulkFile.BatchFileID">@bulkFile.Description</label>
                         </div>
@@ -30,7 +30,7 @@
                 {
                     @foreach (var contact in PagedItems.OfType<OpenApi.ContactResponse>())
                     {
-                        <div class="form-check mb-1">
+                        <div style="width: 385px" class="form-check">
                             <input class="form-check-input" type="checkbox" value="@contact.PhoneNumber" @onchange="e => OnItemSelected(e, contact.PhoneNumber)" checked="@selectedItems.Contains(contact.PhoneNumber)">
                             <label class="form-check-label" for="contact_@contact.ContactName">@contact.ContactName<span> (@contact.PhoneNumber)</span></label>
                         </div>
@@ -40,7 +40,7 @@
                 {
                     @foreach (var group in PagedItems.OfType<string>())
                     {
-                        <div class="form-check mb-1">
+                        <div style="width: 385px" class="form-check">
                             <input class="form-check-input" type="checkbox" value="@group" @onchange="e => OnItemSelected(e, group)" checked="@selectedItems.Contains(group)">
                             <label class="form-check-label">@group</label>
                         </div>
@@ -63,58 +63,54 @@
     [Parameter] public string contactSelection { get; set; }
     [Parameter] public EventCallback<List<string>> OnPhoneNumbersSelected { get; set; }
 
-    private List<object> allItems = [];
-    private List<object> filteredItems = [];
+    private List<object> allItems = new();
+    private List<object> filteredItems = new();
     private List<object> PagedItems => filteredItems.Take(currentPage * pageSize).ToList();
     private bool loading = true;
     private bool isModalVisible = false;
     private string searchQuery = "";
     private int currentPage = 1;
     private const int pageSize = 20;
-    private List<string> selectedItems = [];
+    private List<string> selectedItems = new();
     private bool selectAllChecked = false;
 
     protected override async Task OnParametersSetAsync()
     {
         loading = true;
-
         allItems.Clear();
 
-        // Simulate loading data
+        await LoadData();
+
+        filteredItems = allItems;
+        loading = false;
+    }
+
+    private async Task LoadData()
+    {
         if (contactSelection == "Bulk Files")
         {
-            for (int i = 1; i <= 50; i++)
+            var response = await apiClient.BatchFileListAsync();
+            if (response.StatusCode == 200)
             {
-                allItems.Add(new BatchFileResponse
-                {
-                    BatchFileID = $"BulkFile{i}",
-                    Description = $"Bulk File {i}",
-                    FileType = "txt",
-                    TotalNumbers = i * 10
-                });
+                allItems.AddRange(response.Result);
             }
         }
         else if (contactSelection == "All Contacts")
         {
-            for (int i = 1; i <= 500; i++)
+            var response = await apiClient.ContactListAsync();
+            if (response.StatusCode == 200)
             {
-                allItems.Add(new OpenApi.ContactResponse
-                {
-                    ContactName = $"Contact {i}",
-                    PhoneNumber = $"+123456789{i:D3}"
-                });
+                allItems.AddRange(response.Result);
             }
         }
         else if (contactSelection == "Groups")
         {
-            for (int i = 1; i <= 20; i++)
+            var response = await apiClient.GroupListAsync();
+            if (response.StatusCode == 200)
             {
-                allItems.Add($"Group {i}");
+                allItems.AddRange(response.Result);
             }
         }
-
-        filteredItems = allItems;
-        loading = false;
     }
 
     private void OnItemSelected(ChangeEventArgs e, string item)
@@ -177,8 +173,8 @@
 
     private void OnSearchChanged(ChangeEventArgs e)
     {
-        searchQuery = e.Value.ToString();
-        filteredItems = allItems.Where(item => item.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        searchQuery = e.Value?.ToString()!;
+        filteredItems = allItems.Where(item => item.ToString()!.Contains(searchQuery!, StringComparison.OrdinalIgnoreCase)).ToList();
         currentPage = 1;
         selectAllChecked = CheckIfAllSelected();
     }
