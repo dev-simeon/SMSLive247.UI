@@ -22,7 +22,8 @@
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column>
-                    <Actions OnSave="() => bulkFileModal.Download(context)" OnDelete="() => bulkFileModal.Delete(context)">
+                    <Actions OnDownload="() => bulkFileModal.Download(context)" 
+                             OnDelete="() => bulkFileModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -35,23 +36,23 @@
 @code {
     private SearchBox searchBox = new();
     private BulkFileModal bulkFileModal = new();
-    private List<BatchFileResponse> items = new();
-    private List<BatchFileResponse> filteredItems = new();
+    private List<BatchFileResponse> items = [];
+    private List<BatchFileResponse> filteredItems = [];
 
 
     protected override async Task OnInitializedAsync()
     {
         var response = await apiClient.BatchFileListAsync();
 
-        items = response.Result.ToList();
+        items = response.Result.Where(x => x.FileType == "txt").ToList();
         filteredItems = items;
     }
 
     private void SearchBulkFile()
     {
-        filteredItems = items
-            .Where(i => string.IsNullOrWhiteSpace(searchBox.Text) || 
-                        i.Description.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
+        filteredItems = items.Where(i => string.IsNullOrWhiteSpace(searchBox.Text)
+                                      || i.Description.Contains(searchBox.Text,
+                                          StringComparison.OrdinalIgnoreCase))
+                             .ToList();
     }
 }

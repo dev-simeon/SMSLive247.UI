@@ -11,7 +11,7 @@
             <LeftRight>
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="SearchSenderId">
-                        <InputSelect class="form-select" @bind-Value="selectedStatus">
+                        <InputSelect class="form-select" @bind-Value="searchStatus">
                             <option value="" selected>All</option>
                             <option value="APPROVED">Approved</option>
                             <option value="PENDING">Pending Approval</option>
@@ -19,8 +19,9 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DEFAULT" @onclick="() => senderIdModal.Show()">
-                        New Sender ID Registration
+                    <Button Type="Button.Style.ADD" 
+                            @onclick="e => senderIdModal.Show()">
+                        New Sender ID
                     </Button>
                 </Right>
             </LeftRight>
@@ -40,7 +41,7 @@
                     }
                 </Column>
                 <Column>
-                    <Actions OnDelete="() => senderIdModal.Delete(context)">
+                    <Actions OnDelete="e => senderIdModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -48,16 +49,22 @@
     </Body>
 </Card>
 
-<SenderIdModal @ref="senderIdModal"></SenderIdModal>
+<SenderIdModal @ref="senderIdModal" OnCompleted="FetchData"></SenderIdModal>
 
 @code {
     private SearchBox searchBox = new();
-    private string selectedStatus = "";
-    private List<SenderIdResponse> items = new();
-    private List<SenderIdResponse> filteredItems = new();
     private SenderIdModal senderIdModal = new();
 
+    private string searchStatus = "";
+    private List<SenderIdResponse> items = [];
+    private List<SenderIdResponse> filteredItems = [];
+
     protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    protected async Task FetchData()
     {
         var response = await apiClient.SenderIdListAsync(1, 500);
 
@@ -70,11 +77,29 @@
 
     private void SearchSenderId()
     {
-        filteredItems = items
-            .Where(i => (string.IsNullOrWhiteSpace(selectedStatus) ||
-                        (selectedStatus == "APPROVED" && i.Approved) ||
-                        (selectedStatus == "PENDING" && !i.Approved)) &&
-                        (string.IsNullOrWhiteSpace(searchBox.Text) || i.SenderID.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)))
-            .ToList();
+        filteredItems = items;
+
+        switch (searchStatus)
+        {
+            case "APPROVED":
+                filteredItems = filteredItems.Where(x => x.Approved).ToList();
+                break;
+
+            case "PENDING":
+                filteredItems = filteredItems.Where(x => !x.Approved).ToList();
+                break;
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchBox.Text))
+        {
+            filteredItems = filteredItems.Where(x => x.SenderID.Contains(
+                searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        // filteredItems = items
+        //     .Where(i => (string.IsNullOrWhiteSpace(searchStatus) ||
+        //                 (searchStatus == "APPROVED" && i.Approved) ||
+        //                 (searchStatus == "PENDING" && !i.Approved)) &&
+        //                 (string.IsNullOrWhiteSpace(searchBox.Text) || i.SenderID.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)))
+        //     .ToList();
     }
 }

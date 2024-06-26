@@ -3,7 +3,8 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
+                    <SearchBox @ref="searchBox" 
+                               @onclick="e => ds.LoadData(alert)">
                     </SearchBox>
                 </Left>
             </LeftRight>
@@ -31,20 +32,25 @@
 
 <DraftMessageModal @ref="draftMessageModal"></DraftMessageModal>
 
-
-
 @code {
     private SearchBox searchBox = new();
     private DraftMessageModal draftMessageModal = new();
     private ApiDataSource<SmsBatchResponse> ds = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
         });
-
-        await ds.LoadData(alert);
     }
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     ds.Callback = new((PageState p, FilterState? f) =>
+    //     {
+    //         return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
+    //     });
+    //     await ds.LoadData(alert);
+    // }
 }

@@ -1,6 +1,7 @@
 ﻿<EditModal TItem="SenderIdResponse" @ref="editor" LabelText="Sender ID"
         OnCreate="OnCreate"
-        OnDelete="OnDelete">
+        OnDelete="OnDelete"
+        OnCompleted="OnCompleted">
     <FormInputText Label="Sender ID" @bind-Value="context.SenderID"></FormInputText>
     <FormInputText Label="Message Purpose" @bind-Value="context.Purpose"></FormInputText>
     <FormField Label="Sample Message">
@@ -9,10 +10,11 @@
 </EditModal>
 
 @code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
     private EditModal<SenderIdResponse> editor = new();
 
     public void Show(SenderIdResponse? sender = null) => editor.Show(sender);
-
     public void Delete(SenderIdResponse sender) => editor.Delete(sender);
 
     private async Task OnCreate()
@@ -23,13 +25,14 @@
             Purpose = editor.Model.Purpose,
             SampleText = editor.Model.SampleText
         };
-
         await apiClient.SenderIdCreateAsync(request);
     }
 
     private async Task OnDelete()
     {
-        bool confirmed = await alert.Confirm("Are you sure you want to delete this Sender ID?", "Confirm Deletion");
+        var question = "Are you sure you want to delete this Sender ID?";
+        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+        
         if (confirmed)
         {
             await apiClient.SenderIdDeleteAsync(editor.Model.SenderID);

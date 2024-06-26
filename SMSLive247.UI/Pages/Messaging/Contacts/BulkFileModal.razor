@@ -2,79 +2,81 @@
            OnCreate="OnCreate"
            OnDelete="OnDelete"
            OnDownload="OnDownload">
-    @if (Mode == "create")
+    @if (editor.EditMode == 0) //create=0, edit=1
     {
-        <FormInputFile Label="Select File" OnChange="e => FileSelected(e)"></FormInputFile>
-        <FormField Label="Organize File">
-            <InputRadioGroup @bind-Value="organizeFile">
-                @foreach (var option in radioOptions)
-                {
-                    var radioId = $"radio-{option}";
-                    var isDisabled = DisableMergeOption && option == "Merge into existing groups";
+        <FormInputFile Label="Select File" OnChange="e => FileSelected(e)" Accept="@fileTypes"></FormInputFile>
+            @if (ForCSV == false)
+            {
+            <FormField Label="Organize File">
+                <InputRadioGroup @bind-Value="groupMode">
                     <div class="form-check form-check-inline">
-                        <InputRadio class="form-check-input" id="@radioId" Value="@option" disabled="@isDisabled" />
-                        <label class="form-check-label" for="@radioId">@option</label>
+                        <InputRadio class="form-check-input" id="r1" Value="@("NEW")" />
+                        <label class="form-check-label" for="r1">Save as new file</label>
                     </div>
-                }
-            </InputRadioGroup>
-        </FormField>
-        @if (organizeFile == "Save as new group")
-        {
-            <FormInputText Label="Group Name" @bind-Value="fileName"></FormInputText>
-        }
-        else if (organizeFile == "Merge into existing groups")
-        {
-            <FormField Label="Select Group">
-                <select class="form-select" @bind="fileName">
-                    <option value=""></option>
-                    <option value="group1">Group 1</option>
-                    <option value="group2">Group 2</option>
-                    <option value="group3">Another Group</option>
-                </select>
+                    <div class="form-check form-check-inline">
+                        <InputRadio class="form-check-input" id="r2" Value="@("MERGE")" />
+                        <label class="form-check-label" for="r2">Merge into existing file</label>
+                    </div>
+                </InputRadioGroup>
             </FormField>
-
-            <p class="mt-5">Note: while merging into existing group duplicates will be removed.</p>
+        }
+        @if (groupMode == "NEW")
+        {
+        <FormInputText Label="Group Name" @bind-Value="fileName"></FormInputText>
+        }
+        else if (groupMode == "MERGE")
+        {
+        <FormField Label="Select Group">
+            <select class="form-select" @bind="fileName">
+                <option value="group1">Group 1</option>
+                <option value="group2">Group 2</option>
+                <option value="group3">Another Group</option>
+            </select>
+        </FormField>
         }
     }
-    else if (Mode == "delete")
+    else if (editor.EditMode >= 2) //delete=2, download=3
     {
         <FormInputText Label="Description" @bind-Value="editor.Model.Description" Disabled="true"></FormInputText>
         <FormInputNumber Label="Total In File" @bind-Value="editor.Model.TotalNumbers" Disabled="true"></FormInputNumber>
         <FormInputText Label="File Type" @bind-Value="editor.Model.FileType" Disabled="true"></FormInputText>
         <FormInputDate Label="Date Added" @bind-Value="editor.Model.DateCreated" Disabled="true"></FormInputDate>
     }
+    <p class="mt-5">Note: Duplicate numbers will be removed.</p>
 </EditModal>
 
 @code {
-    [Parameter] public bool DisableMergeOption { get; set; } = false;
-    private string Mode = "create";
-    private IBrowserFile? browserFile;
+    [Parameter] public bool ForCSV { get; set; } = false;
+
     private EditModal<BatchFileResponse> editor = new();
-    private List<string> radioOptions = new List<string> { "Save as new group", "Merge into existing groups" };
-    private string organizeFile = "Save as new group";
-    private string fileName;
+    private IBrowserFile? browserFile;
+    private string groupMode = "NEW";
+    private string fileName = string.Empty;
+    private string fileTypes => ForCSV ? ".csv" : ".txt, .text";
 
-    public void Show(BatchFileResponse? batchFile = null)
-    {
-        Mode = "create";
-        editor.Show(batchFile);
-    }
+    public void Show(BatchFileResponse? batchFile = null) => editor.Show(batchFile);
+    public void Delete(BatchFileResponse batchFile) => editor.Delete(batchFile);
+    public void Download(BatchFileResponse batchFile) => editor.Download(batchFile);
 
-    public void Delete(BatchFileResponse batchFile)
+    private async Task OnCreate()
     {
-        Mode = "delete";
-        editor.Delete(batchFile);
-    }
+        if (browserFile != null)
+        {
+            var file = new FileParameter(browserFile);
+            var response = await apiClient.BatchFileCreateAsync(234, file);
 
-    public void Download(BatchFileResponse batchFile)
-    {
-        Mode = "delete";
-        editor.Download(batchFile);
+            // if (response.StatusCode == 200)
+            //     await alert.Success("Batch file was uploaded successfully.", "Upload Success");
+            // else
+            //     await alert.Error(response.StatusCode.ToString(), "Upload Failed");
+        }
     }
 
     private async Task OnDelete()
     {
-        bool confirmed = await alert.Confirm("Are you sure you want to delete this bulk file?", "Confirm Deletion");
+        var question = "Are you sure you want to delete this bulk file?";
+        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+
         if (confirmed)
         {
             await apiClient.BatchFileDeleteAsync(editor.Model.BatchFileID);
@@ -83,38 +85,17 @@
 
     private async Task OnDownload()
     {
-        await apiClient.BatchFileDownloadAsync(editor.Model.BatchFileID);
-    }
+        var question = "Are you sure you want to download this bulk file?";
+        bool confirmed = await alert.Confirm(question, "Confirm Download");
 
-    private async Task OnCreate()
-    {
-        if(browserFile != null)
+        if (confirmed)
         {
-            var countryCode = 234;
-
-            var file = new FileParameter(browserFile);
-
-            var response = await apiClient.BatchFileCreateAsync(countryCode, file);
-
-            if (response.StatusCode == 200)
-            {
-                await alert.Success("Batch file was uploaded successfully.", "Upload Success");
-            }
+            await apiClient.BatchFileDownloadAsync(editor.Model.BatchFileID);
         }
-        
     }
 
     private void FileSelected(InputFileChangeEventArgs e)
     {
         browserFile = e.File;
     }
-
-    // private async Task OnCreate()
-    // {
-    //     if (User != null && browserFile != null)
-    //     {
-    //         var file = new FileParameter(browserFile);
-    //         await apiClient.AddSignatureAsync(User.UserID, model.Description, file);
-    //     }
-    // }
 }

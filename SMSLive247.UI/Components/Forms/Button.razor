@@ -18,7 +18,7 @@ else
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 
-    public enum Style {DEFAULT, ADD, EDIT, SAVE, DELETE, CANCEL, CUSTOM }
+    public enum Style {DEFAULT, ADD, EDIT, SAVE, DELETE, DOWNLOAD, CANCEL, CUSTOM }
 
     private string? GetIconCss()
     {
@@ -37,6 +37,9 @@ else
 
             case Style.DELETE:
                 return $"fa fa-trash{me}";
+
+            case Style.DOWNLOAD:
+                return $"fa fa-download{me}";
 
             case Style.CANCEL:
                 return $"fa fa-close{me}";
