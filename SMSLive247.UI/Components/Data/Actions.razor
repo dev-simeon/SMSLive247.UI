@@ -42,6 +42,12 @@
         <i class="fa fa-trash"></i>
     </button>
     }
+    @if (OnDownload.HasDelegate)
+    {
+    <button class="@ButtonClass" disabled="@Disabled" @onclick="@OnDownload" @onclick:stopPropagation="true" title="Download">
+        <i class="fa fa-download"></i>
+    </button>
+    }
     @if (OnCancel.HasDelegate)
     {
     <button class="@ButtonClass" disabled="@Disabled" @onclick="@OnCancel" @onclick:stopPropagation="true" title="Cancel Edit">
@@ -57,6 +63,7 @@
     [Parameter] public EventCallback OnEdit { get; set; }
     [Parameter] public EventCallback OnSave { get; set; }
     [Parameter] public EventCallback OnDelete { get; set; }
+    [Parameter] public EventCallback OnDownload { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
 
     [Parameter] public string? ViewLink { get; set; }

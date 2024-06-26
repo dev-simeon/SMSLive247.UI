@@ -3,17 +3,13 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    @* <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                        <select class="form-select" @onchange="FilterStatusChanged">
-                            <option value="All" selected>All</option>
-                            <option value="Pending">Pending</option>
-                            <option value="Aborted">Aborted</option>
-                        </select>
-                    </SearchBox> *@
+                    <SearchBox @ref="searchBox" 
+                               @onclick="e => LoadData()">
+                    </SearchBox>
                 </Left>
             </LeftRight>
         </SearchArea>
-        <Table Items="items">
+        <Table Items="GetFilteredItems()">
             <Columns>
                 <Column Header="#"><input class="form-check-input" type="checkbox" /></Column>
                 <Column Header="Sender ID">
@@ -27,8 +23,8 @@
                 </Column>
                 <Column>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-success" @onclick="() => SendNow(context.BatchID)">Send Now</button>
-                        <button type="button" class="btn btn-danger" @onclick="() => AbortMessage(context.BatchID)">Abort</button>
+                        <button type="button" class="btn btn-success" @onclick="e => ResumeBatch(context.BatchID)">Send Now</button>
+                        <button type="button" class="btn btn-danger" @onclick="e => AbortBatch(context.BatchID)">Abort</button>
                     </div>
                 </Column>
             </Columns>
@@ -38,46 +34,42 @@
 
 @code {
     private SearchBox searchBox = new();
-    private List<SmsBatchResponse> items = new();
-    private string selectedStatus = "All";
+    private List<SmsBatchResponse> items = [];
 
-    protected override async Task OnInitializedAsync()
+    protected async Task LoadData()
     {
         var response = await apiClient.SmsBatchPendingListAsync();
-
         items = response.Result.ToList();
-
     }
 
-    private async Task AbortMessage(long batchId)
+    private async Task AbortBatch(long batchId)
     {
-        bool confirmed = await alert.Confirm("Are you sure you want to abort this message?", "Confirm Abortion");
+        var message = "Are you sure you want to cancel this batch?";
+        bool confirmed = await alert.Confirm(message, "Confirm");
+
         if (confirmed)
         {
             await apiClient.SmsBatchPendingAbortAsync((int)batchId);
         }
     }
 
-    private async Task SendNow(long batchId)
+    private async Task ResumeBatch(long batchId)
     {
-        bool confirmed = await alert.Confirm("Are you sure you want to send this message now?", "Confirm Send Now");
+        var message = "Are you sure you want to resume this batch now?";
+        bool confirmed = await alert.Confirm(message, "Confirm");
+
         if (confirmed)
         {
-            //Todo
-            // var response = await apiClient.SmsBatchGetAsync((int)batchId);
-            // var requestBody = new SmsMessageRequest
-            // {
-            //     SenderID = response.Result.SenderID,
-            //     MessageText = response.Result.MessageText,
-            //     DeliveryTime = DateTime.UtcNow,
-            // };
-            // await apiClient.SmsMessageSendAsync(requestBody);
+            //await apiClient.sms((int)batchId);
         }
     }
 
-    // private async Task FilterStatusChanged(ChangeEventArgs e)
-    // {
-    //     selectedStatus = e.Value.ToString();
-    //     await ds.LoadData(alert);
-    // }
+    private List<SmsBatchResponse> GetFilteredItems()
+    {
+        if (items != null)
+        {
+            return items.Where(x => x.MessageText.Contains(searchBox.Text ?? "")).ToList();
+        }
+        return [];
+    }
 }

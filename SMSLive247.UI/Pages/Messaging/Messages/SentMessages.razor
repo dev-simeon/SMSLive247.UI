@@ -3,11 +3,13 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
+                    <SearchBox @ref="searchBox" 
+                               @onclick="e => ds.LoadData(alert)">
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.SAVE" @onclick="e => downloadModal.Download()">
+                    <Button Type="Button.Style.DOWNLOAD" 
+                            @onclick="e => downloadModal.Download()">
                         Download Messages
                     </Button>
                 </Right>
@@ -49,13 +51,11 @@
     private SentMessageView sentMessageView = new();
     private ApiDataSource<SmsBatchResponse> ds = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
         });
-
-        await ds.LoadData(alert);
     }
 }

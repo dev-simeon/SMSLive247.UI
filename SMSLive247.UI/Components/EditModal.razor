@@ -21,6 +21,7 @@
     [Parameter] public EventCallback OnUpdate { get; set; }
     [Parameter] public EventCallback OnCreate { get; set; }
     [Parameter] public EventCallback OnDownload { get; set; }
+    [Parameter] public EventCallback OnCompleted { get; set; }
     [Parameter] public Modal.ModalSize Size { get; set; } = Modal.ModalSize.MEDIUM;
 
     protected override void OnParametersSet()
@@ -28,24 +29,24 @@
         formName = LabelText + "Form";
     }
 
-    private int isEdit = 0; // 0=create, 1=edit, 2=delete, 3=download
+    private int editMode = 0; // 0=create, 1=edit, 2=delete, 3=download
     public TItem Model = new();
     private bool showModal = false;
     private string? title, buttonText, formName;
     private Button.Style buttonStyle = Button.Style.SAVE;
 
-    public bool ForEdit => isEdit > 0;
+    public int EditMode => editMode;
 
     public void Show(TItem? item = null)
     {
-        isEdit = item == null ? 0 : 1;
+        editMode = item == null ? 0 : 1;
         Model = item != null ? item : new();
 
         title = $"Create New {LabelText}";
         buttonText = $"Create {LabelText}";
         buttonStyle = Button.Style.SAVE;
 
-        if (isEdit > 0)
+        if (editMode == 1)
         {
             title = $"Edit {LabelText}";
             buttonText = $"Update {LabelText}";
@@ -56,7 +57,7 @@
 
     public void Delete(TItem item)
     {
-        isEdit = 2;
+        editMode = 2;
         Model = item;
         title = $"Delete {LabelText}";
         buttonText = $"Delete {LabelText}";
@@ -67,11 +68,11 @@
 
     public void Download(TItem? item = null)
     {
-        isEdit = 3;
+        editMode = 3;
         Model = item != null ? item : new();
         title = $"Download {LabelText}";
         buttonText = $"Download {LabelText}";
-        buttonStyle = Button.Style.SAVE;
+        buttonStyle = Button.Style.DOWNLOAD;
         showModal = true;
         StateHasChanged();
     }
@@ -80,33 +81,54 @@
     {
         try
         {
-            if (isEdit == 0)
-                await TryInvokeAsync(OnCreate, "Create");
-            else if (isEdit == 1)
-                await TryInvokeAsync(OnUpdate, "Update");
-            else if (isEdit == 2)
-                await TryInvokeAsync(OnDelete, "Delete");
-            else if (isEdit == 3)
-                await TryInvokeAsync(OnDownload, "Download");
-
-            await alert.Success($"Operation was successful", "Success");
-            showModal = false;
+            switch (editMode)
+            {
+                case 0:
+                    await TryInvokeAsync(OnCreate, "Create");
+                    break;
+                case 1:
+                    await TryInvokeAsync(OnUpdate, "Update");
+                    break;
+                case 2:
+                    await TryInvokeAsync(OnDelete, "Delete");
+                    break;
+                case 3:
+                    await TryInvokeAsync(OnDownload, "Download");
+                    break;
+                default:
+                    await alert.Info($"EditModal.EditMode = [{editMode}] is invalid", "Error");
+                    break;
+            }
+            await OnAfterSuccessAsync();
         }
         // Todo
-        // catch (ApiException<ProblemDetails> ex)
-        // {
-        //     var message =  $"<h5>{ex.Message}</h5><hr/>";
-        //     var items = ex.Result.AdditionalProperties;
-
-        //     foreach (var item in items)
-        //     {
-        //         message += $"<p><em>{item.Key}</em>: {item.Value}</p>";
-        //     }
-        //     await alert.Error(message, "Error");
-        // }
+        catch (ApiException ex)
+        {
+            if (ex.StatusCode >= 200 && ex.StatusCode < 300)
+            {
+                await OnAfterSuccessAsync();
+                return;
+            }
+            await alert.Error(ex.FormatApiMessage(), "Error");
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.FormatApiMessage(), "Error");
+        }
+    }
+
+    private async Task OnAfterSuccessAsync()
+    {
+        await alert.Success($"Operation was successful", "Success");
+        showModal = false;
+ 
+        switch (editMode)
+        {
+            case 0://create
+            case 2://delete
+                if (OnCompleted.HasDelegate)
+                    await OnCompleted.InvokeAsync();
+                break;
         }
     }
 
@@ -119,4 +141,5 @@
         }
         await callback.InvokeAsync();
     }
+    
 }

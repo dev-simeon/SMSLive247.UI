@@ -22,7 +22,8 @@
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column>
-                    <Actions OnDelete="() => csvFileModal.Delete(context)">
+                    <Actions OnDownload="() => csvFileModal.Download(context)"
+                             OnDelete="() => csvFileModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -30,26 +31,26 @@
     </Body>
 </Card>
 
-<BulkFileModal @ref="csvFileModal" DisableMergeOption="true"></BulkFileModal>
+<BulkFileModal @ref="csvFileModal" ForCSV="true"></BulkFileModal>
 
 @code {
     private SearchBox searchBox = new();
     private BulkFileModal csvFileModal = new();
-    private List<BatchFileResponse> items = new();
-    private List<BatchFileResponse> filteredItems = new();
+    private List<BatchFileResponse> items = [];
+    private List<BatchFileResponse> filteredItems = [];
 
     protected override async Task OnInitializedAsync()
     {
         var response = await apiClient.BatchFileListAsync();
-        items = response.Result.ToList();
+        items = response.Result.Where(x => x.FileType == "csv").ToList();
         filteredItems = items;
     }
 
     private void SearchCsvFile()
     {
-        filteredItems = items
-            .Where(i => string.IsNullOrWhiteSpace(searchBox.Text) ||
-                        i.Description.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
+        filteredItems = items.Where(i => string.IsNullOrWhiteSpace(searchBox.Text) 
+                                      || i.Description.Contains(searchBox.Text, 
+                                          StringComparison.OrdinalIgnoreCase))
+                             .ToList();
     }
 }
