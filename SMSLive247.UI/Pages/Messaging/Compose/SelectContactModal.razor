@@ -1,6 +1,6 @@
 ﻿@typeparam TItem
 
-<Modal Title="Select Contacts" Hidden="@(!isModalVisible)">
+<Modal Title="Select Contacts" Hidden="@isModalHidden">
     <Body>
         @if (loading)
         {
@@ -16,105 +16,55 @@
             </div>
 
             <div>
-                @if (contactSelection == "Bulk Files")
+                @if (Items == null || Items.Count == 0)
                 {
-                    @foreach (var bulkFile in PagedItems.OfType<BatchFileResponse>())
+                    <p><em>No contact found</em></p>
+                }
+                else
+                {
+                    @foreach (var item in PagedItems)
                     {
                         <div class="form-check mb-1">
-                            <input class="form-check-input" type="checkbox" value="@bulkFile.Description" @onchange="e => OnItemSelected(e, bulkFile.Description)" checked="@selectedItems.Contains(bulkFile.Description)">
-                            <label class="form-check-label" for="bulkFile_@bulkFile.BatchFileID">@bulkFile.Description</label>
+                            <input class="form-check-input" type="checkbox" value="@GetItemValue(item)" @onchange="e => OnItemSelected(e, GetItemValue(item))" checked="@selectedItems.Contains(GetItemValue(item))">
+                            <label class="form-check-label">@GetItemLabel(item)</label>
                         </div>
                     }
-                }
-                else if (contactSelection == "All Contacts")
-                {
-                    @foreach (var contact in PagedItems.OfType<OpenApi.ContactResponse>())
+                    @if (currentPage * pageSize < filteredItems.Count)
                     {
-                        <div class="form-check mb-1">
-                            <input class="form-check-input" type="checkbox" value="@contact.PhoneNumber" @onchange="e => OnItemSelected(e, contact.PhoneNumber)" checked="@selectedItems.Contains(contact.PhoneNumber)">
-                            <label class="form-check-label" for="contact_@contact.ContactName">@contact.ContactName<span> (@contact.PhoneNumber)</span></label>
-                        </div>
-                    }
-                }
-                else if (contactSelection == "Groups")
-                {
-                    @foreach (var group in PagedItems.OfType<string>())
-                    {
-                        <div class="form-check mb-1">
-                            <input class="form-check-input" type="checkbox" value="@group" @onchange="e => OnItemSelected(e, group)" checked="@selectedItems.Contains(group)">
-                            <label class="form-check-label">@group</label>
-                        </div>
+                        <button class="btn btn-primary mt-2" @onclick="LoadMoreItems">Load More</button>
                     }
                 }
             </div>
-
-            @if (HasMoreItems)
-            {
-                <button class="btn btn-link" @onclick="LoadMore">Load More</button>
-            }
         }
     </Body>
     <Footer>
-        <Button Type="Button.Style.DEFAULT" @onclick="AppendSelectedContacts">Add Contacts</Button>
+        <Button Type="Button.Style.CUSTOM" @onclick="AppendSelectedContacts">Add Contacts</Button>
     </Footer>
 </Modal>
 
 @code {
-    [Parameter] public string contactSelection { get; set; }
+    [Parameter] public IList<TItem> Items { get; set; }
     [Parameter] public EventCallback<List<string>> OnPhoneNumbersSelected { get; set; }
 
-    private List<object> allItems = [];
-    private List<object> filteredItems = [];
-    private List<object> PagedItems => filteredItems.Take(currentPage * pageSize).ToList();
+    private List<TItem> filteredItems = new();
+    private List<TItem> PagedItems => filteredItems.Take(currentPage * pageSize).ToList();
     private bool loading = true;
-    private bool isModalVisible = false;
+    private bool isModalHidden = true;
     private string searchQuery = "";
     private int currentPage = 1;
     private const int pageSize = 20;
-    private List<string> selectedItems = [];
+    private List<string> selectedItems = new();
     private bool selectAllChecked = false;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        loading = true;
-
-        allItems.Clear();
-
-        // Simulate loading data
-        if (contactSelection == "Bulk Files")
-        {
-            for (int i = 1; i <= 50; i++)
-            {
-                allItems.Add(new BatchFileResponse
-                {
-                    BatchFileID = $"BulkFile{i}",
-                    Description = $"Bulk File {i}",
-                    FileType = "txt",
-                    TotalNumbers = i * 10
-                });
-            }
-        }
-        else if (contactSelection == "All Contacts")
-        {
-            for (int i = 1; i <= 500; i++)
-            {
-                allItems.Add(new OpenApi.ContactResponse
-                {
-                    ContactName = $"Contact {i}",
-                    PhoneNumber = $"+123456789{i:D3}"
-                });
-            }
-        }
-        else if (contactSelection == "Groups")
-        {
-            for (int i = 1; i <= 20; i++)
-            {
-                allItems.Add($"Group {i}");
-            }
-        }
-
-        filteredItems = allItems;
         loading = false;
+        FilterItems();
+    }
+
+    private void FilterItems()
+    {
+        filteredItems = Items.Where(item => GetItemLabel(item).Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
     private void OnItemSelected(ChangeEventArgs e, string item)
@@ -134,7 +84,7 @@
     {
         if ((bool)e.Value)
         {
-            selectedItems = new List<string>(filteredItems.Select(item => item.ToString()));
+            selectedItems = new List<string>(filteredItems.Select(item => GetItemValue(item)));
         }
         else
         {
@@ -143,28 +93,22 @@
         selectAllChecked = (bool)e.Value;
     }
 
-    private bool CheckIfAllSelected()
-    {
-        return filteredItems.All(item => selectedItems.Contains(item.ToString()));
-    }
-
     private void AppendSelectedContacts()
     {
         OnPhoneNumbersSelected.InvokeAsync(selectedItems);
         Close();
     }
 
-    public void Show(string contactSelection, List<string> currentSelectedItems)
+    public void Show(List<string> currentSelectedItems)
     {
-        this.contactSelection = contactSelection;
         selectedItems = currentSelectedItems;
-        isModalVisible = true;
+        isModalHidden = false;
         StateHasChanged();
     }
 
     public void Close()
     {
-        isModalVisible = false;
+        isModalHidden = true;
         StateHasChanged();
     }
 
@@ -178,15 +122,40 @@
     private void OnSearchChanged(ChangeEventArgs e)
     {
         searchQuery = e.Value.ToString();
-        filteredItems = allItems.Where(item => item.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        FilterItems();
         currentPage = 1;
         selectAllChecked = CheckIfAllSelected();
     }
 
-    private void LoadMore()
+    private void LoadMoreItems()
     {
         currentPage++;
     }
 
-    private bool HasMoreItems => filteredItems.Count > PagedItems.Count;
+    private bool CheckIfAllSelected()
+    {
+        return filteredItems.All(item => selectedItems.Contains(GetItemValue(item)));
+    }
+
+    private string GetItemValue(TItem item)
+    {
+        return item switch
+        {
+            BatchFileResponse batchFile => batchFile.Description,
+            OpenApi.ContactResponse contact => contact.PhoneNumber,
+            GroupResponse group => group.GroupName,
+            _ => ""
+        };
+    }
+
+    private string GetItemLabel(TItem item)
+    {
+        return item switch
+        {
+            BatchFileResponse batchFile => batchFile.Description,
+            OpenApi.ContactResponse contact => $"{contact.ContactName} ({contact.PhoneNumber})",
+            GroupResponse group => group.GroupName,
+            _ => ""
+        };
+    }
 }

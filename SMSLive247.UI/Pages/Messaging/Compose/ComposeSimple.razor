@@ -1,4 +1,6 @@
-﻿<section class="d-flex gap-4">
+﻿@inject Settings settings;
+
+<section class="d-flex gap-4">
     <div class="w-50">
         <Card HeaderTitle="Compose SMS">
             <Body>
@@ -24,7 +26,8 @@
                             <label class="form-label">Select From</label>
                             <div>
                                 <InputRadioGroup Value="contactSelection"
-                                            ValueChanged="((string value) => ShowModal(value))">
+                                                 ValueExpression="@(() => contactSelection)"
+                                                 ValueChanged="@((string value) => ShowModal(value))">
                                     <div class="form-check form-check-inline">
                                         <InputRadio class="form-check-input" id="bulkFile" Value='@("Bulk Files")' />
                                         <label class="form-check-label" for="bulkFile">Bulk files</label>
@@ -47,20 +50,20 @@
                             <label for="message" class="form-label">Message</label>
                             <button type="button" class="btn btn-link btn-sm text-decoration-none" @onclick="ClearMessage">Clear Message</button>
                         </div>
-                        <InputTextArea id="message" class="form-control" @bind-Value="model.MessageText" @oninput="HandleMessageInput" rows="5"></InputTextArea>
+                        <textarea id="message" class="form-control" @bind="model.MessageText" maxlength="@settings.MaxCharacter" @oninput="HandleMessageInput" rows="5"></textarea>
                         <div>@_counterText</div>
                     </div>
 
                     <div class="mb-3">
                         <InputRadioGroup @bind-Value="sendOption">
-                            @foreach (var option in sendOptions)
-                            {
-                                var radioId = $"radio-{option}";
-                                <div class="form-check form-check-inline">
-                                    <InputRadio class="form-check-input" id="@radioId" Value="@option" />
-                                    <label class="form-check-label" for="@radioId">@option</label>
-                                </div>
-                            }
+                            <div class="form-check form-check-inline">
+                                <InputRadio class="form-check-input" id="sendNow" Value='@("Send Immediately")' />
+                                <label class="form-check-label" for="sendNow">Send Immediately</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <InputRadio class="form-check-input" id="sendLater" Value='@("Schedule for Later")' />
+                                <label class="form-check-label" for="sendLater">Schedule for Later</label>
+                            </div>
                         </InputRadioGroup>
                     </div>
 
@@ -100,26 +103,44 @@
         </div>
     }
 </section>
-<SelectContactModal TItem="string" @ref="modal" OnPhoneNumbersSelected="AddPhoneNumbers"></SelectContactModal>
+<!-- Modal Integration -->
+<SelectContactModal TItem="OpenApi.ContactResponse" @ref="contactModal" OnPhoneNumbersSelected="AddPhoneNumbers" Items="contacts" />
+<SelectContactModal TItem="BatchFileResponse" @ref="bulkFileModal" OnPhoneNumbersSelected="AddPhoneNumbers" Items="batchFiles" />
+<SelectContactModal TItem="GroupResponse" @ref="groupModal" OnPhoneNumbersSelected="AddPhoneNumbers" Items="groups" />
 
 @code {
     private SmsMessageRequest model = new();
     private List<SenderIdResponse> senderIds = [];
+    private List<BatchFileResponse> batchFiles = [];
+    private List<OpenApi.ContactResponse> contacts = [];
+    private List<GroupResponse> groups = [];
     private string contactSelection = string.Empty;
-    private List<string> sendOptions = ["Send Immediately", "Schedule for Later"];
     private string sendOption = "Send Immediately";
-    private SelectContactModal<string> modal = new();
+    private SelectContactModal<OpenApi.ContactResponse>? contactModal;
+    private SelectContactModal<BatchFileResponse>? bulkFileModal;
+    private SelectContactModal<GroupResponse>? groupModal;
     private List<string> selectedContacts = [];
-    private List<string> selectedGroupsAndBulkFiles = [];
     private string _counterText = "";
-    private const int _smsMaxParts = 6; // Max SMS length
 
     protected override async Task OnInitializedAsync()
     {
-        var senderResponse = await apiClient.SenderIdListAsync(1, 500);
-        if (senderResponse.StatusCode == 200)
+        try
         {
-            senderIds = senderResponse.Result.ToList();
+            var t1 = apiClient.SenderIdListAsync(1, 500);
+            var t2 = apiClient.BatchFileListAsync();
+            var t3 = apiClient.ContactListAsync();
+            var t4 = apiClient.GroupListAsync();
+
+            await Task.WhenAll(t1, t2, t3, t4);
+
+            senderIds = t1.Result.Result.ToList();
+            batchFiles = t2.Result.Result.ToList();
+            contacts = t3.Result.Result.ToList();
+            groups = t4.Result.Result.ToList();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
         }
     }
 
@@ -142,7 +163,18 @@
     private void ShowModal(string value)
     {
         contactSelection = value;
-        modal.Show(contactSelection, selectedContacts);
+        switch (value)
+        {
+            case "Bulk Files":
+                bulkFileModal?.Show(selectedContacts);
+                break;
+            case "Groups":
+                groupModal?.Show(selectedContacts);
+                break;
+            case "All Contacts":
+                contactModal?.Show(selectedContacts);
+                break;
+        }
     }
 
     private void AddPhoneNumbers(List<string> numbers)
@@ -157,7 +189,9 @@
     {
         selectedContacts.Remove(contact);
         model.PhoneNumber = string.Join(", ", selectedContacts);
-        modal.UpdateSelectedItems(selectedContacts);
+        contactModal?.UpdateSelectedItems(selectedContacts);
+        bulkFileModal?.UpdateSelectedItems(selectedContacts);
+        groupModal?.UpdateSelectedItems(selectedContacts);
         StateHasChanged();
     }
 
@@ -174,20 +208,28 @@
 
         int intSmsParts = GetMessageParts(strSmsText);
 
-        if (intSmsParts > _smsMaxParts)
+        if (intSmsParts > settings.SmsMaxParts)
         {
-            // model.MessageText = strSmsText!.Substring(0, _smsMaxParts);
             await alert.Info("Maximum SMS characters reached!", "alert");
             return;
         }
-        
+
         int intNextMax = intSmsParts == 1 ? 160 : intSmsParts * 153;
 
-        _counterText = intSMSLen + "/" + intNextMax + " . . . Cost: " + intSmsParts + " SMS";
-        // if ((intPrevMax > 0) && (intSMSLen == (intPrevMax + 1)))
-        // {
-        //     await alert.Info($"You have just exceeded {intPrevMax}. You will be charged {intSmsParts} credits for this message!", "alert");
-        // }
+        _counterText = $"{intSMSLen}/{intNextMax} . . . Cost: {intSmsParts} SMS";
+
+        if (intSmsParts >= 2)
+        {
+            if (intSMSLen == 161)
+            {
+                await alert.Info($"You have just exceeded 160 characters. You will be charged {intSmsParts} credits for this message!", "alert");
+            }
+
+            if (intSMSLen == intNextMax - 153 + 1)
+            {
+                await alert.Info($"You have just exceeded {intNextMax - 153} characters. You will be charged {intSmsParts} credits for this message!", "alert");
+            }
+        }
     }
 
     private int GetMessageParts(string? input)
@@ -199,11 +241,11 @@
 
         var length = input.GetValidGsmTextLength();
 
-        if(length <= 160)
+        if (length <= 160)
         {
             return 1;
         }
-        
+
         return (int)Math.Ceiling(length / 153m);
     }
 }
