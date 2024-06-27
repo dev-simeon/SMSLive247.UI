@@ -10,11 +10,11 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="SearchSenderId">
+                    <SearchBox @ref="searchBox" @onclick="OnSearch">
                         <InputSelect class="form-select" @bind-Value="searchStatus">
                             <option value="" selected>All</option>
                             <option value="APPROVED">Approved</option>
-                            <option value="PENDING">Pending Approval</option>
+                            <option value="PENDING">Pending</option>
                         </InputSelect>
                     </SearchBox>
                 </Left>
@@ -77,7 +77,7 @@
         }
     }
 
-    private void SearchSenderId()
+    private void OnSearch()
     {
         filteredItems = items;
 
