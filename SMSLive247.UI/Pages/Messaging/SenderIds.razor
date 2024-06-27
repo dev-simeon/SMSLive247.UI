@@ -64,7 +64,7 @@
         await FetchData();
     }
 
-    protected async Task FetchData()
+    private async Task FetchData()
     {
         var response = await apiClient.SenderIdListAsync(1, 500);
 
