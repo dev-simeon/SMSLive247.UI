@@ -35,7 +35,7 @@
         
         if (confirmed)
         {
-            await apiClient.SenderIdDeleteAsync(editor.Model.SenderID);
+            await apiClient.SenderIdDeleteAsync([editor.Model.SenderID]);
         }
     }
 }

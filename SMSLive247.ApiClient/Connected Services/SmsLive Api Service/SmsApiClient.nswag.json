@@ -53,6 +53,43 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "AccountCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v5/accounts/{accountId}": {
@@ -69,6 +106,81 @@
             "schema": {
               "type": "string",
               "default": "self"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "AccountUpdate",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "AccountDelete",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -156,6 +268,45 @@
         "responses": {
           "200": {
             "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/v5/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "Register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -383,6 +534,29 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PriceCalcResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/coverage": {
+      "get": {
+        "tags": [
+          "Credit Pricing"
+        ],
+        "operationId": "CoverageList",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoverageResponse"
+                  }
                 }
               }
             }
@@ -729,6 +903,44 @@
         }
       }
     },
+    "/api/v5/sms/batch/download": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "SmsBatchDownload",
+        "parameters": [
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/v5/sms/batch/pending": {
       "get": {
         "tags": [
@@ -984,6 +1196,44 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/download": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "SmsMessageDownload",
+        "parameters": [
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -1423,6 +1673,53 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Sender IDs"
+        ],
+        "operationId": "SenderIdDelete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v5/sender-ids/{senderId}": {
@@ -1430,7 +1727,7 @@
         "tags": [
           "Sender IDs"
         ],
-        "operationId": "SenderIdDelete",
+        "operationId": "SenderIdDelete2",
         "parameters": [
           {
             "name": "senderId",
@@ -1458,6 +1755,41 @@
   },
   "components": {
     "schemas": {
+      "AccountCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "password": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "AccountResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -1480,9 +1812,80 @@
             "readOnly": true,
             "format": "double"
           },
+          "timeZone": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
           "active": {
             "type": "boolean",
             "readOnly": true
+          },
+          "firstName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "lastName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "email": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "readOnly": true
+          },
+          "countryCode": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "traffic": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "AccountUpdateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "timeZone": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "countryCode": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         }
       },
@@ -1526,6 +1929,7 @@
           },
           "groups": {
             "type": "array",
+            "nullable": true,
             "items": {
               "type": "string"
             }
@@ -1577,6 +1981,30 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "CoverageResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "countryID": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "countryName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "networkID": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "networkName": {
+            "type": "string",
+            "readOnly": true
           }
         }
       },

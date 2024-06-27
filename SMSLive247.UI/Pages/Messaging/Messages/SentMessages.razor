@@ -5,11 +5,28 @@
                 <Left>
                     <SearchBox @ref="searchBox" 
                                @onclick="e => ds.LoadData(alert)">
+                        <InputSelect @bind-Value="dateFilter" class="form-select" @onchange="HandleDateFilterChange">
+                            <option value="Today">Today</option>
+                            <option value="Yesterday">Yesterday</option>
+                            <option value="Last 3 Days">Last 3 Days</option>
+                            <option value="Last 7 Days">Last 7 Days</option>
+                            <option value="Last 14 Days">Last 14 Days</option>
+                            <option value="Last 30 Days">Last 30 Days</option>
+                            <option value="Last 90 Days">Last 90 Days</option>
+                            <option value="This Month">This Month</option>
+                            <option value="Last Month">Last Month</option>
+                            <option value="Custom">Custom</option>
+                        </InputSelect>
+
+                        @if (dateFilter == "Custom")
+                        {
+                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="startDate"></InputDate>
+                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="endDate"></InputDate>
+                        }
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DOWNLOAD" 
-                            @onclick="e => downloadModal.Download()">
+                    <Button Type="Button.Style.DOWNLOAD" @onclick="e => downloadModal.Download()">
                         Download Messages
                     </Button>
                 </Right>
@@ -46,16 +63,79 @@
 
 @code {
     private SearchBox searchBox = new();
+    private string dateFilter = "Today";
     private DownloadModal downloadModal = new();
+    private DateTimeOffset startDate;
+    private DateTimeOffset endDate;
     private SentMessageModal messageModal = new();
     private SentMessageView sentMessageView = new();
     private ApiDataSource<SmsBatchResponse> ds = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        SetDateRange(dateFilter);
+
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, startDate, endDate, searchBox.Text);
         });
+
+        await ds.LoadData(alert); 
+    }
+
+    private void SetDateRange(string filter)
+    {
+        switch (filter)
+        {
+            case "Today":
+                startDate = DateTimeOffset.UtcNow.Date;
+                endDate = startDate.AddDays(1).AddTicks(-1);
+                break;
+            case "Yesterday":
+                startDate = DateTimeOffset.UtcNow.Date.AddDays(-1);
+                endDate = startDate.AddDays(1).AddTicks(-1);
+                break;
+            case "Last 3 Days":
+                startDate = DateTimeOffset.UtcNow.Date.AddDays(-2);
+                endDate = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
+                break;
+            case "Last 7 Days":
+                startDate = DateTimeOffset.UtcNow.Date.AddDays(-6);
+                endDate = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
+                break;
+            case "Last 14 Days":
+                startDate = DateTimeOffset.UtcNow.Date.AddDays(-13);
+                endDate = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
+                break;
+            case "Last 30 Days":
+                startDate = DateTimeOffset.UtcNow.Date.AddDays(-29);
+                endDate = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
+                break;
+            case "Last 90 Days":
+                startDate = DateTimeOffset.UtcNow.Date.AddDays(-89);
+                endDate = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
+                break;
+            case "This Month":
+                startDate = new DateTimeOffset(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, TimeSpan.Zero);
+                endDate = startDate.AddMonths(1).AddTicks(-1);
+                break;
+            case "Last Month":
+                startDate = new DateTimeOffset(DateTime.UtcNow.Year, DateTime.UtcNow.Month - 1, 1, 0, 0, 0, TimeSpan.Zero);
+                endDate = startDate.AddMonths(1).AddTicks(-1);
+                break;
+            case "Custom":
+                // Use startDate and endDate directly
+                break;
+            default:
+                startDate = DateTimeOffset.MinValue;
+                endDate = DateTimeOffset.MaxValue;
+                break;
+        }
+    }
+
+    private void HandleDateFilterChange(ChangeEventArgs e)
+    {
+        dateFilter = e.Value?.ToString()!;
+        SetDateRange(dateFilter);
     }
 }
