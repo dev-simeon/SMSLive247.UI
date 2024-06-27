@@ -66,7 +66,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
@@ -74,11 +73,4 @@
 
         await ds.LoadData(alert); 
     }
-
-    
-
-    // private void HandleDateFilterChange(ChangeEventArgs e)
-    // {
-    //     date = e.Value?.ToString()!;
-    // }
 }

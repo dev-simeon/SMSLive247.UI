@@ -89,7 +89,11 @@
                     _endDate = _startDate.Value.AddMonths(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.CUSTOM:
-                    //_endDate = _endDate?.AddDays(1).AddTicks(-1);
+                    if (_startDate.HasValue && _endDate.HasValue)
+                    {
+                        // Ensure end of day for _endDate
+                        _endDate = _endDate.Value.Date.AddDays(1).AddTicks(-1);
+                    }
                     break;
                 default:
                     _startDate = null;
