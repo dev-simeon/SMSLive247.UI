@@ -30,8 +30,18 @@
             <Columns>
                 <Column Header="#"><input class="form-check-input" type="checkbox" /></Column>
                 <Column Header="SenderID">@context.SenderID</Column>
-                <Column Header="Date Requested">@context.DateRequested</Column>
-                <Column Header="Date Approved">@context.DateApproved</Column>
+                <Column Header="Purpose">@context.Purpose</Column>
+                <Column Header="Date Requested"><FormatDate DateTime="@context.DateRequested"></FormatDate></Column>
+                <Column Header="Date Approved">
+                    @if (context.Approved == true)
+                    {
+                        <FormatDate DateTime="context.DateApproved!.Value.DateTime"></FormatDate>
+                    }
+                    else
+                    {
+                        <span>Pending Approval</span>
+                    }
+                </Column>
                 <Column Header="Status">
                     @if (context.Approved)
                     {

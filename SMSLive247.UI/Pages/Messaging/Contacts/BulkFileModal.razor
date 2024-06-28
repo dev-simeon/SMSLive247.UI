@@ -1,7 +1,8 @@
 ﻿<EditModal TItem="BatchFileResponse" @ref="editor" LabelText="Bulk File"
            OnCreate="OnCreate"
            OnDelete="OnDelete"
-           OnDownload="OnDownload">
+           OnDownload="OnDownload"
+           OnCompleted="OnCompleted">
     @if (editor.EditMode == 0) //create=0, edit=1
     {
         <FormInputFile Label="Select File" OnChange="e => FileSelected(e)" Accept="@fileTypes"></FormInputFile>
@@ -47,6 +48,8 @@
 
 @code {
     [Parameter] public bool ForCSV { get; set; } = false;
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
 
     private EditModal<BatchFileResponse> editor = new();
     private IBrowserFile? browserFile;
