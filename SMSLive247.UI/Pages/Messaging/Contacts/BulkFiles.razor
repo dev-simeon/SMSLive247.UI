@@ -31,7 +31,7 @@
     </Body>
 </Card>
 
-<BulkFileModal @ref="bulkFileModal"></BulkFileModal>
+<BulkFileModal @ref="bulkFileModal" OnCompleted="FetchData"></BulkFileModal>
 
 @code {
     private SearchBox searchBox = new();
@@ -42,17 +42,28 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
         var response = await apiClient.BatchFileListAsync();
 
-        items = response.Result.Where(x => x.FileType == "txt").ToList();
-        filteredItems = items;
+        if (response.StatusCode == 200)
+        {
+            items = response.Result.Where(x => x.FileType == "txt").ToList();
+            filteredItems = items;
+        }
     }
 
     private void SearchBulkFile()
     {
-        filteredItems = items.Where(i => string.IsNullOrWhiteSpace(searchBox.Text)
-                                      || i.Description.Contains(searchBox.Text,
-                                          StringComparison.OrdinalIgnoreCase))
-                             .ToList();
+        filteredItems = items;
+
+        if (!string.IsNullOrWhiteSpace(searchBox.Text))
+        {
+            filteredItems = filteredItems.Where(x => x.Description.Contains(
+                searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
     }
 }

@@ -31,7 +31,7 @@
     </Body>
 </Card>
 
-<BulkFileModal @ref="csvFileModal" ForCSV="true"></BulkFileModal>
+<BulkFileModal @ref="csvFileModal" ForCSV="true" OnCompleted="FetchData"></BulkFileModal>
 
 @code {
     private SearchBox searchBox = new();
@@ -41,16 +41,28 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
         var response = await apiClient.BatchFileListAsync();
-        items = response.Result.Where(x => x.FileType == "csv").ToList();
-        filteredItems = items;
+
+        if (response.StatusCode == 200)
+        {
+            items = response.Result.Where(x => x.FileType == "csv").ToList();
+            filteredItems = items;
+        }
     }
 
     private void SearchCsvFile()
     {
-        filteredItems = items.Where(i => string.IsNullOrWhiteSpace(searchBox.Text) 
-                                      || i.Description.Contains(searchBox.Text, 
-                                          StringComparison.OrdinalIgnoreCase))
-                             .ToList();
+        filteredItems = items;
+
+        if (!string.IsNullOrWhiteSpace(searchBox.Text))
+        {
+            filteredItems = filteredItems.Where(x => x.Description.Contains(
+                searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
     }
 }
