@@ -1,8 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
-using SMSLive247.OpenApi;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace SMSLive247.Authentication
 {
@@ -11,22 +9,23 @@ namespace SMSLive247.Authentication
         private readonly string storageKey = "UserSession";
         private readonly AuthenticationState anonymousState = new(new(new ClaimsIdentity()));
 
-        public class UserClaims
+        public class UserClaims(string email, string apiKey)
         {
-            public string? Username { get; init; }
-            public string? Email { get; init; }
-            public string? FirstName { get; init; }
-            public string? LastName { get; init; }
-            public decimal SmsBalance { get; init; }
-            public string? FullName { get; init; }
-            public string? AvatarUrl { get; init; }
+            public string Email { get; private set; } = email;
+            public string ApiKey { get; private set; } = apiKey;
+            //public string? Username { get; private set; }
+            //public string? FirstName { get; private set; }
+            //public string? LastName { get; private set; }
+            //public decimal SmsBalance { get; private set; }
+            //public string? FullName { get; private set; }
+            //public string? AvatarUrl { get; private set; }
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             try
             {
-                var response = await storage.GetItemAsync<UI.Member>(storageKey);
+                var response = await storage.GetItemAsync<UserClaims>(storageKey);
 
                 if (response == null)
                     return anonymousState;
@@ -40,7 +39,7 @@ namespace SMSLive247.Authentication
             
         }
 
-        public async Task SaveAuthenticationState(UI.Member member)
+        public async Task SaveAuthenticationState(UserClaims member)
         {
             await storage.SetItemAsync(storageKey, member);
 
@@ -48,9 +47,9 @@ namespace SMSLive247.Authentication
             NotifyAuthenticationStateChanged(Task.FromResult(authenticatedState));
         }
 
-        public ValueTask<UI.Member?> GetMember()
+        public ValueTask<UserClaims?> GetMember()
         {
-            return storage.GetItemAsync<UI.Member>(storageKey);
+            return storage.GetItemAsync<UserClaims>(storageKey);
 
         }
 
@@ -60,22 +59,21 @@ namespace SMSLive247.Authentication
             NotifyAuthenticationStateChanged(Task.FromResult(anonymousState));
         }
 
-        private static AuthenticationState CreateAuthenticationState(UI.Member member)
+        private static AuthenticationState CreateAuthenticationState(UserClaims member)
         {
             var principal = GetClaimsPrincipal(member);
             return new AuthenticationState(principal);
         }
 
-        private static ClaimsPrincipal GetClaimsPrincipal(UI.Member member)
+        private static ClaimsPrincipal GetClaimsPrincipal(UserClaims member)
         {
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Email, member.Email),
-                new Claim("SmsBalance", member.ApiKey),
-                new Claim("Key", member.ApiKey)
-            };
+            List<Claim> claims =
+                [
+                new(ClaimTypes.Email, member.Email),
+                new ("SmsBalance", member.ApiKey),
+                new ("Key", member.ApiKey)
+            ];
             var identity = new ClaimsIdentity(claims, "JwtAuth");
-
             return new ClaimsPrincipal(identity);
         }
     }

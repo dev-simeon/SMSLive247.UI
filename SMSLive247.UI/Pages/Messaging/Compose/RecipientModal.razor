@@ -1,0 +1,84 @@
+﻿<Modal Title="Select Contacts" @bind-Hidden="hideModal">
+    <Body>
+        <input class="form-control mb-2" 
+               type="text" placeholder="Search..."
+               @oninput="OnSearchChanged" />
+
+        <div class="form-check mb-1">
+            <input class="form-check-input" type="checkbox" 
+                    @onchange="OnSelectAll" id="x-all">
+            <label class="form-check-label" for="x-all">Select All</label>
+        </div>
+
+        <div>
+            @if (Items == null)
+            {
+                <p><em>Loading...</em></p>
+            }
+            else if (Items.Count == 0)
+            {
+                <p>No contact found</p>
+            }
+            else
+            {
+                @foreach (var item in Items.Where(x => x.Visible))
+                {
+                <div class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox"
+                        value="@item.Key" checked="@item.Selected"
+                        id="x-@item.Key" @onchange="e => OnSelect(item, e)">
+                    <label class="form-check-label" for="x-@item.Key">@item.Name</label>
+                </div>
+                }
+            }
+        </div>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.CANCEL"
+                @onclick="e => Hide()">
+                Close
+        </Button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public List<ContactModel>? Items { get; set; } 
+    [Parameter] public EventCallback OnSelected { get; set; }
+
+    private bool hideModal = true;
+
+    public void Show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        hideModal = true;
+        StateHasChanged();
+    }
+
+    public async Task OnSelect(ContactModel contact, ChangeEventArgs e)
+    {
+        contact.Selected = (bool?)e.Value ?? false;
+        await OnSelected.InvokeAsync();
+    }
+
+    private void OnSearchChanged(ChangeEventArgs e)
+    {
+        var search = e.Value?.ToString();
+        var noCase = StringComparison.OrdinalIgnoreCase;
+
+        if (string.IsNullOrWhiteSpace(search))
+            Items?.ForEach(x => x.Visible = true);
+        else
+            Items?.ForEach(x => x.Visible = x.Name.Contains(search, noCase));
+    }
+
+    private void OnSelectAll(ChangeEventArgs e)
+    {
+        var selected = (bool?)e.Value ?? false;
+        Items?.ForEach(x => x.Selected = selected);
+    }
+}

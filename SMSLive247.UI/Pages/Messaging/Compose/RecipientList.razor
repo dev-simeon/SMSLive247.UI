@@ -1,0 +1,30 @@
+﻿@if (selected != null && selected.Count > 0)
+{
+<div class="card mb-3 bg-info-subtle">
+    <div class="card-body">
+        <h6 class="card-title" @onclick="OnClick">
+            @Caption [@selected.Sum(x => x.Count) / 
+                      @Items?.Sum(x => x.Count)]
+        </h6>
+        @foreach (var item in selected)
+        {
+        <span class="badge bg-info me-1">
+            @item.Name
+        </span>
+        }
+    </div>
+</div>
+}
+else
+{
+    @ChildContent
+}
+
+@code{
+    [Parameter] public string Caption { get; set; } = "Heading";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public List<ContactModel>? Items { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private List<ContactModel>? selected => Items?.Where(x => x.Selected).ToList();
+}

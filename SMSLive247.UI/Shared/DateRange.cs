@@ -1,20 +1,29 @@
 ﻿namespace SMSLive247.UI
 {
+    public enum DateRangeFilter
+    {
+        TODAY,
+        YESTERDAY,
+        LAST_3_DAYS,
+        LAST_7_DAYS,
+        LAST_14_DAYS,
+        LAST_30_DAYS,
+        LAST_90_DAYS,
+        THIS_MONTH,
+        LAST_MONTH,
+        CUSTOM
+    }
+
     public class DateRange
     {
-        //public DateRange(DateTimeOffset? StartDate = null, DateTimeOffset? EndDate = null)
-        //{
-        //    ArgumentOutOfRangeException.ThrowIfGreaterThan(StartDate, EndDate);
-        //}
+        private DateRangeFilter _filter;
+        private DateTimeOffset _startDate;
+        private DateTimeOffset _endDate;
 
-        private DateTimeOffset? _startDate;
-        private DateRangeFilter? _filter;
-        private DateTimeOffset? _endDate;
-
-        public DateTimeOffset? StartDate {
+        public DateTimeOffset StartDate {
             get
             {
-                SetDateRange(Filter);
+                SetDateRange();
                 return _startDate;
             } 
             set 
@@ -23,11 +32,11 @@
             }
         }
 
-        public DateTimeOffset? EndDate
+        public DateTimeOffset EndDate
         {
             get
             {
-                SetDateRange(Filter);
+                SetDateRange();
                 return _endDate;
             }
             set
@@ -36,7 +45,7 @@
             }
         }
 
-        public DateRangeFilter? Filter {
+        public DateRangeFilter Filter {
             get
             {
                 return _filter;
@@ -44,21 +53,21 @@
             set
             {
                 _filter = value;
-                SetDateRange(_filter);
+                SetDateRange();
             }
         }
 
-        private void SetDateRange(DateRangeFilter? filter)
+        private void SetDateRange()
         {
-            switch (filter)
+            switch (_filter)
             {
                 case DateRangeFilter.TODAY:
                     _startDate = DateTimeOffset.UtcNow.Date;
-                    _endDate = _startDate.Value.AddDays(1).AddTicks(-1);
+                    _endDate = _startDate.AddDays(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.YESTERDAY:
                     _startDate = DateTimeOffset.UtcNow.Date.AddDays(-1);
-                    _endDate = _startDate.Value.AddDays(1).AddTicks(-1);
+                    _endDate = _startDate.AddDays(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.LAST_3_DAYS:
                     _startDate = DateTimeOffset.UtcNow.Date.AddDays(-3);
@@ -81,37 +90,18 @@
                     _endDate = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.THIS_MONTH:
-                    _startDate = new DateTimeOffset(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, TimeSpan.Zero);
-                    _endDate = _startDate.Value.AddMonths(1).AddTicks(-1);
+                    _startDate = new DateTimeOffset(DateTime.UtcNow.Year, 
+                        DateTime.UtcNow.Month, 1, 0, 0, 0, TimeSpan.Zero);
+                    _endDate = _startDate.AddMonths(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.LAST_MONTH:
-                    _startDate = new DateTimeOffset(DateTime.UtcNow.Year, DateTime.UtcNow.Month - 1, 1, 0, 0, 0, TimeSpan.Zero);
-                    _endDate = _startDate.Value.AddMonths(1).AddTicks(-1);
+                    _startDate = new DateTimeOffset(DateTime.UtcNow.Year,
+                        DateTime.UtcNow.Month, 1, 0, 0, 0, TimeSpan.Zero).AddMonths(-1);
+                    _endDate = _startDate.AddMonths(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.CUSTOM:
-                    //_endDate = _endDate?.AddDays(1).AddTicks(-1);
-                    break;
-                default:
-                    _startDate = null;
-                    _endDate = null;
                     break;
             }
         }
     }
-
-    public enum DateRangeFilter
-    {
-        TODAY,
-        YESTERDAY,
-        LAST_3_DAYS,
-        LAST_7_DAYS,
-        LAST_14_DAYS,
-        LAST_30_DAYS,
-        LAST_90_DAYS,
-        THIS_MONTH,
-        LAST_MONTH,
-        CUSTOM
-    }
-
-    
 }
