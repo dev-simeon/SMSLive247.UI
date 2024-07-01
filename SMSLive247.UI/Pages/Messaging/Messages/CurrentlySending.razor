@@ -11,20 +11,55 @@
         </SearchArea>
         <Table Items="GetFilteredItems()">
             <Columns>
-                <Column Header="#"><input class="form-check-input" type="checkbox" /></Column>
+                <Column Header="Scheduled Time">
+                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate><br />
+                    <span class="badge text-bg-warning">@context.Status</span>
+                </Column>
                 <Column Header="Sender ID">
                     @context.SenderID
                 </Column>
-                <Column Header="Message">
-                    @context.MessageText
-                </Column>
-                <Column Header="Time of Schedule">
-                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
+                <Column Header="Message" Width="50%">
+                    @context.MessageText.Left(160)
+                    <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
                 </Column>
                 <Column>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-success" @onclick="e => ResumeBatch(context.BatchID)">Send Now</button>
-                        <button type="button" class="btn btn-danger" @onclick="e => AbortBatch(context.BatchID)">Abort</button>
+@*                     <span class="badge text-bg-success">
+                        Sent: @context.TotalProcessed
+                    </span>
+                    <span class="badge text-bg-danger">
+                        Failed: @context.TotalFailed
+                    </span>
+                    <span class="badge text-bg-primary">
+                        Total: @(context.TotalProcessed + context.TotalFailed)
+                    </span>
+ *@
+
+                    <button type="button" class="btn btn-secondary position-relative">
+                        Sent
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            @context.TotalProcessed
+                        </span>
+                    </button>
+
+                    <button type="button" class="btn btn-secondary position-relative">
+                        Failed
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            @context.TotalFailed
+                        </span>
+                    </button>
+                </Column>
+                <Column>
+                    <div class="btn-group float-end">
+                        <button class="btn btn-outline-secondary" 
+                                @onclick="e => ResumeBatch(context.BatchID)" 
+                                @onclick:stopPropagation="true" title="Resume Batch">
+                            <i class="fa fa-play"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" 
+                                @onclick="e => AbortBatch(context.BatchID)"
+                                @onclick:stopPropagation="true" title="Abort Batch">
+                            <i class="fa fa-stop"></i>
+                        </button>
                     </div>
                 </Column>
             </Columns>
