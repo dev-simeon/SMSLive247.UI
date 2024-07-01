@@ -107,11 +107,5 @@
             filteredItems = filteredItems.Where(x => x.SenderID.Contains(
                 searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
         }
-        // filteredItems = items
-        //     .Where(i => (string.IsNullOrWhiteSpace(searchStatus) ||
-        //                 (searchStatus == "APPROVED" && i.Approved) ||
-        //                 (searchStatus == "PENDING" && !i.Approved)) &&
-        //                 (string.IsNullOrWhiteSpace(searchBox.Text) || i.SenderID.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)))
-        //     .ToList();
     }
 }
