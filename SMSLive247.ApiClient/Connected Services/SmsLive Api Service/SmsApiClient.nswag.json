@@ -2168,9 +2168,14 @@
             "readOnly": true,
             "format": "double"
           },
-          "status": {
-            "type": "string",
+          "isPaid": {
+            "type": "boolean",
             "readOnly": true
+          },
+          "error": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
           }
         }
       },

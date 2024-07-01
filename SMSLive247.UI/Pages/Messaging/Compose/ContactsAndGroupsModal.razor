@@ -1,48 +1,50 @@
-﻿<Modal Title="Select Contacts" @bind-Hidden="hideModal">
+﻿<Modal Title="Select Contacts and Groups" @bind-Hidden="hideModal" Size="Modal.ModalSize.LARGE">
     <Body>
-        <input class="form-control mb-2" 
+        <input class="w-50 form-control mb-2"
                type="text" placeholder="Search..."
                @oninput="OnSearchChanged" />
 
         <div class="form-check mb-1">
-            <input class="form-check-input" type="checkbox" 
-                    @onchange="OnSelectAll" id="x-@id-all">
+            <input class="form-check-input" type="checkbox"
+                   @onchange="OnSelectAll" id="x-@id-all">
             <label class="form-check-label" for="x-@id-all">Select All</label>
         </div>
 
-        <div>
+        <div class="row">
             @if (Items == null)
             {
                 <p><em>Loading...</em></p>
             }
             else if (Items.Count == 0)
             {
-                <p>No contact found</p>
+                <p>No contact or group found</p>
             }
             else
             {
                 @foreach (var item in Items.Where(x => x.Visible).OrderBy(x => x.Name))
                 {
-                <div class="form-check mb-1">
-                    <input class="form-check-input" type="checkbox"
-                        value="@item.Key" checked="@item.Selected"
-                        id="x-@id-@item.Key" @onchange="e => OnSelect(item, e)">
-                    <label class="form-check-label" for="x-@id-@item.Key">@item.Name</label>
-                </div>
+                    <div class="col-md-4">
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox"
+                                   value="@item.Key" checked="@item.Selected"
+                                   id="x-@id-@item.Key" @onchange="e => OnSelect(item, e)">
+                            <label class="form-check-label" for="x-@id-@item.Key">@item.Name</label>
+                        </div>
+                    </div>
                 }
             }
         </div>
     </Body>
     <Footer>
         <Button Type="Button.Style.CANCEL"
-                @onclick="e => Hide()">
-                Close
+                @onclick="Hide">
+            Close
         </Button>
     </Footer>
 </Modal>
 
 @code {
-    [Parameter] public List<ContactModel>? Items { get; set; } 
+    [Parameter] public List<ContactModel>? Items { get; set; }
     [Parameter] public EventCallback OnSelected { get; set; }
 
     private bool hideModal = true;
