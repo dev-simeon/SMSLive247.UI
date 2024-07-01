@@ -28,17 +28,26 @@
         </SearchArea>
         <Table DataSource="ds">
             <Columns>
-                <Column Header="Sender">@context.SenderID</Column>
-                <Column Header="Message">@context.MessageText</Column>
-                <Column Header="Delivery Report">
-                    @(context.TotalProcessed)/@(context.TotalProcessed + context.TotalFailed)<br />
-                    @* @(context.CreditsCharged + "ç")<br /> *@
-                    @context.MessageParts page(@context.MessageText.Length)
-                </Column>
                 <Column Header="Time">
-                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
+                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate><br />
+                    <span class="badge text-bg-@GetStatusCssColor(context.Status)">@context.Status</span>
                 </Column>
-                <Column Header="Action">
+                <Column Header="Sender">
+                    @context.SenderID.ToUpper()
+                </Column>
+                <Column Header="Message" Width="50%">
+                    @context.MessageText.Left(160)
+                    <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
+                </Column>
+                <Column Header="Delivery Report">
+                    <small class="text-muted">
+                        @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
+                    </small><br />
+                    <small class="text-muted">
+                        <em>Credits:</em> @context.CreditsCharged.ToString("#,##0.00")ç
+                    </small>
+                </Column>
+                <Column Header="">
                     <Actions OnView="e => sentMessageView.Show((int)context.BatchID)"
                              OnDelete="e => messageModal.Delete(context)">
                     </Actions>
@@ -70,7 +79,23 @@
         {
             return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
         });
-
         await ds.LoadData(alert); 
+    }
+
+    private string GetStatusCssColor(string status)
+    {
+        if (status == "COMPLETED")
+            return "success";
+
+        if (status == "RUNNING")
+            return "info";
+
+        if (status == "PAUSED")
+            return "warning";
+
+        if (status == "ABORTED")
+            return "danger";
+
+        return "dark";
     }
 }

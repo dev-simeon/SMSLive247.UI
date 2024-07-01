@@ -15,12 +15,14 @@
         </SearchArea>
         <Table Items="filteredItems">
             <Columns>
-                <Column Header="Description">@context.Description</Column>
-                <Column Header="Total In File">@context.TotalNumbers</Column>
-                <Column Header="Def Code">@context.FileType</Column>
-                <Column Header="Date Added">
+                <Column Header="File Name" Width="45%">@context.Description</Column>
+                <Column Header="Total Numbers" Width="15%">
+                    <div class="float-end p-2 pe-4">@context.TotalNumbers.ToString("#,##0")</div>
+                </Column>
+                <Column Header="Date Uploaded">
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
+                <Column Header="Type">@context.FileType</Column>
                 <Column>
                     <Actions OnDownload="() => bulkFileModal.Download(context)" 
                              OnDelete="() => bulkFileModal.Delete(context)">
