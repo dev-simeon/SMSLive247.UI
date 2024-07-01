@@ -33,5 +33,5 @@ else
     [Parameter] public List<ContactModel>? Items { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 
-    private List<ContactModel>? selected => Items;
+    private List<ContactModel>? selected => Items?.Where(x => x.Selected).ToList();
 }
