@@ -34,8 +34,6 @@
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
         
         if (confirmed)
-        {
             await apiClient.SenderIdDeleteAsync([editor.Model.SenderID]);
-        }
     }
 }

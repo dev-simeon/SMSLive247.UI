@@ -1,19 +1,13 @@
-﻿@using SMSLive247.UI.Pages.Messaging.Compose
-
-@page "/Messaging/Compose"
+﻿@page "/Messaging/Compose"
 @attribute [Authorize]
 
 <PageTitle>Compose Message</PageTitle>
 
 <Tabs>
-    <TabPage Title="Compose Simple Message">
+    <TabPage Title="Compose Message">
         <ComposeSimple></ComposeSimple>
     </TabPage>
     <TabPage Title="Compose Template Message">
         <ComposeTemplate></ComposeTemplate>
     </TabPage>
 </Tabs>
-
-@code{
-
-}

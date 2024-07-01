@@ -23,7 +23,7 @@ namespace SMSLive247.OpenApi
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
     public partial class ApiClient 
     {
-        private string _baseUrl = "https://smslive-api-service-staging.azurewebsites.net";
+        private string _baseUrl = "https://localhost:5001";// "https://smslive-api-service-staging.azurewebsites.net";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<System.Text.Json.JsonSerializerOptions> _settings;
 

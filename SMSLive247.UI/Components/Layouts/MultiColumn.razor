@@ -1,8 +1,8 @@
 ﻿<div class="row">
-    <div class="col-6 pe-4 border-end">
+    <div class="col-@Column1Width ps-3 pe-4 border-end">
         @Column1
     </div>
-    <div class="col-6 ps-4">
+    <div class="col-@Column2Width ps-4 pe-3">
         @Column2
     </div>
 </div>
@@ -10,4 +10,7 @@
 @code {
     [Parameter] public RenderFragment? Column1 { get; set; }
     [Parameter] public RenderFragment? Column2 { get; set; }
+
+    [Parameter] public int? Column1Width { get; set; } = 6;
+    [Parameter] public int? Column2Width { get; set; } = 6;
 }

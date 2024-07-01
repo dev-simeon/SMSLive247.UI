@@ -100,7 +100,7 @@
                     new AuthenticationHeaderValue("Bearer", response.Result.AccessToken);
 
                 var apiKey = $"MA-{response.Result.AccessToken}";
-                var member = new Member(Model.Username, apiKey);
+                var member = new Authentication.SmsAuthProvider.UserClaims(Model.Username, apiKey);
 
                 await ((Authentication.SmsAuthProvider)auth)
                     .SaveAuthenticationState(member);
@@ -132,10 +132,6 @@
         {
             //
         }
-        // var result = true;
-        // alert.Info(result.ToString(), "Result");
-        // await Task.Delay(10000);
-        // alert.Error(result.ToString(), "Result2");
     }
 
     private void Toggle()

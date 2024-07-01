@@ -50,9 +50,9 @@
     [Parameter] public bool ForCSV { get; set; } = false;
     [Parameter] public EventCallback OnCompleted { get; set; }
 
-
     private EditModal<BatchFileResponse> editor = new();
     private IBrowserFile? browserFile;
+
     private string groupMode = "NEW";
     private string fileName = string.Empty;
     private string fileTypes => ForCSV ? ".csv" : ".txt, .text";
@@ -81,9 +81,7 @@
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
 
         if (confirmed)
-        {
             await apiClient.BatchFileDeleteAsync(editor.Model.BatchFileID);
-        }
     }
 
     private async Task OnDownload()
@@ -92,9 +90,7 @@
         bool confirmed = await alert.Confirm(question, "Confirm Download");
 
         if (confirmed)
-        {
             await apiClient.BatchFileDownloadAsync(editor.Model.BatchFileID);
-        }
     }
 
     private void FileSelected(InputFileChangeEventArgs e)
