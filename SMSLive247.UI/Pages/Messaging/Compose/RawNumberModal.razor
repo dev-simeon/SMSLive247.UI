@@ -1,0 +1,53 @@
+﻿<Modal Title="Enter Raw Numbers" @bind-Hidden="hideModal">
+    <Body>
+        <textarea class="form-control mb-2" rows="10" @bind="rawNumbersText"></textarea>
+        <div class="form-text">
+            Enter or paste numbers separated by commas.
+        </div>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.CUSTOM" @onclick="Save">
+            Save
+        </Button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public List<ContactModel>? RawNumbers { get; set; }
+    [Parameter] public EventCallback OnSelected { get; set; }
+
+    private bool hideModal = true;
+    private string rawNumbersText = string.Empty;
+
+    public void Show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        hideModal = true;
+        StateHasChanged();
+    }
+
+    private void Save()
+    {
+        var numbers = rawNumbersText
+            .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            .Distinct()
+            .Select((number, index) => new ContactModel(index.ToString(), number.Trim(), 1))
+            .ToList();
+
+        if (RawNumbers != null)
+        {
+            RawNumbers.Clear();
+            RawNumbers.AddRange(numbers);
+
+            RawNumbers?.ForEach(x => x.Selected = true);
+        }
+
+        OnSelected.InvokeAsync();
+        Hide();
+    }
+}

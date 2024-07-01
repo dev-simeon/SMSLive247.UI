@@ -57,9 +57,9 @@
                 <div style="height: 480px; overflow-y: auto;">
                     <h4>Recipients</h4>
 
-                    <RecipientList Caption="Raw Numbers" Items="groups" @onclick="e => groupModal.Show()">
+                    <RecipientList Caption="Raw Numbers" Items="rawNumbers" @onclick="e => rawNumberModal.Show()">
                         <button type="button" class="btn btn-outline-primary"
-                                @onclick="e => groupModal.Show()">
+                                @onclick="e => rawNumberModal.Show()">
                             <i class="fa fa-paste me-2"></i>Paste...
                         </button>
                         <p class="form-text">
@@ -67,13 +67,13 @@
                         </p>
                     </RecipientList>
 
-                    <RecipientList Caption="From Contacts" Items="contacts" @onclick="e => contactModal.Show()">
+                    <RecipientList Caption="From Contacts" Items="contactsAndGroups" @onclick="e => contactsAndGroupsModal.Show()">
                         <button type="button" class="btn btn-outline-primary"
-                                @onclick="e => contactModal.Show()">
+                                @onclick="e => contactsAndGroupsModal.Show()">
                             <i class="fa fa-user me-2"></i>Contacts...
                         </button>
                         <p class="form-text">
-                            You can also select numbers from your Phonebook. Click the [Contacts] button above.
+                            You can also select numbers from your Phonebook or Groups. Click the [Contacts] button above.
                         </p>
                     </RecipientList>
 
@@ -91,28 +91,30 @@
         </MultiColumn>
     </Body>
     <Footer>
-        <Button Type="Button.Style.CUSTOM">
+        <Button Type="Button.Style.CUSTOM" @onclick="SubmitMessage">
             @(sendOption == SendOption.SEND_NOW ? "Send SMS Now!" : "Queue Message")
         </Button>
     </Footer>
 </Card>
 
-<RecipientModal @ref="contactModal" Items="contacts" OnSelected="OnSelected" />
-<RecipientModal @ref="bulkFileModal" Items="batchFiles" OnSelected="OnSelected" />
-<RecipientModal @ref="groupModal" Items="groups" OnSelected="OnSelected" />
+
+<BulkFilesModal @ref="bulkFileModal" Items="batchFiles" OnSelected="OnSelected" />
+<RawNumberModal @ref="rawNumberModal" RawNumbers="rawNumbers" OnSelected="OnSelected" />
+<ContactsAndGroupsModal @ref="contactsAndGroupsModal" Items="contactsAndGroups" OnSelected="OnSelected" />
 
 @code {
-    private enum SendOption {SEND_NOW, SEND_LATER};
+    private enum SendOption { SEND_NOW, SEND_LATER }
 
-    private RecipientModal contactModal = new();
-    private RecipientModal bulkFileModal = new();
-    private RecipientModal groupModal = new();
+    private BulkFilesModal bulkFileModal = new();
+    private RawNumberModal rawNumberModal = new();
+    private ContactsAndGroupsModal contactsAndGroupsModal = new();
 
-    private List<SenderIdResponse> senderIds = [];
-
-    private List<ContactModel>? batchFiles;
-    private List<ContactModel>? contacts;
-    private List<ContactModel>? groups;
+    private List<SenderIdResponse> senderIds = new();
+    private List<ContactModel> batchFiles = new();
+    private List<ContactModel> contacts = new();
+    private List<ContactModel> groups = new();
+    private List<ContactModel> rawNumbers = new();
+    private List<ContactModel> contactsAndGroups = new();
 
     private SmsBatchRequest model = new();
     private string counterText = "Type your Message here";
@@ -135,6 +137,8 @@
             batchFiles = t2.Result.Result.Select(x => ToContact(x)).ToList();
             contacts = t3.Result.Result.Select(x => ToContact(x)).ToList();
             groups = t4.Result.Result.Select(x => ToContact(x)).ToList();
+
+            contactsAndGroups = contacts.Concat(groups).ToList();
         }
         catch (Exception ex)
         {
@@ -145,13 +149,9 @@
     private async Task SubmitMessage()
     {
         if (sendOption == SendOption.SEND_NOW) model.DeliveryTime = null;
-        model.PhoneNumbers = contacts?.Where(x => x.Selected).Select(x => x.Key).ToList();
-        model.BatchFileIDs = batchFiles?.Where(x => x.Selected).Select(x => x.Key).ToList();
-        model.RawNumbers = "";
-
-        // model.RouteID = "";
-        // model.SenderID = "";
-        // model.MessageText = "";
+        model.PhoneNumbers = contactsAndGroups.Where(x => x.Selected).Select(x => x.Key).ToList();
+        model.BatchFileIDs = batchFiles.Where(x => x.Selected).Select(x => x.Key).ToList();
+        model.RawNumbers = string.Join(",", rawNumbers.Where(x => x.Selected).Select(x => x.Key));
 
         await apiClient.SmsBatchCreateAsync(model);
     }
@@ -171,13 +171,13 @@
     {
         var strSmsText = e.Value?.ToString();
 
-        if (strSmsText?.Length < 1)
+        if (string.IsNullOrWhiteSpace(strSmsText))
         {
             counterText = "Type your Message here";
             return;
         }
 
-        int intSmsLength = strSmsText!.GetValidGsmTextLength();
+        int intSmsLength = strSmsText.GetValidGsmTextLength();
         int intSmsParts = GetMessageParts(intSmsLength);
         int intNextMax = intSmsParts == 1 ? 160 : intSmsParts * 153;
 
@@ -202,21 +202,18 @@
     {
         if (length <= 160) return 1;
 
-        return (int)Math.Ceiling(length / 153m);
+        return (int)Math.Ceiling(length / 153.0);
     }
 
-    private ContactModel ToContact(object item)
+    private static ContactModel ToContact(object item)
     {
         return item switch
         {
-            BatchFileResponse b => 
+            BatchFileResponse b =>
                 new ContactModel(b.BatchFileID, $"{b.Description} ({b.TotalNumbers})", b.TotalNumbers),
-            ContactResponse c => 
-                new ContactModel(c.PhoneNumber, c.ContactName, 1),
-            GroupResponse g => 
-                new ContactModel(g.GroupName, $"{g.GroupName} ({g.Members.Count})", g.Members.Count),
-            _ => 
-                throw new Exception("Not supported contact type")
+            ContactResponse c => new ContactModel(c.PhoneNumber, c.ContactName, 1),
+            GroupResponse g => new ContactModel(g.GroupName, $"{g.GroupName} ({g.Members.Count})", g.Members.Count),
+            _ => throw new ArgumentException("Not supported contact type", nameof(item))
         };
     }
 }

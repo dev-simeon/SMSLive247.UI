@@ -1,5 +1,19 @@
-﻿<h3>ComposeTemplate</h3>
+﻿<Card HeaderTitle="Template SMS">
+    <Body>
+        <h6 class="mb-0">Upload A Customized Message</h6>
+         <MultiColumn Column1Width="5">
+             <Column1>
+                <FormInputFile Label="Select File" OnChange="e => FileSelected(e)" Accept='@(".csv")'></FormInputFile>
+             </Column1>
+         </MultiColumn>
+    </Body>
+</Card>
 
 @code {
+    private IBrowserFile? browserFile;
 
+    private void FileSelected(InputFileChangeEventArgs e)
+    {
+        browserFile = e.File;
+    }
 }
