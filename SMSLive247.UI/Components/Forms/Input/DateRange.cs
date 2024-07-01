@@ -1,4 +1,4 @@
-﻿namespace SMSLive247.UI
+﻿namespace SMSLive247.UI.Components.Forms.Input
 {
     public enum DateRangeFilter
     {
@@ -100,15 +100,15 @@
                     _endDate = _startDate.AddMonths(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.CUSTOM:
-                    if (_startDate.HasValue && _endDate.HasValue)
-                    {
-                        // Ensure end of day for _endDate
-                        _endDate = _endDate.Value.Date.AddDays(1).AddTicks(-1);
-                    }
+                    //if (_startDate.HasValue && _endDate.HasValue)
+                    //{
+                    //    // Ensure end of day for _endDate
+                    //    _endDate = _endDate.Value.Date.AddDays(1).AddTicks(-1);
+                    //}
                     break;
                 default:
-                    _startDate = null;
-                    _endDate = null;
+                    //_startDate = null;
+                    //_endDate = null;
                     break;
             }
         }

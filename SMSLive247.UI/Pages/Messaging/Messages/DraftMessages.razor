@@ -44,13 +44,4 @@
             return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
         });
     }
-
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     ds.Callback = new((PageState p, FilterState? f) =>
-    //     {
-    //         return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
-    //     });
-    //     await ds.LoadData(alert);
-    // }
 }

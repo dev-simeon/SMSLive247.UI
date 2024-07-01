@@ -10,14 +10,11 @@
 @code {
     private EditModal<SmsBatchResponse> editor = new();
 
-
     public void Show(SmsBatchResponse? item = null) => editor.Show(item);
-
     public void Delete(SmsBatchResponse item) => editor.Delete(item);
 
     private async Task OnUpdate()
     {
-        // Todo
         // var request = new SmsMessageUpdateRequest()
         // {
         //     BatchID = editor.Model.BatchID,
@@ -30,10 +27,10 @@
 
     private async Task OnDelete()
     {
-        bool confirmed = await alert.Confirm("Are you sure you want to delete this message?", "Confirm Deletion");
+        var question = "Are you sure you want to delete this message?";
+        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+       
         if (confirmed)
-        {
             await apiClient.SmsBatchDeleteAsync((int)editor.Model.BatchID);
-        }
     }
 }

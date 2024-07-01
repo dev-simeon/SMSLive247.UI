@@ -1,11 +1,18 @@
 ﻿@if (selected != null && selected.Count > 0)
 {
 <div class="card mb-3 bg-info-subtle">
-    <div class="card-body">
-        <h6 class="card-title" @onclick="OnClick">
-            @Caption [@selected.Sum(x => x.Count) / 
-                      @Items?.Sum(x => x.Count)]
-        </h6>
+    <div class="card-body" @onclick="OnClick">
+        <LeftRight>
+            <Left>
+                <h6 class="card-title">
+                    @Caption [@selected.Sum(x => x.Count) /
+                    @Items?.Sum(x => x.Count)]
+                </h6>
+            </Left>
+            <Right>
+                <i class="fa fa-edit"></i>
+            </Right>
+        </LeftRight>
         @foreach (var item in selected)
         {
         <span class="badge bg-info me-1">

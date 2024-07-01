@@ -1,10 +1,13 @@
 ﻿@using System.Linq.Expressions
-@inherits InputBase<FormInputDateRangeValue>
+@inherits InputBase<DateRange>
 
 <div class="row my-3">
     <label class="form-label col-@Column">@Label</label>
     <div class="col-@(12 - Column) d-flex">
         <div class="input-group">
+@*             <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.StartDate"></InputDate>
+            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.EndDate"></InputDate>
+ *@
             <input class="form-control" type="date" 
                    @bind:format="dd-MM-yyyy"
                    @bind="@CurrentValue.StartDate" />
@@ -19,11 +22,12 @@
     [Parameter] public string? Label { get; set; }
     [Parameter] public int? Column { get; set; } = 4;
 
-    protected override bool TryParseValueFromString(string? value,
-        [MaybeNullWhen(false)] out FormInputDateRangeValue result,
+    protected override bool TryParseValueFromString(
+        string? value,
+        [MaybeNullWhen(false)] out DateRange result,
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
-        result = new();// value ?? string.Empty;
+        result = new(); //value ?? string.Empty;
         validationErrorMessage = null;
         return true;
     }

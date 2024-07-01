@@ -31,17 +31,17 @@
                 <div class="mb-4">
                     <InputRadioGroup @bind-Value="sendOption">
                         <div class="form-check form-check-inline">
-                            <InputRadio class="form-check-input" id="r3" Value='@("NOW")' />
+                            <InputRadio class="form-check-input" id="r3" Value=@SendOption.SEND_NOW />
                             <label class="form-check-label" for="r3">Send Immediately</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <InputRadio class="form-check-input" id="r4" Value='@("LATER")' />
+                            <InputRadio class="form-check-input" id="r4" Value=@SendOption.SEND_LATER />
                             <label class="form-check-label" for="r4">Schedule for Later</label>
                         </div>
                     </InputRadioGroup>
                 </div>
 
-                @if (sendOption == "LATER")
+                @if (sendOption == SendOption.SEND_LATER)
                 {
                 <div class="mb-4">
                     @* <label class="form-label" for="s5">Delivery Time</label> *@
@@ -54,7 +54,7 @@
                 }
             </Column1>
             <Column2>
-                <div style="height: 500px; overflow-y: scroll;">
+                <div style="height: 480px; overflow-y: auto;">
                     <h4>Recipients</h4>
 
                     <RecipientList Caption="Raw Numbers" Items="groups" @onclick="e => groupModal.Show()">
@@ -92,7 +92,7 @@
     </Body>
     <Footer>
         <Button Type="Button.Style.CUSTOM">
-            @(sendOption == "LATER" ? "Queue Message" : "Send SMS Now!")
+            @(sendOption == SendOption.SEND_NOW ? "Send SMS Now!" : "Queue Message")
         </Button>
     </Footer>
 </Card>
@@ -102,6 +102,8 @@
 <RecipientModal @ref="groupModal" Items="groups" OnSelected="OnSelected" />
 
 @code {
+    private enum SendOption {SEND_NOW, SEND_LATER};
+
     private RecipientModal contactModal = new();
     private RecipientModal bulkFileModal = new();
     private RecipientModal groupModal = new();
@@ -112,9 +114,9 @@
     private List<ContactModel>? contacts;
     private List<ContactModel>? groups;
 
-    private SmsMessageRequest model = new();
+    private SmsBatchRequest model = new();
     private string counterText = "Type your Message here";
-    private string sendOption = "NOW"; //or LATER
+    private SendOption sendOption = SendOption.SEND_NOW;
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,10 +144,16 @@
 
     private async Task SubmitMessage()
     {
-        if (sendOption == "NOW")
-            model.DeliveryTime = null;
+        if (sendOption == SendOption.SEND_NOW) model.DeliveryTime = null;
+        model.PhoneNumbers = contacts?.Where(x => x.Selected).Select(x => x.Key).ToList();
+        model.BatchFileIDs = batchFiles?.Where(x => x.Selected).Select(x => x.Key).ToList();
+        model.RawNumbers = "";
 
-        await apiClient.SmsMessageSendAsync(model);
+        // model.RouteID = "";
+        // model.SenderID = "";
+        // model.MessageText = "";
+
+        await apiClient.SmsBatchCreateAsync(model);
     }
 
     private void ClearMessage()
