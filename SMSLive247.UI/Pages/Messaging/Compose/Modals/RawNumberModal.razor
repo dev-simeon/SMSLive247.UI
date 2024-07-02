@@ -1,0 +1,48 @@
+﻿<Modal Title="Enter Numbers" @bind-Hidden="hideModal">
+    <Body>
+        <label class="form-label" for="a">Enter recipients phone numbers here</label>
+        <textarea class="form-control" rows="8" id="a" @bind="RawText"></textarea>
+        <div class="form-text">
+            Type or paste numbers separated by commas or spaces.
+        </div>
+        <div class="form-text">
+            Your Country Code is @CountryCode.
+        </div>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.SAVE" 
+                @onclick="Hide">
+                Save
+        </Button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public ComposeSimpleModel? Model { get; set; }
+    [Parameter] public EventCallback OnSelected { get; set; }
+    [Parameter] public int CountryCode { get; set; } = 234;
+
+    public string RawText = string.Empty;
+
+    private bool hideModal = true;
+
+    public void Show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    public Task Hide()
+    {
+        if (Model == null)
+            return Task.CompletedTask;
+
+        Model.Numbers = RawText
+            .ConvertRawUploadToList(CountryCode)
+            .Select(num => new ContactModel(num, num, 1, true))
+            .ToList();
+
+        hideModal = true;
+        return OnSelected.InvokeAsync();
+    }
+}

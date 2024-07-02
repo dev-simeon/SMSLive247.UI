@@ -1,5 +1,6 @@
 ﻿using SMSLive247.OpenApi;
 using System.Globalization;
+using System.Text;
 
 namespace SMSLive247.UI
 {
@@ -96,6 +97,61 @@ namespace SMSLive247.UI
                 default:
                     return exception.Message;
             }
+        }
+
+
+        public static List<string> ConvertRawUploadToList(this string rawString, int countryCode)
+        {
+            var stream = new MemoryStream(Encoding.ASCII.GetBytes(rawString));
+            return stream.ConvertRawUploadToList(countryCode);
+        }
+
+        public static List<string> ConvertRawUploadToList(this Stream rawStream, int countryCode)
+        {
+            int p = 0;
+            var sr = new StreamReader(rawStream);
+            var currNumber = new List<char>();
+            var bulkNumbers = new List<string>();
+            var countryCodeArr = countryCode.ToString().ToCharArray();
+
+            while (!(p < 0))
+            {
+                p = sr.Read();
+                //U.InputStream.ReadByte
+                //if char code is numeric
+                if (p >= 48 & p <= 57)
+                {
+                    currNumber.Add(Convert.ToChar(p));
+                }
+                else
+                {
+                    if (currNumber.Count > 5)
+                    {
+                        if (currNumber[0] == '0')
+                        {
+                            currNumber.RemoveRange(0, 1);
+                            currNumber.InsertRange(0, countryCodeArr);
+                        }
+                        bulkNumbers.Add(string.Concat(currNumber.ToArray()));
+                    }
+                    if (currNumber.Count > 0)
+                        currNumber.Clear();
+                }
+            }
+            //take care of the vary last number
+            if (currNumber.Count > 5)
+            {
+                if (currNumber[0] == '0')
+                {
+                    currNumber.RemoveRange(0, 1);
+                    currNumber.InsertRange(0, countryCodeArr);
+                }
+                bulkNumbers.Add(string.Concat(currNumber.ToArray()));
+            }
+            //=================================================
+            //ohowojeheri ruby
+
+            return bulkNumbers.Distinct().ToList();
         }
     }
 }

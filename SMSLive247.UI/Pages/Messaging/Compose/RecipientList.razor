@@ -1,19 +1,19 @@
-﻿@if (selected != null && selected.Count > 0)
+﻿@if (Selected.Count > 0)
 {
     <div class="card mb-3 bg-info-subtle">
         <div class="card-body" @onclick="OnClick">
             <LeftRight>
                 <Left>
                     <h6 class="card-title">
-                        @Caption [@selected.Sum(x => x.Count) /
-                        @Items?.Sum(x => x.Count)]
+                        @Caption [@Selected.Sum(x => x.Count) /
+                        @Recipients.Sum(x => x.Count)]
                     </h6>
                 </Left>
                 <Right>
                     <i class="fa fa-edit"></i>
                 </Right>
             </LeftRight>
-            @foreach (var item in selected)
+            @foreach (var item in Selected)
             {
                 <span class="badge bg-info me-1">
                     @item.Name
@@ -30,8 +30,8 @@ else
 @code {
     [Parameter] public string Caption { get; set; } = "Heading";
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public List<ContactModel>? Items { get; set; }
+    [Parameter] public List<ContactModel> Recipients { get; set; } = [];
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 
-    private List<ContactModel>? selected => Items?.Where(x => x.Selected).ToList();
+    public List<ContactModel> Selected => Recipients.Where(x => x.Selected).ToList();
 }
