@@ -23,7 +23,8 @@
                     <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
                 </Column>
                 <Column>
-@*                     <span class="badge text-bg-success">
+@*
+                    <span class="badge text-bg-success">
                         Sent: @context.TotalProcessed
                     </span>
                     <span class="badge text-bg-danger">
@@ -33,7 +34,6 @@
                         Total: @(context.TotalProcessed + context.TotalFailed)
                     </span>
  *@
-
                     <button type="button" class="btn btn-secondary position-relative">
                         Sent
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

@@ -1,59 +1,41 @@
-﻿namespace SMSLive247.UI.Pages.Messaging.Compose
+﻿using SMSLive247.OpenApi;
+
+namespace SMSLive247.UI.Pages.Messaging.Compose
 {
-    /// <summary>
-    /// Represents a contact model used in the messaging compose functionality.
-    /// </summary>
+    public class ComposeSimpleModel
+    {
+        public List<string>? SenderIds { get; private set; }  
+        public SmsBatchRequest Request { get; private set; } = new();
+
+        public List<ContactModel> Contacts { get; private set; } = [];
+        public List<ContactModel> BatchFiles { get; private set; } = [];
+        public List<ContactModel> Numbers { get; set; } = [];
+
+        public void Initialize(
+            IEnumerable<SenderIdResponse> senderIds,
+            IEnumerable<ContactResponse> contacts,
+            IEnumerable<BatchFileResponse> batchFiles)
+        {
+            SenderIds = senderIds.Select(x => x.SenderID).ToList();
+            Contacts = contacts.Select(c => new ContactModel(c.PhoneNumber, c.ContactName, 1)).ToList();
+            BatchFiles = batchFiles.Select(b => new ContactModel(b.BatchFileID, $"{b.Description} ({b.TotalNumbers})", b.TotalNumbers)).ToList();
+        }
+    }
+
     public record class ContactModel
     {
-        /// <summary>
-        /// Gets the unique key of the contact.
-        /// </summary>
         public string Key { get; init; }
-
-        /// <summary>
-        /// Gets the name of the contact.
-        /// </summary>
         public string Name { get; init; }
-
-        /// <summary>
-        /// Gets the count associated with the contact (e.g., number of members in a group).
-        /// </summary>
         public int Count { get; init; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the contact is selected.
-        /// </summary>
         public bool Selected { get; set; } = false;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the contact is visible.
-        /// </summary>
         public bool Visible { get; set; } = true;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ContactModel"/> class.
-        /// </summary>
-        /// <param name="key">The unique key of the contact.</param>
-        /// <param name="name">The name of the contact.</param>
-        /// <param name="count">The count associated with the contact.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the key or name is null or empty.</exception>
-        public ContactModel(string key, string name, int count)
+        public ContactModel(string key, string name, int count, bool selected = false)
         {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                throw new ArgumentNullException(nameof(key), "Key cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentNullException(nameof(name), "Name cannot be null or empty.");
-            }
-
             Key = key;
             Name = name;
             Count = count;
+            Selected = selected;
         }
-
-        public override string ToString() => $"{Name} ({Count})";
     }
 }
