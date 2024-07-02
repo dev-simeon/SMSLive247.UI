@@ -1,0 +1,52 @@
+﻿<EditModal TItem="ContactResponse" @ref="editor" LabelText="Contact"
+           OnCreate="OnCreate"
+           OnUpdate="OnUpdate"
+           OnDelete="OnDelete"
+           OnCompleted="OnCompleted">
+    <FormInputText Label="Name" @bind-Value="editor.Model.ContactName"></FormInputText>
+    <FormInputText Label="Phone Number" @bind-Value="editor.Model.PhoneNumber"></FormInputText>
+</EditModal>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+
+    private EditModal<ContactResponse> editor = new();
+    private ContactResponse model => editor.Model;
+
+    public void Show(ContactResponse? item = null) => editor.Show(item);
+    public void Delete(ContactResponse item) => editor.Delete(item);
+
+    public async Task OnCreate()
+    {
+        var request = new ContactCreateRequest
+        {
+            ContactName = model.ContactName,
+            PhoneNumber = model.PhoneNumber,
+            Groups = new List<string>()
+        };
+
+        await apiClient.ContactCreateAsync(request);
+    }
+
+    private async Task OnUpdate()
+    {
+        var request = new ContactUpdateRequest
+        {
+            ContactName = model.ContactName,
+            PhoneNumber = model.PhoneNumber,
+            Groups = model.Groups
+        };
+
+        await apiClient.ContactUpdateAsync(model.PhoneNumber, request);
+    }
+
+    private async Task OnDelete()
+    {
+        var question = "Are you sure you want to delete this contact?";
+        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+
+        if (confirmed)
+            await apiClient.ContactDeleteAsync(editor.Model.PhoneNumber);
+    }
+}

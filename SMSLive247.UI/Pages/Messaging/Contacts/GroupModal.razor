@@ -1,0 +1,59 @@
+﻿<EditModal TItem="GroupResponse" @ref="editor" LabelText="Group"
+           OnCreate="OnCreate"
+           OnUpdate="OnUpdate"
+           OnDelete="OnDelete"
+           OnCompleted="OnCompleted">
+    <FormInputText Label="Group Name" @bind-Value="model.GroupName"></FormInputText>
+    <FormField Label="Select Contacts">
+        <SelectMultiple Id="contactMultiSelect" 
+                     DropdownValues="contactDropdownValues"
+                     SelectedValues="selectedContacts"
+                     SelectedValuesChanged="OnSelectedContactsChanged" />
+    </FormField>
+</EditModal>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public List<ContactResponse> allContacts { get; set; } = new();
+
+    private EditModal<GroupResponse> editor = new();
+    private GroupResponse model => editor.Model;
+    private List<string> selectedContacts = new();
+    private Dictionary<string, string> contactDropdownValues = new();
+
+    protected override void OnParametersSet() => contactDropdownValues = allContacts.ToDictionary(c => c.PhoneNumber, c => c.ContactName);
+
+    public void Show(GroupResponse? group = null)
+    {
+        editor.Show(group);
+        selectedContacts = group?.Members.Select(c => c.PhoneNumber).ToList() ?? new List<string>();
+    }
+
+    public void Delete(GroupResponse group) => editor.Delete(group);
+
+    private async Task OnCreate()
+    {
+        await apiClient.GroupCreateAsync(model.GroupName, selectedContacts);
+    }
+
+    private async Task OnUpdate()
+    {
+        await apiClient.GroupUpdateAsync(model.GroupName, selectedContacts);
+    }
+
+    private async Task OnDelete()
+    {
+        var question = "Are you sure you want to delete this group?";
+        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+
+        if (confirmed)
+        {
+            await apiClient.GroupDeleteAsync(model.GroupName);
+        }
+    }
+
+    private void OnSelectedContactsChanged(List<string> contacts)
+    {
+        selectedContacts = contacts;
+    }
+}

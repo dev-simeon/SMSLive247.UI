@@ -1,5 +1,138 @@
-﻿<h3>PhoneBook</h3>
+﻿<Card HeaderTitle="PhoneBook">
+    <Body>
+        <Tabs Style="Tabs.TabStyleEnum.TAB">
+            <TabPage Title="Contacts">
+                <SearchArea>
+                    <LeftRight>
+                        <Left>
+                            <SearchBox @ref="searchBox" @onclick="SearchContacts">
+                            </SearchBox>
+                        </Left>
+                        <Right>
+                            <Button Type="Button.Style.ADD" @onclick="() => contactModal.Show()">
+                                Add Contact
+                            </Button>
+                        </Right>
+                    </LeftRight>
+                </SearchArea>
+                <div class="list-group">
+                    @foreach (var contact in filteredContacts)
+                    {
+                        <div class="list-group-item">
+                            <LeftRight>
+                                <Left>
+                                    @contact.ContactName (@contact.PhoneNumber)
+                                </Left>
+                                <Right>
+                                    <Button Type="Button.Style.EDIT" @onclick="() => contactModal.Show(contact)">
+                                        Edit
+                                    </Button>
+                                    <Button Type="Button.Style.DELETE" @onclick="() => contactModal.Delete(contact)">
+                                        Delete
+                                    </Button>
+                                </Right>
+                            </LeftRight>
+                        </div>
+                    }
+                </div>
+            </TabPage>
+            <TabPage Title="Groups">
+                <SearchArea>
+                    <LeftRight>
+                        <Left>
+                            <SearchBox @ref="searchBox" @onclick="SearchGroups">
+                            </SearchBox>
+                        </Left>
+                        <Right>
+                            <Button Type="Button.Style.ADD" @onclick="() => groupModal.Show()">
+                                Add Group
+                            </Button>
+                        </Right>
+                    </LeftRight>
+                </SearchArea>
+                <div class="list-group">
+                    @foreach (var group in filteredgroups)
+                    {
+                        <div class="list-group-item">
+                            <LeftRight>
+                                <Left>
+                                    @group.GroupName
+                                </Left>
+                                <Right>
+                                    <Button Type="Button.Style.EDIT" @onclick="() => groupModal.Show(group)">
+                                        Edit
+                                    </Button>
+                                    <Button Type="Button.Style.DELETE" @onclick="() => groupModal.Delete(group)">
+                                        Delete
+                                    </Button>
+                                </Right>
+                            </LeftRight>
+                        </div>
+                    }
+                </div>
+            </TabPage>
+        </Tabs>
+    </Body>
+</Card>
+
+<ContactModal @ref="contactModal" OnCompleted="FetchData" />
+<GroupModal @ref="groupModal" allContacts="contacts" OnCompleted="FetchData" />
 
 @code {
+    private SearchBox searchBox = new();
+    private List<ContactResponse> contacts = [];
+    private List<ContactResponse> filteredContacts = [];
+    private List<GroupResponse> groups = [];
+    private List<GroupResponse> filteredgroups = [];
+    private ContactModal contactModal = new();
+    private GroupModal groupModal = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        try
+        {
+            var t1 = apiClient.ContactListAsync();
+            var t2 = apiClient.GroupListAsync();
+
+            await Task.WhenAll(t1, t2);
+
+            contacts = t1.Result.Result.ToList();
+            groups = t2.Result.Result.ToList();
+            filteredContacts = contacts;
+            filteredgroups = groups;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private void SearchContacts()
+    {
+        if (string.IsNullOrEmpty(searchBox.Text))
+        {
+            filteredContacts = contacts;
+        }
+        else
+        {
+            filteredContacts = contacts.Where(c => c.ContactName.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+
+    private void SearchGroups()
+    {
+        if (string.IsNullOrEmpty(searchBox.Text))
+        {
+            filteredgroups = groups;
+        }
+        else
+        {
+            filteredgroups = groups.Where(c => c.GroupName.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
 }
