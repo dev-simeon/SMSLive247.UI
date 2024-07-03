@@ -1,4 +1,5 @@
-﻿using SMSLive247.OpenApi;
+﻿using Microsoft.JSInterop;
+using SMSLive247.OpenApi;
 using System.Globalization;
 using System.Text;
 
@@ -7,6 +8,12 @@ namespace SMSLive247.UI
     public static class Extensions
     {
         private static readonly TextInfo _textInfo = new CultureInfo("en-US", false).TextInfo;
+
+        public static ValueTask DownloadFromStream(this IJSRuntime js, Stream fileStream, string fileName)
+        {
+            using var streamRef = new DotNetStreamReference(stream: fileStream);
+            return js.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+        }
 
         public static string Left(this string input, int length)
         {

@@ -19,10 +19,10 @@ namespace SMSLive247.UI
             var settings = new Settings();
             builder.Configuration.Bind(settings);
 
-            //var apiSettings = new ApiClientFactory.Settings { BaseUrl = settings.BaseUrl };
+            var apiSettings = new ApiClientFactory.ApiSettings(settings.BaseUrl);
 
             builder.Services.AddSingleton(settings);
-            //builder.Services.AddSingleton(apiSettings);
+            builder.Services.AddSingleton(apiSettings);
 
             builder.Services.AddSingleton<AlertService>();
             builder.Services.AddSingleton<SpinnerService>();
@@ -32,7 +32,7 @@ namespace SMSLive247.UI
             builder.Services.AddTransient<CacheDelegateHandler>();
             builder.Services.AddTransient<SpinnerDelegateHandler>();
 
-            builder.Services.AddHttpClient<ApiClient>()
+            builder.Services.AddHttpClient<ApiClientFactory>()
                 .AddHttpMessageHandler<AuthDelegateHandler>()
                 //.AddHttpMessageHandler<CacheDelegateHandler>()
                 .AddHttpMessageHandler<SpinnerDelegateHandler>();

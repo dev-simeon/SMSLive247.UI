@@ -90,7 +90,10 @@
         bool confirmed = await alert.Confirm(question, "Confirm Download");
 
         if (confirmed)
-            await apiClient.BatchFileDownloadAsync(editor.Model.BatchFileID);
+        {
+            var response = await apiClient.BatchFileDownloadAsync(editor.Model.BatchFileID);
+            await js.DownloadFromStream(response.Stream, "example.txt");
+        }
     }
 
     private void FileSelected(InputFileChangeEventArgs e)

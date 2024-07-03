@@ -23,12 +23,13 @@ namespace SMSLive247.OpenApi
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
     public partial class ApiClient 
     {
-        private string _baseUrl = "https://smslive-api-service-staging.azurewebsites.net";
+        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<System.Text.Json.JsonSerializerOptions> _settings;
 
-        public ApiClient(System.Net.Http.HttpClient httpClient)
+        public ApiClient(string baseUrl, System.Net.Http.HttpClient httpClient)
         {
+            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<System.Text.Json.JsonSerializerOptions>(CreateSerializerSettings);
         }
@@ -54,7 +55,7 @@ namespace SMSLive247.OpenApi
         partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
         partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize)
         {
@@ -62,7 +63,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
         {
@@ -137,7 +138,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountCreateAsync(AccountCreateRequest? body)
         {
@@ -145,7 +146,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountCreateAsync(AccountCreateRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -215,7 +216,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountGetAsync(string accountId)
         {
@@ -223,7 +224,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountGetAsync(string accountId, System.Threading.CancellationToken cancellationToken)
         {
@@ -293,7 +294,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountUpdateAsync(string accountId, AccountUpdateRequest? body)
         {
@@ -301,7 +302,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountUpdateAsync(string accountId, AccountUpdateRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -375,7 +376,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountDeleteAsync(string accountId)
         {
@@ -383,7 +384,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountDeleteAsync(string accountId, System.Threading.CancellationToken cancellationToken)
         {
@@ -453,7 +454,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<LoginResponse>> LoginAsync(LoginRequest? body)
         {
@@ -461,7 +462,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<LoginResponse>> LoginAsync(LoginRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -531,7 +532,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse> ResetPasswordAsync(string? email)
         {
@@ -539,7 +540,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse> ResetPasswordAsync(string? email, System.Threading.CancellationToken cancellationToken)
         {
@@ -605,7 +606,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse> LogoutAsync()
         {
@@ -613,7 +614,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse> LogoutAsync(System.Threading.CancellationToken cancellationToken)
         {
@@ -673,7 +674,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> RegisterAsync(AccountCreateRequest? body)
         {
@@ -681,7 +682,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> RegisterAsync(AccountCreateRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -751,7 +752,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<BatchFileResponse>>> BatchFileListAsync()
         {
@@ -759,7 +760,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<BatchFileResponse>>> BatchFileListAsync(System.Threading.CancellationToken cancellationToken)
         {
@@ -825,7 +826,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileCreateAsync(int? countryCode, FileParameter file)
         {
@@ -833,7 +834,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileCreateAsync(int? countryCode, FileParameter file, System.Threading.CancellationToken cancellationToken)
         {
@@ -921,17 +922,17 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse> BatchFileDownloadAsync(string fileId)
+        public virtual System.Threading.Tasks.Task<FileResponse> BatchFileDownloadAsync(string fileId)
         {
             return BatchFileDownloadAsync(fileId, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse> BatchFileDownloadAsync(string fileId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<FileResponse> BatchFileDownloadAsync(string fileId, System.Threading.CancellationToken cancellationToken)
         {
             if (fileId == null)
                 throw new System.ArgumentNullException("fileId");
@@ -947,6 +948,7 @@ namespace SMSLive247.OpenApi
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/octet-stream"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -969,9 +971,12 @@ namespace SMSLive247.OpenApi
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
+                        if (status_ == 200 || status_ == 206)
                         {
-                            return new SwaggerResponse(status_, headers_);
+                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
+                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
+                            return fileResponse_;
                         }
                         else
                         {
@@ -993,7 +998,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileUpdateAsync(string fileId, int? countryCode, FileParameter file)
         {
@@ -1001,7 +1006,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileUpdateAsync(string fileId, int? countryCode, FileParameter file, System.Threading.CancellationToken cancellationToken)
         {
@@ -1093,7 +1098,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse> BatchFileDeleteAsync(string fileId)
         {
@@ -1101,7 +1106,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse> BatchFileDeleteAsync(string fileId, System.Threading.CancellationToken cancellationToken)
         {
@@ -1165,7 +1170,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PriceResponse>>> PriceListAsync()
         {
@@ -1173,7 +1178,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PriceResponse>>> PriceListAsync(System.Threading.CancellationToken cancellationToken)
         {
@@ -1239,7 +1244,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<PriceCalcResponse>> PriceCalculateAsync(double? amount, long? quantity)
         {
@@ -1247,7 +1252,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<PriceCalcResponse>> PriceCalculateAsync(double? amount, long? quantity, System.Threading.CancellationToken cancellationToken)
         {
@@ -1322,7 +1327,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<CoverageResponse>>> CoverageListAsync()
         {
@@ -1330,7 +1335,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<CoverageResponse>>> CoverageListAsync(System.Threading.CancellationToken cancellationToken)
         {
@@ -1396,7 +1401,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PurchaseResponse>>> PurchaseListAsync(int? pageNumber, int? pageSize)
         {
@@ -1404,7 +1409,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PurchaseResponse>>> PurchaseListAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
         {
@@ -1479,7 +1484,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseBeginAsync(PurchaseRequest? body)
         {
@@ -1487,7 +1492,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseBeginAsync(PurchaseRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -1557,7 +1562,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseCompleteAsync(System.Guid transactionId)
         {
@@ -1565,7 +1570,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseCompleteAsync(System.Guid transactionId, System.Threading.CancellationToken cancellationToken)
         {
@@ -1635,7 +1640,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<TransferResponse>>> TransferListAsync(int? pageNumber, int? pageSize)
         {
@@ -1643,7 +1648,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<TransferResponse>>> TransferListAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
         {
@@ -1718,7 +1723,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<TransferResponse>> TransferCreditAsync(TransferRequest? body)
         {
@@ -1726,7 +1731,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<TransferResponse>> TransferCreditAsync(TransferRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -1796,7 +1801,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCreateAsync(SmsBatchRequest? body)
         {
@@ -1804,7 +1809,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCreateAsync(SmsBatchRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -1874,7 +1879,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsBatchResponse>>> SmsBatchListAsync(int? pageNumber, int? pageSize, System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText)
         {
@@ -1882,7 +1887,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsBatchResponse>>> SmsBatchListAsync(int? pageNumber, int? pageSize, System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
@@ -1969,7 +1974,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCsvCreateAsync(SmsBatchCsvRequest? body)
         {
@@ -1977,7 +1982,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCsvCreateAsync(SmsBatchCsvRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -2047,17 +2052,17 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse> SmsBatchDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText)
+        public virtual System.Threading.Tasks.Task<FileResponse> SmsBatchDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText)
         {
             return SmsBatchDownloadAsync(dateFrom, dateTo, searchText, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse> SmsBatchDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<FileResponse> SmsBatchDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/download?");
@@ -2082,6 +2087,7 @@ namespace SMSLive247.OpenApi
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/csv"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2104,9 +2110,12 @@ namespace SMSLive247.OpenApi
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
+                        if (status_ == 200 || status_ == 206)
                         {
-                            return new SwaggerResponse(status_, headers_);
+                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
+                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
+                            return fileResponse_;
                         }
                         else
                         {
@@ -2128,7 +2137,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsBatchResponse>>> SmsBatchPendingListAsync()
         {
@@ -2136,7 +2145,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsBatchResponse>>> SmsBatchPendingListAsync(System.Threading.CancellationToken cancellationToken)
         {
@@ -2202,7 +2211,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchGetAsync(int batchId)
         {
@@ -2210,7 +2219,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchGetAsync(int batchId, System.Threading.CancellationToken cancellationToken)
         {
@@ -2280,7 +2289,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse> SmsBatchDeleteAsync(int batchId)
         {
@@ -2288,7 +2297,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse> SmsBatchDeleteAsync(int batchId, System.Threading.CancellationToken cancellationToken)
         {
@@ -2352,7 +2361,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse> SmsBatchPendingAbortAsync(int batchId)
         {
@@ -2360,7 +2369,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse> SmsBatchPendingAbortAsync(int batchId, System.Threading.CancellationToken cancellationToken)
         {
@@ -2424,7 +2433,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsMessageResponse>>> SmsBatchReportsListAsync(int? pageNumber, int? pageSize, int batchId)
         {
@@ -2432,7 +2441,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsMessageResponse>>> SmsBatchReportsListAsync(int? pageNumber, int? pageSize, int batchId, System.Threading.CancellationToken cancellationToken)
         {
@@ -2511,7 +2520,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageSendAsync(SmsMessageRequest? body)
         {
@@ -2519,7 +2528,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageSendAsync(SmsMessageRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -2589,7 +2598,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsMessageResponse>>> SmsMessageListAsync(int? pageNumber, int? pageSize, System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText)
         {
@@ -2597,7 +2606,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsMessageResponse>>> SmsMessageListAsync(int? pageNumber, int? pageSize, System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
@@ -2684,17 +2693,17 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse> SmsMessageDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText)
+        public virtual System.Threading.Tasks.Task<FileResponse> SmsMessageDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText)
         {
             return SmsMessageDownloadAsync(dateFrom, dateTo, searchText, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse> SmsMessageDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<FileResponse> SmsMessageDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/download?");
@@ -2719,6 +2728,7 @@ namespace SMSLive247.OpenApi
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/csv"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -2741,9 +2751,12 @@ namespace SMSLive247.OpenApi
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
+                        if (status_ == 200 || status_ == 206)
                         {
-                            return new SwaggerResponse(status_, headers_);
+                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                            var fileResponse_ = new FileResponse(status_, headers_, responseStream_, null, response_);
+                            disposeClient_ = false; disposeResponse_ = false; // response and client are disposed by FileResponse
+                            return fileResponse_;
                         }
                         else
                         {
@@ -2765,7 +2778,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsMessageResponse>>> SmsDraftListAsync()
         {
@@ -2773,7 +2786,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsMessageResponse>>> SmsDraftListAsync(System.Threading.CancellationToken cancellationToken)
         {
@@ -2839,7 +2852,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageGetAsync(string messageId)
         {
@@ -2847,7 +2860,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageGetAsync(string messageId, System.Threading.CancellationToken cancellationToken)
         {
@@ -2917,7 +2930,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<ContactResponse>>> ContactListAsync()
         {
@@ -2925,7 +2938,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<ContactResponse>>> ContactListAsync(System.Threading.CancellationToken cancellationToken)
         {
@@ -2991,7 +3004,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactCreateAsync(ContactCreateRequest? body)
         {
@@ -2999,7 +3012,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactCreateAsync(ContactCreateRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -3069,7 +3082,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactUpdateAsync(string phoneNo, ContactUpdateRequest? body)
         {
@@ -3077,7 +3090,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactUpdateAsync(string phoneNo, ContactUpdateRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -3151,7 +3164,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactDeleteAsync(string phoneNo)
         {
@@ -3159,7 +3172,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactDeleteAsync(string phoneNo, System.Threading.CancellationToken cancellationToken)
         {
@@ -3229,7 +3242,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<GroupResponse>>> GroupListAsync()
         {
@@ -3237,7 +3250,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<GroupResponse>>> GroupListAsync(System.Threading.CancellationToken cancellationToken)
         {
@@ -3303,7 +3316,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<GroupResponse>> GroupCreateAsync(string groupId, System.Collections.Generic.IEnumerable<string>? body)
         {
@@ -3311,7 +3324,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<GroupResponse>> GroupCreateAsync(string groupId, System.Collections.Generic.IEnumerable<string>? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -3385,7 +3398,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<GroupResponse>> GroupUpdateAsync(string groupId, System.Collections.Generic.IEnumerable<string>? body)
         {
@@ -3393,7 +3406,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<GroupResponse>> GroupUpdateAsync(string groupId, System.Collections.Generic.IEnumerable<string>? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -3467,7 +3480,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<GroupResponse>> GroupDeleteAsync(string groupId)
         {
@@ -3475,7 +3488,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<GroupResponse>> GroupDeleteAsync(string groupId, System.Threading.CancellationToken cancellationToken)
         {
@@ -3545,7 +3558,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SenderIdResponse>>> SenderIdListAsync(int? pageNumber, int? pageSize)
         {
@@ -3553,7 +3566,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SenderIdResponse>>> SenderIdListAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
         {
@@ -3628,7 +3641,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdCreateAsync(SenderIdRequest? body)
         {
@@ -3636,7 +3649,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdCreateAsync(SenderIdRequest? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -3706,7 +3719,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<int>> SenderIdDeleteAsync(System.Collections.Generic.IEnumerable<string>? body)
         {
@@ -3714,7 +3727,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<int>> SenderIdDeleteAsync(System.Collections.Generic.IEnumerable<string>? body, System.Threading.CancellationToken cancellationToken)
         {
@@ -3784,7 +3797,7 @@ namespace SMSLive247.OpenApi
             }
         }
 
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdDelete2Async(string senderId)
         {
@@ -3792,7 +3805,7 @@ namespace SMSLive247.OpenApi
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Success</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdDelete2Async(string senderId, System.Threading.CancellationToken cancellationToken)
         {
@@ -3968,47 +3981,53 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("accountName")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string AccountName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("timeZone")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         public int TimeZone { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("active")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         public bool Active { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("password")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Password { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("firstName")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string FirstName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("lastName")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string LastName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("email")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Email { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("phone")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Phone { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("countryCode")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         public int CountryCode { get; set; } = default!;
 
     }
@@ -4162,12 +4181,14 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("phoneNumber")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string PhoneNumber { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("contactName")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string ContactName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("groups")]
@@ -4293,12 +4314,14 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("username")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Username { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("password")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Password { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("parentID")]
@@ -4377,12 +4400,13 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("providerID")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string ProviderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("amount")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         public double Amount { get; set; } = default!;
 
     }
@@ -4444,17 +4468,20 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("purpose")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Purpose { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("sampleText")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string SampleText { get; set; } = default!;
 
     }
@@ -4501,12 +4528,14 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageText")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string MessageText { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("deliveryTime")]
@@ -4521,7 +4550,8 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("batchFileID")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string BatchFileID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("phoneNumberColumn")]
@@ -4537,12 +4567,14 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageText")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string MessageText { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("deliveryTime")]
@@ -4629,17 +4661,20 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("messageText")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string MessageText { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("phoneNumber")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string PhoneNumber { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("deliveryTime")]
@@ -4706,12 +4741,13 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonPropertyName("recipientID")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string RecipientID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("credits")]
 
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         public long Credits { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("remarks")]
@@ -4789,6 +4825,41 @@ namespace SMSLive247.OpenApi
         public string? ContentType { get; private set; }
     }
 
+    [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
+    public partial class FileResponse : System.IDisposable
+    {
+        private System.IDisposable? _client;
+        private System.IDisposable? _response;
+
+        public int StatusCode { get; private set; }
+
+        public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
+
+        public System.IO.Stream Stream { get; private set; }
+
+        public bool IsPartial
+        {
+            get { return StatusCode == 206; }
+        }
+
+        public FileResponse(int statusCode, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.IO.Stream stream, System.IDisposable? client, System.IDisposable? response)
+        {
+            StatusCode = statusCode;
+            Headers = headers;
+            Stream = stream;
+            _client = client;
+            _response = response;
+        }
+
+        public void Dispose()
+        {
+            Stream.Dispose();
+            if (_response != null)
+                _response.Dispose();
+            if (_client != null)
+                _client.Dispose();
+        }
+    }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
     public partial class SwaggerResponse
