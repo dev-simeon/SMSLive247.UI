@@ -14,11 +14,11 @@
 
 @code {
     [Parameter] public EventCallback OnCompleted { get; set; }
-    [Parameter] public List<ContactResponse> allContacts { get; set; } = new();
+    [Parameter] public List<ContactResponse> allContacts { get; set; } = [];
 
     private EditModal<GroupResponse> editor = new();
     private GroupResponse model => editor.Model;
-    private List<string> selectedContacts = new();
+    private List<string> selectedContacts = [];
     private Dictionary<string, string> contactDropdownValues = new();
 
     protected override void OnParametersSet() => contactDropdownValues = allContacts.ToDictionary(c => c.PhoneNumber, c => c.ContactName);
