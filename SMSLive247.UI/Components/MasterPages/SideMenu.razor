@@ -7,7 +7,8 @@
     </header>
 
     <ul class="sb-menu flex-column">
-        @foreach (var group in navItems.Where(x => x.Name == currentMenu || currentMenu == "Index").ToList())
+        @* @foreach (var group in navItems.Where(x => x.Name == currentMenu || currentMenu == "Index").ToList()) *@
+        @foreach (var group in navItems)
         {
             <li class="sb-group">@group.Name?.ToUpper()</li>
             @foreach (var item in group.Items)

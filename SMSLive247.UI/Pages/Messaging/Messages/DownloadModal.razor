@@ -1,5 +1,5 @@
 ﻿<EditModal TItem="SmsBatchResponse" @ref="editor" 
-    LabelText="Messages" OnDownload="OnDownload">
+LabelText="Messages" OnDownload="OnDownload">
 
     <FormField Label="Select Period">
         <InputSelect @bind-Value="dateRange.Filter" class="form-select">
@@ -82,8 +82,11 @@
 
         if (downloadType == DownloadType.BATCHES)
         {
+            // nav.NavigateTo("/");
             var response = await apiClient.SmsBatchDownloadAsync(
                 dateRange.StartDate, dateRange.EndDate, editor.Model.SenderID);
+
+            await js.DownloadFromStream(response.Stream, "example.txt");
             return;
         }
 
@@ -91,6 +94,8 @@
         {
             var response = await apiClient.SmsMessageDownloadAsync(
                 dateRange.StartDate, dateRange.EndDate, editor.Model.SenderID);
+
+            await js.DownloadFromStream(response.Stream, $"example.report.txt");
             return;
         }
     }

@@ -1,5 +1,5 @@
-﻿@inherits LayoutComponentBase
-@inject AuthenticationStateProvider auth;
+﻿@inject AuthenticationStateProvider auth;
+@inherits LayoutComponentBase
 @attribute [Authorize]
 
 <PageTitle>SmsLive247</PageTitle>
@@ -29,12 +29,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/Wallet/Buy">Wallet</a>
                         </li>
-                        <li class="nav-item">
+                        @* <li class="nav-item">
                             <a class="nav-link" href="/Support/Tickets">Support</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/Developers/ApiKeys">Developers</a>
-                        </li>
+                        </li> *@
                     </ul>
                 </left>
                 <right class="d-flex gap-3 align-items-center">
@@ -77,28 +77,18 @@
     private string? avatarUrl;
     private string? fullName;
 
+    private void ToggleMenu() => hideMainMenu = !hideMainMenu;
+    private void ToggleDropdown() => hideDropdown = !hideDropdown;
+
     protected override async Task OnInitializedAsync()
     {
-        // try
-        // {
-           var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
+        var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
 
-            if (member != null)
-            {
-                fullName = member.Email?.ToLower();
-                //Todo
-                // avatarUrl = member.AvatarUrl;
-            }
-        // }
-        // catch (Exception)
-        // {
-            
-        //     throw;
-        // }
+        if (member != null)
+        {
+            fullName = member.Email?.ToLower();
+            // avatarUrl = member.AvatarUrl;
+        }
     }
-
-    private void ToggleMenu() => hideMainMenu = !hideMainMenu;
-
-    private void ToggleDropdown() => hideDropdown = !hideDropdown;
 
 }
