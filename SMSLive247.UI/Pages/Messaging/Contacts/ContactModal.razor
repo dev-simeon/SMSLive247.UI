@@ -1,32 +1,62 @@
-﻿<EditModal TItem="ContactResponse" @ref="editor" LabelText="Contact"
+﻿<EditModal TItem="ContactResponse" Size="Modal.ModalSize.MEDIUM" @ref="editor" LabelText="Contact"
            OnCreate="OnCreate"
            OnUpdate="OnUpdate"
            OnDelete="OnDelete"
            OnCompleted="OnCompleted">
-    <FormInputText Label="Name" @bind-Value="editor.Model.ContactName"></FormInputText>
-    <FormInputText Label="Phone Number" @bind-Value="editor.Model.PhoneNumber"></FormInputText>
+    @if(editor.EditMode == 0)
+    {
+        @foreach (var field in contactFields)
+        {
+            <FormInputText Label="Name" @bind-Value="field.ContactName"></FormInputText>
+            <FormInputText Label="Phone Number" @bind-Value="field.PhoneNumber"></FormInputText>
+           @if (!IsLastField(field))
+            {
+                <hr />
+            }
+        }
+
+        <button type="button" class="btn btn-primary" @onclick="AddField">
+            <i class="fa fa-plus-circle me-2"></i>
+            Add Fields
+        </button>
+    }
+    else
+    {
+        <FormInputText Label="Name" @bind-Value="model.ContactName"></FormInputText>
+        <FormInputText Label="Phone Number" @bind-Value="model.PhoneNumber"></FormInputText>
+    }
 </EditModal>
 
 @code {
     [Parameter] public EventCallback OnCompleted { get; set; }
 
-
     private EditModal<ContactResponse> editor = new();
     private ContactResponse model => editor.Model;
+    private List<ContactResponse> contactFields = [ new ContactResponse() ];
 
     public void Show(ContactResponse? item = null) => editor.Show(item);
     public void Delete(ContactResponse item) => editor.Delete(item);
 
+    private void AddField()
+    {
+        contactFields.Add(new ContactResponse());
+    }
+
+    private bool IsLastField(ContactResponse field) => contactFields.LastOrDefault() == field;
+
     public async Task OnCreate()
     {
-        var request = new ContactCreateRequest
+        foreach (var contact in contactFields)
         {
-            ContactName = model.ContactName,
-            PhoneNumber = model.PhoneNumber,
-            Groups = new List<string>()
-        };
+            var request = new ContactCreateRequest
+            {
+                ContactName = contact.ContactName,
+                PhoneNumber = contact.PhoneNumber,
+                Groups = new List<string>()
+            };
 
-        await apiClient.ContactCreateAsync(request);
+            await apiClient.ContactCreateAsync(request);
+        }
     }
 
     private async Task OnUpdate()

@@ -1,0 +1,76 @@
+﻿<div class="autocomplete">
+    <InputText @bind-Value="searchText" @oninput="FilterItems" class="form-control" placeholder="Search..." />
+    <div class="autocomplete-results list-group" style="max-height: 200px; overflow-y: auto;">
+        @if (!string.IsNullOrEmpty(searchText))
+        {
+            @foreach (var item in filteredItems)
+            {
+                <div class="list-group-item">
+                    <input type="checkbox" @onchange="() => ToggleSelection(item)" checked="@SelectedValues.Contains(GetValue(item))" />
+                    <label>@GetText(item)</label>
+                </div>
+            }
+        }
+    </div>
+    <div class="selected-badges mt-3 d-flex flex-wrap gap-2">
+        @foreach (var selectedValue in SelectedValues)
+        {
+            var selectedItem = Data.FirstOrDefault(item => GetValue(item).Equals(selectedValue));
+            if (selectedItem != null)
+            {
+                <span class="badge bg-info d-flex align-items-center gap-1" style="cursor: pointer">
+                    @GetText(selectedItem)
+                    <button type="button" class="btn-close btn-close-white" aria-label="Close" @onclick="() => RemoveSelectedValue(selectedValue)"></button>
+                </span>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<ContactResponse> Data { get; set; }
+    [Parameter] public Func<ContactResponse, string> TextField { get; set; }
+    [Parameter] public Func<ContactResponse, string> ValueField { get; set; }
+    [Parameter] public List<string> SelectedValues { get; set; } = new();
+    [Parameter] public EventCallback<List<string>> SelectedValuesChanged { get; set; }
+
+    private string searchText;
+    private List<ContactResponse> filteredItems;
+
+    protected override void OnInitialized()
+    {
+        filteredItems = Data;
+    }
+
+    private void FilterItems(ChangeEventArgs e)
+    {
+        searchText = e.Value.ToString();
+        filteredItems = Data.Where(item =>
+            GetText(item).Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+            GetValue(item).Contains(searchText, StringComparison.OrdinalIgnoreCase)
+        ).ToList();
+    }
+
+    private void ToggleSelection(ContactResponse item)
+    {
+        var value = GetValue(item);
+        if (SelectedValues.Contains(value))
+        {
+            SelectedValues.Remove(value);
+        }
+        else
+        {
+            SelectedValues.Add(value);
+        }
+        SelectedValuesChanged.InvokeAsync(SelectedValues);
+    }
+
+    private void RemoveSelectedValue(string value)
+    {
+        SelectedValues.Remove(value);
+        SelectedValuesChanged.InvokeAsync(SelectedValues);
+    }
+
+    private string GetText(ContactResponse item) => TextField(item);
+    private string GetValue(ContactResponse item) => ValueField(item);
+}
