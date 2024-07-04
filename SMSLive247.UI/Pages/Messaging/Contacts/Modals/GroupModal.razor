@@ -5,10 +5,9 @@
            OnCompleted="OnCompleted">
     <FormInputText Label="Group Name" @bind-Value="model.GroupName"></FormInputText>
     <FormField Label="Select Contacts">
-        <SelectMultiple Id="contactMultiSelect" 
-                     DropdownValues="contactDropdownValues"
-                     SelectedValues="selectedContacts"
-                     SelectedValuesChanged="OnSelectedContactsChanged" />
+        <AutoComplete Data="allContacts" TextField="@(contact => contact.ContactName)"
+                      ValueField="@(contact => contact.PhoneNumber)"
+                      @bind-SelectedValues="selectedContacts" />
     </FormField>
 </EditModal>
 
@@ -27,7 +26,7 @@
     public void Show(GroupResponse? group = null)
     {
         editor.Show(group);
-        selectedContacts = group?.Members.Select(c => c.PhoneNumber).ToList() ?? new List<string>();
+        selectedContacts = group?.Members?.Select(c => c.PhoneNumber).ToList() ?? new List<string>();
     }
 
     public void Delete(GroupResponse group) => editor.Delete(group);
@@ -51,10 +50,5 @@
         {
             await apiClient.GroupDeleteAsync(model.GroupName);
         }
-    }
-
-    private void OnSelectedContactsChanged(List<string> contacts)
-    {
-        selectedContacts = contacts;
     }
 }
