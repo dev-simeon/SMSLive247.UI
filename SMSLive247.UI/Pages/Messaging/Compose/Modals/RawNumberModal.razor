@@ -39,7 +39,7 @@
 
         Model.Numbers = RawText
             .ConvertRawUploadToList(CountryCode)
-            .Select(num => new ContactModel(num, num, 1, true))
+            .Select(number => new ContactModel(number))
             .ToList();
 
         hideModal = true;

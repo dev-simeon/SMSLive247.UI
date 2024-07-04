@@ -1,7 +1,7 @@
 ﻿@typeparam TItem where TItem : class, new()
 
 <EditForm Model="Model" OnValidSubmit="Submit" FormName="@formName">
-    <Modal Title="@title" Hidden="@(!showModal)" Size="@Size">
+    <Modal Title="@title" @bind-Hidden="hideModal" Size="@Size">
         <Body>
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -31,7 +31,7 @@
 
     private int editMode = 0; // 0=create, 1=edit, 2=delete, 3=download
     public TItem Model = new();
-    private bool showModal = false;
+    private bool hideModal = true;
     private string? title, buttonText, formName;
     private Button.Style buttonStyle = Button.Style.SAVE;
 
@@ -51,7 +51,7 @@
             title = $"Edit {LabelText}";
             buttonText = $"Update {LabelText}";
         }
-        showModal = true;
+        hideModal = false;
         StateHasChanged();
     }
 
@@ -62,7 +62,7 @@
         title = $"Delete {LabelText}";
         buttonText = $"Delete {LabelText}";
         buttonStyle = Button.Style.DELETE;
-        showModal = true;
+        hideModal = false;
         StateHasChanged();
     }
 
@@ -73,7 +73,7 @@
         title = $"Download {LabelText}";
         buttonText = $"Download {LabelText}";
         buttonStyle = Button.Style.DOWNLOAD;
-        showModal = true;
+        hideModal = false;
         StateHasChanged();
     }
 
@@ -120,7 +120,7 @@
     private async Task OnAfterSuccessAsync()
     {
         await alert.Success($"Operation was successful", "Success");
-        showModal = false;
+        hideModal = true;
  
         switch (editMode)
         {

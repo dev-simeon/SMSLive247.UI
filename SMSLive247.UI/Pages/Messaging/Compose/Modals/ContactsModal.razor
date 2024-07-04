@@ -27,7 +27,7 @@
                     <div class="form-check mb-1">
                         <input class="form-check-input" type="checkbox"
                                 value="@item.Key" checked="@item.Selected"
-                                id="ct-@item.Key" @onchange="e => OnSelect(item, e)">
+                                id="ct-@item.Key" @onchange="e => OnSelect(e, item)">
                         <label class="form-check-label" for="ct-@item.Key">@item.Name</label>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
         return OnSelected.InvokeAsync();
     }
 
-    public Task OnSelect(ContactModel contact, ChangeEventArgs e)
+    public Task OnSelect(ChangeEventArgs e, ContactModel contact)
     {
         contact.Selected = (bool?)e.Value ?? false;
         return OnSelected.InvokeAsync();

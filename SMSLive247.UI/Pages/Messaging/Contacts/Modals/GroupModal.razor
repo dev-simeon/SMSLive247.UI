@@ -13,15 +13,16 @@
 </EditModal>
 
 @code {
+    [Parameter] public List<ContactModel> AllContacts { get; set; } = [];
     [Parameter] public EventCallback OnCompleted { get; set; }
-    [Parameter] public List<ContactResponse> allContacts { get; set; } = [];
 
     private EditModal<GroupResponse> editor = new();
     private GroupResponse model => editor.Model;
+
     private List<string> selectedContacts = [];
     private Dictionary<string, string> contactDropdownValues = new();
 
-    protected override void OnParametersSet() => contactDropdownValues = allContacts.ToDictionary(c => c.PhoneNumber, c => c.ContactName);
+    protected override void OnParametersSet() => contactDropdownValues = AllContacts.ToDictionary(c => c.Key, c => c.Name);
 
     public void Show(GroupResponse? group = null)
     {

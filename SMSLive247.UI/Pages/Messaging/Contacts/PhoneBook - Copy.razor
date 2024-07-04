@@ -1,0 +1,198 @@
+﻿@using SMSLive247.UI.Pages.Messaging.Contacts.Modals
+
+<Card HeaderTitle="PhoneBook">
+    <Body>
+        <MultiColumn Column1Width="6" Column2Width="6">
+            <Column1>
+                <SearchArea>
+                    <LeftRight>
+                        <Left>
+                            <SearchBox @ref="searchBox" @onclick="SearchContacts">
+                                <InputSelect @bind-Value="selectedGroup" id="groupFilter" class="form-select">
+                                    <option value="">All Contact</option>
+                                    @foreach (var group in groups)
+                                    {
+                                        <option value="@group.GroupName">@group.GroupName</option>
+                                    }
+                                </InputSelect>
+                            </SearchBox>
+                        </Left>
+                    </LeftRight>
+                </SearchArea>
+                <div class="list-group">
+                    @foreach (var contact in filteredContacts)
+                    {
+                        <div class="list-group-item">
+                            <LeftRight>
+                                <Left>
+                                    <div class="d-flex flex-column">
+                                        @contact.ContactName (@contact.PhoneNumber)
+                                        @if (contact.Groups != null && contact.Groups.Count > 0)
+                                        {
+                                            <div class="d-flex align-items-center gap-1">
+                                                <p class="mb-0 me-2">Groups:</p>
+                                                @foreach (var group in contact.Groups)
+                                                {
+                                                    <span style="cursor: pointer" class="badge bg-info" @onclick="() => ShowGroupDetails(group)">
+                                                        @group
+                                                    </span>
+                                                }
+                                            </div>
+                                        }
+
+                                    </div>
+                                </Left>
+                                <Right>
+                                    <Button Type="Button.Style.EDIT" @onclick="() => contactModal.Show(contact)">
+                                    </Button>
+                                    <Button Type="Button.Style.DELETE" @onclick="() => contactModal.Delete(contact)">
+                                    </Button>
+                                </Right>
+                            </LeftRight>
+                        </div>
+                    }
+                </div>
+            </Column1>
+            <Column2>
+                @if (selectedGroupDetails != null)
+                {
+                    <Card HeaderTitle="Group Details">
+                        <Body>
+                           <LeftRight>
+                               <Left>
+                                   <div class="d-flex flex-column">
+                                        <h5 class="mb-0 fw-semibold">@selectedGroupDetails.GroupName</h5>
+                                        <div class=" d-flex gap-2 align-items-center mb-0">
+                                            <span>Total Number of Contact:</span>
+                                            <div style="width: 30px; height: 30px;" 
+                                                class="d-flex fw-semibold rounded-circle border align-items-center justify-content-center">
+                                                <p class="mb-0">@selectedGroupDetails.Members.Count</p>
+                                            </div>
+                                        </div>
+                                   </div>
+                               </Left>
+                               <Right>
+                                    <Button Type="Button.Style.DELETE" @onclick="() => groupModal.Delete(selectedGroupDetails)">
+                                        Delete Group
+                                    </Button>
+                               </Right>
+                           </LeftRight>
+                            <div class="d-flex flex-column gap-2 mt-3">
+                                <h6 class="mb-0">Contacts in this Group</h6>
+                                <div class="list-group">
+                                    @foreach (var contact in selectedGroupContacts)
+                                    {
+                                        <div class="list-group-item">
+                                            <LeftRight>
+                                                <Left>
+                                                    @contact.ContactName (@contact.PhoneNumber)
+                                                </Left>
+                                                <Right>
+                                                    <Button Type="Button.Style.DELETE" @onclick="() => RemoveContactFromGroup(contact, selectedGroupDetails)">
+                                                        Remove From Group
+                                                    </Button>
+                                                </Right>
+                                            </LeftRight>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="mt-2">
+                                    <Button Type="Button.Style.ADD" @onclick="() => groupModal.Show(selectedGroupDetails)">
+                                        Add Contacts to Group
+                                    </Button>
+                                </div>
+                            </div>
+                        </Body>
+                    </Card>
+                }
+                else
+                {
+                    <h6 class="">Click on a group badge in the contact list on the left side of the page to view details.</h6>
+                }
+            </Column2>
+        </MultiColumn>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.ADD" @onclick="() => contactModal.Show()">
+            Add Contact
+        </Button>
+        <Button Type="Button.Style.ADD" @onclick="() => groupModal.Show()">
+            Add Group
+        </Button>
+    </Footer>
+</Card>
+
+<ContactModal @ref="contactModal" OnCompleted="FetchData" />
+<GroupModal @ref="groupModal"  OnCompleted="FetchData" />
+
+@code {
+    private SearchBox searchBox = new();
+    private List<ContactResponse> contacts = [];
+    private List<ContactResponse> filteredContacts = [];
+    private List<GroupResponse> groups = [];
+    private List<GroupResponse> filteredgroups = [];
+    private ContactModal contactModal = new();
+    private GroupModal groupModal = new();
+    private string selectedGroup = string.Empty;
+    private GroupResponse selectedGroupDetails = null;
+    private List<ContactResponse> selectedGroupContacts = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        try
+        {
+            var t1 = apiClient.ContactListAsync();
+            var t2 = apiClient.GroupListAsync();
+
+            await Task.WhenAll(t1, t2);
+
+            contacts = t1.Result.Result.ToList();
+            groups = t2.Result.Result.ToList();
+            filteredContacts = contacts;
+            filteredgroups = groups;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private void SearchContacts()
+    {
+        filteredContacts = contacts;
+
+        // Filter by search term
+        if (!string.IsNullOrEmpty(searchBox.Text))
+        {
+            filteredContacts = filteredContacts.Where(c =>
+                c.ContactName.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase) ||
+                c.PhoneNumber.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+        }
+
+        // Filter by group
+        if (!string.IsNullOrEmpty(selectedGroup))
+        {
+            filteredContacts = filteredContacts.Where(c => c.Groups.Contains(selectedGroup)).ToList();
+        }
+    }
+
+    private void ShowGroupDetails(string groupName)
+    {
+        selectedGroupDetails = groups.FirstOrDefault(g => g.GroupName == groupName);
+        if (selectedGroupDetails != null)
+        {
+            selectedGroupContacts = contacts.Where(c => c.Groups.Contains(groupName)).ToList();
+        }
+    }
+
+    private void RemoveContactFromGroup(ContactResponse contact, GroupResponse group)
+    {
+        // Logic to remove contact from group
+    }
+}
