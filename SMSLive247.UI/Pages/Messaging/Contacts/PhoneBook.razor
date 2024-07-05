@@ -20,23 +20,34 @@
             </LeftRight>
         </SearchArea>
         <div class="mb-3 p-3 bg-info-subtle">
-            <span>Groups: </span>
-            @foreach (var group in groups)
-            {
-                <div class="form-check-inline rounded border border-info bg-info-subtle py-1 px-2 ms-3">
-                    <input class="form-check-input" type="checkbox"
-                           value="@group.Name" checked="@group.Selected"
-                           id="g-@group.Key" @onchange="e => OnGroupSelect(e, group)">
-                    <label class="form-check-label" for="g-@group.Key">
-                        <div class=" position-relative pe-2">
-                            @group.Name
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
-                                @group.Count.ToString("#,##0")
-                            </span>
+            <LeftRight>
+                <Left>
+                    <span>Groups: </span>
+                    @foreach (var group in groups)
+                    {
+                        <div class="form-check-inline rounded border border-info bg-info-subtle py-1 px-2 ms-3">
+                            <input class="form-check-input" type="checkbox"
+                                   value="@group.Name" checked="@group.Selected"
+                                   id="g-@group.Key" @onchange="e => OnGroupSelect(e, group)">
+                            <label class="form-check-label" for="g-@group.Key">
+                                <div class=" position-relative pe-2">
+                                    @group.Name
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                                        @group.Count.ToString("#,##0")
+                                    </span>
+                                </div>
+                            </label>
                         </div>
-                    </label>
-                </div>
-            }
+                    }
+                </Left>
+                <Right>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox"
+                               title="Select single/multiple Groups"
+                               @bind="@MultiSelectGroup" />
+                    </div>
+                </Right>
+            </LeftRight>
         </div>
         <div class="row">
             @foreach (var contact in contacts.Where(x => x.Visible))
@@ -80,12 +91,7 @@
     private List<GroupModel> groups = [];
     private List<ContactModel> contacts = [];
 
-    // private List<ContactResponse> contacts = [];
-    // private List<ContactResponse> filteredContacts = [];
-    // private List<GroupResponse> groups = [];
-    // private List<GroupResponse> filteredGroups = [];
-    // private GroupResponse? selectedGroup;
-    // private List<ContactResponse> selectedGroupContacts = [];
+    private bool MultiSelectGroup = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -103,8 +109,6 @@
 
             contacts = t1.Result.Result.Select(x => new ContactModel(x)).ToList();
             groups = t2.Result.Result.Select(x => new GroupModel(x)).ToList();
-            // filteredContacts = contacts;
-            // filteredGroups = groups;
         }
         catch (Exception ex)
         {
@@ -148,19 +152,11 @@
 
     private void OnGroupSelect(ChangeEventArgs e, GroupModel group)
     {
+        if (MultiSelectGroup == false)
+            groups.ForEach(x => x.Selected = false);
+
         group.Selected = (bool?)e.Value ?? false;
         OnSearch();
-        //return OnSelected.InvokeAsync();
-
-        // selectedGroup = groups.FirstOrDefault(g => g.GroupName == groupName);
-        // if (selectedGroup != null)
-        // {
-        //     selectedGroupContacts = contacts.Where(c => c.Groups.Contains(groupName)).ToList();
-        // }
     }
 
-    private void RemoveContactFromGroup(ContactResponse contact, GroupResponse group)
-    {
-        // Logic to remove contact from group
-    }
 }
