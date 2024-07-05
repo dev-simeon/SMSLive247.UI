@@ -5,19 +5,45 @@
            OnCompleted="OnCompleted">
     @if(editor.EditMode == 0)
     {
-        @foreach (var field in contactFields)
-        {
-            <FormInputText Label="Name" @bind-Value="field.ContactName"></FormInputText>
-            <FormInputText Label="Phone Number" @bind-Value="field.PhoneNumber"></FormInputText>
-           @if (!IsLastField(field))
+        <div class="row row-gap-1">
+            <div class="col-6">
+                <label class="form-label">Name</label>
+            </div>
+            <div class="col-6">
+                <label class="form-label">PhoneNumber</label>
+            </div>
+            @foreach (var field in contactFields)
             {
-                <hr />
+                <div class="col-6">
+                    <InputText class="form-control" @bind-Value="field.ContactName"></InputText>
+                </div>
+                <div class="col-6">
+                    <InputText class="form-control" @bind-Value="field.PhoneNumber"></InputText>
+                </div>
             }
+        </div>
+
+        <div class="mt-2">
+            <InputCheckbox class="form-check-input me-1" id="addToGroup" @bind-Value="addToGroup"></InputCheckbox>
+            <label for="addToGroup" class="form-check-label">Add Contacts to Group</label>
+        </div>
+
+        @if (addToGroup)
+        {
+            <div class="mt-2">
+                <label class="form-label mb-1">Select Group</label>
+                <InputSelect class="form-select w-50" @bind-Value="selectedGroup">
+                    @foreach (var group in AllGroups)
+                    {
+                        <option value="@group.Name">@group.Name</option>
+                    }
+                </InputSelect>
+            </div>
         }
 
-        <button type="button" class="btn btn-primary" @onclick="AddField">
+        <button type="button" class="btn btn-outline-secondary mt-3" @onclick="AddField">
             <i class="fa fa-plus-circle me-2"></i>
-            Add Fields
+            Add More Contact
         </button>
     }
     else
@@ -33,7 +59,10 @@
 
     private EditModal<ContactResponse> editor = new();
     private ContactResponse model => editor.Model;
-    private List<ContactResponse> contactFields = [ new ContactResponse() ];
+    private List<ContactResponse> contactFields = new() { new ContactResponse() };
+
+    private bool addToGroup = false;
+    private string selectedGroup = string.Empty;
 
     public void Show(ContactResponse? item = null) => editor.Show(item);
     public void Delete(ContactResponse item) => editor.Delete(item);
@@ -43,21 +72,24 @@
         contactFields.Add(new ContactResponse());
     }
 
-    private bool IsLastField(ContactResponse field) => contactFields.LastOrDefault() == field;
-
     public async Task OnCreate()
     {
-        foreach (var contact in contactFields)
+        await Task.WhenAll(contactFields.Select(async contact =>
         {
             var request = new ContactCreateRequest
             {
                 ContactName = contact.ContactName,
                 PhoneNumber = contact.PhoneNumber,
-                Groups = new List<string>()
+                Groups = !string.IsNullOrEmpty(selectedGroup) ? new List<string> { selectedGroup } : new()
             };
 
             await apiClient.ContactCreateAsync(request);
-        }
+        }));
+
+        // Reset fields after creating contacts
+        contactFields = new List<ContactResponse> { new ContactResponse() };
+        addToGroup = false;
+        selectedGroup = string.Empty;
     }
 
     private async Task OnUpdate()
@@ -78,6 +110,8 @@
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
 
         if (confirmed)
+        {
             await apiClient.ContactDeleteAsync(editor.Model.PhoneNumber);
+        }
     }
 }

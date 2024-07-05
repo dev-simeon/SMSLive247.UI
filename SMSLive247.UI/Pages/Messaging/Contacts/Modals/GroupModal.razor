@@ -1,14 +1,18 @@
-﻿<EditModal TItem="GroupResponse" @ref="editor" LabelText="Group"
+﻿<EditModal Size="Modal.ModalSize.LARGE" TItem="GroupResponse" @ref="editor" LabelText="Group"
            OnCreate="OnCreate"
            OnUpdate="OnUpdate"
            OnDelete="OnDelete"
            OnCompleted="OnCompleted">
-    <FormInputText Label="Group Name" @bind-Value="model.GroupName"></FormInputText>
-    <FormField Label="Select Contacts">
-        <AutoComplete TextField="@(contact => contact.ContactName)"
-                      ValueField="@(contact => contact.PhoneNumber)"
-                      @bind-SelectedValues="selectedContacts" />
-    </FormField>
+
+    <div class="form-group">
+        <label for="groupName" class="form-label">Group Name</label>
+        <InputText id="groupName" class="form-control w-50" @bind-Value="model.GroupName"></InputText>
+    </div>
+
+    <div class="mt-3">
+        <label class="form-label">Select Contacts</label>
+        <ContactSelctor @ref="contactSelector" Contacts="AllContacts" OnSelected="UpdateSelectedContacts" />
+    </div>
 </EditModal>
 
 @code {
@@ -19,25 +23,45 @@
     private GroupResponse model => editor.Model;
 
     private List<string> selectedContacts = [];
-    private Dictionary<string, string> contactDropdownValues = new();
 
-    protected override void OnParametersSet() => contactDropdownValues = AllContacts.ToDictionary(c => c.Key, c => c.Name);
+    private ContactSelctor contactSelector = new();
+
+    protected override void OnParametersSet()
+    {
+        if (AllContacts != null)
+        {
+            foreach (var contact in AllContacts)
+            {
+                contact.Selected = selectedContacts.Contains(contact.Key);
+            }
+        }
+    }
 
     public void Show(GroupResponse? group = null)
     {
         editor.Show(group);
         selectedContacts = group?.Members?.Select(c => c.PhoneNumber).ToList() ?? new List<string>();
+
+        if (AllContacts != null)
+        {
+            foreach (var contact in AllContacts)
+            {
+                contact.Selected = selectedContacts.Contains(contact.Key);
+            }
+        }
     }
 
     public void Delete(GroupResponse group) => editor.Delete(group);
 
     private async Task OnCreate()
     {
+        selectedContacts = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
         await apiClient.GroupCreateAsync(model.GroupName, selectedContacts);
     }
 
     private async Task OnUpdate()
     {
+        selectedContacts = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
         await apiClient.GroupUpdateAsync(model.GroupName, selectedContacts);
     }
 
@@ -50,5 +74,10 @@
         {
             await apiClient.GroupDeleteAsync(model.GroupName);
         }
+    }
+
+    private void UpdateSelectedContacts()
+    {
+        selectedContacts = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
     }
 }
