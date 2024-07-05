@@ -5,7 +5,7 @@
            OnCompleted="OnCompleted">
     <FormInputText Label="Group Name" @bind-Value="model.GroupName"></FormInputText>
     <FormField Label="Select Contacts">
-        <AutoComplete Data="allContacts" TextField="@(contact => contact.ContactName)"
+        <AutoComplete TextField="@(contact => contact.ContactName)"
                       ValueField="@(contact => contact.PhoneNumber)"
                       @bind-SelectedValues="selectedContacts" />
     </FormField>
