@@ -2,13 +2,13 @@
 
 <Card HeaderTitle="PhoneBook">
     <Header>
-        <Button Type="Button.Style.ADD" 
+        <Button Type="Button.Style.ADD"
                 @onclick="e => contactModal.Show()">
-                Add Contact
+            Add Contact
         </Button>
-        <Button Type="Button.Style.ADD" 
+        <Button Type="Button.Style.ADD"
                 @onclick="e => groupModal.Show()">
-                Add Group
+            Add Group
         </Button>
     </Header>
     <Body>
@@ -70,7 +70,7 @@
 </Card>
 
 <ContactModal @ref="contactModal" OnCompleted="FetchData" AllGroups="groups" />
-<GroupModal @ref="groupModal" OnCompleted="FetchData" AllContacts="contacts" />
+<GroupModal @ref="groupModal" OnCompleted="FetchData" AllContacts="allContacts" />
 
 @code {
     private SearchBox searchBox = new();
@@ -79,13 +79,7 @@
 
     private List<GroupModel> groups = [];
     private List<ContactModel> contacts = [];
-
-    // private List<ContactResponse> contacts = [];
-    // private List<ContactResponse> filteredContacts = [];
-    // private List<GroupResponse> groups = [];
-    // private List<GroupResponse> filteredGroups = [];
-    // private GroupResponse? selectedGroup;
-    // private List<ContactResponse> selectedGroupContacts = [];
+    private List<ContactModel> allContacts = []; // New list to store all contacts
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,9 +96,8 @@
             await Task.WhenAll(t1, t2);
 
             contacts = t1.Result.Result.Select(x => new ContactModel(x)).ToList();
+            allContacts = t1.Result.Result.Select(x => new ContactModel(x)).ToList(); // Keep a copy of all contacts
             groups = t2.Result.Result.Select(x => new GroupModel(x)).ToList();
-            // filteredContacts = contacts;
-            // filteredGroups = groups;
         }
         catch (Exception ex)
         {
@@ -142,14 +135,13 @@
         // {
         //     filteredContacts = filteredContacts.Where(c => c.Groups.Contains(selectedGroup.GroupName)).ToList();
         // }
-
-
     }
 
     private void OnGroupSelect(ChangeEventArgs e, GroupModel group)
     {
         group.Selected = (bool?)e.Value ?? false;
         OnSearch();
+
         //return OnSelected.InvokeAsync();
 
         // selectedGroup = groups.FirstOrDefault(g => g.GroupName == groupName);
