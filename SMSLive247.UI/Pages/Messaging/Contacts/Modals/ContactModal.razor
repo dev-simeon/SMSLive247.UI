@@ -9,10 +9,10 @@
             @foreach (var field in contactFields)
             {
                 <div class="col-6">
-                    <InputText class="form-control" placeholder="name" @bind-Value="field.ContactName"></InputText>
+                    <InputText class="form-control" placeholder="Contact Name" @bind-Value="field.ContactName"></InputText>
                 </div>
                 <div class="col-6">
-                    <InputText class="form-control" placeholder="phone number" @bind-Value="field.PhoneNumber"></InputText>
+                    <InputText class="form-control" placeholder="Phone Number" @bind-Value="field.PhoneNumber"></InputText>
                 </div>
             }
         </div>
@@ -63,27 +63,29 @@
 
     private void AddField()
     {
-        contactFields.Add(new ContactResponse());
+        contactFields.Add(new());
     }
 
     public async Task OnCreate()
     {
-        await Task.WhenAll(contactFields.Select(async contact =>
+        string[] groups = string.IsNullOrEmpty(selectedGroup) ? [] : [ selectedGroup ];
+
+        var tasks = contactFields.Select(contact =>
         {
             var request = new ContactCreateRequest
             {
                 ContactName = contact.ContactName,
                 PhoneNumber = contact.PhoneNumber,
-                Groups = !string.IsNullOrEmpty(selectedGroup) ? new List<string> { selectedGroup } : new()
+                Groups = groups,
             };
+            return apiClient.ContactCreateAsync(request);
+        });
 
-            await apiClient.ContactCreateAsync(request);
-        }));
-
+        await Task.WhenAll(tasks);
         // Reset fields after creating contacts
         contactFields = [ new(), new(), new(), new(), new() ];
-        addToGroup = false;
         selectedGroup = string.Empty;
+        // addToGroup = false;
     }
 
     private async Task OnUpdate()
@@ -104,8 +106,6 @@
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
 
         if (confirmed)
-        {
             await apiClient.ContactDeleteAsync(editor.Model.PhoneNumber);
-        }
     }
 }

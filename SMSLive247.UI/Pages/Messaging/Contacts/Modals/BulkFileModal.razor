@@ -66,12 +66,7 @@
         if (browserFile != null)
         {
             var file = new FileParameter(browserFile);
-            var response = await apiClient.BatchFileCreateAsync(234, file);
-
-            // if (response.StatusCode == 200)
-            //     await alert.Success("Batch file was uploaded successfully.", "Upload Success");
-            // else
-            //     await alert.Error(response.StatusCode.ToString(), "Upload Failed");
+            await apiClient.BatchFileCreateAsync(234, file);
         }
     }
 
