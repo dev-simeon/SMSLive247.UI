@@ -82,7 +82,7 @@
 </Card>
 
 <ContactModal @ref="contactModal" OnCompleted="FetchData" AllGroups="groups" />
-<GroupModal @ref="groupModal" OnCompleted="FetchData" AllContacts="allContacts" />
+<GroupModal @ref="groupModal" OnCompleted="FetchData" AllContacts="contacts" />
 
 @code {
     private SearchBox searchBox = new();
@@ -93,7 +93,6 @@
     private List<ContactModel> contacts = [];
 
     private bool MultiSelectGroup = false;
-    private List<ContactModel> allContacts = []; // New list to store all contacts
 
     protected override async Task OnInitializedAsync()
     {
@@ -110,7 +109,6 @@
             await Task.WhenAll(t1, t2);
 
             contacts = t1.Result.Result.Select(x => new ContactModel(x)).ToList();
-            allContacts = t1.Result.Result.Select(x => new ContactModel(x)).ToList(); // Keep a copy of all contacts
             groups = t2.Result.Result.Select(x => new GroupModel(x)).ToList();
         }
         catch (Exception ex)
@@ -121,34 +119,35 @@
 
     private void OnSearch()
     {
-        contacts.ForEach(x => x.Visible = true);
-
         var selectedGroups = groups.Where(g => g.Selected).ToList();
 
-        if (selectedGroups.Count > 0)
+        if (string.IsNullOrEmpty(searchBox.Text) && selectedGroups.Count == 0)
         {
-            contacts.ForEach(x => x.Visible = false);
-
-            foreach (var g in selectedGroups)
-            {
-                contacts.Where(x => g.Contacts.Select(x => x.Key).ToList().Contains(x.Key)).ToList().ForEach(x => x.Visible = true);
-            }
+            //no filter, show everything
+            contacts.ForEach(x => x.Visible = true);
+            return;
         }
 
-        // // Filter by search term
-        // if (!string.IsNullOrEmpty(searchBox.Text))
-        // {
-        //     contacts.Where(c =>
-        //         c.Key.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase) ||
-        //         c.Name.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)
-        //     ).ToList().ForEach(x => x.Visible = true);
-        // }
+        //otherwise, hide all before search
+        contacts.ForEach(x => x.Visible = false);
 
-        // // Filter by group
-        // if (selectedGroup != null)
-        // {
-        //     filteredContacts = filteredContacts.Where(c => c.Groups.Contains(selectedGroup.GroupName)).ToList();
-        // }
+        var temp = contacts.AsEnumerable();
+
+        //filter by group
+        foreach (var group in selectedGroups)
+        {
+            var members = group.Contacts.Select(c => c.Key).ToList();
+            temp = temp.Where(c => members.Contains(c.Key));
+        }
+
+        // search by text
+        if (!string.IsNullOrEmpty(searchBox.Text))
+        {
+            temp = temp.Where(c => c.Key.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)
+                                || c.Name.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase));
+        }
+
+        temp.ToList().ForEach(x => x.Visible = true);
     }
 
     private void OnContactSelect(MouseEventArgs e, ContactModel contact)

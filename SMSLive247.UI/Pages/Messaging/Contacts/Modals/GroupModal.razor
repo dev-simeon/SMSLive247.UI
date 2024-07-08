@@ -66,13 +66,6 @@
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
 
         if (confirmed)
-        {
             await apiClient.GroupDeleteAsync(model.GroupName);
-        }
     }
-
-    // private void UpdateSelectedContacts()
-    // {
-    //     selectedContacts = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
-    // }
 }
