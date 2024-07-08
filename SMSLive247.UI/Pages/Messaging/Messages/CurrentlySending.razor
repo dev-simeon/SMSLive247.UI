@@ -3,9 +3,7 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" 
-                               @onclick="e => LoadData()">
-                    </SearchBox>
+                    <SearchBox @ref="searchBox"></SearchBox>
                 </Left>
             </LeftRight>
         </SearchArea>
@@ -23,17 +21,6 @@
                     <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
                 </Column>
                 <Column>
-@*
-                    <span class="badge text-bg-success">
-                        Sent: @context.TotalProcessed
-                    </span>
-                    <span class="badge text-bg-danger">
-                        Failed: @context.TotalFailed
-                    </span>
-                    <span class="badge text-bg-primary">
-                        Total: @(context.TotalProcessed + context.TotalFailed)
-                    </span>
- *@
                     <button type="button" class="btn btn-secondary position-relative">
                         Sent
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -50,12 +37,12 @@
                 </Column>
                 <Column>
                     <div class="btn-group float-end">
-                        <button class="btn btn-outline-secondary" 
-                                @onclick="e => ResumeBatch(context.BatchID)" 
+                        <button class="btn btn-outline-secondary"
+                                @onclick="e => ResumeBatch(context.BatchID)"
                                 @onclick:stopPropagation="true" title="Resume Batch">
                             <i class="fa fa-play"></i>
                         </button>
-                        <button class="btn btn-outline-secondary" 
+                        <button class="btn btn-outline-secondary"
                                 @onclick="e => AbortBatch(context.BatchID)"
                                 @onclick:stopPropagation="true" title="Abort Batch">
                             <i class="fa fa-stop"></i>
@@ -71,6 +58,11 @@
     private SearchBox searchBox = new();
     private List<SmsBatchResponse> items = [];
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
     protected async Task LoadData()
     {
         var response = await apiClient.SmsBatchPendingListAsync();
@@ -85,6 +77,7 @@
         if (confirmed)
         {
             await apiClient.SmsBatchPendingAbortAsync((int)batchId);
+            await LoadData(); // Reload data after aborting
         }
     }
 
@@ -92,10 +85,18 @@
     {
         var message = "Are you sure you want to resume this batch now?";
         bool confirmed = await alert.Confirm(message, "Confirm");
+        var scheduledMessage = await apiClient.SmsBatchGetAsync((int)batchId);
 
         if (confirmed)
         {
-            //await apiClient.sms((int)batchId);
+            // SmsBatchRequest request = new SmsBatchRequest()
+            // {
+            //      SenderID = scheduledMessage.Result.SenderID,
+            //      MessageText = scheduledMessage.Result.MessageText,
+            //      PhoneNumbers = 
+            // }
+            // await apiClient.SmsBatchCreateAsync(request); 
+            await LoadData();
         }
     }
 
