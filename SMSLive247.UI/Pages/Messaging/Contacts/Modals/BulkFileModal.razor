@@ -36,7 +36,7 @@
         </FormField>
         }
     }
-    else if (editor.EditMode >= 2) //delete=2, download=3
+    else if ((int)editor.EditMode >= 2) //delete=2, download=3
     {
         <FormInputText Label="Description" @bind-Value="editor.Model.Description" Disabled="true"></FormInputText>
         <FormInputNumber Label="Total In File" @bind-Value="editor.Model.TotalNumbers" Disabled="true"></FormInputNumber>

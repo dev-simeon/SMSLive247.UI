@@ -24,29 +24,30 @@
     [Parameter] public EventCallback OnCompleted { get; set; }
     [Parameter] public Modal.ModalSize Size { get; set; } = Modal.ModalSize.MEDIUM;
 
-    protected override void OnParametersSet()
-    {
-        formName = LabelText + "Form";
-    }
+    public enum EditModeEnum { CREATE, EDIT, DELETE, DOWNLOAD }
 
-    private int editMode = 0; // 0=create, 1=edit, 2=delete, 3=download
     public TItem Model = new();
     private bool hideModal = true;
     private string? title, buttonText, formName;
     private Button.Style buttonStyle = Button.Style.SAVE;
 
-    public int EditMode => editMode;
+    public EditModeEnum EditMode = EditModeEnum.CREATE;
+
+    protected override void OnParametersSet()
+    {
+        formName = LabelText + "Form";
+    }
 
     public void Show(TItem? item = null)
     {
-        editMode = item == null ? 0 : 1;
+        EditMode = item == null ? EditModeEnum.CREATE : EditModeEnum.EDIT;
         Model = item != null ? item : new();
 
         title = $"Create New {LabelText}";
         buttonText = $"Create {LabelText}";
         buttonStyle = Button.Style.SAVE;
 
-        if (editMode == 1)
+        if (EditMode == EditModeEnum.EDIT)
         {
             title = $"Edit {LabelText}";
             buttonText = $"Update {LabelText}";
@@ -57,7 +58,7 @@
 
     public void Delete(TItem item)
     {
-        editMode = 2;
+        EditMode = EditModeEnum.DELETE;
         Model = item;
         title = $"Delete {LabelText}";
         buttonText = $"Delete {LabelText}";
@@ -68,7 +69,7 @@
 
     public void Download(TItem? item = null)
     {
-        editMode = 3;
+        EditMode = EditModeEnum.DOWNLOAD;
         Model = item != null ? item : new();
         title = $"Download {LabelText}";
         buttonText = $"Download {LabelText}";
@@ -81,22 +82,22 @@
     {
         try
         {
-            switch (editMode)
+            switch (EditMode)
             {
-                case 0:
+                case EditModeEnum.CREATE:
                     await TryInvokeAsync(OnCreate, "Create");
                     break;
-                case 1:
+                case EditModeEnum.EDIT:
                     await TryInvokeAsync(OnUpdate, "Update");
                     break;
-                case 2:
+                case EditModeEnum.DELETE:
                     await TryInvokeAsync(OnDelete, "Delete");
                     break;
-                case 3:
+                case EditModeEnum.DOWNLOAD:
                     await TryInvokeAsync(OnDownload, "Download");
                     break;
                 default:
-                    await alert.Info($"EditModal.EditMode = [{editMode}] is invalid", "Error");
+                    await alert.Info($"EditModal.EditMode = [{EditMode}] is invalid", "Error");
                     break;
             }
             await OnAfterSuccessAsync();
@@ -122,10 +123,10 @@
         await alert.Success($"Operation was successful", "Success");
         hideModal = true;
  
-        switch (editMode)
+        switch (EditMode)
         {
-            case 0://create
-            case 2://delete
+            case EditModeEnum.CREATE:
+            case EditModeEnum.DELETE:
                 if (OnCompleted.HasDelegate)
                     await OnCompleted.InvokeAsync();
                 break;
