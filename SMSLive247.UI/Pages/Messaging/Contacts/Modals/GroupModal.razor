@@ -5,64 +5,59 @@
            OnCompleted="OnCompleted">
 
     <div class="form-group">
-        <label for="groupName" class="form-label">Group Name</label>
-        <InputText id="groupName" class="form-control w-50" @bind-Value="model.GroupName"></InputText>
+        <label class="form-label" for="n">Group Name</label>
+        <InputText class="form-control w-50" id="n" @bind-Value="model.GroupName"></InputText>
     </div>
 
-    <div class="mt-3">
-        <label class="form-label">Select Contacts</label>
-        <ContactSelctor @ref="contactSelector" Contacts="AllContacts" OnSelected="UpdateSelectedContacts" />
-    </div>
+    @if (editor.EditMode == EditModal<GroupResponse>.EditModeEnum.DELETE)
+    {
+        <div class="mt-3">
+            @foreach (var member in editor.Model.Members)
+            {
+                <span class="badge bg-info me-1">@member.ContactName</span>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="mt-3">
+            <label class="form-label">Select Contacts</label>
+            <ContactSelctor @ref="contactSelector" Contacts="AllContacts" />
+        </div>
+    }
 </EditModal>
 
 @code {
     [Parameter] public List<ContactModel> AllContacts { get; set; } = [];
     [Parameter] public EventCallback OnCompleted { get; set; }
 
+    private ContactSelctor contactSelector = new();
     private EditModal<GroupResponse> editor = new();
     private GroupResponse model => editor.Model;
 
-    private List<string> selectedContacts = [];
-
-    private ContactSelctor contactSelector = new();
-
-    protected override void OnParametersSet()
-    {
-        if (AllContacts != null)
-        {
-            foreach (var contact in AllContacts)
-            {
-                contact.Selected = selectedContacts.Contains(contact.Key);
-            }
-        }
-    }
+    public void Delete(GroupResponse group) => editor.Delete(group);
 
     public void Show(GroupResponse? group = null)
     {
-        editor.Show(group);
-        selectedContacts = group?.Members?.Select(c => c.PhoneNumber).ToList() ?? new List<string>();
+        var groupMembersIds = group?.Members?.Select(c => c.PhoneNumber).ToList() ?? [];
 
-        if (AllContacts != null)
-        {
-            foreach (var contact in AllContacts)
-            {
-                contact.Selected = selectedContacts.Contains(contact.Key);
-            }
-        }
+        if (groupMembersIds != null)
+            AllContacts?.ForEach(c => c.Selected = groupMembersIds.Contains(c.Key));
+
+        editor.Show(group);
     }
 
-    public void Delete(GroupResponse group) => editor.Delete(group);
 
     private async Task OnCreate()
     {
-        selectedContacts = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
-        await apiClient.GroupCreateAsync(model.GroupName, selectedContacts);
+        var groupMembersIds = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
+        await apiClient.GroupCreateAsync(model.GroupName, groupMembersIds);
     }
 
     private async Task OnUpdate()
     {
-        selectedContacts = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
-        await apiClient.GroupUpdateAsync(model.GroupName, selectedContacts);
+        var groupMembersIds = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
+        await apiClient.GroupUpdateAsync(model.GroupName, groupMembersIds);
     }
 
     private async Task OnDelete()
@@ -76,8 +71,8 @@
         }
     }
 
-    private void UpdateSelectedContacts()
-    {
-        selectedContacts = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
-    }
+    // private void UpdateSelectedContacts()
+    // {
+    //     selectedContacts = AllContacts.Where(c => c.Selected).Select(c => c.Key).ToList();
+    // }
 }
