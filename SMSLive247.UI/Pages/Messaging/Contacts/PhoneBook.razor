@@ -15,7 +15,9 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="OnSearch"></SearchBox>
+                    <div class="input-group">
+                        <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString())" />
+                    </div>
                 </Left>
             </LeftRight>
         </SearchArea>
@@ -31,7 +33,7 @@
                                    id="g-@group.Key" @onchange="e => OnGroupSelect(e, group)">
                             <label class="btn btn-outline-info" for="g-@group.Key">
                                 @group.Name<span class="badge ms-2 text-bg-warning">@group.Count.ToString("#,##0")</span>
-                            
+
                                 @if (group.Selected)
                                 {
                                     <span>
@@ -85,7 +87,7 @@
 <GroupModal @ref="groupModal" OnCompleted="FetchData" AllContacts="contacts" />
 
 @code {
-    private SearchBox searchBox = new();
+    private string searchText = string.Empty;
     private GroupModal groupModal = new();
     private ContactModal contactModal = new();
 
@@ -117,11 +119,12 @@
         }
     }
 
-    private void OnSearch()
+    private void OnSearch(string? input = null)
     {
+        searchText = input ?? string.Empty;
         var selectedGroups = groups.Where(g => g.Selected).ToList();
 
-        if (string.IsNullOrEmpty(searchBox.Text) && selectedGroups.Count == 0)
+        if (string.IsNullOrEmpty(searchText) && selectedGroups.Count == 0)
         {
             //no filter, show everything
             contacts.ForEach(x => x.Visible = true);
@@ -141,10 +144,10 @@
         }
 
         // search by text
-        if (!string.IsNullOrEmpty(searchBox.Text))
+        if (!string.IsNullOrEmpty(searchText))
         {
-            temp = temp.Where(c => c.Key.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase)
-                                || c.Name.Contains(searchBox.Text, StringComparison.OrdinalIgnoreCase));
+            temp = temp.Where(c => c.Key.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+                                || c.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
         }
 
         temp.ToList().ForEach(x => x.Visible = true);
