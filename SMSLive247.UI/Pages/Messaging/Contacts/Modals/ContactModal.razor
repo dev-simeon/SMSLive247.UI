@@ -6,19 +6,13 @@
     @if(editor.EditMode == 0)
     {
         <div class="row row-gap-1">
-            <div class="col-6">
-                <label class="form-label">Name</label>
-            </div>
-            <div class="col-6">
-                <label class="form-label">PhoneNumber</label>
-            </div>
             @foreach (var field in contactFields)
             {
                 <div class="col-6">
-                    <InputText class="form-control" @bind-Value="field.ContactName"></InputText>
+                    <InputText class="form-control" placeholder="name" @bind-Value="field.ContactName"></InputText>
                 </div>
                 <div class="col-6">
-                    <InputText class="form-control" @bind-Value="field.PhoneNumber"></InputText>
+                    <InputText class="form-control" placeholder="phone number" @bind-Value="field.PhoneNumber"></InputText>
                 </div>
             }
         </div>
@@ -59,7 +53,7 @@
 
     private EditModal<ContactResponse> editor = new();
     private ContactResponse model => editor.Model;
-    private List<ContactResponse> contactFields = new() { new ContactResponse() };
+    private List<ContactResponse> contactFields = [ new(), new(), new(), new(), new() ];
 
     private bool addToGroup = false;
     private string selectedGroup = string.Empty;
@@ -87,7 +81,7 @@
         }));
 
         // Reset fields after creating contacts
-        contactFields = new List<ContactResponse> { new ContactResponse() };
+        contactFields = [ new(), new(), new(), new(), new() ];
         addToGroup = false;
         selectedGroup = string.Empty;
     }
