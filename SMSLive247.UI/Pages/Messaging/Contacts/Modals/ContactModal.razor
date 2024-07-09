@@ -3,7 +3,7 @@
            OnUpdate="OnUpdate"
            OnDelete="OnDelete"
            OnCompleted="OnCompleted">
-    @if(editor.EditMode == 0)
+    @if (editor.EditMode == EditModal<ContactResponse>.EditModeEnum.CREATE)
     {
         <div class="row row-gap-1">
             @foreach (var field in contactFields)
@@ -44,6 +44,25 @@
     {
         <FormInputText Label="Name" @bind-Value="model.ContactName"></FormInputText>
         <FormInputText Label="Phone Number" @bind-Value="model.PhoneNumber"></FormInputText>
+
+        <div class="mt-2">
+            <label class="form-label mb-1">Groups</label>
+            <div class="row gap-1">
+                @foreach (var group in AllGroups)
+                {
+                    <div class="col-5">
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" type="checkbox" id="@group.Key"
+                                @bind-Value="group.Selected">
+                            </InputCheckbox>
+                            <label class="form-check-label" for="@group.Key">
+                                @group.Name
+                            </label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
     }
 </EditModal>
 
@@ -53,12 +72,26 @@
 
     private EditModal<ContactResponse> editor = new();
     private ContactResponse model => editor.Model;
-    private List<ContactResponse> contactFields = [ new(), new(), new(), new(), new() ];
+    private List<ContactResponse> contactFields = new() { new(), new(), new(), new(), new() };
 
     private bool addToGroup = false;
     private string selectedGroup = string.Empty;
 
-    public void Show(ContactResponse? item = null) => editor.Show(item);
+    public void Show(ContactResponse? item = null)
+    {
+        editor.Show(item);
+
+        if (editor.EditMode == EditModal<ContactResponse>.EditModeEnum.EDIT
+            || editor.EditMode == EditModal<ContactResponse>.EditModeEnum.DELETE)
+        {
+            var contactGroups = model.Groups ?? Array.Empty<string>();
+            foreach (var group in AllGroups)
+            {
+                group.Selected = contactGroups.Contains(group.Name);
+            }
+        }
+
+    }
     public void Delete(ContactResponse item) => editor.Delete(item);
 
     private void AddField()
@@ -68,7 +101,7 @@
 
     public async Task OnCreate()
     {
-        string[] groups = string.IsNullOrEmpty(selectedGroup) ? [] : [ selectedGroup ];
+        string[] groups = string.IsNullOrEmpty(selectedGroup) ? Array.Empty<string>() : new[] { selectedGroup };
 
         var tasks = contactFields.Select(contact =>
         {
@@ -83,13 +116,14 @@
 
         await Task.WhenAll(tasks);
         // Reset fields after creating contacts
-        contactFields = [ new(), new(), new(), new(), new() ];
+        contactFields = new() { new(), new(), new(), new(), new() };
         selectedGroup = string.Empty;
         // addToGroup = false;
     }
 
     private async Task OnUpdate()
     {
+        model.Groups = AllGroups.Where(g => g.Selected).Select(g => g.Name).ToArray();
         var request = new ContactUpdateRequest
         {
             ContactName = model.ContactName,

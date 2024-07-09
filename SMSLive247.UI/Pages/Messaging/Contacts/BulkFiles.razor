@@ -5,8 +5,7 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="SearchBulkFile">
-                    </SearchBox>
+                    <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
                 </Left>
                 <Right>
                     <Button Type="Button.Style.ADD" @onclick="e => bulkFileModal.Show()">
@@ -26,7 +25,7 @@
                 </Column>
                 <Column Header="Type">@context.FileType</Column>
                 <Column>
-                    <Actions OnDownload="() => bulkFileModal.Download(context)" 
+                    <Actions OnDownload="() => bulkFileModal.Download(context)"
                              OnDelete="() => bulkFileModal.Delete(context)">
                     </Actions>
                 </Column>
@@ -38,11 +37,10 @@
 <BulkFileModal @ref="bulkFileModal" OnCompleted="FetchData"></BulkFileModal>
 
 @code {
-    private SearchBox searchBox = new();
+    private string searchText = string.Empty;
     private BulkFileModal bulkFileModal = new();
     private List<BatchFileResponse> items = [];
     private List<BatchFileResponse> filteredItems = [];
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,14 +58,17 @@
         }
     }
 
-    private void SearchBulkFile()
+    private void OnSearch(string input)
     {
-        filteredItems = items;
+        searchText = input;
 
-        if (!string.IsNullOrWhiteSpace(searchBox.Text))
+        if (string.IsNullOrEmpty(searchText))
         {
-            filteredItems = filteredItems.Where(x => x.Description.Contains(
-                searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+            filteredItems = items;
+        }
+        else
+        {
+            filteredItems = items.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }
 }

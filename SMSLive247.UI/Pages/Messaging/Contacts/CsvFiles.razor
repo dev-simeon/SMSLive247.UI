@@ -5,8 +5,7 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="SearchCsvFile">
-                    </SearchBox>
+                    <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
                 </Left>
                 <Right>
                     <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
@@ -38,7 +37,7 @@
 <BulkFileModal @ref="csvFileModal" ForCSV="true" OnCompleted="FetchData"></BulkFileModal>
 
 @code {
-    private SearchBox searchBox = new();
+    private string searchText = string.Empty;
     private BulkFileModal csvFileModal = new();
     private List<BatchFileResponse> items = [];
     private List<BatchFileResponse> filteredItems = [];
@@ -59,14 +58,17 @@
         }
     }
 
-    private void SearchCsvFile()
+    private void OnSearch(string input)
     {
-        filteredItems = items;
+        searchText = input;
 
-        if (!string.IsNullOrWhiteSpace(searchBox.Text))
+        if (string.IsNullOrEmpty(searchText))
         {
-            filteredItems = filteredItems.Where(x => x.Description.Contains(
-                searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+            filteredItems = items;
+        }
+        else
+        {
+            filteredItems = items.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }
 }
