@@ -10,9 +10,9 @@
         <MultiColumn>
             <Column1>
                 <StaticText Label="Sender ID" Text="" />
-                <StaticText Label="Delivery Email" Text="" />
+                <StaticText Label="Delivery Email" Text="@account.Email" />
                 <StaticText Label="Signature" Text="" />
-                <StaticText Label="TimeZone" Text="GMT +1" />
+                <StaticText Label="TimeZone" Text="@account.TimeZone.ToString()" />
             </Column1>
             <Column2>
                
@@ -27,20 +27,15 @@
 </Card>
 
 @code {
-    // private SettingModel model = new();
-    // private ApiDataSource<SettingResponse> ds = new();
+    private AccountResponse account = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await apiClient.AccountGetAsync("self");
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     ds.Callback = new((PageState p, FilterState? f) =>
-    //     {
-    //         return apiClient.ac();
-    //     });
-
-    //     await ds.LoadData(alert);
-
-    //     if (ds.Items != null)
-    //         model = new(ds.Items);
-    // } 
+        if (response.StatusCode == 200)
+        {
+            account = response.Result;
+        }
+    } 
 }
