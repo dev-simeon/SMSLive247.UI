@@ -3,7 +3,7 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox"></SearchBox>
+                    <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="OnSearch" />
                 </Left>
             </LeftRight>
         </SearchArea>
@@ -55,7 +55,7 @@
 </Card>
 
 @code {
-    private SearchBox searchBox = new();
+    private string searchText = string.Empty;
     private List<SmsBatchResponse> items = [];
 
     protected override async Task OnInitializedAsync()
@@ -77,7 +77,7 @@
         if (confirmed)
         {
             await apiClient.SmsBatchPendingAbortAsync((int)batchId);
-            await LoadData(); // Reload data after aborting
+            await LoadData();
         }
     }
 
@@ -93,19 +93,27 @@
             // {
             //      SenderID = scheduledMessage.Result.SenderID,
             //      MessageText = scheduledMessage.Result.MessageText,
-            //      PhoneNumbers = 
+            //      PhoneNumbers =
             // }
-            // await apiClient.SmsBatchCreateAsync(request); 
+            // await apiClient.SmsBatchCreateAsync(request);
             await LoadData();
         }
     }
 
+    private void OnSearch(ChangeEventArgs e)
+    {
+        searchText = e.Value?.ToString() ?? string.Empty;
+    }
+
     private List<SmsBatchResponse> GetFilteredItems()
     {
-        if (items != null)
+        if (string.IsNullOrWhiteSpace(searchText))
         {
-            return items.Where(x => x.MessageText.Contains(searchBox.Text ?? "")).ToList();
+            return items;
         }
-        return [];
+        else
+        {
+            return items.Where(x => x.MessageText.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
     }
 }

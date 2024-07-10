@@ -5,7 +5,7 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" 
+                    <SearchBox @ref="searchBox"
                                @onclick="e => ds.LoadData(alert)">
                         <InputSelect @bind-Value="dateRange.Filter" class="form-select">
                             @foreach (var item in Enum.GetValues<DateRangeFilter>())
@@ -46,7 +46,7 @@
                         @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
                     </small><br />
                     <small class="text-muted">
-                        <em>Credits:</em> @context.CreditsCharged.ToString("#,##0.00")ç
+                        <em>Credits:</em> @context.CreditsCharged.ToString("#,##0.00")
                     </small>
                 </Column>
                 <Column Header="">
@@ -63,7 +63,7 @@
 </Card>
 
 <DownloadModal @ref="downloadModal"></DownloadModal>
-<SentMessageModal @ref="messageModal"></SentMessageModal>
+<SentMessageModal @ref="messageModal" OnCompleted="ReloadData"></SentMessageModal>
 <SentMessageView @ref="sentMessageView"></SentMessageView>
 
 @code {
@@ -81,7 +81,7 @@
         {
             return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
         });
-        await ds.LoadData(alert); 
+        await ds.LoadData(alert);
     }
 
     private string GetStatusCssColor(string status)
@@ -99,5 +99,10 @@
             return "danger";
 
         return "dark";
+    }
+
+    private async Task ReloadData()
+    {
+        await ds.LoadData(alert);
     }
 }

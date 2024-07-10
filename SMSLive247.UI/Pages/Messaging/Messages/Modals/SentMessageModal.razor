@@ -1,5 +1,6 @@
 ﻿<EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Sent Message"
-    OnDelete="OnDelete">
+    OnDelete="OnDelete"
+    OnCompleted="OnCompleted">
     <FormInputNumber Label="Batch ID" @bind-Value="editor.Model.BatchID" disabled></FormInputNumber>
     <FormInputText Label="Sender ID" @bind-Value="editor.Model.SenderID" disabled></FormInputText>
     <FormField Label="Message">
@@ -8,6 +9,7 @@
 </EditModal>
 
 @code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
     private EditModal<SmsBatchResponse> editor = new();
 
     public void Delete(SmsBatchResponse item) => editor.Delete(item);
