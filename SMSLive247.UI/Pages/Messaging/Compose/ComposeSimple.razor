@@ -117,7 +117,7 @@
         </EditForm>
     </Body>
     <Footer>
-        <Button Type="Button.Style.CUSTOM" ButtonType="button" @onclick="SubmitForm">
+        <Button Type="Button.Style.CUSTOM" @onclick="SubmitForm">
             @(sendOption == SendOption.SEND_NOW ? "Send SMS Now!" : "Queue Message")
         </Button>
     </Footer>
