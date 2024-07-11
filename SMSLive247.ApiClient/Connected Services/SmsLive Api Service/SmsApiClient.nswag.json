@@ -4,6 +4,11 @@
     "title": "SMSLive247 API v5",
     "version": "v5"
   },
+  "servers": [
+    {
+      "url": "https://api.smslive247.com"
+    }
+  ],
   "paths": {
     "/api/v5/accounts": {
       "get": {
@@ -193,6 +198,104 @@
         }
       }
     },
+    "/api/v5/accounts/{accountId}/password": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "AccountChangePassword",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/accounts/{accountId}/provider-key": {
+      "post": {
+        "tags": [
+          "Accounts"
+        ],
+        "operationId": "AccountUpdateProviderKey",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountProviderKeyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountProviderKeyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountProviderKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v5/auth": {
       "post": {
         "tags": [
@@ -240,7 +343,14 @@
         "operationId": "ResetPassword",
         "parameters": [
           {
-            "name": "email",
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentID",
             "in": "query",
             "schema": {
               "type": "string"
@@ -394,7 +504,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "application/octet-stream": {
+              "text/csv": {
                 "schema": {
                   "type": "string",
                   "format": "binary"
@@ -1000,7 +1110,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int64"
             }
           }
         ],
@@ -1029,7 +1139,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int64"
             }
           }
         ],
@@ -1053,7 +1163,29 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "SmsBatchPendingResume",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
             }
           }
         ],
@@ -1097,7 +1229,7 @@
             "required": true,
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int64"
             }
           }
         ],
@@ -1710,53 +1842,6 @@
             }
           }
         }
-      },
-      "delete": {
-        "tags": [
-          "Sender IDs"
-        ],
-        "operationId": "SenderIdDelete",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "text/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              }
-            }
-          }
-        }
       }
     },
     "/api/v5/sender-ids/{senderId}": {
@@ -1764,7 +1849,7 @@
         "tags": [
           "Sender IDs"
         ],
-        "operationId": "SenderIdDelete2",
+        "operationId": "SenderIdDelete",
         "parameters": [
           {
             "name": "senderId",
@@ -1802,11 +1887,15 @@
           "email",
           "firstName",
           "lastName",
+          "parentID",
           "password",
           "phone",
           "timeZone"
         ],
         "properties": {
+          "parentID": {
+            "type": "string"
+          },
           "accountName": {
             "type": "string"
           },
@@ -1835,6 +1924,38 @@
           "countryCode": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "AccountPasswordRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "newPassword"
+        ],
+        "properties": {
+          "newPassword": {
+            "type": "string"
+          },
+          "oldPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AccountProviderKeyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "providerID",
+          "providerKey"
+        ],
+        "properties": {
+          "providerID": {
+            "type": "string"
+          },
+          "providerKey": {
+            "type": "string"
           }
         }
       },
@@ -1908,10 +2029,6 @@
           },
           "active": {
             "type": "boolean",
-            "nullable": true
-          },
-          "password": {
-            "type": "string",
             "nullable": true
           },
           "firstName": {
@@ -2101,6 +2218,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "parentID",
           "password",
           "username"
         ],
@@ -2112,8 +2230,7 @@
             "type": "string"
           },
           "parentID": {
-            "type": "string",
-            "nullable": true
+            "type": "string"
           }
         }
       },
@@ -2214,11 +2331,6 @@
             "format": "int64"
           },
           "price": {
-            "type": "number",
-            "readOnly": true,
-            "format": "double"
-          },
-          "fees": {
             "type": "number",
             "readOnly": true,
             "format": "double"

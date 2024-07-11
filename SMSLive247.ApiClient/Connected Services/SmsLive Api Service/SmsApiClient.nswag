@@ -3,7 +3,7 @@
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
-      "url": "https://localhost:5001/api-docs/v5/openapi.json",
+      "url": "https://smslive-api-service-staging.azurewebsites.net/api-docs/v5/openapi.json",
       "output": "SmsApiClient.nswag.json",
       "newLineBehavior": "Auto"
     }

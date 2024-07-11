@@ -76,7 +76,7 @@
 
         if (confirmed)
         {
-            await apiClient.SmsBatchPendingAbortAsync((int)batchId);
+            await apiClient.SmsBatchPendingAbortAsync(batchId);
             await LoadData();
         }
     }
@@ -88,7 +88,7 @@
 
         if (confirmed)
         {
-            //await apiClient.SmsBatchPendingResumeAsync((int)batchId);
+            await apiClient.SmsBatchPendingResumeAsync(batchId);
             await LoadData();
         }
     }
