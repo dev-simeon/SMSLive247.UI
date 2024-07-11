@@ -162,13 +162,14 @@
         if (sendOption == SendOption.SEND_NOW) 
             model.Request.DeliveryTime = null;
 
-        model.Request.PhoneNumbers = model.Numbers
+        model.Request.PhoneNumbers = model.Contacts
             .Where(x => x.Selected).Select(x => x.Key).ToList();
 
         model.Request.BatchFileIDs = model.BatchFiles
             .Where(x => x.Selected).Select(x => x.Key).ToList();
 
-        model.Request.RawNumbers = rawNumberModal.RawText;
+        model.Request.RawNumbers = string.Join(",", 
+            model.Numbers.Select(x => x.Key));
 
         await apiClient.SmsBatchCreateAsync(model.Request);
     }

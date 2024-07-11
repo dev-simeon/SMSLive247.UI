@@ -1,7 +1,7 @@
 ﻿<Modal Title="Enter Numbers" @bind-Hidden="hideModal">
     <Body>
         <label class="form-label" for="a">Enter recipients phone numbers here</label>
-        <textarea class="form-control" rows="8" id="a" @bind="RawText"></textarea>
+        <textarea class="form-control" rows="8" id="a" @bind="rawText"></textarea>
         <div class="form-text">
             Type or paste numbers separated by commas or spaces.
         </div>
@@ -22,7 +22,7 @@
     [Parameter] public EventCallback OnSelected { get; set; }
     [Parameter] public int CountryCode { get; set; } = 234;
 
-    public string RawText = string.Empty;
+    private string rawText = string.Empty;
 
     private bool hideModal = true;
 
@@ -37,7 +37,7 @@
         if (Model == null)
             return Task.CompletedTask;
 
-        Model.Numbers = RawText
+        Model.Numbers = rawText
             .ConvertRawUploadToList(CountryCode)
             .Select(number => new ContactModel(number))
             .ToList();

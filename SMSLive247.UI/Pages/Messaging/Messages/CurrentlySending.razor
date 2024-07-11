@@ -85,17 +85,10 @@
     {
         var message = "Are you sure you want to resume this batch now?";
         bool confirmed = await alert.Confirm(message, "Confirm");
-        var scheduledMessage = await apiClient.SmsBatchGetAsync((int)batchId);
 
         if (confirmed)
         {
-            // SmsBatchRequest request = new SmsBatchRequest()
-            // {
-            //      SenderID = scheduledMessage.Result.SenderID,
-            //      MessageText = scheduledMessage.Result.MessageText,
-            //      PhoneNumbers =
-            // }
-            // await apiClient.SmsBatchCreateAsync(request);
+            //await apiClient.SmsBatchPendingResumeAsync((int)batchId);
             await LoadData();
         }
     }
@@ -108,12 +101,9 @@
     private List<SmsBatchResponse> GetFilteredItems()
     {
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             return items;
-        }
-        else
-        {
-            return items.Where(x => x.MessageText.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+
+        return items.Where(x => x.MessageText.Contains(searchText, 
+            StringComparison.OrdinalIgnoreCase)).ToList();
     }
 }
