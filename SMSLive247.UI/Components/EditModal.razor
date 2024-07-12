@@ -4,7 +4,7 @@
     <Modal Title="@title" @bind-Hidden="hideModal" Size="@Size">
         <Body>
             <DataAnnotationsValidator />
-            <ValidationSummary />
+            <ValidationSummary class="text-danger" />
             @ChildContent(Model)
         </Body>
         <Footer>

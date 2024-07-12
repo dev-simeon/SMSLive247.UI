@@ -2,10 +2,10 @@
         OnCreate="OnCreate"
         OnDelete="OnDelete"
         OnCompleted="OnCompleted">
-    <FormInputText Label="Sender ID" @bind-Value="context.SenderID"></FormInputText>
-    <FormInputText Label="Message Purpose" @bind-Value="context.Purpose"></FormInputText>
+    <FormInputText Label="Sender ID" @bind-Value="context.SenderID" Required="true"></FormInputText>
+    <FormInputText Label="Message Purpose" @bind-Value="context.Purpose" Required="true"></FormInputText>
     <FormField Label="Sample Message">
-        <InputTextArea class="form-control" @bind-Value="context.SampleText" rows="5"></InputTextArea>
+        <InputTextArea class="form-control" @bind-Value="context.SampleText" rows="5" required></InputTextArea>
     </FormField>
 </EditModal>
 

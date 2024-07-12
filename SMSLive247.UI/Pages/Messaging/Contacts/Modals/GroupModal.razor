@@ -6,7 +6,7 @@
 
     <div class="form-group">
         <label class="form-label" for="n">Group Name</label>
-        <InputText class="form-control w-50" id="n" @bind-Value="model.GroupName"></InputText>
+        <InputText class="form-control w-50" id="n" @bind-Value="model.GroupName" required></InputText>
     </div>
 
     @if (editor.EditMode == EditModal<GroupResponse>.EditModeEnum.DELETE)

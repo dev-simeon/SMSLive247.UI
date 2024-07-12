@@ -3,16 +3,16 @@
 
 <Card HeaderTitle="Compose SMS">
     <Body>
-        <EditForm Id="composeForm" Model="model.Request" OnValidSubmit="SubmitMessage">
+        <EditForm Model="model.Request" OnValidSubmit="SubmitMessage">
             <DataAnnotationsValidator />
-            <ValidationSummary />
+            <ValidationSummary class="text-danger" />
 
             <MultiColumn Column1Width="5" Column2Width="7">
                 <Column1>
                     <div class="mb-4 mt-3">
                         <div class="input-group">
                             <span class="input-group-text">Sender ID</span>
-                            <InputSelect class="form-select" id="s1" @bind-Value="model.Request.SenderID" required>
+                            <InputSelect class="form-select" id="s1" @bind-Value="model.Request.SenderID">
                                 @if (model.SenderIds == null)
                                 {
                                     <option>Loading...</option>
@@ -27,7 +27,7 @@
                                 }
                             </InputSelect>
                         </div>
-                        <ValidationMessage For="@(() => model.Request.SenderID)" />
+                        <ValidationMessage class="text-danger" For="@(() => model.Request.SenderID)" />
                         <div class="form-text">You can request for more SenderIDs here</div>
                     </div>
 
@@ -39,8 +39,8 @@
                         <textarea class="form-control" id="m2" rows="5"
                                   maxlength="@settings.MaxCharacter"
                                   @bind="model.Request.MessageText"
-                                  @oninput="OnTextChange" required></textarea>
-                        <ValidationMessage For="@(() => model.Request.MessageText)" />
+                                  @oninput="OnTextChange"></textarea>
+                        <ValidationMessage class="text-danger" For="@(() => model.Request.MessageText)" />
                         <div class="form-text">
                             Messages longer than 160 characters are charged per each page
                         </div>
@@ -61,29 +61,29 @@
 
                     @if (sendOption == SendOption.SEND_LATER)
                     {
-                        <div class="mb-4">
-                            <div class="input-group">
-                                <span class="input-group-text">Delivery Time</span>
-                                <InputDate class="form-control" id="s5"
-                                           Type="InputDateType.DateTimeLocal"
-                                           @bind-Value="model.Request.DeliveryTime" />
-                            </div>
-                            <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
+                    <div class="mb-4">
+                        <div class="input-group">
+                            <span class="input-group-text">Delivery Time</span>
+                            <InputDate class="form-control" id="s5" 
+                                Type="InputDateType.DateTimeLocal" 
+                                @bind-Value="model.Request.DeliveryTime" />
                         </div>
+                        <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
+                    </div>
                     }
                 </Column1>
                 <Column2>
                     <div style="height: 480px; overflow-y: auto; scrollbar-width: none;">
                         <h4>Recipients</h4>
 
-                        <RecipientList Caption="Raw Numbers" Recipients="model.Numbers"
-                                       @onclick="e => rawNumberModal.Show()">
+                        <RecipientList Caption="Raw Numbers" Recipients="model.Numbers" 
+                                        @onclick="e => rawNumberModal.Show()">
                             <button type="button" class="btn btn-outline-primary"
                                     @onclick="e => rawNumberModal.Show()">
                                 <i class="fa fa-paste me-2"></i>Paste...
                             </button>
                             <p class="form-text">
-                                Type or paste your recipients phone numbers.
+                                Type or paste your recipients phone numbers. 
                                 Click the [Paste] button above.
                             </p>
                         </RecipientList>
@@ -95,7 +95,7 @@
                                 <i class="fa fa-user me-2"></i>Contacts...
                             </button>
                             <p class="form-text">
-                                You can also select numbers from your Phonebook or Groups.
+                                You can also select numbers from your Phonebook or Groups. 
                                 Click the [Contacts] button above.
                             </p>
                         </RecipientList>
@@ -107,20 +107,18 @@
                                 <i class="fa fa-book me-2"></i>Bulk Files...
                             </button>
                             <p class="form-text">
-                                You may also include your Batch Files numbers.
+                                You may also include your Batch Files numbers. 
                                 Click the [Bulk File] button above.
                             </p>
                         </RecipientList>
                     </div>
                 </Column2>
             </MultiColumn>
+            <Button Type="Button.Style.CUSTOM">
+                @(sendOption == SendOption.SEND_NOW ? "Send SMS Now!" : "Queue Message")
+            </Button>
         </EditForm>
     </Body>
-    <Footer>
-        <Button Type="Button.Style.CUSTOM" @onclick="SubmitForm">
-            @(sendOption == SendOption.SEND_NOW ? "Send SMS Now!" : "Queue Message")
-        </Button>
-    </Footer>
 </Card>
 
 <ContactsModal @ref="contactsModal" Model="model" OnSelected="OnSelected" />
@@ -164,7 +162,7 @@
 
     private async Task SubmitMessage()
     {
-        if (sendOption == SendOption.SEND_NOW)
+        if (sendOption == SendOption.SEND_NOW) 
             model.Request.DeliveryTime = null;
 
         model.Request.PhoneNumbers = model.Contacts
@@ -173,7 +171,7 @@
         model.Request.BatchFileIDs = model.BatchFiles
             .Where(x => x.Selected).Select(x => x.Key).ToList();
 
-        model.Request.RawNumbers = string.Join(",",
+        model.Request.RawNumbers = string.Join(",", 
             model.Numbers.Select(x => x.Key));
 
         await apiClient.SmsBatchCreateAsync(model.Request);
@@ -227,15 +225,4 @@
 
         return (int)Math.Ceiling(length / 153.0);
     }
-
-    private void SubmitForm()
-    {
-        js.InvokeVoidAsync("submitForm", "composeForm");
-    }
 }
-
-<script>
-    function submitForm(formId) {
-        document.getElementById(formId).submit();
-    }
-</script>

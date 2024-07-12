@@ -9,10 +9,10 @@
             @foreach (var field in contactFields)
             {
                 <div class="col-6">
-                    <InputText class="form-control" placeholder="Contact Name" @bind-Value="field.ContactName"></InputText>
+                    <InputText class="form-control" placeholder="Contact Name" @bind-Value="field.ContactName" required></InputText>
                 </div>
                 <div class="col-6">
-                    <InputText class="form-control" placeholder="Phone Number" @bind-Value="field.PhoneNumber"></InputText>
+                    <InputText class="form-control" placeholder="Phone Number" @bind-Value="field.PhoneNumber" required></InputText>
                 </div>
             }
         </div>

@@ -1,4 +1,6 @@
-﻿namespace SMSLive247.UI.Components.Forms.Input
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace SMSLive247.UI.Components.Forms.Input
 {
     public enum DateRangeFilter
     {
@@ -14,24 +16,27 @@
         CUSTOM
     }
 
-    public class DateRange
+    public class DateRange : IValidatableObject
     {
         private DateRangeFilter _filter;
         private DateTimeOffset _startDate;
         private DateTimeOffset _endDate;
 
-        public DateTimeOffset StartDate {
+        [Required(ErrorMessage = "Start Date is required.")]
+        public DateTimeOffset StartDate
+        {
             get
             {
                 SetDateRange();
                 return _startDate;
-            } 
-            set 
+            }
+            set
             {
                 _startDate = value;
             }
         }
 
+        [Required(ErrorMessage = "End Date is required.")]
         public DateTimeOffset EndDate
         {
             get
@@ -45,7 +50,8 @@
             }
         }
 
-        public DateRangeFilter Filter {
+        public DateRangeFilter Filter
+        {
             get
             {
                 return _filter;
@@ -90,7 +96,7 @@
                     _endDate = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.THIS_MONTH:
-                    _startDate = new DateTimeOffset(DateTime.UtcNow.Year, 
+                    _startDate = new DateTimeOffset(DateTime.UtcNow.Year,
                         DateTime.UtcNow.Month, 1, 0, 0, 0, TimeSpan.Zero);
                     _endDate = _startDate.AddMonths(1).AddTicks(-1);
                     break;
@@ -110,6 +116,18 @@
                     //_startDate = null;
                     //_endDate = null;
                     break;
+            }
+        }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (_filter == DateRangeFilter.CUSTOM)
+            {
+                // Custom range validation
+                if (_startDate > _endDate)
+                {
+                    yield return new ValidationResult("End Date must be greater than or equal to Start Date.", new[] { nameof(EndDate) });
+                }
             }
         }
     }

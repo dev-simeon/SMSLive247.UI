@@ -1,8 +1,8 @@
-﻿<EditModal TItem="SmsBatchResponse" @ref="editor" 
-LabelText="Messages" OnDownload="OnDownload">
+﻿<EditModal TItem="SmsBatchResponse" @ref="editor"
+           LabelText="Messages" OnDownload="OnDownload">
 
     <FormField Label="Select Period">
-        <InputSelect @bind-Value="dateRange.Filter" class="form-select">
+        <InputSelect @bind-Value="dateRange.Filter" class="form-select" required>
             @foreach (var item in Enum.GetValues<DateRangeFilter>())
             {
                 <option value="@item">@item</option>
@@ -15,22 +15,22 @@ LabelText="Messages" OnDownload="OnDownload">
             bool disabled = dateRange.Filter != DateRangeFilter.CUSTOM;
         }
         <div class="input-group">
-            <InputDate class="form-control" 
-                Type="InputDateType.Date"
-                @bind-Value:format="dd-MM-yyyy" 
-                @bind-Value="dateRange.StartDate"
-                disabled="@disabled"></InputDate>
-            <InputDate class="form-control" 
-                Type="InputDateType.Date" 
-                @bind-Value:format="dd-MM-yyyy"
-                @bind-Value="dateRange.EndDate"
-                disabled="@disabled"></InputDate>
+            <InputDate class="form-control"
+                       Type="InputDateType.Date"
+                       @bind-Value:format="dd-MM-yyyy"
+                       @bind-Value="dateRange.StartDate"
+                       disabled="@disabled"></InputDate>
+            <InputDate class="form-control"
+                       Type="InputDateType.Date"
+                       @bind-Value:format="dd-MM-yyyy"
+                       @bind-Value="dateRange.EndDate"
+                       disabled="@disabled"></InputDate>
         </div>
     </FormField>
 
     <FormField Label="Sender ID">
         <div class="input-group">
-            <InputText class="form-control" @bind-Value="editor.Model.SenderID" placeholder="Type or select" />
+            <InputText class="form-control" @bind-Value="editor.Model.SenderID" placeholder="Type or select" required />
             <InputSelect class="form-select" @bind-Value="editor.Model.SenderID">
                 <option value="" selected></option>
                 @foreach (var item in senderIds)
@@ -55,7 +55,7 @@ LabelText="Messages" OnDownload="OnDownload">
 </EditModal>
 
 @code {
-    private enum DownloadType {BATCHES, REPORTS};
+    private enum DownloadType { BATCHES, REPORTS };
 
     private DateRange dateRange = new();
     private EditModal<SmsBatchResponse> editor = new();
@@ -75,9 +75,9 @@ LabelText="Messages" OnDownload="OnDownload">
 
     private async Task OnDownload()
     {
-        var debug = $@"From Date: {dateRange.StartDate}, 
-                     To Date: {dateRange.EndDate}, 
-                     Sender ID: {editor.Model.SenderID}, 
+        var debug = $@"From Date: {dateRange.StartDate},
+                     To Date: {dateRange.EndDate},
+                     Sender ID: {editor.Model.SenderID},
                      Download Type: {downloadType}";
 
         if (downloadType == DownloadType.BATCHES)
