@@ -123,12 +123,12 @@
 
     private async Task OnUpdate()
     {
-        model.Groups = AllGroups.Where(g => g.Selected).Select(g => g.Name).ToArray();
+        var selectedGroups = AllGroups.Where(g => g.Selected).Select(g => g.Name).ToArray();
         var request = new ContactUpdateRequest
         {
             ContactName = model.ContactName,
             PhoneNumber = model.PhoneNumber,
-            Groups = model.Groups
+            Groups = selectedGroups
         };
 
         await apiClient.ContactUpdateAsync(model.PhoneNumber, request);
