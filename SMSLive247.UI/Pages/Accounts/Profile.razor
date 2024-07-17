@@ -3,9 +3,75 @@
 
 <PageTitle>Profile</PageTitle>
 
-<h3>Profile</h3>
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div>
+                    <div class="mb-3">
+                        <i class="bi bi-person-circle h1 text-primary"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="mb-0">@accountDetail.LastName @accountDetail.FirstName</h5>
+                        <p class="text-muted mb-0">Email: @accountDetail.AccountName</p>
+                        <p class="text-muted mb-0">Phone Number: 08064844392</p>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card-body border-top">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div>
+                            <p class="fw-medium mb-2">Wallet Balance :</p>
+                            <h4>$ 6134.39</h4>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div>
+                            <p class="fw-medium mb-2">SMS Credit Balance :</p>
+                            <h4>C @accountDetail.Credits</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer border-top">
+                <a href="javascript: void(0);" class="btn btn-primary me-2 w-md">
+                    <i class="fa fa-save me-2"></i>
+                    Buy Sms Credit
+                </a>
+                <a href="javascript: void(0);" class="btn btn-outline-secondary me-2 w-md">
+                    <i class="fa fa-plus-circle me-2"></i>
+                    Fund Wallet
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
+    private AccountResponse accountDetail = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync("self");
+
+            if(response.StatusCode == 200)
+            {
+                accountDetail = response.Result;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
 }
 

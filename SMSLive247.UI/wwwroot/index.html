@@ -33,6 +33,7 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <script>
         window.downloadFileFromStream = async (fileName, contentStreamReference) => {
@@ -46,8 +47,14 @@
             anchorElement.remove();
             URL.revokeObjectURL(url);
         }
+
+        window.apexChartsInterop = {
+            renderChart: function (elementId, options) {
+                var chart = new ApexCharts(document.querySelector("#" + elementId), options);
+                chart.render();
+            }
+        };
     </script>
 
 </body>
-
 </html>
