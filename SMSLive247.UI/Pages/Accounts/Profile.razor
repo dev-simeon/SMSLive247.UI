@@ -16,11 +16,9 @@
                         <h5 class="mb-0">@accountDetail.LastName @accountDetail.FirstName</h5>
                         <p class="text-muted mb-0">Email: @accountDetail.AccountName</p>
                         <p class="text-muted mb-0">Phone Number: 08064844392</p>
-
                     </div>
                 </div>
             </div>
-
 
             <div class="card-body border-top">
                 <div class="row">
@@ -51,6 +49,82 @@
             </div>
         </div>
     </div>
+
+    <!-- Basic Info Form -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Basic Info</h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" class="form-control" id="firstName" value="@accountDetail.FirstName">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" value="@accountDetail.LastName">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" class="form-control" id="email" value="@accountDetail.AccountName">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="phoneNumber">Phone Number</label>
+                                <input type="text" class="form-control" id="phoneNumber" value="08064844392">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Change Password Form -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title">Change Password</h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="currentPassword">Current Password</label>
+                                <input type="password" class="form-control" id="currentPassword">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" class="form-control" id="newPassword">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirmPassword">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
@@ -62,7 +136,7 @@
         {
             var response = await apiClient.AccountGetAsync("self");
 
-            if(response.StatusCode == 200)
+            if (response.StatusCode == 200)
             {
                 accountDetail = response.Result;
             }
@@ -74,4 +148,3 @@
         }
     }
 }
-

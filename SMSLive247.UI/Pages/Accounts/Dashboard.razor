@@ -30,7 +30,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <p class="text-muted fw-medium">SMS Credit Balance</p>
-                        <h4 class="mb-0">@accountDetail.Credits</h4>
+                        <h4 class="mb-0">C @accountDetail.Credits.ToString("F2")</h4>
                     </div>
                     <div class="flex-shrink-0 align-self-center">
                         <div class="p-3 rounded-circle bg-primary">
@@ -46,7 +46,7 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between">
                     <div>
-                        <p class="text-muted fw-medium">Total SMS Sent</p>
+                        <p class="text-muted fw-medium">Total SMS Sent (Today)</p>
                         <h4 class="mb-0">@totalSmsSent</h4>
                     </div>
                     <div class="flex-shrink-0 align-self-center">
@@ -79,7 +79,7 @@
 
 <div class="row mt-4">
     <div class="col-md-6">
-        <Card HeaderTitle="Traffic Summary">
+        <Card HeaderTitle="Messages Delivery Rates">
             <Body>
                 <div id="trafficSummaryChart"></div>
             </Body>
@@ -112,33 +112,23 @@
     </div>
 </div>
 
-<!-- Support and Help -->
-<div class="row mt-4">
-    <div class="col-md-6">
-        <Card HeaderTitle="Contact Support">
-            <Body>
-                <a href="/support">Live Chat or Email Support</a>
-            </Body>
-        </Card>
-    </div>
-</div>
-
 @code {
     private AccountResponse accountDetail = new();
-    private List<SmsBatchResponse> recentMessages =[];
+    private List<SmsBatchResponse> messagesSentToday =[];
     private List<ContactResponse> contacts = [];
     private List<GroupResponse> groups = [];
     private List<PurchaseResponse> recentTransactions = [];
     private List<BatchFileResponse> batchFiles = [];
     private int totalSmsSent = 0;
-    private double deliveryRates = 0;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var t1 = apiClient.AccountGetAsync("self");
-            var t2 = apiClient.SmsBatchListAsync(1, 500, DateTimeOffset.UtcNow.Date.AddDays(-7), DateTimeOffset.UtcNow.Date, null);
+            var dateFrom = DateTimeOffset.UtcNow.Date.AddMonths(-12);
+            var dateTo = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
+            var t2 = apiClient.SmsBatchListAsync(1, 500, dateFrom, dateTo, null);
             var t3 = apiClient.ContactListAsync();
             var t4 = apiClient.GroupListAsync();
             var t5 = apiClient.PurchaseListAsync(1, 500);
@@ -148,16 +138,15 @@
             await Task.WhenAll(t1, t2, t3, t4, t5, t6);
 
             accountDetail = t1.Result.Result;
-            recentMessages = t2.Result.Result.ToList();
+            messagesSentToday = t2.Result.Result.ToList();
             contacts = t3.Result.Result.ToList();
             groups = t4.Result.Result.ToList();
             recentTransactions = t5.Result.Result.ToList();
             batchFiles = t6.Result.Result.ToList();
 
-            totalSmsSent = (int)recentMessages.Sum(m => m.TotalProcessed);
-            deliveryRates = CalculateDeliveryRates(recentMessages);
+            totalSmsSent = messagesSentToday.Count;
 
-            await RenderTrafficSummaryChart();
+            await RenderDeliveryStatistics(messagesSentToday);
         }
         catch (Exception ex)
         {
@@ -165,16 +154,22 @@
         }
     }
 
-    private double CalculateDeliveryRates(List<SmsBatchResponse> messages)
+    private async Task RenderDeliveryStatistics(List<SmsBatchResponse> messages)
     {
-        // Implement logic to calculate delivery rates
-        return 0;
-    }
+        var groupedMessages = messages
+            .GroupBy(m => m.DateSubmitted.Date)
+            .Select(g => new
+            {
+                Date = g.Key,
+                TotalReceived = g.Sum(m => m.TotalProcessed),
+                TotalFailed = g.Sum(m => m.TotalFailed)
+            })
+            .OrderBy(g => g.Date)
+            .ToList();
 
-    private async Task RenderTrafficSummaryChart()
-    {
-        var seriesData = recentMessages.Select(m => m.TotalProcessed + m.TotalFailed).ToArray();
-        var categories = recentMessages.Select(m => m.DateSubmitted.ToString("dd MMM")).ToArray();
+        var receivedSeriesData = groupedMessages.Select(g => g.TotalReceived).ToArray();
+        var failedSeriesData = groupedMessages.Select(g => g.TotalFailed).ToArray();
+        var categories = groupedMessages.Select(g => g.Date.ToString("dd MMM")).ToArray();
 
         var options = new
         {
@@ -188,21 +183,16 @@
                 {
                     colors = new
                     {
-                        ranges = new[]
-                        {
-                        new { from = 0, to = 1000, color = "#F15B46" },
-                        new { from = 1001, to = 5000, color = "#FEB019" },
-                        new { from = 5001, to = 10000, color = "#00E396" }
-                    },
                         backgroundBarColors = new[] { "#F0F0F0" },
                         backgroundBarOpacity = 1,
                     }
                 }
             },
-            colors = new[] { "#FF4560" }, // Default color for bars
+            colors = new[] { "#F15B46", "#FF4560" }, // Colors for received and failed messages
             series = new[]
             {
-            new { name = "Messages Sent", data = seriesData }
+            new { name = "Received Messages", data = receivedSeriesData },
+            new { name = "Failed Messages", data = failedSeriesData }
         },
             xaxis = new
             {
@@ -212,5 +202,14 @@
 
         await js.InvokeVoidAsync("apexChartsInterop.renderChart", "trafficSummaryChart", options);
     }
-
 }
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    window.apexChartsInterop = {
+        renderChart: function (elementId, options) {
+            var chart = new ApexCharts(document.querySelector("#" + elementId), options);
+            chart.render();
+        }
+    };
+</script>
