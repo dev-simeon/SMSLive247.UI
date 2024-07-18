@@ -15,7 +15,8 @@
                     <div>
                         <h5 class="mb-0">@accountDetail.LastName @accountDetail.FirstName</h5>
                         <p class="text-muted mb-0">Email: @accountDetail.AccountName</p>
-                        <p class="text-muted mb-0">Phone Number: 08064844392</p>
+                        <p class="text-muted mb-0">Phone Number: @accountDetail.Phone</p>
+                        <p class="text-muted mb-0">Country Code/TimeZone: +@(accountDetail.CountryCode)(GMT+@(accountDetail.TimeZone))</p>
                     </div>
                 </div>
             </div>
@@ -31,7 +32,7 @@
                     <div class="col-sm-6">
                         <div>
                             <p class="fw-medium mb-2">SMS Credit Balance :</p>
-                            <h4>C @accountDetail.Credits</h4>
+                            <h4>C @accountDetail.Credits.ToString("F2")</h4>
                         </div>
                     </div>
                 </div>
@@ -52,23 +53,23 @@
 
     <!-- Basic Info Form -->
     <div class="col-md-8">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">Basic Info</h5>
-            </div>
-            <div class="card-body">
-                <form>
+        <Card HeaderTitle="Basic Info">
+            <Body>
+                <EditForm Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="firstName">First Name</label>
-                                <input type="text" class="form-control" id="firstName" value="@accountDetail.FirstName">
+                                <InputText class="form-control" id="firstName" @bind-Value="accountUpdateRequest.FirstName"></InputText>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="lastName">Last Name</label>
-                                <input type="text" class="form-control" id="lastName" value="@accountDetail.LastName">
+                                <InputText class="form-control" id="lastName" @bind-Value="accountUpdateRequest.LastName"></InputText>
                             </div>
                         </div>
                     </div>
@@ -76,59 +77,52 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="email">Email</label>
-                                <input type="email" class="form-control" id="email" value="@accountDetail.AccountName">
+                                <InputText type="email" class="form-control" id="email" @bind-Value="accountUpdateRequest.Email" disabled></InputText>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="phoneNumber">Phone Number</label>
-                                <input type="text" class="form-control" id="phoneNumber" value="08064844392">
+                                <InputText class="form-control" id="phoneNumber" @bind-Value="accountUpdateRequest.Phone" disabled></InputText>
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
-            </div>
-        </div>
+                    <Button Type="Button.Style.SAVE">Save Changes</Button>
+                </EditForm>
+            </Body>
+        </Card>
 
         <!-- Change Password Form -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5 class="card-title">Change Password</h5>
-            </div>
-            <div class="card-body">
-                <form>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="currentPassword">Current Password</label>
-                                <input type="password" class="form-control" id="currentPassword">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="newPassword">New Password</label>
-                                <input type="password" class="form-control" id="newPassword">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="confirmPassword">Confirm New Password</label>
-                                <input type="password" class="form-control" id="confirmPassword">
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Change Password</button>
-                </form>
-            </div>
-        </div>
+        <Card HeaderTitle="Change Password">
+            <Body>
+                <EditForm Model="@accountPasswordRequest" OnValidSubmit="HandleChangePassword">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <FormField Label="Current Password">
+                        <InputText type="password" class="form-control" id="oldPassword" @bind-Value="accountPasswordRequest.OldPassword"></InputText>
+                    </FormField>
+
+                    <FormField Label="New Password">
+                        <InputText type="password" class="form-control" id="newPassword" @bind-Value="accountPasswordRequest.NewPassword"></InputText>
+                    </FormField>
+
+                    <FormField Label="Confirm New Password">
+                        <InputText type="password" class="form-control" id="confirmPassword" @bind-Value="confirmNewPassword"></InputText>
+                    </FormField>
+
+                    <Button Type="Button.Style.DEFAULT">Change Password</Button>
+                </EditForm>
+            </Body>
+        </Card>
     </div>
 </div>
 
 @code {
     private AccountResponse accountDetail = new();
+    private AccountUpdateRequest accountUpdateRequest = new();
+    private AccountPasswordRequest accountPasswordRequest = new();
+    private string confirmNewPassword = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,8 +133,60 @@
             if (response.StatusCode == 200)
             {
                 accountDetail = response.Result;
+                accountUpdateRequest.FirstName = accountDetail.FirstName;
+                accountUpdateRequest.LastName = accountDetail.LastName;
+                accountUpdateRequest.Email = accountDetail.AccountName;
+                accountUpdateRequest.Phone = accountDetail.Phone;
             }
 
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await apiClient.AccountUpdateAsync(accountDetail.AccountID, accountUpdateRequest);
+
+            if (response.StatusCode == 200)
+            {
+                await alert.Success("Profile updated successfully.", "Success");
+            }
+            else
+            {
+                await alert.Error("Failed to update profile.", "Error");
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private async Task HandleChangePassword()
+    {
+        if (accountPasswordRequest.NewPassword != confirmNewPassword)
+        {
+            await alert.Error("Passwords do not match.", "Error");
+            return;
+        }
+
+        try
+        {
+            var response = await apiClient.AccountChangePasswordAsync(accountDetail.AccountID, accountPasswordRequest);
+
+            if (response.StatusCode == 200)
+            {
+                await alert.Success("Password changed successfully.", "Success");
+            }
+            else
+            {
+                await alert.Error("Failed to change password.", "Error");
+            }
         }
         catch (Exception ex)
         {
