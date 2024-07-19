@@ -1,83 +1,79 @@
-﻿@page "/Wallet/Buy"
+﻿@using SMSLive247.UI.Pages.Wallet.Modals
+@page "/Wallet/Buy"
 @attribute [Authorize]
 
 <PageTitle>Buy SMS Credits</PageTitle>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-6 offset-md-3">
-            <div class="card mt-5">
-                <div class="card-header">
-                    <h3 class="card-title">Buy SMS Credits</h3>
-                </div>
-                <div class="card-body">
-                    <EditForm Model="purchaseRequest" OnValidSubmit="BuySms">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary />
+<Card HeaderTitle="Purchase History">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <SearchArea>
+                        <SearchBox @ref="searchBox">
+                            <InputSelect class="form-select" @bind-Value="status">
+                                <option value="">PAID</option>
+                                <option value="">PENDING</option>
+                                <option value="">FAILED</option>
+                            </InputSelect>
+                        </SearchBox>
+                    </SearchArea>
+                </Left>
+                <Right>
+                    <Button Type="Button.Style.DEFAULT" @onclick="e => purchaseModal.Show()">
+                        Buy SMS Credit
+                    </Button>
+                </Right>
+            </LeftRight>
+        </SearchArea>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Provider ID">
+                    @context.ProviderID
+                </Column>
+                <Column Header="Reference">
+                    @context.Reference
+                </Column>
+                <Column Header="Quantity">
+                    @context.Quantity
+                </Column>
+                <Column Header="Price">
+                    @context.Price
+                </Column>
+                <Column Header="Amount">
+                    @context.Amount
+                </Column>
+                <Column Header="Status">
+                    <span class="badge text-bg-@(context.IsPaid ? "success" : "danger")">
+                        @(context.IsPaid ? "Yes" : "No")
+                    </span>
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
+</Card>
 
-                        <div class="form-group">
-                            <label for="providerID">Provider ID</label>
-                            <InputText id="providerID" class="form-control" @bind-Value="purchaseRequest.ProviderID" />
-                        </div>
-
-                        <div class="form-group">
-                            <label for="amount">Amount</label>
-                            <InputNumber id="amount" class="form-control" @bind-Value="purchaseRequest.Amount" />
-                        </div>
-
-                        <button type="submit" class="btn btn-primary mt-3">Buy Credits</button>
-                    </EditForm>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<PurchaseModal @ref="purchaseModal"></PurchaseModal>
 
 @code {
-    private PurchaseRequest purchaseRequest = new();
-    private List<PurchaseResponse> purchaseList = [];
+    private SearchBox searchBox = new();
+    private string status = string.Empty;
+    private PurchaseModal purchaseModal = new();
+    private ApiDataSource<PurchaseResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var response = await apiClient.PurchaseListAsync(1, 500);
 
-            if (response.StatusCode == 200)
-            {
-                purchaseList = response.Result.ToList();
-            }
-        }
-        catch (Exception ex)
+        ds.Callback = new((PageState p, FilterState? f) =>
         {
-            await alert.Error(ex.Message, "Error");
-        }
-    }
-
-    private async Task BuySms()
-    {
-        try
-        {
-            var task = await apiClient.PurchaseBeginAsync(purchaseRequest);
-
-            if (task.StatusCode == 200)
-            {
-                var response = task.Result;
-                // Initialize the payment transaction with Paystack
-                var callbackUrl = nav.ToAbsoluteUri("/Wallet/Complete").ToString();
-                var result = await paystack.InitializeTransaction(response.ProviderID, (decimal)response.Amount, callbackUrl, response.Reference);
-
-                // Redirect the user to Paystack for payment
-                nav.NavigateTo(result.AuthorizationUrl);
-            }
-            else
-            {
-                await alert.Error("Failed to initialize purchase.", "Error");
-            }
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
+            return apiClient.PurchaseListAsync(p.PageNumber, p.PageSize);
+        });
+        await ds.LoadData(alert);
     }
 }
