@@ -5,6 +5,7 @@ using SMSLive247.Authentication;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Blazored.LocalStorage;
+using iDevWorks.Paystack;
 
 namespace SMSLive247.UI
 {
@@ -20,7 +21,9 @@ namespace SMSLive247.UI
             builder.Configuration.Bind(settings);
 
             var apiSettings = new ApiClientFactory.ApiSettings(settings.BaseUrl);
+            var paystack = new PaystackClient(settings.PaystackKey);
 
+            builder.Services.AddSingleton(paystack);
             builder.Services.AddSingleton(settings);
             builder.Services.AddSingleton(apiSettings);
 
