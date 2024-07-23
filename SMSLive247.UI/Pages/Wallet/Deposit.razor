@@ -1,4 +1,5 @@
-﻿@page "/Wallet/Deposit"
+﻿@using SMSLive247.UI.Pages.Wallet.Modals
+@page "/Wallet/Deposit"
 @inject AuthenticationStateProvider auth
 @attribute [Authorize]
 
@@ -6,58 +7,74 @@
 
 <h3 class="mb-4">Deposit</h3>
 
-<div class="w-50">
-    <Card HeaderTitle="Deposit">
-        <Body>
-            <EditForm Model="purchaseRequest" OnValidSubmit="InitiateDeposit">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+<Card HeaderTitle="Purchase History">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <SearchBox @ref="searchBox">
+                        <InputSelect class="form-select" @bind-Value="status">
+                            <option value="">PAID</option>
+                            <option value="">PENDING</option>
+                            <option value="">FAILED</option>
+                        </InputSelect>
+                    </SearchBox>
+                </Left>
+                <Right>
+                    <Button Type="Button.Style.DEFAULT" @onclick="e => purchaseModal.Show()">
+                        Buy SMS Credit
+                    </Button>
+                </Right>
+            </LeftRight>
+        </SearchArea>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Provider ID">
+                    @context.ProviderID
+                </Column>
+                <Column Header="Reference">
+                    @context.Reference
+                </Column>
+                <Column Header="Quantity">
+                    <FormatNumber Number="@context.Quantity"></FormatNumber>
+                </Column>
+                <Column Header="Price">
+                    <FormatNumber Currency="@context.Price" Format="#,##0.00"></FormatNumber>
+                </Column>
+                <Column Header="Amount">
+                    <FormatNumber Currency="@context.Amount" Format="#,##0.00"></FormatNumber>
+                </Column>
+                <Column Header="Status">
+                    <span class="badge text-bg-@(context.IsPaid ? "success" : "warning")">
+                        @(context.IsPaid ? "SUCCESS" : "PENDING")
+                    </span>
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
+</Card>
 
-                <FormInputMoney Label="Amount To Deposit" @bind-Value="purchaseRequest.Amount"></FormInputMoney>
-            </EditForm>
-        </Body>
-    </Card>
-</div>
-
-
+<PurchaseModal @ref="purchaseModal"></PurchaseModal>
 
 @code {
-    private string email;
-    private PurchaseRequest purchaseRequest = new PurchaseRequest { ProviderID = "PYSTK" };
+    private SearchBox searchBox = new();
+    private string status = string.Empty;
+    private PurchaseModal purchaseModal = new();
+    private ApiDataSource<PurchaseResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
 
-        if (member != null)
+        ds.Callback = new((PageState p, FilterState? f) =>
         {
-            email = member.Email?.ToLower();
-        }
+            return apiClient.PurchaseListAsync(p.PageNumber, p.PageSize);
+        });
+        await ds.LoadData(alert);
     }
-
-    private async Task InitiateDeposit()
-    {
-        try
-        {
-            var response = await apiClient.PurchaseBeginAsync(purchaseRequest);
-
-            var purchaseResponse = response.Result;
-
-            // Initialize the payment transaction with Paystack
-            var callbackUrl = nav.ToAbsoluteUri($"/Wallet/PaymentComplete/{purchaseResponse.Reference}").ToString()
-                ?? throw new InvalidOperationException("Callback URL is invalid");
-
-            var totalAmount = (decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M;
-
-            var result = await paystack.InitializeTransaction(email, totalAmount, callbackUrl, purchaseResponse.Reference);
-
-            // Redirect the user to Paystack for payment
-            nav.NavigateTo(result.AuthorizationUrl);
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-    }
-
 }

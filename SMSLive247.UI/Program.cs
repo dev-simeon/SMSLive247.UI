@@ -21,7 +21,7 @@ namespace SMSLive247.UI
             builder.Configuration.Bind(settings);
 
             var apiSettings = new ApiClientFactory.Settings(settings.BaseUrl);
-            var paystack = new PaystackClient(settings.PaystackKey);
+            var paystack = new PaystackClient(settings.Paystack.Key);
 
             builder.Services.AddSingleton(paystack);
             builder.Services.AddSingleton(settings);
