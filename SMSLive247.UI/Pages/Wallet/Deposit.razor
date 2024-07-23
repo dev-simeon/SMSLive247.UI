@@ -1,10 +1,61 @@
 ﻿@page "/Wallet/Deposit"
+@inject AuthenticationStateProvider auth
 @attribute [Authorize]
 
 <PageTitle>Deposit - Top Up Wallet</PageTitle>
 
-<h3>Deposit</h3>
+<div class="w-50">
+    <Card HeaderTitle="Deposit">
+        <Body>
+            <EditForm Model="purchaseRequest" OnValidSubmit="InitiateDeposit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <FormInputMoney Label="Amount To Deposit" @bind-Value="purchaseRequest.Amount"></FormInputMoney>
+            </EditForm>
+        </Body>
+    </Card>
+</div>
+
+
 
 @code {
+    private string email;
+    private PurchaseRequest purchaseRequest = new PurchaseRequest { ProviderID = "PYSTK" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
+
+        if (member != null)
+        {
+            email = member.Email?.ToLower();
+        }
+    }
+
+    private async Task InitiateDeposit()
+    {
+        try
+        {
+            var response = await apiClient.PurchaseBeginAsync(purchaseRequest);
+
+            var purchaseResponse = response.Result;
+
+            // Initialize the payment transaction with Paystack
+            var callbackUrl = nav.ToAbsoluteUri($"/Wallet/PaymentComplete/{purchaseResponse.Reference}").ToString()
+                ?? throw new InvalidOperationException("Callback URL is invalid");
+
+            var totalAmount = (decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M;
+
+            var result = await paystack.InitializeTransaction(email, totalAmount, callbackUrl, purchaseResponse.Reference);
+
+            // Redirect the user to Paystack for payment
+            nav.NavigateTo(result.AuthorizationUrl);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
 
 }

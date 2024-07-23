@@ -21,7 +21,7 @@ namespace SMSLive247.OpenApi
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
-    public partial class ApiClient
+    public partial class ApiClient 
     {
         private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
@@ -1732,7 +1732,7 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseCompleteAsync(System.Guid transactionId)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseCompleteAsync(string transactionId)
         {
             return PurchaseCompleteAsync(transactionId, System.Threading.CancellationToken.None);
         }
@@ -1740,7 +1740,7 @@ namespace SMSLive247.OpenApi
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseCompleteAsync(System.Guid transactionId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseCompleteAsync(string transactionId, System.Threading.CancellationToken cancellationToken)
         {
             if (transactionId == null)
                 throw new System.ArgumentNullException("transactionId");
@@ -4690,20 +4690,20 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public System.DateTimeOffset DateRequested { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("dateApproved")]
+        [System.Text.Json.Serialization.JsonPropertyName("dateDecided")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset? DateApproved { get; set; } = default!;
+        public System.DateTimeOffset? DateDecided { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public string SenderID { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("approved")]
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public bool Approved { get; set; } = default!;
+        public string Status { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("purpose")]
 
