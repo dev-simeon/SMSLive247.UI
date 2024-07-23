@@ -33,6 +33,7 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
 
     <script>
         window.downloadFileFromStream = async (fileName, contentStreamReference) => {
@@ -46,7 +47,30 @@
             anchorElement.remove();
             URL.revokeObjectURL(url);
         }
+
+        window.paystackInterop = {
+            payWithPaystack: function (email, amount, reference, accessCode, paystackKey) {
+                var handler = PaystackPop.setup({
+                    key: paystackKey, // Use the passed Paystack key
+                    email: email,
+                    amount: amount * 100, // Amount is in kobo
+                    currency: 'NGN',
+                    ref: reference,
+                    access_code: accessCode,
+                    callback: function (response) {
+                        // Redirect to PaymentComplete page with the reference
+                        window.location.href = '/Wallet/PaymentComplete/' + response.reference;
+                    },
+                    onClose: function () {
+                        // Handle when the payment modal is closed
+                        console.log('Payment popup closed');
+                    }
+                });
+                handler.openIframe();
+            }
+        };
     </script>
 
 </body>
+
 </html>

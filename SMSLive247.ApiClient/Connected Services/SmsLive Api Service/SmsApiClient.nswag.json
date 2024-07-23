@@ -36,6 +36,15 @@
               "maximum": 500.0,
               "minimum": 5.0
             }
+          },
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "self"
+            }
           }
         ],
         "responses": {
@@ -133,7 +142,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "default": "self"
             }
           }
         ],
@@ -210,7 +220,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "default": "self"
             }
           }
         ],
@@ -259,7 +270,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "default": "self"
             }
           }
         ],
@@ -2294,16 +2306,16 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "amount",
-          "providerID"
+          "providerID",
+          "quantity"
         ],
         "properties": {
           "providerID": {
             "type": "string"
           },
-          "amount": {
-            "type": "number",
-            "format": "double"
+          "quantity": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },

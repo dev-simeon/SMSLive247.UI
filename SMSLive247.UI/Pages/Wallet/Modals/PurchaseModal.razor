@@ -1,4 +1,6 @@
 ﻿@inject AuthenticationStateProvider auth
+@inject Settings settings;
+
 
 <Modal Title="Buy SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
@@ -16,20 +18,20 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
-                <FormInputNumber Label="SMS Quantity" @bind-Value="purchaseRequest.Amount"></FormInputNumber>
+                <FormInputNumber Label="SMS Quantity" @bind-Value="purchaseRequest.Quantity"></FormInputNumber>
             </EditForm>
         }
     </Body>
     <Footer>
         @if (showConfirmation)
         {
-            <Button Type="Button.Style.DEFAULT" @onclick="ConfirmPurchase">Confirm</Button>
-            <Button Type="Button.Style.CANCEL" @onclick="CancelConfirmation">Cancel</Button>
+            <Button Type="Button.Style.DEFAULT" @onclick="ConfirmPurchase">Proceed To Pay</Button>
+            <button type="button" class="btn btn-secondary" @onclick="CancelConfirmation">Cancel</button>
         }
         else
         {
-            <button type="submit" class="btn btn-primary" @onclick="BeginPurchase" disabled="@(purchaseRequest.Amount <= 1000)">Buy Credits</button>
-            <Button Type="Button.Style.CANCEL" @onclick="ToggleModal">Cancel</Button>
+            <Button Type="Button.Style.DEFAULT"@onclick="BeginPurchase">Buy Credits</Button>
+            <button type="button" class="btn btn-primary" @onclick="ToggleModal">Cancel</button>
         }
     </Footer>
 </Modal>
@@ -100,16 +102,22 @@
     {
         try
         {
+            // Get the total amount including the transaction fee
+            var totalAmount = (decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M;
+
             // Initialize the payment transaction with Paystack
             var callbackUrl = nav.ToAbsoluteUri($"/Wallet/PaymentComplete").ToString()
                 ?? throw new InvalidOperationException("Callback URL is invalid");
-
-            var totalAmount = (decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M;
-
             var result = await paystack.InitializeTransaction(email, totalAmount, callbackUrl, purchaseResponse.Reference);
 
-            // Redirect the user to Paystack for payment
-            nav.NavigateTo(result.AuthorizationUrl);
+            if (result != null)
+            {
+                await js.InvokeVoidAsync("paystackInterop.payWithPaystack", email, totalAmount, purchaseResponse.Reference, result.AccessCode, settings.Paystack.Key);
+            }
+            else
+            {
+                await alert.Error("Failed to initialize Paystack transaction.", "Error");
+            }
         }
         catch (Exception ex)
         {
