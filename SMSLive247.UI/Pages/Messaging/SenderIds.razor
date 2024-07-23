@@ -1,17 +1,18 @@
 ﻿@page "/Messaging/SenderIds"
 @attribute [Authorize]
 
-<PageTitle>Sender Ids</PageTitle>
+<PageTitle>SMSLive247 - SenderIDs</PageTitle>
+<Title>My Sender IDs</Title>
 
-<h3 class="mb-4">Sender IDs</h3>
-
-<Card HeaderTitle="Sender IDs">
+<Card HeaderTitle="List of Sender IDs on your account">
     <Body>
         <SearchArea>
             <LeftRight>
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="OnSearch">
-                        <InputSelect class="form-select" @bind-Value="searchStatus">
+                        <InputSelect class="form-select" 
+                                     @bind-Value="searchStatus" 
+                                     @bind-Value:after="OnSearch">
                             <option value="">All</option>
                             <option value="PENDING">Pending</option>
                             <option value="APPROVED">Approved</option>
@@ -22,7 +23,7 @@
                 <Right>
                     <Button Type="Button.Style.ADD" 
                             @onclick="e => senderIdModal.Show()">
-                        New Sender ID
+                        Request for Sender ID
                     </Button>
                 </Right>
             </LeftRight>

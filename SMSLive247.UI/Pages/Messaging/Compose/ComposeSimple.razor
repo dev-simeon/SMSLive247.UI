@@ -1,12 +1,12 @@
 ﻿@using SMSLive247.UI.Pages.Messaging.Compose.Modals
 @inject Settings settings;
 
-<Card HeaderTitle="Compose SMS">
-    <Body>
-        <EditForm Model="model.Request" OnValidSubmit="SubmitMessage">
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" />
+<EditForm Model="model.Request" OnValidSubmit="SubmitMessage">
+    <ValidationSummary class="text-danger" />
+    <DataAnnotationsValidator />
 
+    <Card HeaderTitle="Compose simple or batch text messages">
+        <Body>
             <MultiColumn Column1Width="5" Column2Width="7">
                 <Column1>
                     <div class="mb-4 mt-3">
@@ -114,12 +114,14 @@
                     </div>
                 </Column2>
             </MultiColumn>
+        </Body>
+        <Footer>
             <Button Type="Button.Style.CUSTOM">
                 @(sendOption == SendOption.SEND_NOW ? "Send SMS Now!" : "Queue Message")
             </Button>
-        </EditForm>
-    </Body>
-</Card>
+        </Footer>
+    </Card>
+</EditForm>
 
 <ContactsModal @ref="contactsModal" Model="model" OnSelected="OnSelected" />
 <BulkFilesModal @ref="bulkFileModal" Model="model" OnSelected="OnSelected" />

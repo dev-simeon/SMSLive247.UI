@@ -18,12 +18,11 @@ namespace SMSLive247.UI.Components.Forms.Input
 
     public class DateRange : IValidatableObject
     {
-        private DateRangeFilter _filter;
-        private DateTimeOffset _startDate;
-        private DateTimeOffset _endDate;
+        private DateRangeFilter _filter = DateRangeFilter.CUSTOM;
+        private DateTimeOffset? _startDate;
+        private DateTimeOffset? _endDate;
 
-        [Required(ErrorMessage = "Start Date is required.")]
-        public DateTimeOffset StartDate
+        public DateTimeOffset? StartDate
         {
             get
             {
@@ -36,8 +35,7 @@ namespace SMSLive247.UI.Components.Forms.Input
             }
         }
 
-        [Required(ErrorMessage = "End Date is required.")]
-        public DateTimeOffset EndDate
+        public DateTimeOffset? EndDate
         {
             get
             {
@@ -69,11 +67,11 @@ namespace SMSLive247.UI.Components.Forms.Input
             {
                 case DateRangeFilter.TODAY:
                     _startDate = DateTimeOffset.UtcNow.Date;
-                    _endDate = _startDate.AddDays(1).AddTicks(-1);
+                    _endDate = _startDate.Value.AddDays(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.YESTERDAY:
                     _startDate = DateTimeOffset.UtcNow.Date.AddDays(-1);
-                    _endDate = _startDate.AddDays(1).AddTicks(-1);
+                    _endDate = _startDate.Value.AddDays(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.LAST_3_DAYS:
                     _startDate = DateTimeOffset.UtcNow.Date.AddDays(-3);
@@ -98,12 +96,12 @@ namespace SMSLive247.UI.Components.Forms.Input
                 case DateRangeFilter.THIS_MONTH:
                     _startDate = new DateTimeOffset(DateTime.UtcNow.Year,
                         DateTime.UtcNow.Month, 1, 0, 0, 0, TimeSpan.Zero);
-                    _endDate = _startDate.AddMonths(1).AddTicks(-1);
+                    _endDate = _startDate.Value.AddMonths(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.LAST_MONTH:
                     _startDate = new DateTimeOffset(DateTime.UtcNow.Year,
                         DateTime.UtcNow.Month, 1, 0, 0, 0, TimeSpan.Zero).AddMonths(-1);
-                    _endDate = _startDate.AddMonths(1).AddTicks(-1);
+                    _endDate = _startDate.Value.AddMonths(1).AddTicks(-1);
                     break;
                 case DateRangeFilter.CUSTOM:
                     //if (_startDate.HasValue && _endDate.HasValue)
@@ -121,14 +119,15 @@ namespace SMSLive247.UI.Components.Forms.Input
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (_filter == DateRangeFilter.CUSTOM)
+            if (_startDate.HasValue && _endDate.HasValue)
             {
-                // Custom range validation
                 if (_startDate > _endDate)
                 {
-                    yield return new ValidationResult("End Date must be greater than or equal to Start Date.", new[] { nameof(EndDate) });
+                    yield return new ValidationResult("End Date must be later than or equal to Start Date",
+                        [nameof(StartDate), nameof(EndDate)]);
                 }
             }
         }
+
     }
 }

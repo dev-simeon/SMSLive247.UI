@@ -1,16 +1,43 @@
-﻿<Card HeaderTitle="Template SMS">
-    <Body>
-        <h6 class="mb-0">Upload A Customized Message</h6>
-         <MultiColumn Column1Width="5">
-             <Column1>
-                <FormInputFile Label="Select File" OnChange="e => FileSelected(e)" Accept='@(".csv")'></FormInputFile>
-             </Column1>
-         </MultiColumn>
-    </Body>
-</Card>
+﻿@using SMSLive247.UI.Pages.Messaging.Compose.Modals
+@inject Settings settings;
+
+<EditForm Model="model.Request" OnValidSubmit="SubmitMessage">
+    <ValidationSummary class="text-danger" />
+    <DataAnnotationsValidator />
+
+    <Card HeaderTitle="Compose template SMS messages">
+        <Body>
+            <h6 class="mb-0">Upload A Customized Message</h6>
+             <MultiColumn Column1Width="5">
+                 <Column1>
+                    <FormInputFile Label="Select File" OnChange="e => FileSelected(e)" Accept='@(".csv")'></FormInputFile>
+                 </Column1>
+             </MultiColumn>
+        </Body>
+    </Card>
+</EditForm>
 
 @code {
+    private ComposeSimpleModel model = new();
+
     private IBrowserFile? browserFile;
+
+    private async Task SubmitMessage()
+    {
+        // if (sendOption == SendOption.SEND_NOW)
+        //     model.Request.DeliveryTime = null;
+
+        model.Request.PhoneNumbers = model.Contacts
+            .Where(x => x.Selected).Select(x => x.Key).ToList();
+
+        model.Request.BatchFileIDs = model.BatchFiles
+            .Where(x => x.Selected).Select(x => x.Key).ToList();
+
+        model.Request.RawNumbers = string.Join(",",
+            model.Numbers.Select(x => x.Key));
+
+        await apiClient.SmsBatchCreateAsync(model.Request);
+    }
 
     private void FileSelected(InputFileChangeEventArgs e)
     {
