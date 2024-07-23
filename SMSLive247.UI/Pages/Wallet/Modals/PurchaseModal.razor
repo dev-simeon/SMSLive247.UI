@@ -106,13 +106,15 @@
             var totalAmount = (decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M;
 
             // Initialize the payment transaction with Paystack
-            var callbackUrl = nav.ToAbsoluteUri($"/Wallet/PaymentComplete").ToString()
+            var callbackUrl = nav.ToAbsoluteUri($"/Wallet/PaymentComplete/{purchaseResponse.Reference}").ToString()
                 ?? throw new InvalidOperationException("Callback URL is invalid");
             var result = await paystack.InitializeTransaction(email, totalAmount, callbackUrl, purchaseResponse.Reference);
 
             if (result != null)
             {
-                await js.InvokeVoidAsync("paystackInterop.payWithPaystack", email, totalAmount, purchaseResponse.Reference, result.AccessCode, settings.Paystack.Key);
+                // Redirect the user to Paystack for payment
+                nav.NavigateTo(result.AuthorizationUrl);
+                // await js.InvokeVoidAsync("payWithPaystack", email, totalAmount, purchaseResponse.Reference, result.AccessCode, settings.Paystack.Key);
             }
             else
             {

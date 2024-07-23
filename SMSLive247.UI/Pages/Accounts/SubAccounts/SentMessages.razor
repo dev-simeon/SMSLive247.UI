@@ -1,0 +1,108 @@
+﻿@using SMSLive247.UI.Pages.Messaging.Messages.Modals
+
+<Card HeaderTitle="Sent Messages">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <SearchBox @ref="searchBox"
+                               @onclick="e => ds.LoadData(alert)">
+                        <InputSelect @bind-Value="dateRange.Filter" class="form-select">
+                            @foreach (var item in Enum.GetValues<DateRangeFilter>())
+                            {
+                                <option value="@item">@item</option>
+                            }
+                        </InputSelect>
+
+                        @if (dateRange.Filter == DateRangeFilter.CUSTOM)
+                        {
+                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.StartDate"></InputDate>
+                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.EndDate"></InputDate>
+                        }
+                    </SearchBox>
+                </Left>
+                <Right>
+                    <Button Type="Button.Style.DOWNLOAD" @onclick="e => downloadModal.Download()">
+                        Download Messages
+                    </Button>
+                </Right>
+            </LeftRight>
+        </SearchArea>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Time">
+                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate><br />
+                    <span class="badge text-bg-@GetStatusCssColor(context.Status)">@context.Status</span>
+                </Column>
+                <Column Header="Sender">
+                    @context.SenderID.ToUpper()
+                </Column>
+                <Column Header="Message" Width="50%">
+                    @context.MessageText.Left(160)
+                    <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
+                </Column>
+                <Column Header="Delivery Report">
+                    <small class="text-muted">
+                        @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
+                    </small><br />
+                    <small class="text-muted">
+                        <em>Credits:</em> @context.CreditsCharged.ToString("#,##0.00")
+                    </small>
+                </Column>
+                <Column Header="">
+                    <Actions OnView="e => sentMessageView.Show((int)context.BatchID)"
+                             OnDelete="e => messageModal.Delete(context)">
+                    </Actions>
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
+</Card>
+
+<DownloadModal @ref="downloadModal"></DownloadModal>
+<SentMessageModal @ref="messageModal" OnCompleted="ReloadData"></SentMessageModal>
+<SentMessageView @ref="sentMessageView"></SentMessageView>
+
+@code {
+    private SearchBox searchBox = new();
+    private DateRange dateRange = new();
+
+    private DownloadModal downloadModal = new();
+    private SentMessageModal messageModal = new();
+    private SentMessageView sentMessageView = new();
+    private ApiDataSource<SmsBatchResponse> ds = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
+        });
+        await ds.LoadData(alert);
+    }
+
+    private string GetStatusCssColor(string status)
+    {
+        if (status == "COMPLETED")
+            return "success";
+
+        if (status == "RUNNING")
+            return "info";
+
+        if (status == "PAUSED")
+            return "warning";
+
+        if (status == "ABORTED")
+            return "danger";
+
+        return "dark";
+    }
+
+    private async Task ReloadData()
+    {
+        await ds.LoadData(alert);
+    }
+}

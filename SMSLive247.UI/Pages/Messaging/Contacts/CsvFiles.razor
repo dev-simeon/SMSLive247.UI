@@ -23,7 +23,9 @@
                 <Column Header="Date Uploaded">
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
-                <Column Header="Type">@context.FileType</Column>
+                <Column Header="Type">
+                    <span class="badge text-bg-info">@context.FileType</span>
+                </Column>
                 <Column>
                     <Actions OnDownload="() => csvFileModal.Download(context)"
                              OnDelete="() => csvFileModal.Delete(context)">

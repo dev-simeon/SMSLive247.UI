@@ -1,48 +1,146 @@
 ﻿@page "/Wallet/PaymentComplete/{reference}"
 
-<div class="text-center">
-    @if (errorMessage != null)
-    {
-        <svg width="100" height="100" class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-        <h2>Payment Failed!</h2>
-        <p>@errorMessage</p>
+<style>
+    /* Example CSS for the Invoice */
+    .card {
+        margin: 20px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
     }
-    else if (transaction != null && transaction.Status == "success")
-    {
-        <svg width="100" height="100" class="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <h2>Payment Successful!</h2>
-        <p>We are delighted to inform you that we received your payment of @((transaction.AmountInKobo / 100).ToString("C")).</p>
+
+    .card-header {
+        background-color: #f5f5f5;
+        padding: 20px;
+        border-bottom: 1px solid #ddd;
     }
-    else
-    {
-        <svg width="100" height="100" class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M12 3v18" />
-        </svg>
-        <h2>Payment Pending!</h2>
-        <p>Your payment is still being processed. Please check back later.</p>
+
+    .card-body {
+        padding: 20px;
     }
+
+    .invoice-title {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .invoice-table th, .invoice-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+</style>
+
+<div class="card">
+    <div class="card-header text-center">
+        @if (errorMessage != null)
+        {
+            <svg width="100" height="100" class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <h2 class="text-danger">Payment Failed!</h2>
+            <p>@errorMessage</p>
+        }
+        else if (transaction != null && transaction.Status == "success")
+        {
+            <img src="http://dgtlmrktng.s3.amazonaws.com/go/emails/generic-email-template/tick.png" alt="GO" width="50">
+            <h2 class="text-primary">Payment Successful!</h2>
+            <p>We are delighted to inform you that we received your payment of 20000.</p>
+        }
+        else
+        {
+            <svg width="100" height="100" class="h-6 w-6 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M12 3v18" />
+            </svg>
+            <h2 class="text-warning">Payment Pending!</h2>
+            <p>Your payment is still being processed. Please check back later.</p>
+        }
+    </div>
+    <div class="card-body">
+        @if (transaction != null && transaction.Status == "success")
+        {
+            <div class="row expanded">
+                <main class="columns">
+                    <div class="inner container">
+                        <section class="row">
+                            <div class="invoice-header d-flex justify-content-between">
+                                <h1 class="invoice-title">Invoice</h1>
+                                <div class="company-address text-end">
+                                    <p><strong>SMSLive247</strong></p>
+                                    <p>Hello, @transaction.Customer.Email</p>
+                                    <p>Thank you for your order.</p>
+                                    <p>Order @reference</p>
+                                    <p>Date: <FormatDate DateTime="@purchaseDetails.DateCreated"></FormatDate></p>
+                                </div>
+                            </div>
+                            <table class="invoice-table">
+                                <thead>
+                                    <tr>
+                                        <th>Item Description</th>
+                                        <th>Provider ID</th>
+                                        <th>Unit Price</th>
+                                        <th>Quantity</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>SMS Credit Unit</td>
+                                        <td>@purchaseDetails.ProviderID</td>
+                                        <td><FormatNumber Currency="@purchaseDetails.Price" Format="#,##0.00"></FormatNumber></td>
+                                        <td><FormatNumber Number="@purchaseDetails.Quantity"></FormatNumber></td>
+                                        <td><FormatNumber Currency="@purchaseDetails.Amount" Format="#,##0.00"></FormatNumber></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2"></td>
+                                        <td>Transaction Fee</td>
+                                        <td><FormatNumber Currency="(decimal)purchaseDetails.Amount * 0.015M" Format="#,##0.00"></FormatNumber></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2"></td>
+                                        <td>Total</td>
+                                        <td><FormatNumber Currency="(decimal)purchaseDetails.Amount + (decimal)purchaseDetails.Amount * 0.015M" Format="#,##0.00"></FormatNumber></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </section>
+                    </div>
+                </main>
+            </div>
+        }
+    </div>
 </div>
 
 @code {
     [Parameter] public string reference { get; set; }
     private Transaction transaction;
+    private PurchaseResponse purchaseDetails = new();
     private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            var response = await apiClient.PurchaseListAsync(1, 500);
+
+            purchaseDetails = response.Result.FirstOrDefault(p => p.Reference == reference)
+                    ?? throw new ArgumentNullException(nameof(purchaseDetails));
             transaction = await paystack.VerifyTransaction(reference);
 
             if (transaction.Status == "success")
             {
                 await apiClient.PurchaseCompleteAsync(reference);
             }
-            else
+            else if (transaction.Status == "failed")
             {
                 errorMessage = transaction.GatewayResponse;
             }
