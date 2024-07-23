@@ -21,15 +21,14 @@ namespace SMSLive247.OpenApi
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
-    public partial class ApiClient
+    public partial class ApiClient 
     {
-        private string _baseUrl = "";
+        private string _baseUrl = "https://api.smslive247.com";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<System.Text.Json.JsonSerializerOptions> _settings;
 
-        public ApiClient(string baseUrl, System.Net.Http.HttpClient httpClient)
+        public ApiClient(System.Net.Http.HttpClient httpClient)
         {
-            BaseUrl = baseUrl;
             _httpClient = httpClient;
             _settings = new System.Lazy<System.Text.Json.JsonSerializerOptions>(CreateSerializerSettings);
         }
@@ -4690,20 +4689,20 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public System.DateTimeOffset DateRequested { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("dateApproved")]
+        [System.Text.Json.Serialization.JsonPropertyName("dateDecided")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public System.DateTimeOffset? DateApproved { get; set; } = default!;
+        public System.DateTimeOffset? DateDecided { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("senderID")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public string SenderID { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("approved")]
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public bool Approved { get; set; } = default!;
+        public string Status { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("purpose")]
 

@@ -1,10 +1,13 @@
 ﻿namespace SMSLive247.OpenApi
 {
-    public class ApiClientFactory(
-        ApiClientFactory.ApiSettings settings,
-        HttpClient httpClient) : ApiClient(settings.BaseUrl, httpClient)
+    public class ApiClientFactory : ApiClient
     {
-        public record class ApiSettings(string BaseUrl);
+        public ApiClientFactory(Settings settings, HttpClient httpClient) : base(httpClient)
+        {
+            BaseUrl = settings.BaseUrl;
+        }
+
+        public record Settings(string BaseUrl);
     }
 
 }

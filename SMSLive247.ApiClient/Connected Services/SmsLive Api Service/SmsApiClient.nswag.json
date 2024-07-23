@@ -2380,7 +2380,7 @@
             "readOnly": true,
             "format": "date-time"
           },
-          "dateApproved": {
+          "dateDecided": {
             "type": "string",
             "readOnly": true,
             "format": "date-time",
@@ -2390,8 +2390,8 @@
             "type": "string",
             "readOnly": true
           },
-          "approved": {
-            "type": "boolean",
+          "status": {
+            "type": "string",
             "readOnly": true
           },
           "purpose": {
