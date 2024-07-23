@@ -1,4 +1,4 @@
-﻿@page "/Wallet/PaymentComplete/{reference}"
+﻿@page "/Wallet/PaymentComplete"
 
 <div class="text-center">
     @if (errorMessage != null)
@@ -28,7 +28,6 @@
 </div>
 
 @code {
-    [Parameter] public string Reference { get; set; }
     private Transaction transaction;
     private string? errorMessage;
 
@@ -36,12 +35,14 @@
     {
         try
         {
-            transaction = await paystack.VerifyTransaction(Reference);
+            var currentUrl = nav.Uri;
+            Console.WriteLine(currentUrl);
+            var reference = currentUrl;
+            transaction = await paystack.VerifyTransaction(reference);
 
             if (transaction.Status == "success")
             {
-                var referenceToGuid = new Guid(Reference);
-                await apiClient.PurchaseCompleteAsync(referenceToGuid);
+                await apiClient.PurchaseCompleteAsync(reference);
             }
             else
             {

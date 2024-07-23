@@ -4,11 +4,11 @@
     <Body>
         @if (showConfirmation)
         {
-            <StaticText Label="Unit Price" Text="@purchaseResponse.Price.ToString()" />
-            <StaticText Label="Purchase Amount" Text="@purchaseResponse.Amount.ToString("C")" />
+            <StaticText Label="Unit Price" Text="@("₦" + purchaseResponse.Price.ToString())" />
+            <StaticText Label="Purchase Amount" Text="@("₦" + purchaseResponse.Amount.ToString())" />
             <StaticText Label="SMS Quantity" Text="@purchaseResponse.Quantity.ToString()" />
-            <StaticText Label="Transaction Fee" Text="@(((decimal)purchaseResponse.Amount * 0.015M).ToString("C"))" />
-            <StaticText Label="Total Amount" Text="@(((decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M).ToString("C"))" />
+            <StaticText Label="Transaction Fee" Text="@("₦" + ((decimal)purchaseResponse.Amount * 0.015M).ToString("#,##0.00"))" />
+            <StaticText Label="Total Amount" Text="@("₦" + ((decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M).ToString("#,##0.00"))" />
         }
         else
         {
@@ -16,7 +16,7 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
-                <FormInputMoney Label="Amount To Buy" @bind-Value="purchaseRequest.Amount"></FormInputMoney>
+                <FormInputNumber Label="SMS Quantity" @bind-Value="purchaseRequest.Amount"></FormInputNumber>
             </EditForm>
         }
     </Body>
@@ -28,7 +28,7 @@
         }
         else
         {
-            <button type="submit" class="btn btn-primary" @onclick="BeginPurchase" disabled="@(purchaseRequest.Amount <= 0)">Buy Credits</button>
+            <button type="submit" class="btn btn-primary" @onclick="BeginPurchase" disabled="@(purchaseRequest.Amount <= 1000)">Buy Credits</button>
             <Button Type="Button.Style.CANCEL" @onclick="ToggleModal">Cancel</Button>
         }
     </Footer>
@@ -101,7 +101,7 @@
         try
         {
             // Initialize the payment transaction with Paystack
-            var callbackUrl = nav.ToAbsoluteUri($"/Wallet/PaymentComplete/{purchaseResponse.Reference}").ToString()
+            var callbackUrl = nav.ToAbsoluteUri($"/Wallet/PaymentComplete").ToString()
                 ?? throw new InvalidOperationException("Callback URL is invalid");
 
             var totalAmount = (decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M;

@@ -1,0 +1,51 @@
+﻿<Modal Title="Transfer SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
+    <Body>
+        <EditForm Model="transferRequest" OnValidSubmit="BeginTransfer">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <FormInputText Label="Recipient ID" @bind-Value="transferRequest.RecipientID"></FormInputText>
+            <FormInputNumber Label="Credits" @bind-Value="transferRequest.Credits"></FormInputNumber>
+            <FormInputText Label="Remarks" @bind-Value="transferRequest.Remarks"></FormInputText>
+        </EditForm>
+    </Body>
+    <Footer>
+        <button type="submit" class="btn btn-primary" @onclick="BeginTransfer" disabled="@(string.IsNullOrEmpty(transferRequest.RecipientID) || transferRequest.Credits <= 0)">Transfer Credits</button>
+    </Footer>
+</Modal>
+
+@code {
+    private bool showModal = false;
+    private TransferRequest transferRequest = new TransferRequest();
+
+    public void Show()
+    {
+        showModal = true;
+        StateHasChanged();
+    }
+
+    private async Task BeginTransfer()
+    {
+        try
+        {
+            var task = await apiClient.TransferCreditAsync(transferRequest);
+
+            if (task.StatusCode == 200)
+            {
+                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.RecipientID} was successful", "Success");
+            }
+            else
+            {
+                await alert.Error("Failed to initialize transfer.", "Error");
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+}

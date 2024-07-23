@@ -1,9 +1,62 @@
-﻿@page "/Wallet/Transfer"
+﻿@using SMSLive247.UI.Pages.Wallet.Modals
+@page "/Wallet/Transfer"
 @attribute [Authorize]
 
-<PageTitle>Transfer Credits</PageTitle>
-<h3>Transfer</h3>
+<PageTitle>Transfer SMS Credits</PageTitle>
+
+<h3 class="mb-4">Transfer</h3>
+
+<Card HeaderTitle="Transfer History">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <SearchBox @ref="searchBox">
+                    </SearchBox>
+                </Left>
+                <Right>
+                    <Button Type="Button.Style.DEFAULT" @onclick="e => transferModal.Show()">
+                        Buy SMS Credit
+                    </Button>
+                </Right>
+            </LeftRight>
+        </SearchArea>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Sender">
+                    @context.SenderName
+                </Column>
+                <Column Header="Recipient">
+                    @context.RecipientName
+                </Column>
+                <Column Header="SMS Value">
+                    <FormatNumber Number="@context.Credits"></FormatNumber>
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
+</Card>
+
+<TransferModal @ref="transferModal"></TransferModal>
 
 @code {
+    private SearchBox searchBox = new();
+    private TransferModal transferModal = new();
+    private ApiDataSource<TransferResponse> ds = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.TransferListAsync(p.PageNumber, p.PageSize);
+        });
+        await ds.LoadData(alert);
+    }
 }

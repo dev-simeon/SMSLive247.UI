@@ -2,7 +2,7 @@
 
 @if (!Currency.Equals(default(TValue)))
 {
-    <div class="text-end text-nowrap">
+    <div class="text-nowrap">
         @FormatValueAsString(Currency, $"{Symbol} {Format}")
     </div>
 }
@@ -14,7 +14,7 @@
 }
 @if (!Number.Equals(default(TValue)))
 {
-    <div class="text-end text-nowrap">
+    <div class="text-nowrap">
         @FormatValueAsString(Number, "G")
     </div>
 }
