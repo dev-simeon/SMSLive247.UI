@@ -13,8 +13,8 @@
                     <SearchBox @ref="searchBox" @onclick="OnSearch">
                         <InputSelect class="form-select" @bind-Value="searchStatus">
                             <option value="">All</option>
-                            <option value="APPROVED">Approved</option>
                             <option value="PENDING">Pending</option>
+                            <option value="APPROVED">Approved</option>
                             <option value="REJECTED">Rejected</option>
                         </InputSelect>
                     </SearchBox>
@@ -38,9 +38,9 @@
                     <FormatDate DateTime="@context.DateRequested"></FormatDate>
                 </Column>
                 <Column Header="Date Approved">
-                    @if (context.Status == "APPROVED")
+                    @if (context.DateDecided.HasValue)
                     {
-                        <FormatDate DateTime="context.DateDecided!.Value.DateTime"></FormatDate>
+                        <FormatDate DateTime="context.DateDecided.Value.DateTime"></FormatDate>
                     }
                     else
                     {
@@ -52,9 +52,9 @@
                     {
                         <span class="badge text-bg-success">APPROVED</span>
                     }
-                    else if (context.Status == "PENDING")
+                    else if (context.Status == "REJECTED")
                     {
-                        <span class="badge text-bg-warning">PENDING</span>
+                        <span class="badge text-bg-error">REJECTED</span>
                     }
                     else
                     {
@@ -100,19 +100,9 @@
     {
         filteredItems = items;
 
-        switch (searchStatus)
+        if (!string.IsNullOrWhiteSpace(searchStatus))
         {
-            case "APPROVED":
-                filteredItems = filteredItems.Where(x => x.Status == "APPROVED").ToList();
-                break;
-
-            case "PENDING":
-                filteredItems = filteredItems.Where(x => x.Status == "PENDING").ToList();
-                break;
-
-            case "REJECTED":
-                filteredItems = filteredItems.Where(x => x.Status == "REJECTED").ToList();
-                break;
+            filteredItems = filteredItems.Where(x => x.Status == searchStatus).ToList();
         }
 
         if (!string.IsNullOrWhiteSpace(searchBox.Text))
