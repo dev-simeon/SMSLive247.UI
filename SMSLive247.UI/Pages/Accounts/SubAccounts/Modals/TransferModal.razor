@@ -7,13 +7,15 @@
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <InputSelect @bind-Value="@transferRequest.RecipientID" class="form-select">
-                <option value="">Select a sub account to transfer to</option>
-                @foreach (var item in subAccounts)
-                {
-                    <option value="@item.AccountID">@item.AccountName</option>
-                }
-            </InputSelect>
+            <FormField Label="Select Sub Account">
+                <InputSelect @bind-Value="@transferRequest.RecipientID" class="form-select">
+                    <option value=""></option>
+                    @foreach (var item in subAccounts)
+                    {
+                        <option value="@item.AccountID">@item.AccountName</option>
+                    }
+                </InputSelect>
+            </FormField>
             <FormInputNumber Label="Credits" @bind-Value="transferRequest.Credits" @oninput="UpdateNewBalance"></FormInputNumber>
             <FormInputText Label="Remarks" @bind-Value="transferRequest.Remarks"></FormInputText>
             <FormInputNumber Label="Old Balance" @bind-Value="parentAccount.Credits" disabled="true"></FormInputNumber>
