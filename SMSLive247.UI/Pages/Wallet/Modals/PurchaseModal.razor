@@ -108,7 +108,7 @@
 
             if (result != null)
             {
-                await js.InvokeVoidAsync("payWithPaystack", email, totalAmount, purchaseResponse.Reference, result.AccessCode, settings.Paystack.Key);
+                await js.InvokeVoidAsync("payWithPaystack", email, totalAmount, purchaseResponse.Reference, settings.Paystack.Key);
             }
             else
             {

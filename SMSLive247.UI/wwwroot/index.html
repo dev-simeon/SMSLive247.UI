@@ -48,19 +48,18 @@
             URL.revokeObjectURL(url);
         }
 
-        function payWithPaystack(email, amount, reference, accessCode, paystackKey) {
+        function payWithPaystack(email, amount, reference, paystackKey) {
             var handler = PaystackPop.setup({
                 key: paystackKey, // Use the passed Paystack key
                 email: email,
                 amount: amount * 100, // Amount is in kobo
                 currency: 'NGN',
                 ref: reference,
-                access_code: accessCode,
-                callback: function (response) {
+                callback: function(response) {
                     // Redirect to PaymentComplete page with the reference
                     window.location.href = '/Wallet/PaymentComplete/' + response.reference;
                 },
-                onClose: function () {
+                onClose: function() {
                     // Handle when the payment modal is closed
                     console.log('Payment popup closed');
                 }
