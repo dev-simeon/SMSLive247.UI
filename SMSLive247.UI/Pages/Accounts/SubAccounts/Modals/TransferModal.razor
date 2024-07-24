@@ -18,7 +18,7 @@
             <FormInputText Label="Remarks" @bind-Value="transferRequest.Remarks"></FormInputText>
             <FormInputNumber Label="Old Balance" @bind-Value="parentAccount.Credits" disabled="true"></FormInputNumber>
             <FormField Label="New Balance">
-                <InputNumber Value="newBalance" class="form-control" disabled="true"></InputNumber>
+                <InputNumber @bind-Value="newBalance" class="form-control" disabled="true"></InputNumber>
             </FormField>
 
         </EditForm>
