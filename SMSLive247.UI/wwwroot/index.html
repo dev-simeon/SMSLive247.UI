@@ -55,9 +55,12 @@
                 amount: amount * 100, // Amount is in kobo
                 currency: 'NGN',
                 ref: reference,
-                callback: function(response) {
+                callback: function (response) {
+                    console.log("payment completed");
+                    console.log(response);
+
                     // Redirect to PaymentComplete page with the reference
-                    window.location.href = '/Wallet/PaymentComplete/' + response.reference;
+                    window.location.href = '/Wallet/PaymentComplete/'
                 },
                 onClose: function() {
                     // Handle when the payment modal is closed

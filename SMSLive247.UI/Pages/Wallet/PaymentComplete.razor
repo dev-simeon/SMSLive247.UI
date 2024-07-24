@@ -1,4 +1,4 @@
-﻿@page "/Wallet/PaymentComplete/{reference}"
+﻿@page "/Wallet/PaymentComplete"
 
 <style>
     /* Example CSS for the Invoice */
@@ -76,7 +76,7 @@
                                     <p><strong>SMSLive247</strong></p>
                                     <p>Hello, @transaction.Customer.Email</p>
                                     <p>Thank you for your order.</p>
-                                    <p>Order @Reference</p>
+                                    <p>Order @purchaseDetails.Reference</p>
                                     <p>Date: <FormatDate DateTime="@purchaseDetails.DateCreated"></FormatDate></p>
                                 </div>
                             </div>
@@ -121,7 +121,6 @@
 </div>
 
 @code {
-    [Parameter] public string Reference { get; set; }
     private Transaction transaction;
     private PurchaseResponse purchaseDetails = new();
     private string? errorMessage;
@@ -130,19 +129,27 @@
     {
         try
         {
-            var response = await apiClient.PurchaseListAsync(1, 500);
+            var uri = new Uri(nav.Uri);
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            var reference = query.Get("reference") ?? string.Empty;
 
-            purchaseDetails = response.Result.FirstOrDefault(p => p.Reference == Reference)
-                    ?? throw new ArgumentNullException(nameof(purchaseDetails));
-            transaction = await paystack.VerifyTransaction(Reference);
+            if (!string.IsNullOrEmpty(reference))
+            {
+                var response = await apiClient.PurchaseListAsync(1, 500);
 
-            if (transaction.Status == "success")
-            {
-                await apiClient.PurchaseCompleteAsync(Reference);
-            }
-            else if (transaction.Status == "failed")
-            {
-                errorMessage = transaction.GatewayResponse;
+                purchaseDetails = response.Result.FirstOrDefault(p => p.Reference == reference)
+                        ?? throw new ArgumentNullException(nameof(purchaseDetails));
+
+                transaction = await paystack.VerifyTransaction(reference);
+
+                if (transaction.Status == "success")
+                {
+                    await apiClient.PurchaseCompleteAsync(reference);
+                }
+                else if (transaction.Status == "failed")
+                {
+                    errorMessage = transaction.GatewayResponse;
+                }
             }
         }
         catch (Exception ex)
