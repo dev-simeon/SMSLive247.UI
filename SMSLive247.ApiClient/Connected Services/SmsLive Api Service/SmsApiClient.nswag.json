@@ -38,7 +38,7 @@
             }
           },
           {
-            "name": "accountId",
+            "name": "parentId",
             "in": "path",
             "required": true,
             "schema": {

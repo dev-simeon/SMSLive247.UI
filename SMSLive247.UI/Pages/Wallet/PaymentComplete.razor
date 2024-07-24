@@ -76,7 +76,7 @@
                                     <p><strong>SMSLive247</strong></p>
                                     <p>Hello, @transaction.Customer.Email</p>
                                     <p>Thank you for your order.</p>
-                                    <p>Order @reference</p>
+                                    <p>Order @Reference</p>
                                     <p>Date: <FormatDate DateTime="@purchaseDetails.DateCreated"></FormatDate></p>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@
 </div>
 
 @code {
-    [Parameter] public string reference { get; set; }
+    [Parameter] public string Reference { get; set; }
     private Transaction transaction;
     private PurchaseResponse purchaseDetails = new();
     private string? errorMessage;
@@ -132,13 +132,13 @@
         {
             var response = await apiClient.PurchaseListAsync(1, 500);
 
-            purchaseDetails = response.Result.FirstOrDefault(p => p.Reference == reference)
+            purchaseDetails = response.Result.FirstOrDefault(p => p.Reference == Reference)
                     ?? throw new ArgumentNullException(nameof(purchaseDetails));
-            transaction = await paystack.VerifyTransaction(reference);
+            transaction = await paystack.VerifyTransaction(Reference);
 
             if (transaction.Status == "success")
             {
-                await apiClient.PurchaseCompleteAsync(reference);
+                await apiClient.PurchaseCompleteAsync(Reference);
             }
             else if (transaction.Status == "failed")
             {

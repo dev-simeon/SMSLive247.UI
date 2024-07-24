@@ -1,0 +1,106 @@
+﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
+
+<Card HeaderTitle="Sub Account">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <SearchBox @ref="searchBox" @onclick="OnSearch">
+                        <InputSelect class="form-select" @bind-Value="accountStatus">
+                            <option value="" selected>Filter Account Status</option>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="INACTIVE">INACTIVE</option>
+                        </InputSelect>
+                    </SearchBox>
+                </Left>
+                <Right>
+                    <Button Type="Button.Style.DOWNLOAD" @onclick="e => subAccount.Show()">
+                        Create Sub Account
+                    </Button>
+                </Right>
+            </LeftRight>
+        </SearchArea>
+        <Table Items="filteredItems">
+            <Columns>
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Account ID">
+                    @context.AccountID
+                </Column>
+                <Column Header="Sub-Account Name">
+                    @context.AccountName
+                </Column>
+                <Column Header="Balance">
+                    @context.Credits.ToString("#,##0.00")
+                </Column>
+                <Column Header="Account Status">
+                    @if (context.Active)
+                    {
+                        <span class="badge text-bg-success">ACTIVE</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-success">INACTIVE</span>
+                    }
+                </Column>
+                <Column Header="">
+                    <Actions OnView="e => subAccount.Show(context)"
+                             OnDelete="e => subAccount.Delete(context)">
+                    </Actions>
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+</Card>
+
+<SubAccountModal @ref="subAccount" OnCompleted="FetchData"></SubAccountModal>
+
+@code {
+    private SearchBox searchBox = new();
+    private SubAccountModal subAccount = new();
+    private List<AccountResponse> items = new();
+    private List<AccountResponse> filteredItems = new();
+    private string accountStatus = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        var response = await apiClient.AccountsListAsync(1, 500, "self");
+
+        if (response.StatusCode == 200)
+        {
+            items = response.Result.ToList();
+            filteredItems = items;
+        }
+    }
+
+    private void OnSearch()
+    {
+        filteredItems = items;
+
+        if (!string.IsNullOrEmpty(accountStatus))
+        {
+            switch (accountStatus)
+            {
+                case "ACTIVE":
+                    filteredItems = filteredItems.Where(x => x.Active).ToList();
+                    break;
+
+                case "INACTIVE":
+                    filteredItems = filteredItems.Where(x => !x.Active).ToList();
+                    break;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchBox.Text))
+        {
+            filteredItems = filteredItems.Where(x => x.AccountName.Contains(
+                searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+}

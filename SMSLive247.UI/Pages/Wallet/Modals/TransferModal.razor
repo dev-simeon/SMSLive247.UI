@@ -1,5 +1,8 @@
 ﻿<Modal Title="Transfer SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
+        <div class="alert alert-info" role="alert">
+            Minimum credit to transfer is 50 sms credit..
+        </div>
         <EditForm Model="transferRequest" OnValidSubmit="BeginTransfer">
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -10,7 +13,7 @@
         </EditForm>
     </Body>
     <Footer>
-        <button type="submit" class="btn btn-primary" @onclick="BeginTransfer" disabled="@(string.IsNullOrEmpty(transferRequest.RecipientID) || transferRequest.Credits <= 0)">Transfer Credits</button>
+        <button type="submit" class="btn btn-primary" @onclick="BeginTransfer">Transfer Credits</button>
     </Footer>
 </Modal>
 

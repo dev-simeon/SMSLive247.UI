@@ -56,22 +56,22 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, string accountId)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, string parentId)
         {
-            return AccountsListAsync(pageNumber, pageSize, accountId, System.Threading.CancellationToken.None);
+            return AccountsListAsync(pageNumber, pageSize, parentId, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, string accountId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, string parentId, System.Threading.CancellationToken cancellationToken)
         {
-            if (accountId == null)
-                throw new System.ArgumentNullException("accountId");
+            if (parentId == null)
+                throw new System.ArgumentNullException("parentId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/accounts?");
-            urlBuilder_.Replace("{accountId}", System.Uri.EscapeDataString(ConvertToString(accountId, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Replace("{parentId}", System.Uri.EscapeDataString(ConvertToString(parentId, System.Globalization.CultureInfo.InvariantCulture)));
             if (pageNumber != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
