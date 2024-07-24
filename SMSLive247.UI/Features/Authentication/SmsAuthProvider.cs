@@ -11,7 +11,7 @@ namespace SMSLive247.Authentication
 
         public class UserClaims(string email, string apiKey)
         {
-            public string Email { get; private set; } = email;
+            public string Email { get; private set; } = email.ToLower();
             public string ApiKey { get; private set; } = apiKey;
             //public string? Username { get; private set; }
             //public string? FirstName { get; private set; }
@@ -50,7 +50,6 @@ namespace SMSLive247.Authentication
         public ValueTask<UserClaims?> GetMember()
         {
             return storage.GetItemAsync<UserClaims>(storageKey);
-
         }
 
         public async Task ClearAuthenticationState()

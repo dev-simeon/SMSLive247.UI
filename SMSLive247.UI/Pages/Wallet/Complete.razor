@@ -1,4 +1,4 @@
-﻿@page "/Wallet/PaymentComplete"
+﻿@page "/Credits/Complete?ref={reference}"
 
 <style>
     /* Example CSS for the Invoice */
@@ -48,7 +48,7 @@
             <h2 class="text-danger">Payment Failed!</h2>
             <p>@errorMessage</p>
         }
-        else if (transaction != null && transaction.Status == "success")
+        else if (purchase != null && purchase.IsPaid)
         {
             <img src="http://dgtlmrktng.s3.amazonaws.com/go/emails/generic-email-template/tick.png" alt="GO" width="50">
             <h2 class="text-primary">Payment Successful!</h2>
@@ -64,7 +64,7 @@
         }
     </div>
     <div class="card-body">
-        @if (transaction != null && transaction.Status == "success")
+        @if (purchase != null && purchase.IsPaid)
         {
             <div class="row expanded">
                 <main class="columns">
@@ -74,10 +74,10 @@
                                 <h1 class="invoice-title">Invoice</h1>
                                 <div class="company-address text-end">
                                     <p><strong>SMSLive247</strong></p>
-                                    <p>Hello, @transaction.Customer.Email</p>
+                                    <p>Hello, @purchase.ProviderID</p>
                                     <p>Thank you for your order.</p>
-                                    <p>Order @purchaseDetails.Reference</p>
-                                    <p>Date: <FormatDate DateTime="@purchaseDetails.DateCreated"></FormatDate></p>
+                                    <p>Order @Reference</p>
+                                    <p>Date: <FormatDate DateTime="@purchase.DateCreated"></FormatDate></p>
                                 </div>
                             </div>
                             <table class="invoice-table">
@@ -93,22 +93,22 @@
                                 <tbody>
                                     <tr>
                                         <td>SMS Credit Unit</td>
-                                        <td>@purchaseDetails.ProviderID</td>
-                                        <td><FormatNumber Currency="@purchaseDetails.Price" Format="#,##0.00"></FormatNumber></td>
-                                        <td><FormatNumber Number="@purchaseDetails.Quantity"></FormatNumber></td>
-                                        <td><FormatNumber Currency="@purchaseDetails.Amount" Format="#,##0.00"></FormatNumber></td>
+                                        <td>@purchase.ProviderID</td>
+                                        <td><FormatNumber Currency="@purchase.Price" Format="#,##0.00"></FormatNumber></td>
+                                        <td><FormatNumber Number="@purchase.Quantity"></FormatNumber></td>
+                                        <td><FormatNumber Currency="@purchase.Amount" Format="#,##0.00"></FormatNumber></td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td colspan="2"></td>
                                         <td>Transaction Fee</td>
-                                        <td><FormatNumber Currency="(decimal)purchaseDetails.Amount * 0.015M" Format="#,##0.00"></FormatNumber></td>
+                                        <td><FormatNumber Currency="(decimal)purchase.Amount * 0.015M" Format="#,##0.00"></FormatNumber></td>
                                     </tr>
                                     <tr>
                                         <td colspan="2"></td>
                                         <td>Total</td>
-                                        <td><FormatNumber Currency="(decimal)purchaseDetails.Amount + (decimal)purchaseDetails.Amount * 0.015M" Format="#,##0.00"></FormatNumber></td>
+                                        <td><FormatNumber Currency="(decimal)purchase.Amount + (decimal)purchase.Amount * 0.015M" Format="#,##0.00"></FormatNumber></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -121,36 +121,17 @@
 </div>
 
 @code {
-    private Transaction transaction;
-    private PurchaseResponse purchaseDetails = new();
+    [Parameter] public string? Reference { get; set; }
+
+    private PurchaseResponse? purchase;
     private string? errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var uri = new Uri(nav.Uri);
-            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-            var reference = query.Get("reference") ?? string.Empty;
-
-            if (!string.IsNullOrEmpty(reference))
-            {
-                var response = await apiClient.PurchaseListAsync(1, 500);
-
-                purchaseDetails = response.Result.FirstOrDefault(p => p.Reference == reference)
-                        ?? throw new ArgumentNullException(nameof(purchaseDetails));
-
-                transaction = await paystack.VerifyTransaction(reference);
-
-                if (transaction.Status == "success")
-                {
-                    await apiClient.PurchaseCompleteAsync(reference);
-                }
-                else if (transaction.Status == "failed")
-                {
-                    errorMessage = transaction.GatewayResponse;
-                }
-            }
+            var response = await apiClient.PurchaseCompleteAsync(Reference!);
+            purchase = response.Result;
         }
         catch (Exception ex)
         {

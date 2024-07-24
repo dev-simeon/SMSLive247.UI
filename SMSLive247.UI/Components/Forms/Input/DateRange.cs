@@ -4,6 +4,7 @@ namespace SMSLive247.UI.Components.Forms.Input
 {
     public enum DateRangeFilter
     {
+        NONE,
         TODAY,
         YESTERDAY,
         LAST_3_DAYS,
@@ -13,12 +14,12 @@ namespace SMSLive247.UI.Components.Forms.Input
         LAST_90_DAYS,
         THIS_MONTH,
         LAST_MONTH,
-        CUSTOM
+        CUSTOM,
     }
 
     public class DateRange : IValidatableObject
     {
-        private DateRangeFilter _filter = DateRangeFilter.CUSTOM;
+        private DateRangeFilter _filter = DateRangeFilter.NONE;
         private DateTimeOffset? _startDate;
         private DateTimeOffset? _endDate;
 
@@ -111,8 +112,8 @@ namespace SMSLive247.UI.Components.Forms.Input
                     //}
                     break;
                 default:
-                    //_startDate = null;
-                    //_endDate = null;
+                    _startDate = null;
+                    _endDate = null;
                     break;
             }
         }

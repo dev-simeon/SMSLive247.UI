@@ -1,96 +1,87 @@
 ﻿@inject AuthenticationStateProvider auth
 @inject Settings settings;
 
-
-<Modal Title="Buy SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
+<Modal Title="Buy SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
         <div class="alert alert-info" role="alert">
             Minimum SMS credit quantity to purchase is 500 sms credit..
         </div>
-        @if (showConfirmation)
+        @if (price != null)
         {
-            <StaticText Label="Unit Price" Text="@("₦" + purchaseResponse.Price.ToString())" />
-            <StaticText Label="Purchase Amount" Text="@("₦" + purchaseResponse.Amount.ToString())" />
-            <StaticText Label="SMS Quantity" Text="@purchaseResponse.Quantity.ToString()" />
-            <StaticText Label="Transaction Fee" Text="@("₦" + ((decimal)purchaseResponse.Amount * 0.015M).ToString("#,##0.00"))" />
-            <StaticText Label="Total Amount" Text="@("₦" + ((decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M).ToString("#,##0.00"))" />
+            <StaticText Label="Unit Price" Text="@("₦" + price.Price.ToString())" />
+            <StaticText Label="Purchase Amount" Text="@("₦" + price.Amount.ToString())" />
+            <StaticText Label="SMS Quantity" Text="@price.Quantity.ToString()" />
+            <StaticText Label="Transaction Fee" Text="@("₦" + ((decimal)price.Amount * 0.015M).ToString("#,##0.00"))" />
+            <StaticText Label="Total Amount" Text="@("₦" + ((decimal)price.Amount + (decimal)price.Amount * 0.015M).ToString("#,##0.00"))" />
         }
         else
         {
-            <EditForm Model="purchaseRequest" OnValidSubmit="BeginPurchase">
+            <EditForm Model="quantity" OnValidSubmit="ConfirmPrice">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-
-                <FormInputNumber Label="SMS Quantity" @bind-Value="purchaseRequest.Quantity"></FormInputNumber>
+                <FormInputNumber Label="SMS Quantity" @bind-Value="quantity"></FormInputNumber>
             </EditForm>
         }
     </Body>
     <Footer>
-        @if (showConfirmation)
+        @if (price != null)
         {
-            <Button Type="Button.Style.DEFAULT" @onclick="ConfirmPurchase">Proceed To Pay</Button>
-            <button type="button" class="btn btn-secondary" @onclick="CancelConfirmation">Cancel</button>
+            <Button Type="Button.Style.DEFAULT" @onclick="ConfirmPurchase">Pay with Paystack</Button>
+            <Button Type="Button.Style.CANCEL" @onclick="CancelConfirmation">Cancel</Button>
         }
         else
         {
-            <Button Type="Button.Style.DEFAULT"@onclick="BeginPurchase">Buy Credits</Button>
+            <Button Type="Button.Style.DEFAULT"@onclick="ConfirmPrice">Confirm Price</Button>
         }
     </Footer>
 </Modal>
 
 @code {
-    private bool showModal = false;
-    private bool showConfirmation = false;
-    private PurchaseRequest purchaseRequest = new PurchaseRequest { ProviderID = "PYSTK" };
-    private PurchaseResponse purchaseResponse = new PurchaseResponse();
-    private string? email;
-
-    public void Show()
-    {
-        showModal = true;
-        showConfirmation = false;
-        StateHasChanged();
-    }
-
-    private void CancelConfirmation()
-    {
-        showConfirmation = false;
-        StateHasChanged();
-    }
+    private bool hideModal = true;
+    private PriceCalcResponse? price;
+    private string email = "";
+    private long quantity = 100;
 
     protected override async Task OnInitializedAsync()
     {
         var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
 
-        if (member != null)
+        if (member == null)
         {
-            email = member.Email?.ToLower();
+            await alert.Error("Please re-login", "Error");
+            return;
         }
+
+        email = member.Email;
     }
 
-    private async Task BeginPurchase()
+    public void Show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    private void CancelConfirmation()
+    {
+        price = null;
+    }
+
+    private async Task ConfirmPrice()
     {
         try
         {
-            var task = await apiClient.PurchaseBeginAsync(purchaseRequest);
+            var response = await apiClient.PriceCalculateAsync(null, quantity);
 
-            if (task.StatusCode == 200)
+            if (response.StatusCode == 200)
             {
-                purchaseResponse = task.Result;
-                showConfirmation = true;
+                price = response.Result;
+                return;
             }
-            else
-            {
-                await alert.Error("Failed to initialize purchase.", "Error");
-            }
+            throw new Exception("apiClient.PurchaseBeginAsync() Failed");
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
-        }
-        finally
-        {
-            StateHasChanged();
         }
     }
 
@@ -98,22 +89,21 @@
     {
         try
         {
+            if (price == null)
+                throw new Exception("Confirm the price first");
+
             // Get the total amount including the transaction fee
-            var totalAmount = (decimal)purchaseResponse.Amount + (decimal)purchaseResponse.Amount * 0.015M;
+            var totalAmount = (decimal)price.Amount + (decimal)price.Amount * 0.015M;
 
-            // Initialize the payment transaction with Paystack
-            var callbackUrl = nav.ToAbsoluteUri($"/Wallet/PaymentComplete/{purchaseResponse.Reference}").ToString()
-                ?? throw new InvalidOperationException("Callback URL is invalid");
-            var result = await paystack.InitializeTransaction(email, totalAmount, callbackUrl, purchaseResponse.Reference);
+            var request = new PurchaseRequest { ProviderID = "PAYSTACK", Quantity = quantity };
+            var response = await apiClient.PurchaseBeginAsync(request);
 
-            if (result != null)
-            {
-                await js.InvokeVoidAsync("payWithPaystack", email, totalAmount, purchaseResponse.Reference, settings.Paystack.Key);
-            }
-            else
-            {
-                await alert.Error("Failed to initialize Paystack transaction.", "Error");
-            }
+            if (response.StatusCode != 200)
+                throw new Exception("apiClient.PurchaseBeginAsync() Failed");
+
+            //var accessCode = response.Result.AccessCode;
+            //const popup = new PaystackPop()
+            //popup.resumeTransaction(accessCode)
         }
         catch (Exception ex)
         {
@@ -121,8 +111,7 @@
         }
         finally
         {
-            showModal = false;
-            StateHasChanged();
+            hideModal = true;
         }
     }
 }

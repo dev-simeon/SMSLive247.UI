@@ -1,5 +1,5 @@
 ﻿@using SMSLive247.UI.Pages.Wallet.Modals
-@page "/Wallet/Transfer"
+@page "/Credits/Transfer"
 @attribute [Authorize]
 
 <PageTitle>Transfer SMS Credits</PageTitle>
@@ -16,7 +16,7 @@
                 </Left>
                 <Right>
                     <Button Type="Button.Style.DEFAULT" @onclick="e => transferModal.Show()">
-                        Transfer Credit
+                        Transfer Credits
                     </Button>
                 </Right>
             </LeftRight>
@@ -32,7 +32,7 @@
                 <Column Header="Recipient">
                     @context.RecipientName
                 </Column>
-                <Column Header="SMS Value">
+                <Column Header="Credits">
                     <FormatNumber Number="@context.Credits"></FormatNumber>
                 </Column>
             </Columns>
@@ -52,7 +52,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.TransferListAsync(p.PageNumber, p.PageSize);
