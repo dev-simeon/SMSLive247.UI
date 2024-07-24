@@ -23,8 +23,8 @@
                 <Column Header="Date Uploaded">
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
-                <Column Header="Type">
-                    <span class="badge text-bg-info">@context.FileType</span>
+                <Column Header="File Type">
+                    <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
                 </Column>
                 <Column>
                     <Actions OnDownload="() => csvFileModal.Download(context)"

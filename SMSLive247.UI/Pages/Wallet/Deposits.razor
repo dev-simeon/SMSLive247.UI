@@ -1,5 +1,5 @@
 ﻿@using SMSLive247.UI.Pages.Wallet.Modals
-@page "/Wallet/Deposit"
+@page "/Credits/Deposit"
 @inject AuthenticationStateProvider auth
 @attribute [Authorize]
 
@@ -22,7 +22,7 @@
                 </Left>
                 <Right>
                     <Button Type="Button.Style.DEFAULT" @onclick="e => purchaseModal.Show()">
-                        Buy SMS Credit
+                        Fund My Wallet
                     </Button>
                 </Right>
             </LeftRight>
@@ -70,7 +70,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.PurchaseListAsync(p.PageNumber, p.PageSize);
