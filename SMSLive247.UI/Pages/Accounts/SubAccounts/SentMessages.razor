@@ -1,4 +1,4 @@
-﻿@using SMSLive247.UI.Pages.Messaging.Messages.Modals
+﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
 
 <Card HeaderTitle="Sent Messages">
     <Body>
@@ -6,7 +6,14 @@
             <LeftRight>
                 <Left>
                     <SearchBox @ref="searchBox"
-                               @onclick="e => ds.LoadData(alert)">
+                        @onclick="e => ds.LoadData(alert)">
+                        <InputSelect @bind-Value="subAccount" class="form-select">
+                            <option value="">Select a sub account</option>
+                            @foreach (var item in subAccounts)
+                            {
+                                <option value="@item.AccountID">@item.AccountName</option>
+                            }
+                        </InputSelect>
                         <InputSelect @bind-Value="dateRange.Filter" class="form-select">
                             @foreach (var item in Enum.GetValues<DateRangeFilter>())
                             {
@@ -73,6 +80,8 @@
     private DownloadModal downloadModal = new();
     private SentMessageModal messageModal = new();
     private SentMessageView sentMessageView = new();
+    private List<AccountResponse> subAccounts = [];
+    private string subAccount = "";
     private ApiDataSource<SmsBatchResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
@@ -82,6 +91,13 @@
             return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
         });
         await ds.LoadData(alert);
+
+        var response = await apiClient.AccountsListAsync(1, 500, "self");
+
+        if (response.StatusCode == 200)
+        {
+            subAccounts = response.Result.ToList();
+        }
     }
 
     private string GetStatusCssColor(string status)

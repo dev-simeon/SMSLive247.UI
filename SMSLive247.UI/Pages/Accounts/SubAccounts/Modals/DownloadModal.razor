@@ -1,0 +1,102 @@
+﻿<EditModal TItem="SmsBatchResponse" @ref="editor"
+           LabelText="Messages" OnDownload="OnDownload">
+
+    <FormField Label="Select Period">
+        <InputSelect @bind-Value="dateRange.Filter" class="form-select" required>
+            @foreach (var item in Enum.GetValues<DateRangeFilter>())
+            {
+                <option value="@item">@item</option>
+            }
+        </InputSelect>
+    </FormField>
+
+    <FormField Label="Custom Range">
+        @{
+            bool disabled = dateRange.Filter != DateRangeFilter.CUSTOM;
+        }
+        <div class="input-group">
+            <InputDate class="form-control"
+                       Type="InputDateType.Date"
+                       @bind-Value:format="dd-MM-yyyy"
+                       @bind-Value="dateRange.StartDate"
+                       disabled="@disabled"></InputDate>
+            <InputDate class="form-control"
+                       Type="InputDateType.Date"
+                       @bind-Value:format="dd-MM-yyyy"
+                       @bind-Value="dateRange.EndDate"
+                       disabled="@disabled"></InputDate>
+        </div>
+    </FormField>
+
+    <FormField Label="Sender ID">
+        <div class="input-group">
+            <InputText class="form-control" @bind-Value="editor.Model.SenderID" placeholder="Type or select" required />
+            <InputSelect class="form-select" @bind-Value="editor.Model.SenderID">
+                <option value="" selected></option>
+                @foreach (var item in senderIds)
+                {
+                    <option value="@item.SenderID">@item.SenderID</option>
+                }
+            </InputSelect>
+        </div>
+    </FormField>
+    <FormField Label="Download Type">
+        <InputRadioGroup @bind-Value="downloadType">
+            <div class="form-check form-check-inline">
+                <InputRadio class="form-check-input" id="r1" Value=@DownloadType.BATCHES />
+                <label class="form-check-label" for="r1">Messages</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <InputRadio class="form-check-input" id="r2" Value=@DownloadType.REPORTS />
+                <label class="form-check-label" for="r2">Delivery Reports</label>
+            </div>
+        </InputRadioGroup>
+    </FormField>
+</EditModal>
+
+@code {
+    private enum DownloadType { BATCHES, REPORTS };
+
+    private DateRange dateRange = new();
+    private EditModal<SmsBatchResponse> editor = new();
+
+    private List<SenderIdResponse> senderIds = [];
+    private DownloadType downloadType = DownloadType.BATCHES;
+
+    public void Download() => editor.Download();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await apiClient.SenderIdListAsync(1, 500);
+
+        if (response.StatusCode == 200)
+            senderIds = response.Result.ToList();//.Where(i => i.Approved == true).ToList();
+    }
+
+    private async Task OnDownload()
+    {
+        var debug = $@"From Date: {dateRange.StartDate},
+                     To Date: {dateRange.EndDate},
+                     Sender ID: {editor.Model.SenderID},
+                     Download Type: {downloadType}";
+
+        if (downloadType == DownloadType.BATCHES)
+        {
+            // nav.NavigateTo("/");
+            var response = await apiClient.SmsBatchDownloadAsync(
+                dateRange.StartDate, dateRange.EndDate, editor.Model.SenderID);
+
+            await js.DownloadFromStream(response.Stream, "example.txt");
+            return;
+        }
+
+        if (downloadType == DownloadType.REPORTS)
+        {
+            var response = await apiClient.SmsMessageDownloadAsync(
+                dateRange.StartDate, dateRange.EndDate, editor.Model.SenderID);
+
+            await js.DownloadFromStream(response.Stream, $"example.report.txt");
+            return;
+        }
+    }
+}

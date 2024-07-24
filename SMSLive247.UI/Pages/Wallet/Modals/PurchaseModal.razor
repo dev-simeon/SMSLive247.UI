@@ -4,6 +4,9 @@
 
 <Modal Title="Buy SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
+        <div class="alert alert-info" role="alert">
+            Minimum SMS credit quantity to purchase is 500 sms credit..
+        </div>
         @if (showConfirmation)
         {
             <StaticText Label="Unit Price" Text="@("₦" + purchaseResponse.Price.ToString())" />
