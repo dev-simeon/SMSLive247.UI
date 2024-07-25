@@ -6,8 +6,7 @@
     <meta charset="utf-8" />
     <meta name="author" content="iDevWorks" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link type="image/png" href="images/favico1.png" rel="icon" />
-    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">-->
+    <link rel="icon" type="image/png" href="images/favico1.png" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.2/dist/united/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
@@ -48,29 +47,22 @@
             URL.revokeObjectURL(url);
         }
 
-        function payWithPaystack(email, amount, reference, paystackKey) {
-            var handler = PaystackPop.setup({
-                key: paystackKey, // Use the passed Paystack key
-                email: email,
-                amount: amount * 100, // Amount is in kobo
-                currency: 'NGN',
-                ref: reference,
-                callback: function (response) {
-                    console.log("payment completed");
-                    console.log(response);
-
-                    // Redirect to PaymentComplete page with the reference
-                    window.location.href = '/Wallet/PaymentComplete/'
+        function paystackPopup(accessCode) {
+            const popup = new PaystackPop();
+            popup.resumeTransaction({
+                access_code: accessCode,
+                onSuccess: function (transaction) {
+                    // This runs when the transaction is successful
+                    console.log("Transaction successful:", transaction);
+                    window.location.href = 'Wallet/Credits/Complete' + transaction.data.reference;
                 },
-                onClose: function() {
-                    // Handle when the payment modal is closed
-                    console.log('Payment popup closed');
+                onError: function (error) {
+                    // This runs when there is an error
+                    console.error("Transaction error:", error);
                 }
             });
-            handler.openIframe();
         }
     </script>
-
 </body>
 
 </html>

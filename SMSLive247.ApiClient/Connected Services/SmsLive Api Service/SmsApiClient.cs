@@ -1343,7 +1343,7 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PriceResponse>>> PriceListAsync()
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PriceSlotResponse>>> PriceListAsync()
         {
             return PriceListAsync(System.Threading.CancellationToken.None);
         }
@@ -1351,7 +1351,7 @@ namespace SMSLive247.OpenApi
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PriceResponse>>> PriceListAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PriceSlotResponse>>> PriceListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/pricing");
@@ -1388,12 +1388,12 @@ namespace SMSLive247.OpenApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<PriceResponse>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<PriceSlotResponse>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            return new SwaggerResponse<System.Collections.Generic.ICollection<PriceResponse>>(status_, headers_, objectResponse_.Object);
+                            return new SwaggerResponse<System.Collections.Generic.ICollection<PriceSlotResponse>>(status_, headers_, objectResponse_.Object);
                         }
                         else
                         {
@@ -1657,7 +1657,7 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseBeginAsync(PurchaseRequest? body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<InitPurchaseResponse>> PurchaseBeginAsync(PurchaseRequest? body)
         {
             return PurchaseBeginAsync(body, System.Threading.CancellationToken.None);
         }
@@ -1665,7 +1665,7 @@ namespace SMSLive247.OpenApi
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<PurchaseResponse>> PurchaseBeginAsync(PurchaseRequest? body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<InitPurchaseResponse>> PurchaseBeginAsync(PurchaseRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/purchase");
@@ -1706,12 +1706,12 @@ namespace SMSLive247.OpenApi
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<PurchaseResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<InitPurchaseResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            return new SwaggerResponse<PurchaseResponse>(status_, headers_, objectResponse_.Object);
+                            return new SwaggerResponse<InitPurchaseResponse>(status_, headers_, objectResponse_.Object);
                         }
                         else
                         {
@@ -4511,6 +4511,52 @@ namespace SMSLive247.OpenApi
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
+    public partial class InitPurchaseResponse
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("providerID")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string ProviderID { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("quantity")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public long Quantity { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("price")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double Price { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("amount")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double Amount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fee")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double Fee { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("reference")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string Reference { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("accessCode")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string? AccessCode { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("authorizationUrl")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string? AuthorizationUrl { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
     public partial class LoginRequest
     {
 
@@ -4567,17 +4613,22 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonPropertyName("quantity")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double Quantity { get; set; } = default!;
+        public long Quantity { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("amount")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public double Amount { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("fee")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double Fee { get; set; } = default!;
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
-    public partial class PriceResponse
+    public partial class PriceSlotResponse
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("minQuantity")]
@@ -4647,6 +4698,11 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public double Amount { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("fee")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double Fee { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("isPaid")]
 

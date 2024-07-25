@@ -101,9 +101,7 @@
             if (response.StatusCode != 200)
                 throw new Exception("apiClient.PurchaseBeginAsync() Failed");
 
-            //var accessCode = response.Result.AccessCode;
-            //const popup = new PaystackPop()
-            //popup.resumeTransaction(accessCode)
+            await js.InvokeVoidAsync("paystackPopup", response.Result.AccessCode);
         }
         catch (Exception ex)
         {
