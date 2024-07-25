@@ -55,17 +55,17 @@
       {
         "Name": "Buy",
         "Icon": "fa fa-file-invoice",
-        "Link": "/Wallet/Buy"
+        "Link": "/Credits/Buy"
       },
       {
         "Name": "Deposits",
         "Icon": "fa fa-money-bill-wave",
-        "Link": "/Wallet/Deposit"
+        "Link": "/Credits/Deposit"
       },
       {
         "Name": "Transfers",
         "Icon": "fa fa-file-invoice-dollar",
-        "Link": "/Wallet/Transfer"
+        "Link": "/Credits/Transfer"
       }
     ]
   },

@@ -623,7 +623,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PriceResponse"
+                    "$ref": "#/components/schemas/PriceSlotResponse"
                   }
                 }
               }
@@ -769,7 +769,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PurchaseResponse"
+                  "$ref": "#/components/schemas/InitPurchaseResponse"
                 }
               }
             }
@@ -2225,6 +2225,50 @@
           }
         }
       },
+      "InitPurchaseResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "providerID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "quantity": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "price": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "amount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fee": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "reference": {
+            "type": "string",
+            "readOnly": true
+          },
+          "accessCode": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "authorizationUrl": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          }
+        }
+      },
       "LoginRequest": {
         "type": "object",
         "additionalProperties": false,
@@ -2271,17 +2315,22 @@
             "format": "double"
           },
           "quantity": {
-            "type": "number",
-            "format": "double"
+            "type": "integer",
+            "format": "int64"
           },
           "amount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fee": {
             "type": "number",
             "readOnly": true,
             "format": "double"
           }
         }
       },
-      "PriceResponse": {
+      "PriceSlotResponse": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -2347,6 +2396,11 @@
             "format": "double"
           },
           "amount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fee": {
             "type": "number",
             "readOnly": true,
             "format": "double"
