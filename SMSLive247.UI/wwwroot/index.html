@@ -32,7 +32,6 @@
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
-    <script src="https://js.paystack.co/v2/inline.js"></script>
 
     <script>
         window.downloadFileFromStream = async (fileName, contentStreamReference) => {
@@ -45,22 +44,6 @@
             anchorElement.click();
             anchorElement.remove();
             URL.revokeObjectURL(url);
-        }
-
-        function paystackPopup(accessCode) {
-            const popup = new PaystackPop();
-            popup.resumeTransaction({
-                access_code: accessCode,
-                onSuccess: function (transaction) {
-                    // This runs when the transaction is successful
-                    console.log("Transaction successful:", transaction);
-                    window.location.href = 'Wallet/Credits/Complete' + transaction.data.reference;
-                },
-                onError: function (error) {
-                    // This runs when there is an error
-                    console.error("Transaction error:", error);
-                }
-            });
         }
     </script>
 </body>

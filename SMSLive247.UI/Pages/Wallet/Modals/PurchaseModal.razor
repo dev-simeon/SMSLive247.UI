@@ -4,7 +4,7 @@
 <Modal Title="Buy SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
         <div class="alert alert-info" role="alert">
-            Minimum SMS credit quantity to purchase is 500 sms credit..
+            Minimum SMS credit quantity to purchase is 500 sms credit.
         </div>
         @if (price != null)
         {
@@ -31,7 +31,7 @@
         }
         else
         {
-            <Button Type="Button.Style.DEFAULT"@onclick="ConfirmPrice">Confirm Price</Button>
+            <Button Type="Button.Style.DEFAULT" @onclick="ConfirmPrice">Confirm Price</Button>
         }
     </Footer>
 </Modal>
@@ -112,4 +112,58 @@
             hideModal = true;
         }
     }
+
+    [JSInvokable]
+    private async Task CompletePurchase(string reference)
+    {
+        try
+        {
+            await apiClient.PurchaseCompleteAsync(reference);
+        }
+        catch (Exception ex)
+        {
+            await HandleError(ex.Message);
+        }
+    }
+
+    [JSInvokable]
+    private async Task HandleError(string errorMessage)
+    {
+        await alert.Error(errorMessage, "Error");
+    }
+
 }
+
+<script src="https://js.paystack.co/v2/inline.js"></script>
+<script>
+    function paystackPopup(accessCode) {
+        const popup = new PaystackPop();
+        popup.resumeTransaction({
+            access_code: accessCode,
+            onSuccess: async function (transaction) {
+                console.log("Transaction successful:", transaction);
+                try {
+                    await DotNet.invokeMethodAsync('PurchaseModal', 'CompletePurchase', transaction.reference);
+                } catch (error) {
+                    console.error("Error completing purchase:", error);
+                }
+            },
+            onCancel: async function () {
+                try {
+                    await DotNet.invokeMethodAsync('PurchaseModal', 'HandleError', 'Transaction was canceled.');
+                } catch (error) {
+                    console.error("Error handling cancelation:", error);
+                }
+            },
+            onError: async function (error) {
+                console.error("Transaction error:", error);
+                try {
+                    await DotNet.invokeMethodAsync('PurchaseModal', 'HandleError', error.message);
+                } catch (err) {
+                    console.error("Error handling error:", err);
+                }
+            }
+        });
+    }
+
+</script>
