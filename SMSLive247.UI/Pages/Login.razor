@@ -1,5 +1,7 @@
 @page "/Login"
 @layout EmptyLayout;
+@inject NavigationManager nav
+@inject HttpClient httpClient
 @inject AuthenticationStateProvider auth;
 
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication

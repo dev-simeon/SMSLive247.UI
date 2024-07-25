@@ -1,4 +1,6 @@
-﻿<EditModal TItem="SmsBatchResponse" @ref="editor"
+﻿@inject IJSRuntime js
+
+<EditModal TItem="SmsBatchResponse" @ref="editor"
            LabelText="Messages" OnDownload="OnDownload">
 
     <FormField Label="Select Period">

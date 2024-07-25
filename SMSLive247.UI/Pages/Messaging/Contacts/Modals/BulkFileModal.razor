@@ -1,4 +1,6 @@
-﻿<EditModal TItem="BatchFileResponse" @ref="editor" LabelText="Bulk File"
+﻿@inject IJSRuntime js
+
+<EditModal TItem="BatchFileResponse" @ref="editor" LabelText="Bulk File"
            OnCreate="OnCreate"
            OnDelete="OnDelete"
            OnDownload="OnDownload"
