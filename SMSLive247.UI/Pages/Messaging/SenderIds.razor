@@ -9,16 +9,20 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="OnSearch">
-                        <InputSelect class="form-select" 
-                                     @bind-Value="searchStatus" 
+                    <div class="input-group">
+                        <input type="search" class="form-control" placeholder="Search..." 
+                                   @bind="searchQuery" 
+                                   @bind:event="oninput"
+                                   @bind:after="OnSearch" />
+                        <InputSelect class="form-select"
+                                     @bind-Value="searchStatus"
                                      @bind-Value:after="OnSearch">
                             <option value="">All</option>
                             <option value="PENDING">Pending</option>
                             <option value="APPROVED">Approved</option>
                             <option value="REJECTED">Rejected</option>
                         </InputSelect>
-                    </SearchBox>
+                    </div>
                 </Left>
                 <Right>
                     <Button Type="Button.Style.ADD" 
@@ -74,10 +78,10 @@
 <SenderIdModal @ref="senderIdModal" OnCompleted="FetchData"></SenderIdModal>
 
 @code {
-    private SearchBox searchBox = new();
     private SenderIdModal senderIdModal = new();
 
     private string searchStatus = "";
+    private string searchQuery = "";
     private List<SenderIdResponse> items = [];
     private List<SenderIdResponse> filteredItems = [];
 
@@ -106,10 +110,10 @@
             filteredItems = filteredItems.Where(x => x.Status == searchStatus).ToList();
         }
 
-        if (!string.IsNullOrWhiteSpace(searchBox.Text))
+        if (!string.IsNullOrWhiteSpace(searchQuery))
         {
             filteredItems = filteredItems.Where(x => x.SenderID.Contains(
-                searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+                searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }
 }

@@ -46,7 +46,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.TransferListAsync(p.PageNumber, p.PageSize);

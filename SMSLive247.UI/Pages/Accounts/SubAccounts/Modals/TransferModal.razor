@@ -1,15 +1,12 @@
 ﻿<Modal Title="Transfer SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
-        <div class="alert alert-info" role="alert">
-            Minimum credit to transfer is 50 sms credit.
-        </div>
         <EditForm Model="transferRequest" OnValidSubmit="BeginTransfer">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <FormField Label="Select Sub Account">
+            <FormField Label="Sub Account">
                 <InputSelect @bind-Value="@transferRequest.RecipientID" class="form-select">
-                    <option value=""></option>
+                    <option value="">-- select --</option>
                     @foreach (var item in subAccounts)
                     {
                         <option value="@item.AccountID">@item.AccountName</option>

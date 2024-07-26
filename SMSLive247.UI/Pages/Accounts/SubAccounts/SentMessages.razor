@@ -8,7 +8,7 @@
                     <SearchBox @ref="searchBox"
                         @onclick="e => ds.LoadData(alert)">
                         <InputSelect @bind-Value="subAccount" class="form-select">
-                            <option value="">Select a sub account</option>
+                            <option value="">-- select sub account -- </option>
                             @foreach (var item in subAccounts)
                             {
                                 <option value="@item.AccountID">@item.AccountName</option>

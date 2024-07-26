@@ -5,12 +5,7 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="OnSearch">
-                        <InputSelect class="form-select" @bind-Value="accountStatus">
-                            <option value="" selected>Filter Account Status</option>
-                            <option value="ACTIVE">ACTIVE</option>
-                            <option value="INACTIVE">INACTIVE</option>
-                        </InputSelect>
+                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
                     </SearchBox>
                 </Left>
                 <Right>
@@ -20,13 +15,10 @@
                 </Right>
             </LeftRight>
         </SearchArea>
-        <Table Items="filteredItems">
+        <Table DataSource="ds">
             <Columns>
                 <Column Header="Date Created">
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
-                </Column>
-                <Column Header="Account ID">
-                    @context.AccountID
                 </Column>
                 <Column Header="Sub-Account Name">
                     @context.AccountName
@@ -34,7 +26,7 @@
                 <Column Header="Balance">
                     @context.Credits.ToString("#,##0.00")
                 </Column>
-                <Column Header="Account Status">
+                <Column Header="Status">
                     @if (context.Active)
                     {
                         <span class="badge text-bg-success">ACTIVE</span>
@@ -44,6 +36,9 @@
                         <span class="badge text-bg-success">INACTIVE</span>
                     }
                 </Column>
+                <Column Header="Account ID">
+                    @context.AccountID
+                </Column>
                 <Column Header="">
                     <Actions OnView="e => subAccount.Show(context)"
                              OnDelete="e => subAccount.Delete(context)">
@@ -52,6 +47,9 @@
             </Columns>
         </Table>
     </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
 </Card>
 
 <SubAccountModal @ref="subAccount" OnCompleted="FetchData"></SubAccountModal>
@@ -59,8 +57,7 @@
 @code {
     private SearchBox searchBox = new();
     private SubAccountModal subAccount = new();
-    private List<AccountResponse> items = new();
-    private List<AccountResponse> filteredItems = new();
+    private ApiDataSource<AccountResponse> ds = new();
     private string accountStatus = "";
 
     protected override async Task OnInitializedAsync()
@@ -70,37 +67,10 @@
 
     private async Task FetchData()
     {
-        var response = await apiClient.AccountsListAsync(1, 500, "self");
-
-        if (response.StatusCode == 200)
-        {
-            items = response.Result.ToList();
-            filteredItems = items;
-        }
-    }
-
-    private void OnSearch()
-    {
-        filteredItems = items;
-
-        if (!string.IsNullOrEmpty(accountStatus))
-        {
-            switch (accountStatus)
-            {
-                case "ACTIVE":
-                    filteredItems = filteredItems.Where(x => x.Active).ToList();
-                    break;
-
-                case "INACTIVE":
-                    filteredItems = filteredItems.Where(x => !x.Active).ToList();
-                    break;
-            }
-        }
-
-        if (!string.IsNullOrWhiteSpace(searchBox.Text))
-        {
-            filteredItems = filteredItems.Where(x => x.AccountName.Contains(
-                searchBox.Text, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+       ds.Callback = new((PageState p, FilterState? f) =>
+       {
+           return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, "self"/* , searchBox.Text */);
+       });
+        await ds.LoadData(alert);
     }
 }

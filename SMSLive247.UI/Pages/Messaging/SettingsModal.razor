@@ -1,7 +1,15 @@
 ﻿<EditModal TItem="AccountResponse" @ref="editor" LabelText="Settings"
     OnUpdate="OnUpdate"
     OnCompleted="OnCompleted">
-    <FormInputText Label="Sender ID" @bind-Value="senderId"></FormInputText>
+    <FormField Label="Sender ID">
+        <InputSelect class="form-select" @bind-Value="senderId">
+            <option value="">-- select --</option>
+            @foreach (var item in senderIds)
+            {
+                <option value="@item.SenderID">@item.SenderID</option>
+            }
+        </InputSelect>
+    </FormField>
     <FormInputText Label="Delivery Email" @bind-Value="model.AccountID"></FormInputText>
     <FormInputText Label="Signature" @bind-Value="signature"></FormInputText>
     <FormField Label="TimeZone">
@@ -39,10 +47,28 @@
     [Parameter] public EventCallback OnCompleted { get; set; }
     private EditModal<AccountResponse> editor = new();
     private AccountResponse model => editor.Model;
+    private List<SenderIdResponse> senderIds = [];
     private string senderId = "";
     private string signature = "";
 
     public void Show(AccountResponse? account = null) => editor.Show(account);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.SenderIdListAsync(1, 500);
+
+            if (response.StatusCode == 200)
+            {
+                senderIds = response.Result.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
 
     private async Task OnUpdate()
     {

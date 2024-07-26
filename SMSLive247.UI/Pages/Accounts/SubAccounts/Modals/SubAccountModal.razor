@@ -13,7 +13,7 @@
             <FormInputText Label="Account Name" @bind-Value="model.AccountName" disabled="@(editor.EditMode == EditModal<AccountResponse>.EditModeEnum.CREATE ? false : true)"></FormInputText>
             <FormField Label="Sender ID">
                 <InputSelect class="form-select" @bind-Value="senderId">
-                    <option value="" selected>Select sender Id to assign to this sub account.</option>
+                    <option value="">-- Select --</option>
                     @foreach (var item in senderIds)
                     {
                         <option value="@item.SenderID">@item.SenderID</option>

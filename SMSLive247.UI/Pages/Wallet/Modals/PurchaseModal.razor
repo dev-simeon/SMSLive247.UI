@@ -4,9 +4,6 @@
 
 <Modal Title="Buy SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
-        <div class="alert alert-info" role="alert">
-            Minimum SMS credit quantity to purchase is 500 sms credit.
-        </div>
         @if (price != null)
         {
             <StaticText Label="Unit Price" Text="@("₦" + price.Price.ToString())" />
@@ -17,6 +14,9 @@
         }
         else
         {
+            <div class="alert alert-info" role="alert">
+                Minimum SMS credit quantity to purchase is 500 sms credit.
+            </div>
             <EditForm Model="quantity" OnValidSubmit="ConfirmPrice">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
