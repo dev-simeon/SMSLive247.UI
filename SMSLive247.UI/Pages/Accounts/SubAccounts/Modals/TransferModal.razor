@@ -1,5 +1,8 @@
 ﻿<Modal Title="Transfer SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
+        <div class="alert alert-info" role="alert">
+            Minimum SMS credit quantity to transfer is 50 sms credit.
+        </div>
         <EditForm id="Transfer" Model="transferRequest" OnValidSubmit="BeginTransfer">
             <DataAnnotationsValidator />
             <ValidationSummary />
@@ -14,7 +17,7 @@
                 </InputSelect>
             </FormField>
             <FormField Label="Credits">
-                <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="1" @oninput="UpdateNewBalance"></InputNumber>
+                <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required></InputNumber>
             </FormField>
             <FormInputNumber Label="Old Balance" @bind-Value="parentAccount.Credits" disabled="true"></FormInputNumber>
             <FormField Label="New Balance">

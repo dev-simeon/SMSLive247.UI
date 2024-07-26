@@ -11,7 +11,7 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox">
+                    <SearchBox @ref="searchBox" @onclick="() => ds.LoadData(alert)">
                     </SearchBox>
                 </Left>
                 <Right>
@@ -57,18 +57,8 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.TransferListAsync(p.PageNumber, p.PageSize, null);
+            return apiClient.TransferListAsync(p.PageNumber, p.PageSize, searchBox.Text);
         });
         await ds.LoadData(alert);
     }
-
-    protected async Task ExampleImpersonate()
-    {
-        ds.Callback = new((PageState p, FilterState? f) =>
-        {
-            return subClient.Impersonate(null).TransferListAsync(p.PageNumber, p.PageSize, null);
-        });
-        await ds.LoadData(alert);
-    }
-
 }
