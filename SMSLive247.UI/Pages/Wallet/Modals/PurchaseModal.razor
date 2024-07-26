@@ -6,11 +6,11 @@
     <Body>
         @if (price != null)
         {
-            <StaticText Label="Unit Price" Text="@("₦" + price.Price.ToString())" />
-            <StaticText Label="Purchase Amount" Text="@("₦" + price.Amount.ToString())" />
-            <StaticText Label="SMS Quantity" Text="@price.Quantity.ToString()" />
-            <StaticText Label="Transaction Fee" Text="@("₦" + ((decimal)price.Amount * 0.015M).ToString("#,##0.00"))" />
-            <StaticText Label="Total Amount" Text="@("₦" + ((decimal)price.Amount + (decimal)price.Amount * 0.015M).ToString("#,##0.00"))" />
+            <StaticText Label="SMS Quantity" Text="@price.Quantity.ToString("#,##0")" />
+            <StaticText Label="Unit Price" Text="@(price.Price.ToString("₦ #,##0.00"))" />
+            <StaticText Label="Purchase Amount" Text="@(price.Amount.ToString("₦ #,##0.00"))" />
+            <StaticText Label="Transaction Fee" Text="@(price.Fee.ToString("₦ #,##0.00"))" />
+            <StaticText Label="Total Amount" Text="@((price.Amount + price.Fee).ToString("₦ #,##0.00"))" />
         }
         else
         {
@@ -40,7 +40,6 @@
 @code {
     private bool hideModal = true;
     private PriceCalcResponse? price;
-    private string email = "";
     private long quantity = 100;
 
     protected override async Task OnInitializedAsync()
@@ -48,12 +47,7 @@
         var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
 
         if (member == null)
-        {
             await alert.Error("Please re-login", "Error");
-            return;
-        }
-
-        email = member.Email;
     }
 
     public void Show()
@@ -102,7 +96,12 @@
             if (response.StatusCode != 200)
                 throw new Exception("apiClient.PurchaseBeginAsync() Failed");
 
+            var myRef = DotNetObjectReference.Create(this);
             await js.InvokeVoidAsync("paystackPopup", response.Result.AccessCode);
+
+            // await js.InvokeVoidAsync("paystackPopup",
+            //                           response.Result.AccessCode,
+            //                           OnLoad, OnSuccess, OnCancel, OnError);
         }
         catch (Exception ex)
         {
@@ -114,25 +113,47 @@
         }
     }
 
-    [JSInvokable]
-    private async Task CompletePurchase(string reference)
+
+
+    [JSInvokable("OnLoad")]
+    private void OnLoad(dynamic response)
     {
+        //response.id             String  This is the transaction id
+        //response.accessCode     String  This is a unique payment code used for creating the payment link and loading the Popup
+        //response.customer       Object  The details of the customer making the payment
+        
+        Console.WriteLine(response);
+    }
+
+    [JSInvokable("OnSuccess")]
+    private async Task OnSuccess(dynamic transaction)
+    {
+        //transaction.reference  String  This is the unique payment reference that can be used for reconciliation
+        //transaction.status     String  The final state of the transaction
+        //transaction.message    String  Complimentary note of the transaction status
+        //transaction.transaction String  This is the transaction id
+        
         try
         {
-            await apiClient.PurchaseCompleteAsync(reference);
+            await apiClient.PurchaseCompleteAsync(transaction.transaction);
         }
         catch (Exception ex)
         {
-            await HandleError(ex.Message);
+            await alert.Error(ex.Message, "Error");
         }
     }
 
-    [JSInvokable]
-    private async Task HandleError(string errorMessage)
+    [JSInvokable("OnCancel")]
+    private void OnCancel()
     {
-        await alert.Error(errorMessage, "Error");
+        Console.WriteLine("canceled");
     }
 
+    [JSInvokable("OnError")]
+    private Task OnError(dynamic error)
+    {
+        return alert.Error(error.message, "Error");
+    }
 }
 
 <script src="https://js.paystack.co/v2/inline.js"></script>
@@ -141,30 +162,55 @@
         const popup = new PaystackPop();
         popup.resumeTransaction({
             access_code: accessCode,
-            onSuccess: async function (transaction) {
-                console.log("Transaction successful:", transaction);
-                try {
-                    await DotNet.invokeMethodAsync('PurchaseModal', 'CompletePurchase', transaction.reference);
-                } catch (error) {
-                    console.error("Error completing purchase:", error);
-                }
+            onSuccess: (transaction) => {
+                alert(transaction);
             },
-            onCancel: async function () {
-                try {
-                    await DotNet.invokeMethodAsync('PurchaseModal', 'HandleError', 'Transaction was canceled.');
-                } catch (error) {
-                    console.error("Error handling cancelation:", error);
-                }
+            onLoad: (response) => {
+                alert("onLoad: ", response);
             },
-            onError: async function (error) {
-                console.error("Transaction error:", error);
-                try {
-                    await DotNet.invokeMethodAsync('PurchaseModal', 'HandleError', error.message);
-                } catch (err) {
-                    console.error("Error handling error:", err);
-                }
+            onCancel: () => {
+                alert("onCancel");
+            },
+            onError: (error) => {
+                alert("Error: ", error.message);
             }
+
+            //onSuccess: async function (e) { alert('hello'); }
+            //onCancel: on_cancel,
+            //onError: on_error,
+            //onload: on_load
         });
     }
 
+
+
+    // function paystackPopup222(accessCode) {
+    //     const popup = new PaystackPop();
+    //     popup.resumeTransaction({
+    //         access_code: accessCode,
+    //         onSuccess: async function (transaction) {
+    //             console.log("Transaction successful:", transaction);
+    //             try {
+    //                 await DotNet.invokeMethodAsync('PurchaseModal', 'OnSuccess', transaction.reference);
+    //             } catch (error) {
+    //                 console.error("Error completing purchase:", error);
+    //             }
+    //         },
+    //         onCancel: async function () {
+    //             try {
+    //                 await DotNet.invokeMethodAsync('PurchaseModal', 'OnError', 'Transaction was canceled.');
+    //             } catch (error) {
+    //                 console.error("Error handling cancelation:", error);
+    //             }
+    //         },
+    //         onError: async function (error) {
+    //             console.error("Transaction error:", error);
+    //             try {
+    //                 await DotNet.invokeMethodAsync('PurchaseModal', 'OnError', error.message);
+    //             } catch (err) {
+    //                 console.error("Error handling error:", err);
+    //             }
+    //         }
+    //     });
+    // }
 </script>

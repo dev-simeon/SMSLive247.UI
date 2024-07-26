@@ -1,11 +1,9 @@
-using SMSLive247.UI;
 using SMSLive247.OpenApi;
 using SMSLive247.UI.Services;
 using SMSLive247.Authentication;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Blazored.LocalStorage;
-using iDevWorks.Paystack;
 
 namespace SMSLive247.UI
 {
@@ -19,11 +17,7 @@ namespace SMSLive247.UI
 
             var settings = new Settings();
             builder.Configuration.Bind(settings);
-
-            var apiSettings = new ApiClientFactory.Settings(settings.BaseUrl);
-
             builder.Services.AddSingleton(settings);
-            builder.Services.AddSingleton(apiSettings);
 
             builder.Services.AddSingleton<AlertService>();
             builder.Services.AddSingleton<SpinnerService>();
@@ -33,10 +27,15 @@ namespace SMSLive247.UI
             builder.Services.AddTransient<CacheDelegateHandler>();
             builder.Services.AddTransient<SpinnerDelegateHandler>();
 
-            builder.Services.AddHttpClient<ApiClientFactory>()
+            void setBase(HttpClient c) => c.BaseAddress = new Uri(settings.BaseUrl);
+
+            builder.Services.AddHttpClient<ApiClient>(setBase)
                 .AddHttpMessageHandler<AuthDelegateHandler>()
-                //.AddHttpMessageHandler<CacheDelegateHandler>()
+              //.AddHttpMessageHandler<CacheDelegateHandler>()
                 .AddHttpMessageHandler<SpinnerDelegateHandler>();
+
+            builder.Services.AddHttpClient<SubAccountClient>(setBase)
+                   .AddHttpMessageHandler<SpinnerDelegateHandler>();
 
             builder.Services.AddMemoryCache();
             builder.Services.AddSmsAuthProvider();
