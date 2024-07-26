@@ -48,7 +48,7 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.TransferListAsync(p.PageNumber, p.PageSize);
+            return apiClient.TransferListAsync(p.PageNumber, p.PageSize, searchBox.Text);
         });
         await ds.LoadData(alert);
     }

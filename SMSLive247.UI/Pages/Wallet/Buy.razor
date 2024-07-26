@@ -72,7 +72,7 @@
 
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.PurchaseListAsync(p.PageNumber, p.PageSize);
+            return apiClient.PurchaseListAsync(p.PageNumber, p.PageSize, searchBox.Text);
         });
         await ds.LoadData(alert);
     }

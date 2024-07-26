@@ -7,7 +7,7 @@
                 <Left>
                     <SearchBox @ref="searchBox"
                         @onclick="e => ds.LoadData(alert)">
-                        <InputSelect @bind-Value="subAccount" class="form-select">
+                        <InputSelect @bind-Value="subAccountId" class="form-select">
                             <option value="">-- select sub account -- </option>
                             @foreach (var item in subAccounts)
                             {
@@ -81,23 +81,29 @@
     private SentMessageModal messageModal = new();
     private SentMessageView sentMessageView = new();
     private List<AccountResponse> subAccounts = [];
-    private string subAccount = "";
+    private string subAccountId = "";
     private ApiDataSource<SmsBatchResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ds.Callback = new((PageState p, FilterState? f) =>
-        {
-            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
-        });
-        await ds.LoadData(alert);
-
         var response = await apiClient.AccountsListAsync(1, 500, "self");
 
         if (response.StatusCode == 200)
         {
             subAccounts = response.Result.ToList();
         }
+
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            var account = subAccounts.FirstOrDefault(x => x.AccountID == subAccountId);
+
+            if(account != null)
+            {
+                return subClient.Impersonate(account).SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
+            }
+            return null;
+        });
+        await ds.LoadData(alert);
     }
 
     private string GetStatusCssColor(string status)
