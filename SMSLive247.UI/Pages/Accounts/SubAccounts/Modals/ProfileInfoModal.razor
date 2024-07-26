@@ -1,0 +1,66 @@
+﻿<Modal Title="Update Profile" @bind-Hidden="hideModal">
+    <Body>
+        <EditForm id="BasicInfo" Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <FormInputText Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required></FormInputText>
+            <FormInputText Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required></FormInputText>
+            <FormInputText Label="Email" @bind-Value="accountUpdateRequest.Email" disabled="true"></FormInputText>
+            <FormInputText Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true"></FormInputText>
+
+        </EditForm>
+    </Body>
+    <Footer>
+        <button type="submit" class="btn btn-primary" form="BasicInfo">Save Changes</button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public AccountResponse account { get; set; } = new();
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private bool hideModal = true;
+    private AccountUpdateRequest accountUpdateRequest = new();
+
+    protected override void OnParametersSet()
+    {
+        accountUpdateRequest.FirstName = account.FirstName;
+        accountUpdateRequest.LastName = account.LastName;
+        accountUpdateRequest.Email = account.AccountName;
+        accountUpdateRequest.Phone = account.Phone;
+    }
+
+    public void show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    } 
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await apiClient.AccountUpdateAsync(account.AccountID, accountUpdateRequest);
+
+            if (response.StatusCode == 200)
+            {
+                await alert.Success("Profile updated successfully.", "Success");
+                await OnCompleted.InvokeAsync();
+            }
+            else
+            {
+                await alert.Error("Failed to update profile.", "Error");
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        finally
+        {
+            hideModal = true;
+            StateHasChanged();
+        }
+    }
+}

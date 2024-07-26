@@ -4,7 +4,7 @@
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <FormInputText Label="Recipient Email" @bind-Value="transferRequest.RecipientID" required></FormInputText>
+            <FormInputText Label="Recipient Email" @bind-Value="transferRequest.Recipient" required></FormInputText>
             <FormInputNumber Label="Credits" @bind-Value="transferRequest.Credits" min="1" @oninput="UpdateNewBalance"></FormInputNumber>
             <FormInputText Label="Remarks" @bind-Value="transferRequest.Remarks"></FormInputText>
             <FormInputNumber Label="Old Balance" @bind-Value="account.Credits" disabled="true"></FormInputNumber>
@@ -53,7 +53,7 @@
 
             if (task.StatusCode == 200)
             {
-                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.RecipientID} was successful", "Success");
+                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.Recipient} was successful", "Success");
             }
             else
             {

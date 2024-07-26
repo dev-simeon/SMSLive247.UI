@@ -1,5 +1,6 @@
 ﻿@page "/Accounts/Profile"
 @attribute [Authorize]
+@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
 
 <PageTitle>Profile</PageTitle>
 
@@ -11,12 +12,11 @@
                     <div class="mb-3">
                         <i class="bi bi-person-circle h1 text-primary"></i>
                     </div>
-
                     <div>
                         <h5 class="mb-0">@accountDetail.LastName @accountDetail.FirstName</h5>
-                        <p class="text-muted mb-0">Email: @accountDetail.AccountName</p>
-                        <p class="text-muted mb-0">Phone Number: @accountDetail.Phone</p>
-                        <p class="text-muted mb-0">Country Code/TimeZone: +@(accountDetail.CountryCode)(GMT+@(accountDetail.TimeZone))</p>
+                        <p class="text-muted mb-0">@accountDetail.AccountName</p>
+                        <p class="text-muted mb-0">@accountDetail.Phone</p>
+                        <p class="text-muted mb-0">+@(accountDetail.CountryCode)(GMT+@(accountDetail.TimeZone))</p>
                     </div>
                 </div>
             </div>
@@ -39,92 +39,33 @@
             </div>
 
             <div class="card-footer border-top">
-                <a href="javascript: void(0);" class="btn btn-primary me-2 w-md">
-                    <i class="fa fa-save me-2"></i>
-                    Buy Sms Credit
-                </a>
-                <a href="javascript: void(0);" class="btn btn-outline-secondary me-2 w-md">
-                    <i class="fa fa-plus-circle me-2"></i>
-                    Fund Wallet
-                </a>
+                <button type="button" class="btn btn-primary" @onclick="() => updateProfileModal.show()">
+                    Edit Basic Info
+                </button>
+                <button class="btn btn-outline-primary" @onclick="() => changePasswordModal.Show()">
+                    Change Password
+                </button>
             </div>
         </div>
     </div>
-
-    <!-- Basic Info Form -->
-    <div class="col-md-8">
-        <Card HeaderTitle="Basic Info">
-            <Body>
-                <EditForm Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="firstName">First Name</label>
-                                <InputText class="form-control" id="firstName" @bind-Value="accountUpdateRequest.FirstName"></InputText>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="lastName">Last Name</label>
-                                <InputText class="form-control" id="lastName" @bind-Value="accountUpdateRequest.LastName"></InputText>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <InputText type="email" class="form-control" id="email" @bind-Value="accountUpdateRequest.Email" disabled></InputText>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="phoneNumber">Phone Number</label>
-                                <InputText class="form-control" id="phoneNumber" @bind-Value="accountUpdateRequest.Phone" disabled></InputText>
-                            </div>
-                        </div>
-                    </div>
-                    <Button Type="Button.Style.SAVE">Save Changes</Button>
-                </EditForm>
-            </Body>
-        </Card>
-
-        <!-- Change Password Form -->
-        <Card HeaderTitle="Change Password">
-            <Body>
-                <EditForm Model="@accountPasswordRequest" OnValidSubmit="HandleChangePassword">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-
-                    <FormField Label="Current Password">
-                        <InputText type="password" class="form-control" id="oldPassword" @bind-Value="accountPasswordRequest.OldPassword"></InputText>
-                    </FormField>
-
-                    <FormField Label="New Password">
-                        <InputText type="password" class="form-control" id="newPassword" @bind-Value="accountPasswordRequest.NewPassword"></InputText>
-                    </FormField>
-
-                    <FormField Label="Confirm New Password">
-                        <InputText type="password" class="form-control" id="confirmPassword" @bind-Value="confirmNewPassword"></InputText>
-                    </FormField>
-
-                    <Button Type="Button.Style.DEFAULT">Change Password</Button>
-                </EditForm>
-            </Body>
-        </Card>
-    </div>
 </div>
+
+<ProfileInfoModal @ref="updateProfileModal" account="accountDetail" OnCompleted="FetchAccountInfo"></ProfileInfoModal>
+<ChangePasswordModal @ref="changePasswordModal" account="accountDetail"></ChangePasswordModal>
 
 @code {
     private AccountResponse accountDetail = new();
-    private AccountUpdateRequest accountUpdateRequest = new();
-    private AccountPasswordRequest accountPasswordRequest = new();
-    private string confirmNewPassword = string.Empty;
+    private bool showBasicInfoModal;
+    private ProfileInfoModal updateProfileModal = new();
+    private ChangePasswordModal changePasswordModal = new();
+    private bool showChangePasswordModal;
 
     protected override async Task OnInitializedAsync()
+    {
+        await FetchAccountInfo();
+    }
+
+    private async Task FetchAccountInfo()
     {
         try
         {
@@ -133,59 +74,6 @@
             if (response.StatusCode == 200)
             {
                 accountDetail = response.Result;
-                accountUpdateRequest.FirstName = accountDetail.FirstName;
-                accountUpdateRequest.LastName = accountDetail.LastName;
-                accountUpdateRequest.Email = accountDetail.AccountName;
-                accountUpdateRequest.Phone = accountDetail.Phone;
-            }
-
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-    }
-
-    private async Task HandleValidSubmit()
-    {
-        try
-        {
-            var response = await apiClient.AccountUpdateAsync(accountDetail.AccountID, accountUpdateRequest);
-
-            if (response.StatusCode == 200)
-            {
-                await alert.Success("Profile updated successfully.", "Success");
-            }
-            else
-            {
-                await alert.Error("Failed to update profile.", "Error");
-            }
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-    }
-
-    private async Task HandleChangePassword()
-    {
-        if (accountPasswordRequest.NewPassword != confirmNewPassword)
-        {
-            await alert.Error("Passwords do not match.", "Error");
-            return;
-        }
-
-        try
-        {
-            var response = await apiClient.AccountChangePasswordAsync(accountDetail.AccountID, accountPasswordRequest);
-
-            if (response.StatusCode == 200)
-            {
-                await alert.Success("Password changed successfully.", "Success");
-            }
-            else
-            {
-                await alert.Error("Failed to change password.", "Error");
             }
         }
         catch (Exception ex)

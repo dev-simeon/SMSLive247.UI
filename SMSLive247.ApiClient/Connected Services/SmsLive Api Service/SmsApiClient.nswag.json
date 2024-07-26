@@ -2697,10 +2697,10 @@
         "additionalProperties": false,
         "required": [
           "credits",
-          "recipientID"
+          "recipient"
         ],
         "properties": {
-          "recipientID": {
+          "recipient": {
             "type": "string"
           },
           "credits": {

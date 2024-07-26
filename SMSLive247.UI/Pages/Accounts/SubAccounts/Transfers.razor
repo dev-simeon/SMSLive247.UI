@@ -1,11 +1,19 @@
 ﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
+@using System.Net
 
 <Card HeaderTitle="Transfer History">
     <Body>
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox">
+                    <SearchBox @ref="searchBox" @onclick="() => ds.LoadData(alert)">
+                        <InputSelect @bind-Value="subAccountId" class="form-select">
+                            <option value="">-- select sub account --</option>
+                            @foreach (var item in subAccounts)
+                            {
+                                <option value="@item.AccountID">@item.AccountName</option>
+                            }
+                        </InputSelect>
                     </SearchBox>
                 </Left>
                 <Right>
@@ -41,15 +49,44 @@
 
 @code {
     private SearchBox searchBox = new();
+    private List<AccountResponse> subAccounts = [];
+    private string subAccountId = "";
     private TransferModal transferModal = new();
     private ApiDataSource<TransferResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
-        ds.Callback = new((PageState p, FilterState? f) =>
+        await LoadSubAccounts();
+
+        ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            return apiClient.TransferListAsync(p.PageNumber, p.PageSize, searchBox.Text);
+            var account = subAccounts.FirstOrDefault(x => x.AccountID == subAccountId);
+
+            if(account != null)
+            {
+                return await subClient.Impersonate(account).TransferListAsync(p.PageNumber, p.PageSize, searchBox.Text);
+            }
+            return new SwaggerResponse<ICollection<TransferResponse>>(
+               (int)HttpStatusCode.NotFound,
+               new Dictionary<string, IEnumerable<string>>(),
+               Array.Empty<TransferResponse>());
         });
         await ds.LoadData(alert);
+    }
+
+    private async Task LoadSubAccounts()
+    {
+        try
+        {
+            var response = await apiClient.AccountsListAsync(1, 500, searchBox.Text);
+            if (response.StatusCode == 200)
+            {
+                subAccounts = response.Result.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"Error occurred while fetching sub account. Error: {ex.Message}", "Error");
+        }
     }
 }

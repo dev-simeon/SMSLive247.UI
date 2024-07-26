@@ -4998,11 +4998,11 @@ namespace SMSLive247.OpenApi
     public partial class TransferRequest
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("recipientID")]
+        [System.Text.Json.Serialization.JsonPropertyName("recipient")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string RecipientID { get; set; } = default!;
+        public string Recipient { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("credits")]
 
