@@ -61,14 +61,4 @@
         });
         await ds.LoadData(alert);
     }
-
-    protected async Task ExampleImpersonate()
-    {
-        ds.Callback = new((PageState p, FilterState? f) =>
-        {
-            return subClient.Impersonate(null).TransferListAsync(p.PageNumber, p.PageSize, null);
-        });
-        await ds.LoadData(alert);
-    }
-
 }

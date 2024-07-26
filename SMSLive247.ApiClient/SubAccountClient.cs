@@ -4,20 +4,19 @@ namespace SMSLive247.OpenApi
 {
     public class SubAccountClient(HttpClient httpClient) : ApiClient(httpClient)
     {
-        public SubAccountClient Impersonate(AccountResponse account)
+        public SubAccountClient Impersonate(AccountResponse? account)
         {
+            var apiKey = "fail-safely-by-sending-useless-api-key";
             try
             {
-                var apiKey = new Guid(account.Key!);
-
-                httpClient.DefaultRequestHeaders.Authorization
-                    = new AuthenticationHeaderValue("Bearer", apiKey.ToString());
-                return this;
+                apiKey = (new Guid(account!.Key!)).ToString();
             }
-            catch (Exception)
+            finally  
             {
-                throw new Exception("Invalid Sub-Account API Key");
+                httpClient.DefaultRequestHeaders.Authorization
+                    = new AuthenticationHeaderValue("Bearer", apiKey);
             }
+            return this;
         }
     }
 }
