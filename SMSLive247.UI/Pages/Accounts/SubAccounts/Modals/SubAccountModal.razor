@@ -10,7 +10,7 @@
     </div>
     <MultiColumn>
         <Column1>
-            <FormInputText Label="Account Name" @bind-Value="model.AccountName" disabled="@(editor.EditMode == EditModal<AccountResponse>.EditModeEnum.CREATE ? false : true)"></FormInputText>
+            <FormInputText Label="Account Name" @bind-Value="model.AccountName" required disabled="@(editor.EditMode == EditModal<AccountResponse>.EditModeEnum.CREATE ? false : true)"></FormInputText>
             <FormField Label="Sender ID">
                 <InputSelect class="form-select" @bind-Value="senderId">
                     <option value="">-- Select --</option>
@@ -29,7 +29,7 @@
         <Column2>
             <FormInputText Label="Suffix" @bind-Value="suffix"></FormInputText>
             <FormInputText Label="Prefix" @bind-Value="prefix"></FormInputText>
-            <FormInputText type="password" Label="Password" @bind-Value="password"></FormInputText>
+            <FormInputText type="password" Label="Password" @bind-Value="password" required></FormInputText>
         </Column2>
     </MultiColumn>
 </EditModal>
@@ -72,6 +72,7 @@
         var request = new AccountCreateRequest
         {
             AccountName = model.AccountName,
+             
             Password = password
         };
 

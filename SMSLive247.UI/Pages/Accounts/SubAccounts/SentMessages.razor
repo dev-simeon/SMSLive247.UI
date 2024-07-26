@@ -1,14 +1,14 @@
-﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
+﻿@using SMSLive247.UI.Pages.Messaging.Messages.Modals
+@using System.Net;
 
 <Card HeaderTitle="Sent Messages">
     <Body>
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox"
-                        @onclick="e => ds.LoadData(alert)">
+                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
                         <InputSelect @bind-Value="subAccountId" class="form-select">
-                            <option value="">-- select sub account -- </option>
+                            <option value="">-- select sub account --</option>
                             @foreach (var item in subAccounts)
                             {
                                 <option value="@item.AccountID">@item.AccountName</option>
@@ -23,13 +23,13 @@
 
                         @if (dateRange.Filter == DateRangeFilter.CUSTOM)
                         {
-                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.StartDate"></InputDate>
-                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.EndDate"></InputDate>
+                            <InputDate class="form-control" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.StartDate"></InputDate>
+                            <InputDate class="form-control" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.EndDate"></InputDate>
                         }
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DOWNLOAD" @onclick="e => downloadModal.Download()">
+                    <Button Type="Button.Style.DOWNLOAD" @onclick="() => downloadModal.Download()">
                         Download Messages
                     </Button>
                 </Right>
@@ -57,8 +57,8 @@
                     </small>
                 </Column>
                 <Column Header="">
-                    <Actions OnView="e => sentMessageView.Show((int)context.BatchID)"
-                             OnDelete="e => messageModal.Delete(context)">
+                    <Actions OnView="() => sentMessageView.Show((int)context.BatchID)"
+                             OnDelete="() => messageModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -86,45 +86,48 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var response = await apiClient.AccountsListAsync(1, 500, "self");
+        await LoadSubAccounts();
 
-        if (response.StatusCode == 200)
-        {
-            subAccounts = response.Result.ToList();
-        }
-
-        ds.Callback = new((PageState p, FilterState? f) =>
+        ds.Callback = new(async (PageState p, FilterState? f) =>
         {
             var account = subAccounts.FirstOrDefault(x => x.AccountID == subAccountId);
-
-            if(account != null)
+            if (account != null)
             {
-                return subClient.Impersonate(account).SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
+                return await subClient.Impersonate(account)
+                .SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
             }
-            return null;
+            return new SwaggerResponse<ICollection<SmsBatchResponse>>(
+            (int)HttpStatusCode.NotFound,
+            new Dictionary<string, IEnumerable<string>>(),
+            Array.Empty<SmsBatchResponse>());
         });
         await ds.LoadData(alert);
     }
 
-    private string GetStatusCssColor(string status)
+    private async Task LoadSubAccounts()
     {
-        if (status == "COMPLETED")
-            return "success";
-
-        if (status == "RUNNING")
-            return "info";
-
-        if (status == "PAUSED")
-            return "warning";
-
-        if (status == "ABORTED")
-            return "danger";
-
-        return "dark";
+        try
+        {
+            var response = await apiClient.AccountsListAsync(1, 500, searchBox.Text);
+            if (response.StatusCode == 200)
+            {
+                subAccounts = response.Result.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"Error occurred while fetching sub account. Error: {ex.Message}", "Error");
+        }
     }
 
-    private async Task ReloadData()
+    private string GetStatusCssColor(string status) => status switch
     {
-        await ds.LoadData(alert);
-    }
+        "COMPLETED" => "success",
+        "RUNNING" => "info",
+        "PAUSED" => "warning",
+        "ABORTED" => "danger",
+        _ => "dark",
+    };
+
+    private async Task ReloadData() => await ds.LoadData(alert);
 }

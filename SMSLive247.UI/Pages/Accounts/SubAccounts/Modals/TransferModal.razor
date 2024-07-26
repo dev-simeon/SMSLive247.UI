@@ -1,11 +1,14 @@
 ﻿<Modal Title="Transfer SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
-        <EditForm Model="transferRequest" OnValidSubmit="BeginTransfer">
+        <div class="alert alert-info" role="alert">
+            Minimum SMS credit quantity to transfer is 50 sms credit.
+        </div>
+        <EditForm id="Transfer" Model="transferRequest" OnValidSubmit="BeginTransfer">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
             <FormField Label="Sub Account">
-                <InputSelect @bind-Value="@transferRequest.RecipientID" class="form-select">
+                <InputSelect @bind-Value="@transferRequest.Recipient" class="form-select" required>
                     <option value="">-- select --</option>
                     @foreach (var item in subAccounts)
                     {
@@ -13,7 +16,9 @@
                     }
                 </InputSelect>
             </FormField>
-            <FormInputNumber Label="Credits" @bind-Value="transferRequest.Credits" @oninput="UpdateNewBalance"></FormInputNumber>
+            <FormField Label="Credits">
+                <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required></InputNumber>
+            </FormField>
             <FormInputNumber Label="Old Balance" @bind-Value="parentAccount.Credits" disabled="true"></FormInputNumber>
             <FormField Label="New Balance">
                 <InputNumber @bind-Value="newBalance" class="form-control" disabled="true"></InputNumber>
@@ -22,7 +27,7 @@
         </EditForm>
     </Body>
     <Footer>
-        <button type="submit" class="btn btn-primary" @onclick="BeginTransfer">Transfer Credits</button>
+        <button type="submit" class="btn btn-primary" form="Transfer">Transfer Credits</button>
     </Footer>
 </Modal>
 
@@ -35,19 +40,25 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var t1 = apiClient.AccountsListAsync(1, 500, "self");
-        var t2 = apiClient.AccountGetAsync("self");
+        try
+        {
+            var t1 = apiClient.AccountsListAsync(1, 500, null);
+            var t2 = apiClient.AccountGetAsync("self");
 
-        await Task.WhenAll(t1, t2);
+            await Task.WhenAll(t1, t2);
 
-        subAccounts = t1.Result.Result.ToList();
-        parentAccount = t2.Result.Result;
+            subAccounts = t1.Result.Result.ToList();
+            parentAccount = t2.Result.Result;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
     }
 
     public void Show()
     {
         showModal = true;
-        StateHasChanged();
     }
 
     private async Task BeginTransfer()
@@ -58,7 +69,7 @@
 
             if (task.StatusCode == 200)
             {
-                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.RecipientID} was successful", "Success");
+                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.Recipient} was successful", "Success");
             }
             else
             {
@@ -68,10 +79,6 @@
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
-        }
-        finally
-        {
-            StateHasChanged();
         }
     }
 

@@ -1,11 +1,16 @@
 ﻿<Modal Title="Transfer SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
+        <div class="alert alert-info" role="alert">
+            Minimum SMS credit quantity to transfer is 50 sms credit.
+        </div>
         <EditForm Model="transferRequest" id="Transfer" OnValidSubmit="BeginTransfer">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <FormInputText Label="Recipient Email" @bind-Value="transferRequest.RecipientID" required></FormInputText>
-            <FormInputNumber Label="Credits" @bind-Value="transferRequest.Credits" min="1" @oninput="UpdateNewBalance"></FormInputNumber>
+            <FormInputText Label="Recipient Email" @bind-Value="transferRequest.Recipient" required></FormInputText>
+            <FormField Label="Credits">
+                <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required></InputNumber>
+            </FormField>
             <FormInputText Label="Remarks" @bind-Value="transferRequest.Remarks"></FormInputText>
             <FormInputNumber Label="Old Balance" @bind-Value="account.Credits" disabled="true"></FormInputNumber>
             <FormField Label="New Balance">
@@ -53,7 +58,7 @@
 
             if (task.StatusCode == 200)
             {
-                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.RecipientID} was successful", "Success");
+                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.Recipient} was successful", "Success");
             }
             else
             {

@@ -17,10 +17,12 @@
             <div class="alert alert-info" role="alert">
                 Minimum SMS credit quantity to purchase is 500 sms credit.
             </div>
-            <EditForm Model="quantity" OnValidSubmit="ConfirmPrice">
+            <EditForm id="Purchase" Model="quantity" OnValidSubmit="ConfirmPrice">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
-                <FormInputNumber Label="SMS Quantity" @bind-Value="quantity"></FormInputNumber>
+                <FormField Label="Sms Quantity">
+                    <InputNumber class="form-control" min="500" @bind-Value="quantity" required></InputNumber>
+                </FormField>
             </EditForm>
         }
     </Body>
@@ -32,7 +34,7 @@
         }
         else
         {
-            <Button Type="Button.Style.DEFAULT" @onclick="ConfirmPrice">Confirm Price</Button>
+            <button form="Purchase" type="submit" class="btn btn-primary">Confirm Price</button>
         }
     </Footer>
 </Modal>

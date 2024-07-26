@@ -3,8 +3,73 @@
 
 <PageTitle>Api Keys</PageTitle>
 
-<h3>Api Keys</h3>
+@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
+
+<Card HeaderTitle="Sub Account">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
+                    </SearchBox>
+                </Left>
+            </LeftRight>
+        </SearchArea>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Sub-Account Name">
+                    @context.AccountName
+                </Column>
+                <Column Header="Api Key">
+                    @Convert.ToBase64String(context.Key!)
+                </Column>
+                <Column Header="">
+                    <button class="btn btn-primary" title="Reset API Key" @onclick="() => ResetApiKey(context)">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
+</Card>
 
 @code {
+    private SearchBox searchBox = new();
+    private ApiDataSource<AccountResponse> ds = new();
 
+    protected override async Task OnInitializedAsync()
+    {
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, searchBox.Text);
+        });
+        await ds.LoadData(alert);
+    }
+
+    private async Task ResetApiKey(AccountResponse account)
+    {
+        try
+        {
+            // var response = await apiClient.AccountUpdateProviderKeyAsync(accountrequest);
+            //if (response.StatusCode == 200)
+            // {
+            //     await alert.Success("API key reset successfully.", "Success");
+            //     await ds.LoadData(alert); // Reload data to reflect the reset API key
+            // }
+            // else
+            // {
+            //     await alert.Error("Failed to reset API key.", "Error");
+            // }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
 }
