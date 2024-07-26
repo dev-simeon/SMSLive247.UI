@@ -23,7 +23,6 @@ namespace SMSLive247.OpenApi
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
     public partial class ApiClient 
     {
-        private string _baseUrl = "https://api.smslive247.com";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<System.Text.Json.JsonSerializerOptions> _settings;
 
@@ -40,12 +39,6 @@ namespace SMSLive247.OpenApi
             return settings;
         }
 
-        public string BaseUrl
-        {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
-        }
-
         protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
 
         partial void UpdateJsonSerializerSettings(System.Text.Json.JsonSerializerOptions settings);
@@ -56,22 +49,18 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, string parentId)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, string? searchText)
         {
-            return AccountsListAsync(pageNumber, pageSize, parentId, System.Threading.CancellationToken.None);
+            return AccountsListAsync(pageNumber, pageSize, searchText, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, string parentId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<AccountResponse>>> AccountsListAsync(int? pageNumber, int? pageSize, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
-            if (parentId == null)
-                throw new System.ArgumentNullException("parentId");
-
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/accounts?");
-            urlBuilder_.Replace("{parentId}", System.Uri.EscapeDataString(ConvertToString(parentId, System.Globalization.CultureInfo.InvariantCulture)));
+            urlBuilder_.Append("api/v5/accounts?");
             if (pageNumber != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -79,6 +68,10 @@ namespace SMSLive247.OpenApi
             if (pageSize != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageSize") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (searchText != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("SearchText") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchText, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
 
@@ -154,7 +147,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> AccountCreateAsync(AccountCreateRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/accounts");
+            urlBuilder_.Append("api/v5/accounts");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -235,7 +228,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("accountId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/accounts/{accountId}");
+            urlBuilder_.Append("api/v5/accounts/{accountId}");
             urlBuilder_.Replace("{accountId}", System.Uri.EscapeDataString(ConvertToString(accountId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -313,7 +306,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("accountId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/accounts/{accountId}");
+            urlBuilder_.Append("api/v5/accounts/{accountId}");
             urlBuilder_.Replace("{accountId}", System.Uri.EscapeDataString(ConvertToString(accountId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -395,7 +388,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("accountId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/accounts/{accountId}");
+            urlBuilder_.Append("api/v5/accounts/{accountId}");
             urlBuilder_.Replace("{accountId}", System.Uri.EscapeDataString(ConvertToString(accountId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -473,7 +466,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("accountId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/accounts/{accountId}/password");
+            urlBuilder_.Append("api/v5/accounts/{accountId}/password");
             urlBuilder_.Replace("{accountId}", System.Uri.EscapeDataString(ConvertToString(accountId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -555,7 +548,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("accountId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/accounts/{accountId}/provider-key");
+            urlBuilder_.Append("api/v5/accounts/{accountId}/provider-key");
             urlBuilder_.Replace("{accountId}", System.Uri.EscapeDataString(ConvertToString(accountId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -634,7 +627,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<LoginResponse>> LoginAsync(LoginRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/auth");
+            urlBuilder_.Append("api/v5/auth");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -712,7 +705,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse> ResetPasswordAsync(string? username, string? parentID, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/auth/reset?");
+            urlBuilder_.Append("api/v5/auth/reset?");
             if (username != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("username") + "=").Append(System.Uri.EscapeDataString(ConvertToString(username, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -790,7 +783,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse> LogoutAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/auth/current");
+            urlBuilder_.Append("api/v5/auth/current");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -847,18 +840,23 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> RegisterAsync(AccountCreateRequest? body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> RegisterAsync(string? parentID, AccountCreateRequest? body)
         {
-            return RegisterAsync(body, System.Threading.CancellationToken.None);
+            return RegisterAsync(parentID, body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> RegisterAsync(AccountCreateRequest? body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<AccountResponse>> RegisterAsync(string? parentID, AccountCreateRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/auth/register");
+            urlBuilder_.Append("api/v5/auth/register?");
+            if (parentID != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("parentID") + "=").Append(System.Uri.EscapeDataString(ConvertToString(parentID, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -936,7 +934,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<BatchFileResponse>>> BatchFileListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/batch-files");
+            urlBuilder_.Append("api/v5/batch-files");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1010,7 +1008,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<BatchFileResponse>> BatchFileCreateAsync(int? countryCode, FileParameter file, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/batch-files");
+            urlBuilder_.Append("api/v5/batch-files");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1109,7 +1107,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("fileId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/batch-files/{fileId}");
+            urlBuilder_.Append("api/v5/batch-files/{fileId}");
             urlBuilder_.Replace("{fileId}", System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1185,7 +1183,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("fileId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/batch-files/{fileId}");
+            urlBuilder_.Append("api/v5/batch-files/{fileId}");
             urlBuilder_.Replace("{fileId}", System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1285,7 +1283,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("fileId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/batch-files/{fileId}");
+            urlBuilder_.Append("api/v5/batch-files/{fileId}");
             urlBuilder_.Replace("{fileId}", System.Uri.EscapeDataString(ConvertToString(fileId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1354,7 +1352,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PriceSlotResponse>>> PriceListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/pricing");
+            urlBuilder_.Append("api/v5/credits/pricing");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1428,7 +1426,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<PriceCalcResponse>> PriceCalculateAsync(double? amount, long? quantity, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/pricing/calc?");
+            urlBuilder_.Append("api/v5/credits/pricing/calc?");
             if (amount != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("amount") + "=").Append(System.Uri.EscapeDataString(ConvertToString(amount, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1511,7 +1509,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<CoverageResponse>>> CoverageListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/coverage");
+            urlBuilder_.Append("api/v5/credits/coverage");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1574,18 +1572,18 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PurchaseResponse>>> PurchaseListAsync(int? pageNumber, int? pageSize)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PurchaseResponse>>> PurchaseListAsync(int? pageNumber, int? pageSize, string? searchText)
         {
-            return PurchaseListAsync(pageNumber, pageSize, System.Threading.CancellationToken.None);
+            return PurchaseListAsync(pageNumber, pageSize, searchText, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PurchaseResponse>>> PurchaseListAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<PurchaseResponse>>> PurchaseListAsync(int? pageNumber, int? pageSize, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/purchase?");
+            urlBuilder_.Append("api/v5/credits/purchase?");
             if (pageNumber != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1593,6 +1591,10 @@ namespace SMSLive247.OpenApi
             if (pageSize != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageSize") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (searchText != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("SearchText") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchText, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
 
@@ -1668,7 +1670,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<InitPurchaseResponse>> PurchaseBeginAsync(PurchaseRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/purchase");
+            urlBuilder_.Append("api/v5/credits/purchase");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1749,7 +1751,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("transactionId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/purchase/complete/{transactionId}");
+            urlBuilder_.Append("api/v5/credits/purchase/complete/{transactionId}");
             urlBuilder_.Replace("{transactionId}", System.Uri.EscapeDataString(ConvertToString(transactionId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -1813,18 +1815,18 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<TransferResponse>>> TransferListAsync(int? pageNumber, int? pageSize)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<TransferResponse>>> TransferListAsync(int? pageNumber, int? pageSize, string? searchText)
         {
-            return TransferListAsync(pageNumber, pageSize, System.Threading.CancellationToken.None);
+            return TransferListAsync(pageNumber, pageSize, searchText, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<TransferResponse>>> TransferListAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<TransferResponse>>> TransferListAsync(int? pageNumber, int? pageSize, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/transfer?");
+            urlBuilder_.Append("api/v5/credits/transfer?");
             if (pageNumber != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -1832,6 +1834,10 @@ namespace SMSLive247.OpenApi
             if (pageSize != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageSize") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (searchText != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("SearchText") + "=").Append(System.Uri.EscapeDataString(ConvertToString(searchText, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
 
@@ -1907,7 +1913,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<TransferResponse>> TransferCreditAsync(TransferRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/credits/transfer");
+            urlBuilder_.Append("api/v5/credits/transfer");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1985,7 +1991,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCreateAsync(SmsBatchRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch");
+            urlBuilder_.Append("api/v5/sms/batch");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2063,7 +2069,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsBatchResponse>>> SmsBatchListAsync(int? pageNumber, int? pageSize, System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch?");
+            urlBuilder_.Append("api/v5/sms/batch?");
             if (pageNumber != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -2158,7 +2164,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsBatchResponse>> SmsBatchCsvCreateAsync(SmsBatchCsvRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/template");
+            urlBuilder_.Append("api/v5/sms/batch/template");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2236,7 +2242,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<FileResponse> SmsBatchDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/download?");
+            urlBuilder_.Append("api/v5/sms/batch/download?");
             if (dateFrom != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("DateFrom") + "=").Append(System.Uri.EscapeDataString(dateFrom.Value.ToString("s", System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -2321,7 +2327,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsBatchResponse>>> SmsBatchPendingListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/pending");
+            urlBuilder_.Append("api/v5/sms/batch/pending");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2398,7 +2404,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("batchId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/{batchId}");
+            urlBuilder_.Append("api/v5/sms/batch/{batchId}");
             urlBuilder_.Replace("{batchId}", System.Uri.EscapeDataString(ConvertToString(batchId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2476,7 +2482,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("batchId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/{batchId}");
+            urlBuilder_.Append("api/v5/sms/batch/{batchId}");
             urlBuilder_.Replace("{batchId}", System.Uri.EscapeDataString(ConvertToString(batchId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2548,7 +2554,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("batchId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/pending/{batchId}");
+            urlBuilder_.Append("api/v5/sms/batch/pending/{batchId}");
             urlBuilder_.Replace("{batchId}", System.Uri.EscapeDataString(ConvertToString(batchId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2620,7 +2626,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("batchId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/pending/{batchId}");
+            urlBuilder_.Append("api/v5/sms/batch/pending/{batchId}");
             urlBuilder_.Replace("{batchId}", System.Uri.EscapeDataString(ConvertToString(batchId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -2693,7 +2699,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("batchId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/batch/{batchId}/reports?");
+            urlBuilder_.Append("api/v5/sms/batch/{batchId}/reports?");
             urlBuilder_.Replace("{batchId}", System.Uri.EscapeDataString(ConvertToString(batchId, System.Globalization.CultureInfo.InvariantCulture)));
             if (pageNumber != null)
             {
@@ -2777,7 +2783,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SmsMessageResponse>> SmsMessageSendAsync(SmsMessageRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms");
+            urlBuilder_.Append("api/v5/sms");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -2855,7 +2861,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsMessageResponse>>> SmsMessageListAsync(int? pageNumber, int? pageSize, System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms?");
+            urlBuilder_.Append("api/v5/sms?");
             if (pageNumber != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -2950,7 +2956,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<FileResponse> SmsMessageDownloadAsync(System.DateTimeOffset? dateFrom, System.DateTimeOffset? dateTo, string? searchText, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/download?");
+            urlBuilder_.Append("api/v5/sms/download?");
             if (dateFrom != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("DateFrom") + "=").Append(System.Uri.EscapeDataString(dateFrom.Value.ToString("s", System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -3035,7 +3041,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SmsMessageResponse>>> SmsDraftListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/drafts");
+            urlBuilder_.Append("api/v5/sms/drafts");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3112,7 +3118,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("messageId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sms/{messageId}");
+            urlBuilder_.Append("api/v5/sms/{messageId}");
             urlBuilder_.Replace("{messageId}", System.Uri.EscapeDataString(ConvertToString(messageId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3187,7 +3193,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<ContactResponse>>> ContactListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/phone-book");
+            urlBuilder_.Append("api/v5/phone-book");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3261,7 +3267,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<ContactResponse>> ContactCreateAsync(ContactCreateRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/phone-book");
+            urlBuilder_.Append("api/v5/phone-book");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3342,7 +3348,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("phoneNo");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/phone-book/{phoneNo}");
+            urlBuilder_.Append("api/v5/phone-book/{phoneNo}");
             urlBuilder_.Replace("{phoneNo}", System.Uri.EscapeDataString(ConvertToString(phoneNo, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3424,7 +3430,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("phoneNo");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/phone-book/{phoneNo}");
+            urlBuilder_.Append("api/v5/phone-book/{phoneNo}");
             urlBuilder_.Replace("{phoneNo}", System.Uri.EscapeDataString(ConvertToString(phoneNo, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3499,7 +3505,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<GroupResponse>>> GroupListAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/phone-book/groups");
+            urlBuilder_.Append("api/v5/phone-book/groups");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3576,7 +3582,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("groupId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/phone-book/groups/{groupId}");
+            urlBuilder_.Append("api/v5/phone-book/groups/{groupId}");
             urlBuilder_.Replace("{groupId}", System.Uri.EscapeDataString(ConvertToString(groupId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3658,7 +3664,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("groupId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/phone-book/groups/{groupId}");
+            urlBuilder_.Append("api/v5/phone-book/groups/{groupId}");
             urlBuilder_.Replace("{groupId}", System.Uri.EscapeDataString(ConvertToString(groupId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3740,7 +3746,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("groupId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/phone-book/groups/{groupId}");
+            urlBuilder_.Append("api/v5/phone-book/groups/{groupId}");
             urlBuilder_.Replace("{groupId}", System.Uri.EscapeDataString(ConvertToString(groupId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -3815,7 +3821,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<System.Collections.Generic.ICollection<SenderIdResponse>>> SenderIdListAsync(int? pageNumber, int? pageSize, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sender-ids?");
+            urlBuilder_.Append("api/v5/sender-ids?");
             if (pageNumber != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("PageNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(pageNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
@@ -3898,7 +3904,7 @@ namespace SMSLive247.OpenApi
         public virtual async System.Threading.Tasks.Task<SwaggerResponse<SenderIdResponse>> SenderIdCreateAsync(SenderIdRequest? body, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sender-ids");
+            urlBuilder_.Append("api/v5/sender-ids");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -3979,7 +3985,7 @@ namespace SMSLive247.OpenApi
                 throw new System.ArgumentNullException("senderId");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/v5/sender-ids/{senderId}");
+            urlBuilder_.Append("api/v5/sender-ids/{senderId}");
             urlBuilder_.Replace("{senderId}", System.Uri.EscapeDataString(ConvertToString(senderId, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -4145,12 +4151,6 @@ namespace SMSLive247.OpenApi
     public partial class AccountCreateRequest
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("parentID")]
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string ParentID { get; set; } = default!;
-
         [System.Text.Json.Serialization.JsonPropertyName("accountName")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
@@ -4161,11 +4161,6 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         public int TimeZone { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("active")]
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
-        public bool Active { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("password")]
 
@@ -4302,6 +4297,11 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public string Traffic { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("key")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public byte[]? Key { get; set; } = default!;
 
     }
 
@@ -4662,6 +4662,11 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         public long Quantity { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("callback")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string? Callback { get; set; } = default!;
 
     }
 

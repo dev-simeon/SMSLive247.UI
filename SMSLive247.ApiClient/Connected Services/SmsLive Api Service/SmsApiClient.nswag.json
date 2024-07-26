@@ -38,12 +38,10 @@
             }
           },
           {
-            "name": "parentId",
-            "in": "path",
-            "required": true,
+            "name": "SearchText",
+            "in": "query",
             "schema": {
-              "type": "string",
-              "default": "self"
+              "type": "string"
             }
           }
         ],
@@ -395,6 +393,15 @@
           "Authentication"
         ],
         "operationId": "Register",
+        "parameters": [
+          {
+            "name": "parentID",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -721,6 +728,13 @@
               "maximum": 500.0,
               "minimum": 5.0
             }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -832,6 +846,13 @@
               "format": "int32",
               "maximum": 500.0,
               "minimum": 5.0
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
         ],
@@ -1893,29 +1914,21 @@
         "additionalProperties": false,
         "required": [
           "accountName",
-          "active",
           "countryCode",
           "email",
           "firstName",
           "lastName",
-          "parentID",
           "password",
           "phone",
           "timeZone"
         ],
         "properties": {
-          "parentID": {
-            "type": "string"
-          },
           "accountName": {
             "type": "string"
           },
           "timeZone": {
             "type": "integer",
             "format": "int32"
-          },
-          "active": {
-            "type": "boolean"
           },
           "password": {
             "type": "string"
@@ -2026,6 +2039,12 @@
           "traffic": {
             "type": "string",
             "readOnly": true
+          },
+          "key": {
+            "type": "string",
+            "readOnly": true,
+            "format": "byte",
+            "nullable": true
           }
         }
       },
@@ -2365,6 +2384,10 @@
           "quantity": {
             "type": "integer",
             "format": "int64"
+          },
+          "callback": {
+            "type": "string",
+            "nullable": true
           }
         }
       },

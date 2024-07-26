@@ -23,7 +23,7 @@
         </SearchArea>
         <Table DataSource="ds">
             <Columns>
-                <Column Header="Date Created">
+                <Column Header="Request Date">
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column Header="Sender">
@@ -35,12 +35,15 @@
                 <Column Header="Credits">
                     <FormatNumber Number="@context.Credits"></FormatNumber>
                 </Column>
+                <Column Header="Status">
+                    <span class="badge text-bg-success">SENT</span>
+                </Column> 
             </Columns>
         </Table>
     </Body>
     <Footer>
         <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
-    </Footer>
+    </Footer> 
 </Card>
 
 <TransferModal @ref="transferModal"></TransferModal>
@@ -54,8 +57,18 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.TransferListAsync(p.PageNumber, p.PageSize);
+            return apiClient.TransferListAsync(p.PageNumber, p.PageSize, null);
         });
         await ds.LoadData(alert);
     }
+
+    protected async Task ExampleImpersonate()
+    {
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return subClient.Impersonate(null).TransferListAsync(p.PageNumber, p.PageSize, null);
+        });
+        await ds.LoadData(alert);
+    }
+
 }
