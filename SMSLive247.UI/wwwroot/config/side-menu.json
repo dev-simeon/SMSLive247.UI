@@ -4,27 +4,27 @@
     "Items": [
       {
         "Name": "Compose",
-        "Icon": "fa fa-calculator",
+        "Icon": "fa fa-edit",
         "Link": "/Messaging/Compose"
       },
       {
         "Name": "Messages",
-        "Icon": "fa fa-calculator",
+        "Icon": "fa fa-envelope",
         "Link": "/Messaging/Messages"
       },
       {
         "Name": "Contacts",
-        "Icon": "fa fa-users",
+        "Icon": "fa fa-address-card",
         "Link": "/Messaging/Contacts"
       },
       {
         "Name": "Sender IDs",
-        "Icon": "fa fa-search",
+        "Icon": "fa fa-fingerprint",
         "Link": "/Messaging/SenderIds"
       },
       {
         "Name": "Settings",
-        "Icon": "fa fa-wrench",
+        "Icon": "fa fa-user-cog",
         "Link": "/Messaging/Settings"
       }
     ]
@@ -34,18 +34,18 @@
     "Items": [
       {
         "Name": "Dashboard",
-        "Icon": "fa fa-chart-bar",
+        "Icon": "fa fa-chart-line",
         "Link": "/Accounts/Dashboard"
       },
       {
-        "Name": "Profile",
-        "Icon": "fa fa-history",
-        "Link": "/Accounts/Profile"
+        "Name": "Sub Accounts",
+        "Icon": "fa fa-users",
+        "Link": "/Accounts/SubAccounts"
       },
       {
-        "Name": "Sub Accounts",
-        "Icon": "fa fa-stamp",
-        "Link": "/Accounts/SubAccounts"
+        "Name": "Profile",
+        "Icon": "fa fa-user",
+        "Link": "/Accounts/Profile"
       }
     ]
   },
@@ -54,17 +54,17 @@
     "Items": [
       {
         "Name": "Buy",
-        "Icon": "fa fa-file-invoice",
+        "Icon": "fa fa-shopping-cart",
         "Link": "/Credits/Buy"
       },
       {
         "Name": "Deposits",
-        "Icon": "fa fa-money-bill-wave",
+        "Icon": "fa fa-credit-card",
         "Link": "/Credits/Deposit"
       },
       {
         "Name": "Transfers",
-        "Icon": "fa fa-file-invoice-dollar",
+        "Icon": "fa fa-gift",
         "Link": "/Credits/Transfer"
       }
     ]
@@ -74,7 +74,7 @@
     "Items": [
       {
         "Name": "Tickets",
-        "Icon": "fa fa-arrow-right",
+        "Icon": "fa fa-headset",
         "Link": "/Support/Tickets"
       }
     ]
@@ -84,7 +84,7 @@
     "Items": [
       {
         "Name": "Api Keys",
-        "Icon": "fa fa-scroll",
+        "Icon": "fa fa-code",
         "Link": "/Developers/ApiKeys"
       }
     ]

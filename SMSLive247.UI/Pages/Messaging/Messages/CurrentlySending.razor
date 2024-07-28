@@ -21,31 +21,20 @@
                     <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
                 </Column>
                 <Column>
-                    <button type="button" class="btn btn-secondary position-relative">
-                        Sent
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            @context.TotalProcessed
-                        </span>
-                    </button>
-
-                    <button type="button" class="btn btn-secondary position-relative">
-                        Failed
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            @context.TotalFailed
-                        </span>
-                    </button>
+                    Sent:<FormatNumber Number="@context.TotalProcessed"></FormatNumber>
+                    Failed:<FormatNumber Number="@context.TotalFailed"></FormatNumber>
                 </Column>
                 <Column>
                     <div class="btn-group float-end">
-                        <button class="btn btn-outline-secondary"
+                        <button class="btn btn-outline-primary"
                                 @onclick="e => ResumeBatch(context.BatchID)"
                                 @onclick:stopPropagation="true" title="Resume Batch">
-                            <i class="fa fa-play"></i>
+                            <i class="fa fa-play me-1"></i> Resume
                         </button>
-                        <button class="btn btn-outline-secondary"
+                        <button class="btn btn-outline-primary"
                                 @onclick="e => AbortBatch(context.BatchID)"
                                 @onclick:stopPropagation="true" title="Abort Batch">
-                            <i class="fa fa-stop"></i>
+                            <i class="fa fa-stop me-2"></i> Abort
                         </button>
                     </div>
                 </Column>

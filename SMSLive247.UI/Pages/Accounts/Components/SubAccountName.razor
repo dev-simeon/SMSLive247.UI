@@ -1,0 +1,17 @@
+﻿@if (Name.Contains("STORE:"))
+{
+    @Name.Replace("STORE:", "")
+    <span class="badge ms-2 text-bg-success">RESELLER</span>
+}
+else if (Name.Contains("2WAY:"))
+{
+    @Name.Replace("2WAY:", "")
+    <span class="badge ms-2 text-bg-info">TWO WAY</span>
+}
+else
+{
+    @Name
+}
+@code {
+    [EditorRequired, Parameter] public string Name { get; set; } = "";
+}

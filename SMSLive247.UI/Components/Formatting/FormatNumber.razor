@@ -1,33 +1,30 @@
 ﻿@typeparam TValue where TValue : struct
 
-@if (!Currency.Equals(default(TValue)))
-{
-    <div class="text-end text-nowrap">
+<div class="text-end text-nowrap pe-4">
+    @if (!Currency.Equals(default(TValue)))
+    {
         @FormatValueAsString(Currency, $"{Symbol} {Format}")
-    </div>
-}
-@if (!Percent.Equals(default(TValue)))
-{
-    <div class="text-end text-nowrap">
+    }
+    @if (!Percent.Equals(default(TValue)))
+    {
         @FormatValueAsString(Percent, "P")
-    </div>
-}
-@if (!Number.Equals(default(TValue)))
-{
-    <div class="text-end text-nowrap">
-        @FormatValueAsString(Number, "G")
-    </div>
-}
+    }
+    @if (!Number.Equals(default(TValue)))
+    {
+        @FormatValueAsString(Number, "#,##0")
+    }
+</div>
 
 @code {
     [Parameter] public TValue Currency { get; set; }
     [Parameter] public TValue Percent { get; set; }
     [Parameter] public TValue Number { get; set; }
 
-    [Parameter] public string? Format { get; set; } = "#,##0";
-    [Parameter] public string? Symbol { get; set; } = "₦";
+    // [Parameter] public int Decimal { get; set; } = 0;
+    [Parameter] public string Format { get; set; } = "#,##0.00";
+    [Parameter] public string Symbol { get; set; } = "₦";
 
-    private static string? FormatValueAsString(TValue? value, string? format)
+    private static string? FormatValueAsString(TValue? value, string format)
     {
         switch (value)
         {

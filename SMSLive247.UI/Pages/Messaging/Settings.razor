@@ -10,29 +10,25 @@
             <Column1>
                 <div class="alert alert-info mb-3">
                     Setup a default SenderID here. Note that you can override this when actually sending.
-                    The signature text is appended to the end of every message. Delivery email recieves
+                    The signature text is appended to the end of every message. Delivery email receives
                     failure reports for bulk sending.
                 </div>
-                <FormInputText Label="Sender ID" @bind-Value="senderId" disabled="true"></FormInputText>
-                <FormInputText Label="Delivery Email" @bind-Value="@account.AccountID" disabled="true"></FormInputText>
-                <FormInputText Label="Signature" @bind-Value="signature" disabled="true"></FormInputText>
+                <StaticText Label="Sender ID" Text="@senderId"></StaticText>
+                <StaticText Label="Delivery Email" Text="@account.AccountID"></StaticText>
+                <StaticText Label="Signature" Text="@signature"></StaticText>
                 @{
-                    string timezone = "GMT " + (account.TimeZone >= 1 ? $"+{account.TimeZone}" : $"-{account.TimeZone}");
+                    string sign = account.TimeZone > 0 ? "+" : "-";
+                    string timeZone = $"GMT {sign}{account.TimeZone}";
                 }
-                <FormInputText Label="TimeZone" @bind-Value="timezone" disabled="true"></FormInputText>
-                <div class="form-check">
-                    <InputCheckbox class="form-check-input" id="active" @bind-Value="useEmailServer"></InputCheckbox>
-                    <label class="form-check-label" for="active">
-                        Send Delivery Email Using My Email Server
-                    </label><br />
-                    <small>Use this option if you want delivery reports. Delivery emails will only be sent if you setup an SMTP email account here.</small>
-                </div>
+                <StaticText Label="TimeZone" Text="@timeZone"></StaticText>
             </Column1>
         </MultiColumn>
     </Body>
     <Footer>
         <div class="btn-group">
-            <Button Type="Button.Style.EDIT" @onclick="e => settingsModal.Show(account)">Edit Setting</Button>
+            <Button Type="Button.Style.EDIT" @onclick="e => settingsModal.Show(account)">
+                Edit Settings...
+            </Button>
         </div>
     </Footer>
 </Card>
@@ -44,15 +40,12 @@
     private SettingsModal settingsModal = new();
     private string signature = "";
     private string senderId = "";
-    private bool useEmailServer = false;
 
     protected override async Task OnInitializedAsync()
     {
         var response = await apiClient.AccountGetAsync("self");
 
         if (response.StatusCode == 200)
-        {
             account = response.Result;
-        }
     } 
 }

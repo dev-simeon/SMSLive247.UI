@@ -1,10 +1,9 @@
-﻿@using SMSLive247.UI.Pages.Wallet.Modals
+﻿@using SMSLive247.UI.Pages.Credits.Modals
 @page "/Credits/Transfer"
 @attribute [Authorize]
 
-<PageTitle>Transfer SMS Credits</PageTitle>
-
-<h3 class="mb-4">Transfer</h3>
+<PageTitle>SMSLive247 - Transfers</PageTitle>
+<Title>Transfer SMS Credits</Title>
 
 <Card HeaderTitle="Transfer History">
     <Body>
@@ -15,8 +14,9 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DEFAULT" @onclick="e => transferModal.Show()">
-                        Transfer Credits
+                    <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-paper-plane" 
+                            @onclick="e => transferModal.Show()">
+                        Transfer Credits...
                     </Button>
                 </Right>
             </LeftRight>
@@ -36,7 +36,7 @@
                     <FormatNumber Number="@context.Credits"></FormatNumber>
                 </Column>
                 <Column Header="Status">
-                    <span class="badge text-bg-success">SENT</span>
+                    <span class="badge text-bg-success">TRANSFERED</span>
                 </Column> 
             </Columns>
         </Table>

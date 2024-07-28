@@ -31,7 +31,7 @@ namespace SMSLive247.UI
 
             builder.Services.AddHttpClient<ApiClient>(setBase)
                 .AddHttpMessageHandler<AuthDelegateHandler>()
-              //.AddHttpMessageHandler<CacheDelegateHandler>()
+                .AddHttpMessageHandler<CacheDelegateHandler>()
                 .AddHttpMessageHandler<SpinnerDelegateHandler>();
 
             builder.Services.AddHttpClient<SubAccountClient>(setBase)

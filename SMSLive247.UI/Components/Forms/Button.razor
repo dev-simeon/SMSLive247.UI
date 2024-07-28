@@ -27,7 +27,7 @@ else
         switch (Type)
         {
             case Style.ADD:
-                return $"fa fa-plus-circle{me}";
+                return $"fa fa-plus{me}";
 
             case Style.EDIT:
                 return $"fa fa-edit{me}";
@@ -36,7 +36,7 @@ else
                 return $"fa fa-save{me}";
 
             case Style.DELETE:
-                return $"fa fa-trash{me}";
+                return $"fa fa-trash-alt{me}";
 
             case Style.DOWNLOAD:
                 return $"fa fa-download{me}";
@@ -45,7 +45,7 @@ else
                 return $"fa fa-cancel{me}";
 
             default:
-                return CustomIcon;
+                return $"{CustomIcon}{me}";
         }
     }
 

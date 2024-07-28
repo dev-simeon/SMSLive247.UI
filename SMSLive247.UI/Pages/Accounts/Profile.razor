@@ -1,8 +1,9 @@
-﻿@page "/Accounts/Profile"
+﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
+@page "/Accounts/Profile"
 @attribute [Authorize]
-@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
 
-<PageTitle>Profile</PageTitle>
+<PageTitle>SMSLive247 - Profile</PageTitle>
+<Title>My Profile</Title>
 
 <div class="row">
     <div class="col-md-4">
@@ -13,10 +14,10 @@
                         <i class="bi bi-person-circle h1 text-primary"></i>
                     </div>
                     <div>
-                        <h5 class="mb-0">@accountDetail.LastName @accountDetail.FirstName</h5>
-                        <p class="text-muted mb-0">@accountDetail.AccountName</p>
-                        <p class="text-muted mb-0">@accountDetail.Phone</p>
-                        <p class="text-muted mb-0">+@(accountDetail.CountryCode)(GMT+@(accountDetail.TimeZone))</p>
+                        <h5 class="mb-0">@account.LastName @account.FirstName</h5>
+                        <p class="text-muted mb-0">@account.AccountName</p>
+                        <p class="text-muted mb-0">@account.Phone</p>
+                        <p class="text-muted mb-0">+@account.CountryCode [GMT + @account.TimeZone]</p>
                     </div>
                 </div>
             </div>
@@ -25,56 +26,52 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <div>
-                            <p class="fw-medium mb-2">Wallet Balance :</p>
-                            <h4>$ 6134.39</h4>
+                            <p class="fw-medium mb-2">Wallet Balance:</p>
+                            <h4>N 6,134.39</h4>
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div>
-                            <p class="fw-medium mb-2">SMS Credit Balance :</p>
-                            <h4>C @accountDetail.Credits.ToString("F2")</h4>
+                            <p class="fw-medium mb-2">SMS Credit Balance:</p>
+                            <h4>C @account.Credits.ToString("#,##0")</h4>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="card-footer border-top">
-                <button type="button" class="btn btn-primary" @onclick="() => updateProfileModal.show()">
-                    Edit Basic Info
+                <button type="button" class="btn btn-primary" @onclick="() => profileModal.show()">
+                    Edit Basic Info...
                 </button>
-                <button class="btn btn-outline-primary" @onclick="() => changePasswordModal.Show()">
-                    Change Password
+                <button class="btn btn-outline-primary" @onclick="() => passwordModal.Show()">
+                    Change Password...
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<ProfileInfoModal @ref="updateProfileModal" account="accountDetail" OnCompleted="FetchAccountInfo"></ProfileInfoModal>
-<ChangePasswordModal @ref="changePasswordModal" account="accountDetail"></ChangePasswordModal>
+<ProfileInfoModal @ref="profileModal" account="account" OnCompleted="FetchData"></ProfileInfoModal>
+<ChangePasswordModal @ref="passwordModal" account="account"></ChangePasswordModal>
 
 @code {
-    private AccountResponse accountDetail = new();
-    private bool showBasicInfoModal;
-    private ProfileInfoModal updateProfileModal = new();
-    private ChangePasswordModal changePasswordModal = new();
-    private bool showChangePasswordModal;
+    private AccountResponse account = new();
+    private ProfileInfoModal profileModal = new();
+    private ChangePasswordModal passwordModal = new();
 
     protected override async Task OnInitializedAsync()
     {
-        await FetchAccountInfo();
+        await FetchData();
     }
 
-    private async Task FetchAccountInfo()
+    private async Task FetchData()
     {
         try
         {
             var response = await apiClient.AccountGetAsync("self");
 
             if (response.StatusCode == 200)
-            {
-                accountDetail = response.Result;
-            }
+                account = response.Result;
         }
         catch (Exception ex)
         {

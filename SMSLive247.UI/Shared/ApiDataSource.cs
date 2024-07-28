@@ -49,7 +49,10 @@ namespace SMSLive247.UI
         public PageState PageState { get; private set; } = new(10, 1);
         public FilterState? FilterState { get; private set; } 
         public bool IsLoading { get; private set; } = false;
-        public string? ErrorMessage { get; private set; } 
+        public string? ErrorMessage { get; private set; }
+
+         public SwaggerResponse<ICollection<T>> EmptyResponse =>  
+            new(204, new Dictionary<string, IEnumerable<string>>(), []);
     }
 
     public record class SortState();

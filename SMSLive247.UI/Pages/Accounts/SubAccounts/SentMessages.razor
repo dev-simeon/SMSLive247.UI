@@ -1,5 +1,4 @@
 ﻿@using SMSLive247.UI.Pages.Messaging.Messages.Modals
-@using System.Net;
 
 <Card HeaderTitle="Sent Messages">
     <Body>
@@ -8,12 +7,13 @@
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
                         <InputSelect @bind-Value="subAccountId" class="form-select">
-                            <option value="">-- select sub account --</option>
+                            <option>--select sub account--</option>
                             @foreach (var item in subAccounts)
                             {
                                 <option value="@item.AccountID">@item.AccountName</option>
                             }
                         </InputSelect>
+
                         <InputSelect @bind-Value="dateRange.Filter" class="form-select">
                             @foreach (var item in Enum.GetValues<DateRangeFilter>())
                             {
@@ -29,8 +29,8 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DOWNLOAD" @onclick="() => downloadModal.Download()">
-                        Download Messages
+                    <Button Type="Button.Style.DOWNLOAD" @onclick="e => downloadModal.Download()">
+                        Download...
                     </Button>
                 </Right>
             </LeftRight>
@@ -57,7 +57,7 @@
                     </small>
                 </Column>
                 <Column Header="">
-                    <Actions OnView="() => sentMessageView.Show((int)context.BatchID)"
+                    <Actions OnView="() => messageView.Show((int)context.BatchID)"
                              OnDelete="() => messageModal.Delete(context)">
                     </Actions>
                 </Column>
@@ -69,9 +69,9 @@
     </Footer>
 </Card>
 
-<DownloadModal @ref="downloadModal"></DownloadModal>
 <SentMessageModal @ref="messageModal" OnCompleted="ReloadData"></SentMessageModal>
-<SentMessageView @ref="sentMessageView"></SentMessageView>
+<SentMessageView @ref="messageView"></SentMessageView>
+<DownloadModal @ref="downloadModal"></DownloadModal>
 
 @code {
     private SearchBox searchBox = new();
@@ -79,45 +79,41 @@
 
     private DownloadModal downloadModal = new();
     private SentMessageModal messageModal = new();
-    private SentMessageView sentMessageView = new();
-    private List<AccountResponse> subAccounts = [];
-    private string subAccountId = "";
+    private SentMessageView messageView = new();
+
     private ApiDataSource<SmsBatchResponse> ds = new();
+    private List<AccountResponse> subAccounts = [];
+    private string? subAccountId;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadSubAccounts();
+        subAccounts = await LoadSubAccounts();
 
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
             var account = subAccounts.FirstOrDefault(x => x.AccountID == subAccountId);
+
             if (account != null)
             {
-                return await subClient.Impersonate(account)
-                .SmsBatchListAsync(p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
+                return await subClient.Impersonate(account).SmsBatchListAsync(
+                    p.PageNumber, p.PageSize, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
             }
-            return new SwaggerResponse<ICollection<SmsBatchResponse>>(
-            (int)HttpStatusCode.NotFound,
-            new Dictionary<string, IEnumerable<string>>(),
-            Array.Empty<SmsBatchResponse>());
+            return ds.EmptyResponse;
         });
         await ds.LoadData(alert);
     }
 
-    private async Task LoadSubAccounts()
+    private async Task<List<AccountResponse>> LoadSubAccounts()
     {
         try
         {
-            var response = await apiClient.AccountsListAsync(1, 500, searchBox.Text);
+            var response = await apiClient.AccountsListAsync(1, 500, null);
+
             if (response.StatusCode == 200)
-            {
-                subAccounts = response.Result.ToList();
-            }
+                return response.Result.ToList();
         }
-        catch (Exception ex)
-        {
-            await alert.Error($"Error occurred while fetching sub account. Error: {ex.Message}", "Error");
-        }
+        catch { }
+        return [];
     }
 
     private string GetStatusCssColor(string status) => status switch

@@ -1,22 +1,23 @@
 ﻿@using SMSLive247.UI.Pages.Messaging.Contacts.Modals
 
 <Card HeaderTitle="Phonebook">
-    <Header>
-        <Button Type="Button.Style.ADD"
-                @onclick="e => contactModal.Show()">
-            Add Contact
-        </Button>
-        <Button Type="Button.Style.ADD"
-                @onclick="e => groupModal.Show()">
-            Add Group
-        </Button>
-    </Header>
     <Body>
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString())" />
+                    <input type="search" class="form-control" placeholder="Search..." 
+                        @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString())" />
                 </Left>
+                <Right>
+                    <Button Type="Button.Style.ADD"
+                            @onclick="e => contactModal.Show()">
+                        Add Contacts...
+                    </Button>
+                    <Button Type="Button.Style.ADD"
+                            @onclick="e => groupModal.Show()">
+                        Create Group...
+                    </Button>
+                </Right>
             </LeftRight>
         </SearchArea>
         <div class="mb-3 p-3 bg-info-subtle">

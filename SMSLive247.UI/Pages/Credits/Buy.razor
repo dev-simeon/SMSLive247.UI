@@ -1,11 +1,9 @@
-﻿@using SMSLive247.UI.Pages.Wallet.Modals
-@page "/Credits/Deposit"
-@inject AuthenticationStateProvider auth
+﻿@using SMSLive247.UI.Pages.Credits.Modals
+@page "/Credits/Buy"
 @attribute [Authorize]
 
-<PageTitle>Deposit - Top Up Wallet</PageTitle>
-
-<h3 class="mb-4">Deposit</h3>
+<PageTitle>SMSLive247 - Buy SMS</PageTitle>
+<Title>Buy SMS Credits</Title>
 
 <Card HeaderTitle="Purchase History">
     <Body>
@@ -21,8 +19,9 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DEFAULT" @onclick="e => purchaseModal.Show()">
-                        Fund My Wallet
+                    <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-shopping-cart"
+                            @onclick="e => purchaseModal.Show()">
+                        Buy SMS Credits...
                     </Button>
                 </Right>
             </LeftRight>
@@ -42,10 +41,10 @@
                     <FormatNumber Number="@context.Quantity"></FormatNumber>
                 </Column>
                 <Column Header="Price">
-                    <FormatNumber Currency="@context.Price" Format="#,##0.00"></FormatNumber>
+                    <FormatNumber Currency="@context.Price"></FormatNumber>
                 </Column>
                 <Column Header="Amount">
-                    <FormatNumber Currency="@context.Amount" Format="#,##0.00"></FormatNumber>
+                    <FormatNumber Currency="@context.Amount"></FormatNumber>
                 </Column>
                 <Column Header="Status">
                     <span class="badge text-bg-@(context.IsPaid ? "success" : "warning")">
@@ -70,6 +69,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.PurchaseListAsync(p.PageNumber, p.PageSize, searchBox.Text);

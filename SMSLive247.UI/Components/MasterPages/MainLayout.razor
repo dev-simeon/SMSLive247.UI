@@ -18,37 +18,26 @@
                     </button>
                     <ul class="nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" href="/Messaging/Compose">Messaging</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/Accounts/Dashboard">Accounts</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Wallet/Buy">Wallet</a>
+                            <a class="nav-link" href="/Credits/Buy">Wallet</a>
                         </li>
-                        @* <li class="nav-item">
-                            <a class="nav-link" href="/Support/Tickets">Support</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/Developers/ApiKeys">Developers</a>
-                        </li> *@
                     </ul>
                 </left>
                 <right class="d-flex gap-3 align-items-center">
                     <a class="nav-link" href="/Support/Tickets">
                         <i class="bi bi-bell-fill fs-4"></i>
                     </a>
-                    <div class="dropdown">
-                        <a class="dropdown-toggle nav-link d-flex gap-3 align-items-center"
-                                 @onclick="ToggleDropdown" @onclick:preventDefault 
-                                 EEonblur="ToggleDropdown" href="#">
-                            <img class="rounded-circle" src="@avatarUrl" width="28">
+                    <div class="dropdown" @onfocusout="HideDropdown">
+                        <a class="dropdown-toggle nav-link d-flex gap-3 align-items-center" href="#"
+                                 @onclick="ToggleDropdown" @onclick:preventDefault>
                             <span>@fullName</span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end @(hideDropdown ? "" : "show")">
+                        <div class="dropdown-menu w-100 @(hideDropdown ? "" : "show")">
                             <a class="dropdown-item" href="/Accounts/Profile">Account Profile</a>
                             <hr class="dropdown-divider" />
                             <a class="dropdown-item" href="/Logout">Logout</a>
@@ -79,6 +68,11 @@
 
     private void ToggleMenu() => hideMainMenu = !hideMainMenu;
     private void ToggleDropdown() => hideDropdown = !hideDropdown;
+    private async Task HideDropdown()
+    {
+        await Task.Delay(200);
+        hideDropdown = true;
+    }
 
     protected override async Task OnInitializedAsync()
     {

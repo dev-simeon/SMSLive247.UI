@@ -9,7 +9,7 @@
                 </Left>
                 <Right>
                     <Button Type="Button.Style.ADD" @onclick="e => bulkFileModal.Show()">
-                        New Bulk File
+                        Upload Bulk File...
                     </Button>
                 </Right>
             </LeftRight>
@@ -18,7 +18,7 @@
             <Columns>
                 <Column Header="File Name" Width="45%">@context.Description</Column>
                 <Column Header="Total Numbers" Width="15%">
-                    <div class="float-end p-2 pe-4">@context.TotalNumbers.ToString("#,##0")</div>
+                    <FormatNumber Number="@context.TotalNumbers"></FormatNumber>
                 </Column>
                 <Column Header="Date Uploaded">
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>

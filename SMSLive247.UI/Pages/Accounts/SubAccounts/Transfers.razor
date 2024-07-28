@@ -1,5 +1,4 @@
 ﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
-@using System.Net
 
 <Card HeaderTitle="Transfer History">
     <Body>
@@ -8,7 +7,7 @@
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="() => ds.LoadData(alert)">
                         <InputSelect @bind-Value="subAccountId" class="form-select">
-                            <option value="">-- select sub account --</option>
+                            <option>--select sub account--</option>
                             @foreach (var item in subAccounts)
                             {
                                 <option value="@item.AccountID">@item.AccountName</option>
@@ -17,15 +16,15 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DEFAULT" @onclick="e => transferModal.Show()">
-                        Transfer Credit
+                    <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-paper-plane" @onclick="e => transferModal.Show()">
+                        Transfer Credits...
                     </Button>
                 </Right>
             </LeftRight>
         </SearchArea>
         <Table DataSource="ds">
             <Columns>
-                <Column Header="Date Created">
+                <Column Header="Request Date">
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column Header="Sender">
@@ -34,8 +33,11 @@
                 <Column Header="Recipient">
                     @context.RecipientName
                 </Column>
-                <Column Header="SMS Value">
+                <Column Header="Credits">
                     <FormatNumber Number="@context.Credits"></FormatNumber>
+                </Column>
+                <Column Header="Status">
+                    <span class="badge text-bg-success">TRANSFERED</span>
                 </Column>
             </Columns>
         </Table>
@@ -49,14 +51,15 @@
 
 @code {
     private SearchBox searchBox = new();
-    private List<AccountResponse> subAccounts = [];
-    private string subAccountId = "";
     private TransferModal transferModal = new();
+
     private ApiDataSource<TransferResponse> ds = new();
+    private List<AccountResponse> subAccounts = [];
+    private string? subAccountId;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadSubAccounts();
+        subAccounts = await LoadSubAccounts();
 
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
@@ -64,29 +67,24 @@
 
             if(account != null)
             {
-                return await subClient.Impersonate(account).TransferListAsync(p.PageNumber, p.PageSize, searchBox.Text);
+                return await subClient.Impersonate(account).TransferListAsync(
+                    p.PageNumber, p.PageSize, searchBox.Text);
             }
-            return new SwaggerResponse<ICollection<TransferResponse>>(
-               (int)HttpStatusCode.NotFound,
-               new Dictionary<string, IEnumerable<string>>(),
-               Array.Empty<TransferResponse>());
+            return ds.EmptyResponse;
         });
         await ds.LoadData(alert);
     }
 
-    private async Task LoadSubAccounts()
+    private async Task<List<AccountResponse>> LoadSubAccounts()
     {
         try
         {
-            var response = await apiClient.AccountsListAsync(1, 500, searchBox.Text);
+            var response = await apiClient.AccountsListAsync(1, 500, null);
+
             if (response.StatusCode == 200)
-            {
-                subAccounts = response.Result.ToList();
-            }
+                return response.Result.ToList();
         }
-        catch (Exception ex)
-        {
-            await alert.Error($"Error occurred while fetching sub account. Error: {ex.Message}", "Error");
-        }
+        catch { }
+        return [];
     }
 }

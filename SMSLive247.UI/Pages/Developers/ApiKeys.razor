@@ -1,11 +1,13 @@
-﻿@page "/Developers/ApiKeys"
+﻿@using SMSLive247.UI.Pages.Accounts.Components
+@page "/Developers/ApiKeys"
 @attribute [Authorize]
 
-<PageTitle>Api Keys</PageTitle>
+<PageTitle>SMSLive247 - Api Keys</PageTitle>
+<Title>Your Api Keys</Title>
 
 @using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
 
-<Card HeaderTitle="Sub Account">
+<Card HeaderTitle="Here are your API keys">
     <Body>
         <SearchArea>
             <LeftRight>
@@ -15,21 +17,52 @@
                 </Left>
             </LeftRight>
         </SearchArea>
+
+        <table class="table table-hover align-middle">
+            <thead class="table-primary bg-primary-subtle">
+                <tr>
+                    <th>Main Account</th>
+                    <th>Api Key</th>
+                    <th></th>
+                    <th>Date Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="width:40%">
+                        @mainAccount.AccountID
+                    </td>
+                    <td>
+                        @Guid.NewGuid().ToString().ToUpper()
+                    </td>
+                    <td>
+                        <button class="btn btn-outline-secondary" title="Reset API Key">
+                            <i class="fa fa-redo"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <FormatDate DateTime="@mainAccount.DateCreated"></FormatDate>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
         <Table DataSource="ds">
             <Columns>
-                <Column Header="Date Created">
-                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
-                </Column>
-                <Column Header="Sub-Account Name">
-                    @context.AccountName
+                <Column Header="Sub-Accounts" Width="40%">
+                    <SubAccountName Name="@context.AccountName"></SubAccountName>
                 </Column>
                 <Column Header="Api Key">
-                    @Convert.ToBase64String(context.Key!)
+                    @((new Guid(context.Key!)).ToString().ToUpper())
                 </Column>
                 <Column Header="">
-                    <button class="btn btn-primary" title="Reset API Key" @onclick="() => ResetApiKey(context)">
-                        <i class="bi bi-arrow-counterclockwise"></i>
+                    <button class="btn btn-outline-secondary" title="Reset API Key"
+                            @onclick="e => ResetApiKey(context)">
+                        <i class="fa fa-redo"></i>
                     </button>
+                </Column>
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
             </Columns>
         </Table>
@@ -41,10 +74,16 @@
 
 @code {
     private SearchBox searchBox = new();
+    private AccountResponse mainAccount = new();
     private ApiDataSource<AccountResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
+        var res = await apiClient.AccountGetAsync("self");
+
+        if (res.StatusCode == 200)
+            mainAccount = res.Result;
+
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, searchBox.Text);
@@ -64,7 +103,7 @@
             // }
             // else
             // {
-            //     await alert.Error("Failed to reset API key.", "Error");
+            await alert.Error("Failed to reset API key", "Error");
             // }
         }
         catch (Exception ex)

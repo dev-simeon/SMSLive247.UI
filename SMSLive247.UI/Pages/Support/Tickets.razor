@@ -1,24 +1,9 @@
 ﻿@page "/Support/Tickets"
 @attribute [Authorize]
 
-<PageTitle>Tickets</PageTitle>
+<PageTitle>SMSLive247 - Tickets</PageTitle>
+<Title>My Tickets</Title>
 
-<h3>Tickets</h3>
-
-
-<section class="d-flex flex-column gap-3 px-4 py-4">
-    <h5 class="mb-0 fw-bold d-block d-sm-none"><PageTitle>Sender Ids</PageTitle></h5>
-    <div class="d-flex flex-column gap-2">
-        <div class="d-flex justify-content-end">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#senderIdModal">New Sender Id</button>
-        </div>
-    </div>
-</section>
 
 @code {
-    public ICollection<SenderIdResponse> UserTickets { get; set; } = new List<SenderIdResponse>();
-
-    protected override async Task OnInitializedAsync()
-    {
-    }
 }

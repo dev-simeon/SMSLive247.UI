@@ -65,7 +65,7 @@
     protected override async Task OnInitializedAsync()
     {
         navItems = await httpClient.GetFromJsonAsync<MenuItem[]>
-        ($"{nav.BaseUri}/config/side-menu.json?i=9") ?? [];
+        ($"{nav.BaseUri}/config/side-menu.json?i=1") ?? [];
 
         nav.LocationChanged += HandleLocationChanged;
         base.OnInitialized();

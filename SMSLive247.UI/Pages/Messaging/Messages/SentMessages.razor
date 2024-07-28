@@ -23,7 +23,7 @@
                 </Left>
                 <Right>
                     <Button Type="Button.Style.DOWNLOAD" @onclick="e => downloadModal.Download()">
-                        Download Messages
+                        Download...
                     </Button>
                 </Right>
             </LeftRight>
@@ -38,7 +38,7 @@
                     @context.SenderID.ToUpper()
                 </Column>
                 <Column Header="Message" Width="50%">
-                    @context.MessageText.Left(160)
+                    @context.MessageText.Left(140)
                     <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
                 </Column>
                 <Column Header="Delivery Report">

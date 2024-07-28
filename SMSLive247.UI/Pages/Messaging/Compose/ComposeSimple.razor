@@ -116,9 +116,14 @@
             </MultiColumn>
         </Body>
         <Footer>
-            <Button Type="Button.Style.CUSTOM">
-                @(sendOption == SendOption.SEND_NOW ? "Send SMS Now!" : "Queue Message")
-            </Button>
+            @if (sendOption == SendOption.SEND_NOW)
+            {
+                <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-paper-plane">Send SMS Now!</Button>
+            }
+            else
+            {
+                <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-clock">Queue Message</Button>
+            }
         </Footer>
     </Card>
 </EditForm>

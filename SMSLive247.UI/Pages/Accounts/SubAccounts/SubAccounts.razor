@@ -1,4 +1,5 @@
 ﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
+@using SMSLive247.UI.Pages.Accounts.Components
 
 <Card HeaderTitle="Sub Account">
     <Body>
@@ -9,8 +10,8 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.DOWNLOAD" @onclick="e => subAccount.Show()">
-                        Create Sub Account
+                    <Button Type="Button.Style.ADD" @onclick="e => subAccountModal.Show()">
+                        Add Sub Account...
                     </Button>
                 </Right>
             </LeftRight>
@@ -21,10 +22,13 @@
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column Header="Sub-Account Name">
-                    @context.AccountName
+                    <SubAccountName Name="@context.AccountName"></SubAccountName>
                 </Column>
                 <Column Header="Balance">
-                    @context.Credits.ToString("#,##0.00")
+                    <FormatNumber Number="@context.Credits"></FormatNumber>
+                </Column>
+                <Column Header="Account ID">
+                    @context.AccountID
                 </Column>
                 <Column Header="Status">
                     @if (context.Active)
@@ -33,15 +37,12 @@
                     }
                     else
                     {
-                        <span class="badge text-bg-success">INACTIVE</span>
+                        <span class="badge text-bg-error">INACTIVE</span>
                     }
                 </Column>
-                <Column Header="Account ID">
-                    @context.AccountID
-                </Column>
                 <Column Header="">
-                    <Actions OnView="e => subAccount.Show(context)"
-                             OnDelete="e => subAccount.Delete(context)">
+                    <Actions OnView="e => subAccountModal.Show(context)"
+                             OnDelete="e => subAccountModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -52,26 +53,19 @@
     </Footer>
 </Card>
 
-<SubAccountModal @ref="subAccount" OnCompleted="FetchData"></SubAccountModal>
+<SubAccountModal @ref="subAccountModal" OnCompleted="e => ds.LoadData(alert)"></SubAccountModal>
 
 @code {
     private SearchBox searchBox = new();
-    private SubAccountModal subAccount = new();
+    private SubAccountModal subAccountModal = new();
     private ApiDataSource<AccountResponse> ds = new();
-    private string accountStatus = "";
 
     protected override async Task OnInitializedAsync()
     {
-        await FetchData();
-    }
-
-    private async Task FetchData()
-    {
-       ds.Callback = new((PageState p, FilterState? f) =>
-       {
-           return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, searchBox.Text);
-       });
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, searchBox.Text);
+        });
         await ds.LoadData(alert);
     }
-
 }

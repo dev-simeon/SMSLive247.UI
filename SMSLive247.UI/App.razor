@@ -13,7 +13,7 @@
                     }
                     else
                     {
-                        //not Authorised
+                        //not Authorized
                         <p>You are not authorized to access this resource.</p>
                     }
                 </NotAuthorized>
@@ -32,6 +32,6 @@
 @code {
     private bool IsAuthenticated(AuthenticationState state)
     {
-       return state.User.Identity.IsAuthenticated;
+        return state.User.Identity == null ? false : state.User.Identity.IsAuthenticated;
     } 
 }

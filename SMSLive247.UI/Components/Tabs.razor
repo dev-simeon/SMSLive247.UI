@@ -1,12 +1,16 @@
 ﻿<CascadingValue Value="this">
-	<ul class="@GetNavCss() mb-4" role="tablist">
+	<ul class="@GetNavCss() mb-4">
 		@foreach (TabPage p in pages)
 		{
 		<li class="nav-item">
 			<button type="button"
 					class="nav-link @GetActiveCss(p)"
 					@onclick="e => SetActivePage(p)">
-				@p.Title
+					@if (p.Icon != null)
+					{
+						<i class="@p.Icon me-2"></i>
+					}
+					@p.Title
 			</button>
 		</li>
 		}
