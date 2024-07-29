@@ -10,42 +10,65 @@
     </header>
 
     <ul class="sb-menu flex-column">
-        @* @foreach (var group in navItems.Where(x => x.Name == currentMenu || currentMenu == "Index").ToList()) *@
         @foreach (var group in navItems)
         {
             <li class="sb-group">@group.Name?.ToUpper()</li>
             @foreach (var item in group.Items)
             {
-                @if (item.Items.Count > 0)
+                if (item.Items.Count > 0)
                 {
-                <li class="@item.Css">
-                    <a href="#" title="@group.Name / @item.Name" 
-                        @onclick="@item.ToggleOpen" 
+                    <li class="@item.Css">
+                        <a href="#" title="@group.Name / @item.Name"
+                           @onclick="@item.ToggleOpen"
                         @onclick:preventDefault>
-                        <i class="@item.Icon"></i>
-                        <span>@item.Name</span>
-                    </a>
-                    <ul>
-                        @foreach (var inner in item.Items)
-                        {
-                        <li>
-                            <NavLink href="@inner.Link" Match="NavLinkMatch.Prefix">
-                                <i class="@inner.Icon" title="@group.Name / @item.Name / @inner.Name"></i>
-                                <span>@inner.Name</span>
-                            </NavLink>
-                        </li>
-                        }
-                    </ul>
-                </li>
+                            <i class="@item.Icon"></i>
+                            <span>@item.Name</span>
+                        </a>
+                        <ul>
+                            @foreach (var inner in item.Items)
+                            {
+                                if (IsExternalUrl(inner.Link))
+                                {
+                                    <li>
+                                        <a href="@inner.Link" target="_blank">
+                                            <i class="@inner.Icon" title="@group.Name / @item.Name / @inner.Name"></i>
+                                            <span>@inner.Name</span>
+                                        </a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <NavLink href="@inner.Link" Match="NavLinkMatch.Prefix">
+                                            <i class="@inner.Icon" title="@group.Name / @item.Name / @inner.Name"></i>
+                                            <span>@inner.Name</span>
+                                        </NavLink>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </li>
                 }
                 else
                 {
-                <li>
-                    <NavLink href="@item.Link" Match="NavLinkMatch.Prefix">
-                        <i class="@item.Icon" title="@group.Name - @item.Name"></i>
-                        <span>@item.Name</span>
-                    </NavLink>
-                </li>
+                    if (IsExternalUrl(item.Link))
+                    {
+                        <li>
+                            <a href="@item.Link" target="_blank">
+                                <i class="@item.Icon" title="@group.Name - @item.Name"></i>
+                                <span>@item.Name</span>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <NavLink href="@item.Link" Match="NavLinkMatch.Prefix">
+                                <i class="@item.Icon" title="@group.Name - @item.Name"></i>
+                                <span>@item.Name</span>
+                            </NavLink>
+                        </li>
+                    }
                 }
             }
         }
@@ -88,6 +111,10 @@
         nav.LocationChanged -= HandleLocationChanged;
     }
 
+    private bool IsExternalUrl(string? url)
+    {
+        return !string.IsNullOrEmpty(url) && (url.StartsWith("http://") || url.StartsWith("https://"));
+    }
 
     public class MenuItem
     {

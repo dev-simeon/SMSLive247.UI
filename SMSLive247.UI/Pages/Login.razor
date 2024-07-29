@@ -44,6 +44,10 @@
                    @onclick="Toggle" href=""
                    @onclick:preventDefault>Reset it here</a>
             </p>
+            <p class="mt-0">
+                Sign up for an account
+                <a class="text-decoration-none" href="/Register">here</a>
+            </p>
         </EditForm>
 
         <EditForm Model="Model" OnValidSubmit="Reset" FormName="reset" hidden="@(!toggleView)">
@@ -76,6 +80,7 @@
              src="images/undraw_login_re_4vu2.svg" /> *@
     </aside>
 </main>
+
 
 @code {
     private bool toggleView = false;
@@ -128,11 +133,19 @@
 
     private async Task Reset()
     {
-        var res = await alert.Confirm($"Reset instructions have been sent to your email at {Model.Username}", "Reset Instruction");
-
-        if (res)
+        try
         {
-            //
+            var res = await apiClient.ResetPasswordAsync(Model.Username, "a044b5a7-1147-45cb-871a-76546896c4f3");
+
+            if(res.StatusCode == 200)
+            {
+                await alert.Success($"Reset instructions have been sent to your email at {Model.Username}", "Reset Instruction");
+            }
+        }
+        catch (Exception ex)
+        {
+            var message = ex.FormatApiMessage();
+            await alert.Error(message, "Error");
         }
     }
 

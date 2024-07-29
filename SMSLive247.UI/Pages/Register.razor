@@ -1,0 +1,392 @@
+﻿@page "/Register"
+@layout EmptyLayout;
+@inject NavigationManager nav
+@inject HttpClient httpClient
+@inject AuthenticationStateProvider auth;
+
+@using SMSLive247.UI.Pages.Legal
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Net.Http.Headers;
+@using System.Net.Http.Json;
+@using System.Globalization;
+
+<PageTitle>SmsLive247 Register</PageTitle>
+<AutoSpinner />
+<Alert />
+
+<main class="d-flex vh-100">
+    <aside class="col-12 col-md-6 col-lg-5 col-xl-4 p-5 shadow">
+        <header class="mb-3 fs-3">
+            SmsLive247
+        </header>
+        <EditForm Model="Model" OnValidSubmit="RegisterAsync">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+
+            @if (!showAdditionalFields)
+            {
+                <div class="mb-3">
+                    <label class="form-label" for="FirstName">First Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        <InputText @bind-Value="Model.FirstName" class="form-control" type="text" required @oninput="UpdateAccountName" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="LastName">Last Name</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        <InputText @bind-Value="Model.LastName" class="form-control" type="text" required @oninput="UpdateAccountName" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="Email">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                        <InputText @bind-Value="Model.Email" class="form-control" type="email" required />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="Phone">Phone</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                        <InputText @bind-Value="Model.Phone" class="form-control" type="text" required />
+                    </div>
+                </div>
+                <button @onclick="FirstStepSubmit" class="btn btn-primary mt-4 w-100" type="button">
+                    Submit
+                </button>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <label class="form-label" for="Country">Country</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-globe"></i></span>
+                        <InputSelect @bind-Value="Model.CountryCode" class="form-select" required>
+                            <option value="355">Albania </option>
+                            <option value="213">Algeria</option>
+                            <option value="376">Andorra</option>
+                            <option value="374">Armenia</option>
+                            <option value="61">Australia</option>
+                            <option value="43">Austria</option>
+                            <option value="994">Azerbaijan</option>
+                            <option value="351">Azores</option>
+                            <option value="973">Bahrain</option>
+                            <option value="34">Balearic Islands</option>
+                            <option value="880">Bangladesh</option>
+                            <option value="375">Belarus</option>
+                            <option value="32">Belgium</option>
+                            <option value="229">Benin</option>
+                            <option value="1441">Bermuda</option>
+                            <option value="45">Bornholm</option>
+                            <option value="387">Bosnia-Herzegovina</option>
+                            <option value="267">Botswana </option>
+                            <option value="55">Brazil </option>
+                            <option value="673">Brunei </option>
+                            <option value="359">Bulgaria </option>
+                            <option value="855">Cambodia </option>
+                            <option value="237">Cameroon </option>
+                            <option value="1">Canada </option>
+                            <option value="34">Canary Island </option>
+                            <option value="238">Cape Verde </option>
+                            <option value="236">Central African Republic </option>
+                            <option value="56">Chile </option>
+                            <option value="86">China </option>
+                            <option value="242">Congo </option>
+                            <option value="33">Corsica </option>
+                            <option value="30">Crete </option>
+                            <option value="385">Croatia </option>
+                            <option value="30">Cyclades </option>
+                            <option value="357">Cyprus </option>
+                            <option value="420">Czech Republic </option>
+                            <option value="45">Denmark </option>
+                            <option value="1809">Dominican Republic </option>
+                            <option value="61">East Timor </option>
+                            <option value="20">Egypt </option>
+                            <option value="372">Estinia </option>
+                            <option value="372">Estonia </option>
+                            <option value="298">Faroe Islands </option>
+                            <option value="679">Fiji </option>
+                            <option value="358">Finland </option>
+                            <option value="33">France </option>
+                            <option value="590">French W Indies </option>
+                            <option value="241">Gabon </option>
+                            <option value="995">Georgia </option>
+                            <option value="49">Germany </option>
+                            <option value="233">Ghana </option>
+                            <option value="350">Gibraltar </option>
+                            <option value="46">Gotland </option>
+                            <option value="30">Greece </option>
+                            <option value="299">Greenland </option>
+                            <option value="590">Guadaloup </option>
+                            <option value="590">Guadaloupe </option>
+                            <option value="44">Guernsey </option>
+                            <option value="594">Guyane </option>
+                            <option value="44">Hebrides </option>
+                            <option value="852">Hong Kong </option>
+                            <option value="36">Hungary </option>
+                            <option value="354">Iceland </option>
+                            <option value="91">India </option>
+                            <option value="62">Indonesia </option>
+                            <option value="30">Ionian Islands </option>
+                            <option value="98">Iran </option>
+                            <option value="353">Ireland </option>
+                            <option value="44">Isle Of Man </option>
+                            <option value="39">Italy </option>
+                            <option value="225">Ivory Coast </option>
+                            <option value="1876">Jamaica </option>
+                            <option value="44">Jersey </option>
+                            <option value="962">Jordan  </option>
+                            <option value="7">Kazakhstan </option>
+                            <option value="254">Kenya </option>
+                            <option value="82">Korea </option>
+                            <option value="965">Kuwait </option>
+                            <option value="371">Latvia </option>
+                            <option value="961">Lebanon </option>
+                            <option value="231">Liberia </option>
+                            <option value="423">Liechtenstein </option>
+                            <option value="370">Lithuania </option>
+                            <option value="423">Luxembourg </option>
+                            <option value="853">Macau </option>
+                            <option value="389">Macedonia </option>
+                            <option value="43">Madagacar </option>
+                            <option value="351">Madeira </option>
+                            <option value="60">Malaysia </option>
+                            <option value="960">Maldives </option>
+                            <option value="223">Mali </option>
+                            <option value="34">Mallorca </option>
+                            <option value="356">Malta </option>
+                            <option value="596">Martinique </option>
+                            <option value="230">Mauritius </option>
+                            <option value="34">Melilla </option>
+                            <option value="52">Mexico </option>
+                            <option value="373">Moldova </option>
+                            <option value="377">Monaco </option>
+                            <option value="976">Mongolia </option>
+                            <option value="33">Monte Carlo </option>
+                            <option value="212">Morocco </option>
+                            <option value="258">Mozambique </option>
+                            <option value="264">Namibia </option>
+                            <option value="977">Nepal </option>
+                            <option value="31">Netherlands </option>
+                            <option value="64">New Zealand </option>
+                            <option selected="selected" value="234">Nigeria </option>
+                            <option value="44">North Ireland </option>
+                            <option value="47">Norway </option>
+                            <option value="46">Oland </option>
+                            <option value="968">Oman </option>
+                            <option value="44">Orkney Islands </option>
+                            <option value="92">Pakistan </option>
+                            <option value="970">Palestine </option>
+                            <option value="30">Peloponnese </option>
+                            <option value="51">Peru </option>
+                            <option value="63">Philipines </option>
+                            <option value="48">Poland </option>
+                            <option value="351">Portugal </option>
+                            <option value="974">Qatar </option>
+                            <option value="262">Reunion </option>
+                            <option value="40">Romania </option>
+                            <option value="7">Russia </option>
+                            <option value="39">San Marino </option>
+                            <option value="39">Sardinia </option>
+                            <option value="966">Saudi Arabia </option>
+                            <option value="221">Senegal </option>
+                            <option value="248">Seychelles </option>
+                            <option value="44">Shetland </option>
+                            <option value="39">Sicily </option>
+                            <option value="65">Singapore </option>
+                            <option value="421">Slovak Republic </option>
+                            <option value="386">Slovenia </option>
+                            <option value="27">South Africa </option>
+                            <option value="34">Spain </option>
+                            <option value="94">Sri Lanka </option>
+                            <option value="249">Sudan </option>
+                            <option value="47">Svalbard </option>
+                            <option value="268">Swaziland </option>
+                            <option value="46">Sweden </option>
+                            <option value="41">Switzerland </option>
+                            <option value="96393">Syria I </option>
+                            <option value="96394">Syria II </option>
+                            <option value="886">Taiwan </option>
+                            <option value="255">Tanzania </option>
+                            <option value="66">Thailand </option>
+                            <option value="228">Togo </option>
+                            <option value="216">Tunisia </option>
+                            <option value="90">Turkey </option>
+                            <option value="993">Turkmenistan </option>
+                            <option value="971">United Arab Emirates </option>
+                            <option value="44">United Kingdom </option>
+                            <option value="1">United States of America </option>
+                            <option value="256">Uganda </option>
+                            <option value="380">Ukraine </option>
+                            <option value="998">Uzbekistan </option>
+                            <option value="39">Vatican City </option>
+                            <option value="58">Venezuela </option>
+                            <option value="84">Vietnam </option>
+                            <option value="967">Yemen </option>
+                            <option value="381">Yugoslavia </option>
+                            <option value="260">Zambia </option>
+                            <option value="263">Zimbabwe </option>
+                        </InputSelect>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="TimeZone">Time Zone</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-clock"></i></span>
+                        <InputSelect @bind-Value="Model.TimeZone" class="form-select" required>
+                            <option value="-12">GMT -12</option>
+                            <option value="-11">GMT -11</option>
+                            <option value="-10">GMT -10</option>
+                            <option value="-9">GMT -9</option>
+                            <option value="-8">GMT -8</option>
+                            <option value="-7">GMT -7</option>
+                            <option value="-6">GMT -6</option>
+                            <option value="-5">GMT -5</option>
+                            <option value="-4">GMT -4</option>
+                            <option value="-3">GMT -3</option>
+                            <option value="-2">GMT -2</option>
+                            <option value="-1">GMT -1</option>
+                            <option value="0">GMT</option>
+                            <option value="1">GMT +1</option>
+                            <option value="2">GMT +2</option>
+                            <option value="3">GMT +3</option>
+                            <option value="4">GMT +4</option>
+                            <option value="5">GMT +5</option>
+                            <option value="6">GMT +6</option>
+                            <option value="7">GMT +7</option>
+                            <option value="8">GMT +8</option>
+                            <option value="9">GMT +9</option>
+                            <option value="10">GMT +10</option>
+                            <option value="11">GMT +11</option>
+                            <option value="12">GMT +12</option>
+                        </InputSelect>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="Password">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-key"></i></span>
+                        <InputText @bind-Value="Model.Password" class="form-control" type="password" required />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="ConfirmPassword">Confirm Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa fa-key"></i></span>
+                        <InputText @bind-Value="ConfirmPassword" class="form-control" type="password" required />
+                    </div>
+                </div>
+                <div class="mb-3 form-check">
+                    <InputCheckbox @bind-Value="AcceptAgreement" class="form-check-input" id="agreementCheckbox" />
+                    <label class="form-check-label" for="agreementCheckbox">
+                        I have read and accepted the
+                        <a href="" @onclick="() => termsAndCondition.Show()" @onclick:preventDefault>SMSLive247 Agreement</a> and
+                        <a href="" @onclick="() => privacyPolicy.Show()" @onclick:preventDefault>Privacy Policy</a>
+                    </label>
+                </div>
+                <button class="btn btn-primary mt-4 w-100" disabled="@(AcceptAgreement ? null : "disabled")" type="submit">
+                    Sign Me Up
+                </button>
+            }
+            <p class="mt-3">
+                Already have an account?
+                <a class="text-decoration-none"
+                   href="/Login">
+                    click here to login
+                </a>
+            </p>
+        </EditForm>
+    </aside>
+
+    <aside class="col-md-6 col-lg-7 col-xl-8 d-none d-md-block bg-light">
+        @* <img class="img-fluid h-100 w-100 p-md-3 p-lg-4 p-xl-5"
+        src="images/undraw_login_re_4vu2.svg" /> *@
+    </aside>
+</main>
+
+<Agreement @ref="termsAndCondition"></Agreement>
+<PrivacyPolicy @ref="privacyPolicy"></PrivacyPolicy>
+
+@code {
+    private Agreement termsAndCondition = new();
+    private PrivacyPolicy privacyPolicy = new();
+
+    private bool showAdditionalFields = false;
+    private string ConfirmPassword = "";
+    public bool AcceptAgreement { get; set; }
+
+    [SupplyParameterFromForm]
+    public AccountCreateRequest Model { get; set; } = new();
+
+    private void FirstStepSubmit()
+    {
+        showAdditionalFields = true;
+    }
+
+    private void UpdateAccountName(ChangeEventArgs e)
+    {
+        Model.AccountName = $"{Model.FirstName} {Model.LastName}";
+    }
+
+    private async Task RegisterAsync()
+    {
+
+        if (!AcceptAgreement)
+        {
+            await alert.Error("You must accept the agreement and privacy policy to register.", "Error");
+            return;
+        }
+
+        if (Model.Password != ConfirmPassword)
+        {
+            await alert.Error("Passwords do not match.", "Error");
+            return;
+        }
+
+        try
+        {
+            var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", Model);
+
+            if (response.StatusCode == 200)
+            {
+                var loginResponse = await apiClient.LoginAsync(new LoginRequest
+                {
+                    ParentID = "a044b5a7-1147-45cb-871a-76546896c4f3",
+                    Username = Model.Email,
+                    Password = Model.Password
+                });
+
+                if (loginResponse.StatusCode == 200)
+                {
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", loginResponse.Result.AccessToken);
+
+                    var apiKey = $"MA-{loginResponse.Result.AccessToken}";
+                    var member = new Authentication.SmsAuthProvider.UserClaims(Model.Email, apiKey);
+
+                    await ((Authentication.SmsAuthProvider)auth)
+                        .SaveAuthenticationState(member);
+
+                    nav.NavigateTo("/");
+                    return;
+                }
+
+                await alert.Error("Login failed after registration.", "Error");
+            }
+            else
+            {
+                await alert.Error("Registration failed.", "Error");
+            }
+        }
+        catch (SMSLive247.OpenApi.ApiException ex)
+        {
+            await alert.Error(ex.Message, "Api Error");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+}

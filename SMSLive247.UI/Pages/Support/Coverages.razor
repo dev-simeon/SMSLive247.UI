@@ -1,0 +1,65 @@
+﻿@page "/Support/Coverages"
+@attribute [Authorize]
+
+<Title>Coverage List</Title>
+
+<Card HeaderTitle="Coverage List">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <input type="search" class="form-control" placeholder="Search..."
+                           @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
+                </Left>
+            </LeftRight>
+        </SearchArea>
+        <Table Items="filteredItems">
+            <Columns>
+                <Column Header="Country">
+                    @context.CountryName
+                </Column>
+                <Column Header="Network">
+                    @context.NetworkName
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+</Card>
+
+@code {
+    private string searchText = "";
+    private List<CoverageResponse> items = [];
+    private List<CoverageResponse> filteredItems = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.CoverageListAsync();
+
+            if (response.StatusCode == 200)
+            {
+                items = response.Result.ToList();
+                filteredItems = items;
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private void OnSearch(string input)
+    {
+        searchText = input;
+
+        if (string.IsNullOrEmpty(searchText))
+        {
+            filteredItems = items;
+        }
+        else
+        {
+            filteredItems = items.Where(x => x.CountryName.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+}

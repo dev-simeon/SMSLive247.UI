@@ -5,6 +5,10 @@
     {
         @FormatValueAsString(Currency, $"{Symbol} {Format}")
     }
+    else
+    {
+        @($"{Symbol} 0.00")
+    }
     @if (!Percent.Equals(default(TValue)))
     {
         @FormatValueAsString(Percent, "P")

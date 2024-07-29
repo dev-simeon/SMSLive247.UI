@@ -1,0 +1,94 @@
+﻿@page "/Credits/PriceList"
+@attribute [Authorize]
+
+<Title>Price List</Title>
+
+<Card HeaderTitle="Price List">
+    <Body>
+        <MultiColumn Column1Width="7" Column2Width="5">
+            <Column1>
+                <Table Items="items">
+                    <Columns>
+                        <Column Header="Credit Volume (Quantity)">
+                            @context.MinQuantity - @context.MaxQuantity
+                        </Column>
+                        <Column Header="Price">
+                           <FormatNumber Currency="@context.Price"></FormatNumber>
+                        </Column>
+                    </Columns>
+                </Table>
+            </Column1>
+            <Column2>
+                <div class="card">
+                    <header class="card-header pt-3 pb-2">
+                        <h6>Calculate Your Price Here</h6>
+                    </header>
+
+                    <div class="card-body">
+                        <InputNumber @bind-Value="quantity" class="form-control" placeholder="SMS Quantity" />
+                        
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label">Rate (Naira)</label>
+                                <FormatNumber Currency="@calculatedPrice.Price"></FormatNumber>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label">Price (Naira)</label>
+                                <FormatNumber Currency="@calculatedPrice.Amount"></FormatNumber>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer border-top py-2">
+                        <Button Type="Button.Style.DEFAULT" @onclick="CalculatePrice">Get Price</Button>
+                    </div>
+                </div>
+            </Column2>
+        </MultiColumn>
+    </Body>
+</Card>
+
+@code {
+    private long quantity;
+    private List<PriceSlotResponse> items = new();
+    private PriceCalcResponse calculatedPrice = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.PriceListAsync();
+
+            if (response.StatusCode == 200)
+            {
+                items = response.Result.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private async Task CalculatePrice()
+    {
+        try
+        {
+            var result = await apiClient.PriceCalculateAsync(null, quantity);
+
+            if (result.StatusCode == 200)
+            {
+                calculatedPrice = result.Result;
+            }
+            else
+            {
+                await alert.Error("Failed to calculate price. Please try again.", "Error");
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+}
