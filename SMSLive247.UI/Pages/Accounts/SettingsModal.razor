@@ -1,6 +1,8 @@
-﻿<EditModal TItem="AccountResponse" @ref="editor" LabelText="Settings"
-    OnUpdate="OnUpdate"
-    OnCompleted="OnCompleted">
+﻿@inject IJSRuntime js
+
+<EditModal TItem="AccountResponse" @ref="editor" LabelText="Settings"
+           OnUpdate="OnUpdate"
+           OnCompleted="OnCompleted">
     <FormField Label="Sender ID">
         <InputSelect class="form-select" @bind-Value="senderId">
             <option value="">-- select --</option>
@@ -11,7 +13,13 @@
         </InputSelect>
     </FormField>
     <FormInputText Label="Delivery Email" @bind-Value="model.AccountID"></FormInputText>
-    <FormInputText Label="Signature" @bind-Value="signature"></FormInputText>
+    <FormInputFile Label="Signature" OnChange="SignatureSelected" Accept=".png,.jpg,.jpeg"></FormInputFile>
+    @if (!string.IsNullOrEmpty(signatureUrl))
+    {
+        <FormField>
+            <img src="@signatureUrl" alt="Signature" style="max-width: 200px; max-height: 100px;" />
+        </FormField>
+    }
     <FormField Label="TimeZone">
         <InputSelect class="form-select" @bind-Value="model.TimeZone">
             <option value="-12">GMT -12</option>
@@ -47,9 +55,10 @@
     [Parameter] public EventCallback OnCompleted { get; set; }
     private EditModal<AccountResponse> editor = new();
     private AccountResponse model => editor.Model;
-    private List<SenderIdResponse> senderIds = [];
+    private List<SenderIdResponse> senderIds = new();
     private string senderId = "";
-    private string signature = "";
+    private IBrowserFile? signatureFile;
+    private string signatureUrl = "";
 
     public void Show(AccountResponse? account = null) => editor.Show(account);
 
@@ -58,7 +67,6 @@
         try
         {
             var response = await apiClient.SenderIdListAsync(1, 500);
-
             if (response.StatusCode == 200)
             {
                 senderIds = response.Result.ToList();
@@ -72,12 +80,45 @@
 
     private async Task OnUpdate()
     {
+        // if (signatureFile != null)
+        // {
+        //     // Upload the signature file
+        //     using var stream = new MemoryStream();
+        //     await signatureFile.OpenReadStream().CopyToAsync(stream);
+        //     var buffer = stream.ToArray();
+
+        //     // Assuming your API supports file upload
+        //     var fileContent = new MultipartFormDataContent
+        //     {
+        //         { new ByteArrayContent(buffer), "file", signatureFile.Name }
+        //     };
+
+        //     var uploadResponse = await apiClient.UploadSignatureAsync(fileContent);
+        //     if (uploadResponse.IsSuccessStatusCode)
+        //     {
+        //         signatureUrl = await uploadResponse.Content.ReadAsStringAsync();  // Get the file URL from response
+        //     }
+        // }
+
         var updateRequest = new AccountUpdateRequest
         {
             TimeZone = model.TimeZone,
-            Active = model.Active
+            Active = model.Active,
+           // SignatureUrl = signatureUrl  Include the signature URL in the update request
         };
 
         await apiClient.AccountUpdateAsync(model.AccountID, updateRequest);
+    }
+
+    private async Task SignatureSelected(InputFileChangeEventArgs e)
+    {
+        signatureFile = e.File;
+
+        // For immediate preview
+        using var stream = signatureFile.OpenReadStream(maxAllowedSize: 1024 * 1024 * 15);  // Limit file size to 15 MB
+        var buffer = new byte[stream.Length];
+        await stream.ReadAsync(buffer, 0, buffer.Length);
+        var base64 = Convert.ToBase64String(buffer);
+        signatureUrl = $"data:{signatureFile.ContentType};base64,{base64}";
     }
 }

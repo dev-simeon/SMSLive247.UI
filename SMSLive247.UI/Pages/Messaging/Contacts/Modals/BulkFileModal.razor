@@ -7,9 +7,9 @@
            OnCompleted="OnCompleted">
     @if (editor.EditMode == 0) //create=0, edit=1
     {
-        <FormInputFile Label="Select File" OnChange="e => FileSelected(e)" Accept="@fileTypes"></FormInputFile>
-            @if (ForCSV == false)
-            {
+        <FormInputFile Label="Select File" OnChange="FileSelected" Accept="@fileTypes"></FormInputFile>
+        @if (ForCSV == false)
+        {
             <FormField Label="Organize File">
                 <InputRadioGroup @bind-Value="groupMode">
                     <div class="form-check form-check-inline">
@@ -25,17 +25,17 @@
         }
         @if (groupMode == "NEW")
         {
-        <FormInputText Label="Group Name" @bind-Value="fileName"></FormInputText>
+            <FormInputText Label="Group Name" @bind-Value="fileName"></FormInputText>
         }
         else if (groupMode == "MERGE")
         {
-        <FormField Label="Select Group">
-            <select class="form-select" @bind="fileName">
-                <option value="group1">Group 1</option>
-                <option value="group2">Group 2</option>
-                <option value="group3">Another Group</option>
-            </select>
-        </FormField>
+            <FormField Label="Select Group">
+                <select class="form-select" @bind="fileName">
+                    <option value="group1">Group 1</option>
+                    <option value="group2">Group 2</option>
+                    <option value="group3">Another Group</option>
+                </select>
+            </FormField>
         }
     }
     else if ((int)editor.EditMode >= 2) //delete=2, download=3

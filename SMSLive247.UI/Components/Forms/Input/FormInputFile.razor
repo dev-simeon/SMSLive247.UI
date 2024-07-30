@@ -1,1 +1,13 @@
-﻿@using System.Linq.Expressions<div class="row my-3">    <label class="form-label col-@Column">@Label</label>    <div class="col-@(12 - Column)">        <InputFile class="form-control" accept="@Accept" OnChange="@OnChange" required></InputFile>    </div></div>@code {    [Parameter] public string? Label { get; set; }    [Parameter] public int? Column { get; set; } = 4;    [Parameter] public string? Accept { get; set; } = ".txt,.csv,.text";    [Parameter] public EventCallback<InputFileChangeEventArgs> OnChange { get; set; }    [Parameter] public Expression<Func<string>>? For { get; set; }}
+﻿@using System.Linq.Expressions@using Microsoft.AspNetCore.Components.Forms<div class="row my-3">    <label class="form-label col-@Column">@Label</label>    <div class="col-@(12 - Column)">        <InputFile class="form-control" accept="@Accept" OnChange="@OnChangeHandler" required></InputFile>    </div></div>@code {    [Parameter] public string? Label { get; set; }
+    [Parameter] public int? Column { get; set; } = 4;
+    [Parameter] public string? Accept { get; set; } = ".txt,.csv,.text";
+
+    [Parameter] public EventCallback<InputFileChangeEventArgs> OnChange { get; set; }
+
+    [Parameter] public Expression<Func<string>>? For { get; set; }
+
+    private async Task OnChangeHandler(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        await OnChange.InvokeAsync(e);
+    }}
