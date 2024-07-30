@@ -68,7 +68,7 @@
         "Link": "/Credits/Transfer"
       },
       {
-        "Name": "Purchase List",
+        "Name": "Price List",
         "Icon": "fa fa-tag",
         "Link": "/Credits/PriceList"
       }
@@ -84,7 +84,7 @@
       },
       {
         "Name": "Coverages",
-        "Icon": "fa fa-globe",
+        "Icon": "fa fa-route",
         "Link": "/Support/Coverages"
       },
       {
