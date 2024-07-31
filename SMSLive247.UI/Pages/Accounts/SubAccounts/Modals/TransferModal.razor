@@ -9,8 +9,8 @@
 
             <FormField Label="Transfer Direction">
                 <InputRadioGroup @bind-Value="transferDirection">
-                    <InputRadio Value="ToParent">To Parent Account</InputRadio>
-                    <InputRadio Value="FromParent">From Parent Account</InputRadio>
+                    <InputRadio Value='@("ToParent")'>To Parent Account</InputRadio>
+                    <InputRadio Value='@("FromParent")'>From Parent Account</InputRadio>
                 </InputRadioGroup>
             </FormField>
             <FormField Label="Credits">
@@ -28,19 +28,20 @@
 </Modal>
 
 @code {
+    [Parameter] public string SubAccountId { get; set; }
     private bool hideModal = true;
     private AccountResponse parentAccount = new();
     private AccountResponse subAccount = new();
     private int currentBalance;
     private int newBalance;
     private TransferRequest transferRequest = new TransferRequest();
-    private string transferDirection = "ToParent";
+    private string transferDirection = "FromParent";
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var t1 = apiClient.AccountGetAsync("parent");
+            var t1 = apiClient.AccountGetAsync("self");
             var t2 = apiClient.AccountGetAsync(SubAccountId);
 
             await Task.WhenAll(t1, t2);
@@ -68,12 +69,10 @@
         {
             if (transferDirection == "ToParent")
             {
-                transferRequest.Sender = subAccount.AccountID;
                 transferRequest.Recipient = parentAccount.AccountID;
             }
             else
             {
-                transferRequest.Sender = parentAccount.AccountID;
                 transferRequest.Recipient = subAccount.AccountID;
             }
 
