@@ -1,5 +1,12 @@
-﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
+﻿@page "/Accounts/SubAccounts"
+
+@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
 @using SMSLive247.UI.Pages.Accounts.Components
+@inject NavigationManager nav
+
+<PageTitle>Sub Accounts</PageTitle>
+
+<Title>My Sub Accounts</Title>
 
 <Card HeaderTitle="Sub Account">
     <Body>
@@ -42,7 +49,7 @@
                 </Column>
                 <Column Header="">
                     <Actions OnEdit="e => subAccountModal.Show(context)"
-                             OnView="e => subAccountModal.Show(context)"
+                             OnView="e => NavigateToSubAccountDetails(context)"
                              OnDelete="e => subAccountModal.Delete(context)">
                     </Actions>
                 </Column>
@@ -68,5 +75,10 @@
             return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, searchBox.Text);
         });
         await ds.LoadData(alert);
+    }
+
+    private void NavigateToSubAccountDetails(AccountResponse account)
+    {
+        nav.NavigateTo($"/Accounts/SubAccounts/Details/{account.AccountID}");
     }
 }

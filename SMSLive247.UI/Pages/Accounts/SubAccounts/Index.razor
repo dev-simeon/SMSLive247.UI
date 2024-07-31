@@ -1,0 +1,115 @@
+﻿<style>
+    .card.account-details-container {
+        max-width: 800px;
+        background-color: #f9f9f9;
+        border: 0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .account-info h2 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .account-details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .detail-item{
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+
+@if (subAccount != null)
+{
+    <div class="card account-details-container">
+        <div class="card-header d-flex justify-content-between align-items-center border-bottom py-3">
+            <div class="account-info">
+                <h2>@subAccount.AccountName</h2>
+                <span>ID: @subAccount.AccountID</span>
+            </div>
+            <a href="#" class="text-decoration-none">Edit</a>
+        </div>
+        <div class="card-body">
+            <div class="account-details-grid">
+                <div class="detail-item">
+                    <label class="fw-semibold mb-1">Status</label>
+                    @if (subAccount.Active)
+                    {
+                        <div>
+                            <span class="badge text-bg-success">ACTIVE</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div>
+                            <span class="badge text-bg-error">INACTIVE</span>
+                        </div>
+                    }
+                </div>
+                <div class="detail-item">
+                    <label class="fw-semibold mb-1">Phone</label>
+                    <span>@subAccount.Phone</span>
+                </div>
+                <div class="detail-item">
+                    <label class="fw-semibold mb-1">Credit Balance</label>
+                    <span>₦ @subAccount.Credits.ToString("##0.00")</span>
+                </div>
+                <div class="detail-item">
+                    <label class="fw-semibold mb-1">Date Created</label>
+                    <span>@subAccount.DateCreated.ToString("MM/dd/yyyy")</span>
+                </div>
+                <div class="detail-item">
+                    <label class="fw-semibold mb-1">Time Zone</label>
+                    @{
+                        string sign = subAccount.TimeZone > 0 ? "+" : "-";
+                    }
+                    <span>GMT @sign@subAccount.TimeZone</span>
+                </div>
+                <div class="detail-item">
+                    <label class="fw-semibold mb-1">Country Code</label>
+                    <span>+@subAccount.CountryCode</span>
+                </div>
+                <div class="detail-item">
+                    <label class="fw-semibold mb-1">Traffic</label>
+                    <span>@subAccount.Traffic</span>
+                </div>
+                <div class="detail-item">
+                    <label class="fw-semibold mb-1">API Key</label>
+                    <span>@(subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    [Parameter] public string SubAccountId { get; set; }
+
+    private AccountResponse subAccount = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync(SubAccountId);
+
+            if (response.StatusCode == 200)
+            {
+                subAccount = response.Result;
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+}

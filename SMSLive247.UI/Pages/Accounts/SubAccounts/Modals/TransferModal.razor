@@ -1,29 +1,25 @@
-﻿<Modal Title="Transfer SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
+﻿<Modal Title="Transfer SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
         <div class="alert alert-info" role="alert">
-            Minimum SMS credit quantity to transfer is 50 sms credit.
+            Minimum SMS credit quantity to transfer is 50 SMS credits.
         </div>
         <EditForm id="Transfer" Model="transferRequest" OnValidSubmit="BeginTransfer">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <FormField Label="Sub Account">
-                <InputSelect @bind-Value="@transferRequest.Recipient" class="form-select" required>
-                    <option value="">-- select --</option>
-                    @foreach (var item in subAccounts)
-                    {
-                        <option value="@item.AccountID">@item.AccountName</option>
-                    }
-                </InputSelect>
+            <FormField Label="Transfer Direction">
+                <InputRadioGroup @bind-Value="transferDirection">
+                    <InputRadio Value="ToParent">To Parent Account</InputRadio>
+                    <InputRadio Value="FromParent">From Parent Account</InputRadio>
+                </InputRadioGroup>
             </FormField>
             <FormField Label="Credits">
                 <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required></InputNumber>
             </FormField>
-            <FormInputNumber Label="Old Balance" @bind-Value="parentAccount.Credits" disabled="true"></FormInputNumber>
+            <FormInputNumber Label="Old Balance" @bind-Value="currentBalance" disabled="true"></FormInputNumber>
             <FormField Label="New Balance">
                 <InputNumber @bind-Value="newBalance" class="form-control" disabled="true"></InputNumber>
             </FormField>
-
         </EditForm>
     </Body>
     <Footer>
@@ -32,23 +28,27 @@
 </Modal>
 
 @code {
-    private bool showModal = false;
-    private List<AccountResponse> subAccounts = new();
+    private bool hideModal = true;
     private AccountResponse parentAccount = new();
+    private AccountResponse subAccount = new();
+    private int currentBalance;
     private int newBalance;
     private TransferRequest transferRequest = new TransferRequest();
+    private string transferDirection = "ToParent";
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var t1 = apiClient.AccountsListAsync(1, 500, null);
-            var t2 = apiClient.AccountGetAsync("self");
+            var t1 = apiClient.AccountGetAsync("parent");
+            var t2 = apiClient.AccountGetAsync(SubAccountId);
 
             await Task.WhenAll(t1, t2);
 
-            subAccounts = t1.Result.Result.ToList();
-            parentAccount = t2.Result.Result;
+            parentAccount = t1.Result.Result;
+            subAccount = t2.Result.Result;
+
+            currentBalance = (int)subAccount.Credits;
         }
         catch (Exception ex)
         {
@@ -58,18 +58,30 @@
 
     public void Show()
     {
-        showModal = true;
+        hideModal = false;
+        StateHasChanged();
     }
 
     private async Task BeginTransfer()
     {
         try
         {
+            if (transferDirection == "ToParent")
+            {
+                transferRequest.Sender = subAccount.AccountID;
+                transferRequest.Recipient = parentAccount.AccountID;
+            }
+            else
+            {
+                transferRequest.Sender = parentAccount.AccountID;
+                transferRequest.Recipient = subAccount.AccountID;
+            }
+
             var task = await apiClient.TransferCreditAsync(transferRequest);
 
             if (task.StatusCode == 200)
             {
-                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.Recipient} was successful", "Success");
+                await alert.Success($"Your transfer of {transferRequest.Credits} was successful", "Success");
             }
             else
             {
@@ -80,13 +92,25 @@
         {
             await alert.Error(ex.Message, "Error");
         }
+        finally
+        {
+            hideModal = true;
+            StateHasChanged();
+        }
     }
 
     private void UpdateNewBalance(ChangeEventArgs e)
     {
         if (int.TryParse(e.Value.ToString(), out int credits))
         {
-            newBalance = (int)parentAccount.Credits - credits;
+            if (transferDirection == "ToParent")
+            {
+                newBalance = (int)subAccount.Credits - credits;
+            }
+            else
+            {
+                newBalance = (int)parentAccount.Credits - credits;
+            }
         }
     }
 }

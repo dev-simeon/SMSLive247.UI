@@ -6,14 +6,6 @@
             <LeftRight>
                 <Left>
                     <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                        <InputSelect @bind-Value="subAccountId" class="form-select">
-                            <option>--select sub account--</option>
-                            @foreach (var item in subAccounts)
-                            {
-                                <option value="@item.AccountID">@item.AccountName</option>
-                            }
-                        </InputSelect>
-
                         <InputSelect @bind-Value="dateRange.Filter" class="form-select">
                             @foreach (var item in Enum.GetValues<DateRangeFilter>())
                             {
@@ -74,6 +66,7 @@
 <DownloadModal @ref="downloadModal"></DownloadModal>
 
 @code {
+    [Parameter] public string SubAccountId { get; set; }
     private SearchBox searchBox = new();
     private DateRange dateRange = new();
 
@@ -82,17 +75,13 @@
     private SentMessageView messageView = new();
 
     private ApiDataSource<SmsBatchResponse> ds = new();
-    private List<AccountResponse> subAccounts = [];
-    private string? subAccountId;
 
     protected override async Task OnInitializedAsync()
     {
-        subAccounts = await LoadSubAccounts();
+        var account = await GetSubAccount(SubAccountId);
 
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            var account = subAccounts.FirstOrDefault(x => x.AccountID == subAccountId);
-
             if (account != null)
             {
                 return await subClient.Impersonate(account).SmsBatchListAsync(
@@ -103,17 +92,20 @@
         await ds.LoadData(alert);
     }
 
-    private async Task<List<AccountResponse>> LoadSubAccounts()
+    private async Task<AccountResponse> GetSubAccount(string subAccountId)
     {
         try
         {
-            var response = await apiClient.AccountsListAsync(1, 500, null);
+            var response = await apiClient.AccountGetAsync(subAccountId);
 
             if (response.StatusCode == 200)
-                return response.Result.ToList();
+                return response.Result;
         }
-        catch { }
-        return [];
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        return new AccountResponse();
     }
 
     private string GetStatusCssColor(string status) => status switch

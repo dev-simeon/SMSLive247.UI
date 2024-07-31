@@ -1,36 +1,41 @@
-﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
-
-<Card HeaderTitle="Transfer History">
+﻿<Card HeaderTitle="Sub Account">
     <Body>
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox" @onclick="() => ds.LoadData(alert)">
+                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-paper-plane" @onclick="e => transferModal.Show()">
-                        Transfer Credits...
-                    </Button>
                 </Right>
             </LeftRight>
         </SearchArea>
         <Table DataSource="ds">
             <Columns>
-                <Column Header="Request Date">
+                <Column Header="Date Created">
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
-                <Column Header="Sender">
-                    @context.SenderName
+                <Column Header="Username">
+                    @context.AccountName
                 </Column>
-                <Column Header="Recipient">
-                    @context.RecipientName
+                <Column Header="First Name">
+                    @context.FirstName
                 </Column>
-                <Column Header="Credits">
+                <Column Header="Last Name">
+                    @context.LastName
+                </Column>
+                <Column Header="Balance">
                     <FormatNumber Number="@context.Credits"></FormatNumber>
                 </Column>
                 <Column Header="Status">
-                    <span class="badge text-bg-success">TRANSFERRED</span>
+                    @if (context.Active)
+                    {
+                        <span class="badge text-bg-success">ACTIVE</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-error">INACTIVE</span>
+                    }
                 </Column>
             </Columns>
         </Table>
@@ -40,14 +45,12 @@
     </Footer>
 </Card>
 
-<TransferModal @ref="transferModal"></TransferModal>
 
 @code {
     [Parameter] public string SubAccountId { get; set; }
     private SearchBox searchBox = new();
-    private TransferModal transferModal = new();
 
-    private ApiDataSource<TransferResponse> ds = new();
+    private ApiDataSource<AccountResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -57,7 +60,7 @@
         {
             if (account != null)
             {
-                return await subClient.Impersonate(account).TransferListAsync(
+                return await subClient.Impersonate(account).AccountsListAsync(
                     p.PageNumber, p.PageSize, searchBox.Text);
             }
             return ds.EmptyResponse;
