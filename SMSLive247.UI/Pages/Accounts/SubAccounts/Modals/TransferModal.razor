@@ -9,20 +9,23 @@
 
             <FormField Label="Transfer Direction">
                 <InputRadioGroup @bind-Value="transferDirection">
-                    <div class="form-check form-check-inline">
+                    <div class="form-check-inline">
                         <InputRadio id="toParent" Value='@("ToParent")' />
                         <label class="form-check-label" for="toParent">To Parent Account</label>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <InputRadio Value='@("FromParent")'></InputRadio>
-                        <label class="form-check-label" for="toParent">From Parent Account</label>
+                    <div class="form-check-inline">
+                        <InputRadio id="fromParent" Value='@("FromParent")' />
+                        <label class="form-check-label" for="fromParent">From Parent Account</label>
                     </div>
                 </InputRadioGroup>
             </FormField>
             <FormField Label="Credits">
                 <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required></InputNumber>
             </FormField>
-            <FormInputNumber Label="Old Balance" @bind-Value="currentBalance" disabled="true"></FormInputNumber>
+            @{
+                int currentBalance = transferDirection == "ToParent" ? (int)subAccount.Credits : (int)parentAccount.Credits;
+            }
+            <FormInputNumber Label="Old Balance" @bind-Value="@currentBalance" disabled="true"></FormInputNumber>
             <FormField Label="New Balance">
                 <InputNumber @bind-Value="newBalance" class="form-control" disabled="true"></InputNumber>
             </FormField>
@@ -38,7 +41,6 @@
     private bool hideModal = true;
     private AccountResponse parentAccount = new();
     private AccountResponse subAccount = new();
-    private int currentBalance;
     private int newBalance;
     private TransferRequest transferRequest = new TransferRequest();
     private string transferDirection = "ToParent";
@@ -54,8 +56,6 @@
 
             parentAccount = t1.Result.Result;
             subAccount = t2.Result.Result;
-
-            currentBalance = (int)subAccount.Credits;
         }
         catch (Exception ex)
         {
