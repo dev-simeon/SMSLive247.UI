@@ -10,7 +10,8 @@
 }
 else if (Item == null)
 {
-    <th style="width: @Width">@Header</th>
+    @* <th style="width: @Width">@Header</th> *@
+    <th style="width: @Width; text-align: @Align">@Header</th>
 }
 else 
 {
@@ -23,5 +24,6 @@ else
     [CascadingParameter] public TItem? Item { get; set; }
     [Parameter] public string? Header { get; set; }
     [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Align { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
 }

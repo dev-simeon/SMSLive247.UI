@@ -40,7 +40,7 @@
         </p>
     </Body>
     <Footer>
-        <button type="button" class="btn btn-secondary" @onclick="HidePolicyModal">Close</button>
+        <button type="button" class="btn btn-secondary" @onclick="Hide">Close</button>
     </Footer>
 </Modal>
 
@@ -53,7 +53,7 @@
         StateHasChanged();
     }
 
-    private void HidePolicyModal()
+    private void Hide()
     {
         hideModal = true;
         StateHasChanged();

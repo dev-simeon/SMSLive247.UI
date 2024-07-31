@@ -27,14 +27,13 @@ namespace SMSLive247.UI
             builder.Services.AddTransient<CacheDelegateHandler>();
             builder.Services.AddTransient<SpinnerDelegateHandler>();
 
-            void setBase(HttpClient c) => c.BaseAddress = new Uri(settings.BaseUrl);
 
-            builder.Services.AddHttpClient<ApiClient>(setBase)
-                .AddHttpMessageHandler<AuthDelegateHandler>()
-                .AddHttpMessageHandler<CacheDelegateHandler>()
-                .AddHttpMessageHandler<SpinnerDelegateHandler>();
+            builder.Services.AddHttpClient<ApiClient>(ConfigureUrl)
+                   .AddHttpMessageHandler<AuthDelegateHandler>()
+                   .AddHttpMessageHandler<CacheDelegateHandler>()
+                  .AddHttpMessageHandler<SpinnerDelegateHandler>();
 
-            builder.Services.AddHttpClient<SubAccountClient>(setBase)
+            builder.Services.AddHttpClient<SubAccountClient>(ConfigureUrl)
                    .AddHttpMessageHandler<SpinnerDelegateHandler>();
 
             builder.Services.AddMemoryCache();
@@ -43,6 +42,11 @@ namespace SMSLive247.UI
             builder.Services.AddBlazoredLocalStorage();
 
             await builder.Build().RunAsync();
+
+            void ConfigureUrl(HttpClient client)
+            {
+                client.BaseAddress = new Uri(settings.BaseUrl);
+            }
         }
     }
 }

@@ -1,0 +1,95 @@
+﻿@page "/Credits/Pricing"
+
+<Title>Price List</Title>
+
+<Card HeaderTitle="Price List">
+    <Body>
+        <MultiColumn Column1Width="5" Column2Width="7">
+            <Column1>
+                <div class="card">
+                    <header class="card-header pt-3 pb-2">
+                        <h5>Calculate your price here</h5>
+                    </header>
+
+                    <div class="card-body">
+                        <InputNumber class="form-control" @bind-Value="quantity" placeholder="SMS Quantity" />
+
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label">Rate (@currencyName)</label>
+                                <FormatNumber Currency="@price.Price"></FormatNumber>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label">Price (@currencyName)</label>
+                                <FormatNumber Currency="@price.Amount"></FormatNumber>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer border-top py-2">
+                        <Button Type="Button.Style.DEFAULT" @onclick="CalculatePrice">Get Price</Button>
+                    </div>
+                </div>
+            </Column1>
+            <Column2>
+                <Table Items="priceSlots">
+                    <Columns>
+                        <Column Header="SN">
+                            1.
+                        </Column>
+                        <Column Align="right" Header="Quantity from">
+                            <FormatNumber Number="@context.MinQuantity"></FormatNumber>
+                        </Column>
+                        <Column Align="right" Header="Quantity to">
+                            <FormatNumber Number="@context.MaxQuantity"></FormatNumber>
+                        </Column>
+                        <Column Align="right" Header="@($"Price in {@currencyName}")">
+                            <FormatNumber Currency="@context.Price" Symbol="@currencySymbol"></FormatNumber>
+                        </Column>
+                    </Columns>
+                </Table>
+            </Column2>
+        </MultiColumn>
+    </Body>
+</Card>
+
+@code {
+    private long quantity = 1000;
+    private string currencyName = "Naira";
+    private string currencySymbol = "₦";
+
+    private PriceCalcResponse price = new();
+    private List<PriceSlotResponse> priceSlots = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await CalculatePrice();
+            var response = await apiClient.PriceListAsync();
+
+            if (response.StatusCode == 200)
+                priceSlots = response.Result.ToList();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private async Task CalculatePrice()
+    {
+        try
+        {
+            var result = await apiClient.PriceCalculateAsync(null, quantity);
+
+            if (result.StatusCode == 200)
+                price = result.Result;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+}

@@ -5,17 +5,17 @@
     {
         @FormatValueAsString(Currency, $"{Symbol} {Format}")
     }
-    else
-    {
-        @($"{Symbol} 0.00")
-    }
-    @if (!Percent.Equals(default(TValue)))
+    else if (!Percent.Equals(default(TValue)))
     {
         @FormatValueAsString(Percent, "P")
     }
-    @if (!Number.Equals(default(TValue)))
+    else if (!Number.Equals(default(TValue)))
     {
         @FormatValueAsString(Number, "#,##0")
+    }
+    else
+    {
+        @(0.00)
     }
 </div>
 
