@@ -2,15 +2,10 @@
 @layout EmptyLayout;
 @inject NavigationManager nav
 @inject HttpClient httpClient
-@inject AuthenticationStateProvider auth;
 
 @using SMSLive247.UI.Pages.Legal
-@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@using System.Net.Http.Headers;
-@using System.Net.Http.Json;
-@using System.Globalization;
 
-<PageTitle>SmsLive247 Register</PageTitle>
+<PageTitle>SmsLive247 - Register</PageTitle>
 <AutoSpinner />
 <Alert />
 
@@ -23,47 +18,47 @@
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
 
-            @if (!showAdditionalFields)
+            @if (!showMore)
             {
                 <div class="mb-3">
-                    <label class="form-label" for="FirstName">First Name</label>
+                    <label class="form-label">First Name</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-user"></i></span>
-                        <InputText @bind-Value="Model.FirstName" class="form-control" type="text" required @oninput="UpdateAccountName" />
+                        <InputText class="form-control" @bind-Value="Model.FirstName" required />
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="LastName">Last Name</label>
+                    <label class="form-label">Last Name</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-user"></i></span>
-                        <InputText @bind-Value="Model.LastName" class="form-control" type="text" required @oninput="UpdateAccountName" />
+                        <InputText class="form-control" @bind-Value="Model.LastName" required />
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="Email">Email</label>
+                    <label class="form-label">Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                        <InputText @bind-Value="Model.Email" class="form-control" type="email" required />
+                        <InputText class="form-control" @bind-Value="Model.Email" type="email" required />
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="Phone">Phone</label>
+                    <label class="form-label">Phone</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-phone"></i></span>
-                        <InputText @bind-Value="Model.Phone" class="form-control" type="text" required />
+                        <InputText class="form-control" @bind-Value="Model.Phone" required />
                     </div>
                 </div>
-                <button @onclick="FirstStepSubmit" class="btn btn-primary mt-4 w-100" type="button">
-                    Submit
+                <button class="btn btn-primary mt-4 w-100" @onclick="GotoNextView" type="button">
+                    Continue...
                 </button>
             }
             else
             {
                 <div class="mb-3">
-                    <label class="form-label" for="Country">Country</label>
+                    <label class="form-label">Country</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-globe"></i></span>
-                        <InputSelect @bind-Value="Model.CountryCode" class="form-select" required>
+                        <InputSelect class="form-select" @bind-Value="Model.CountryCode" required>
                             <option value="355">Albania </option>
                             <option value="213">Algeria</option>
                             <option value="376">Andorra</option>
@@ -232,10 +227,10 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="TimeZone">Time Zone</label>
+                    <label class="form-label">Time Zone</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-clock"></i></span>
-                        <InputSelect @bind-Value="Model.TimeZone" class="form-select" required>
+                        <InputSelect class="form-select" @bind-Value="Model.TimeZone" required>
                             <option value="-12">GMT -12</option>
                             <option value="-11">GMT -11</option>
                             <option value="-10">GMT -10</option>
@@ -265,37 +260,35 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="Password">Password</label>
+                    <label class="form-label">Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-key"></i></span>
-                        <InputText @bind-Value="Model.Password" class="form-control" type="password" required />
+                        <InputText  class="form-control"@bind-Value="Model.Password" type="password" required />
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="ConfirmPassword">Confirm Password</label>
+                    <label class="form-label">Confirm Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-key"></i></span>
-                        <InputText @bind-Value="ConfirmPassword" class="form-control" type="password" required />
+                        <InputText  class="form-control"@bind-Value="confirmPassword" type="password" required />
                     </div>
                 </div>
                 <div class="mb-3 form-check">
-                    <InputCheckbox @bind-Value="AcceptAgreement" class="form-check-input" id="agreementCheckbox" />
-                    <label class="form-check-label" for="agreementCheckbox">
+                    <InputCheckbox @bind-Value="acceptTerms" class="form-check-input" id="a1" />
+                    <label class="form-check-label" for="a1">
                         I have read and accepted the
-                        <a href="" @onclick="() => termsAndCondition.Show()" @onclick:preventDefault>SMSLive247 Agreement</a> and
-                        <a href="" @onclick="() => privacyPolicy.Show()" @onclick:preventDefault>Privacy Policy</a>
+                        <a href="#" @onclick="e => agreementModal.Show()" @onclick:preventDefault>Agreement</a> 
+                        and
+                        <a href="#" @onclick="e => privacyModal.Show()" @onclick:preventDefault>Privacy Policy</a>
                     </label>
                 </div>
-                <button class="btn btn-primary mt-4 w-100" disabled="@(AcceptAgreement ? null : "disabled")" type="submit">
-                    Sign Me Up
+                <button class="btn btn-primary mt-4 w-100" disabled="@(!acceptTerms)" type="submit">
+                    Sign Me Up!
                 </button>
             }
             <p class="mt-3">
                 Already have an account?
-                <a class="text-decoration-none"
-                   href="/Login">
-                    click here to login
-                </a>
+                <a class="text-decoration-none" href="/Login">Click here to login</a>
             </p>
         </EditForm>
     </aside>
@@ -306,79 +299,48 @@
     </aside>
 </main>
 
-<Agreement @ref="termsAndCondition"></Agreement>
-<PrivacyPolicy @ref="privacyPolicy"></PrivacyPolicy>
+<Agreement @ref="agreementModal"></Agreement>
+<PrivacyPolicy @ref="privacyModal"></PrivacyPolicy>
 
 @code {
-    private Agreement termsAndCondition = new();
-    private PrivacyPolicy privacyPolicy = new();
+    private Agreement agreementModal = new();
+    private PrivacyPolicy privacyModal = new();
 
-    private bool showAdditionalFields = false;
-    private string ConfirmPassword = "";
-    public bool AcceptAgreement { get; set; }
+    private string? confirmPassword;
+    private bool acceptTerms;
+    private bool showMore;
 
     [SupplyParameterFromForm]
-    public AccountCreateRequest Model { get; set; } = new();
+    public AccountCreateRequest Model { get; set; } = new() { TimeZone = 1, CountryCode = 234 };
 
-    private void FirstStepSubmit()
+    private void GotoNextView()
     {
-        showAdditionalFields = true;
+        showMore = true;
     }
 
-    private void UpdateAccountName(ChangeEventArgs e)
+    private void GotoPreviousView()
     {
-        Model.AccountName = $"{Model.FirstName} {Model.LastName}";
+        showMore = false;
     }
 
     private async Task RegisterAsync()
     {
-
-        if (!AcceptAgreement)
-        {
-            await alert.Error("You must accept the agreement and privacy policy to register.", "Error");
-            return;
-        }
-
-        if (Model.Password != ConfirmPassword)
-        {
-            await alert.Error("Passwords do not match.", "Error");
-            return;
-        }
-
         try
         {
+            if (!acceptTerms)
+                throw new Exception("You must accept the agreement and privacy policy to register");
+
+            if (Model.Password != confirmPassword)
+                throw new Exception("Passwords do not match");
+
+
+            Model.AccountName = $"{Model.FirstName} {Model.LastName}";
             var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", Model);
 
             if (response.StatusCode == 200)
-            {
-                var loginResponse = await apiClient.LoginAsync(new LoginRequest
-                {
-                    ParentID = "a044b5a7-1147-45cb-871a-76546896c4f3",
-                    Username = Model.Email,
-                    Password = Model.Password
-                });
+                nav.NavigateTo("/Login?email=" + Model.Email);
 
-                if (loginResponse.StatusCode == 200)
-                {
-                    httpClient.DefaultRequestHeaders.Authorization =
-                        new AuthenticationHeaderValue("Bearer", loginResponse.Result.AccessToken);
-
-                    var apiKey = $"MA-{loginResponse.Result.AccessToken}";
-                    var member = new Authentication.SmsAuthProvider.UserClaims(Model.Email, apiKey);
-
-                    await ((Authentication.SmsAuthProvider)auth)
-                        .SaveAuthenticationState(member);
-
-                    nav.NavigateTo("/");
-                    return;
-                }
-
-                await alert.Error("Login failed after registration.", "Error");
-            }
-            else
-            {
-                await alert.Error("Registration failed.", "Error");
-            }
+            throw new Exception("Registration failed");
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {

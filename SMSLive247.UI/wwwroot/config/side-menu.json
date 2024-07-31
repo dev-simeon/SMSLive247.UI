@@ -21,11 +21,6 @@
         "Name": "Sender IDs",
         "Icon": "fa fa-fingerprint",
         "Link": "/Messaging/SenderIds"
-      },
-      {
-        "Name": "Settings",
-        "Icon": "fa fa-user-cog",
-        "Link": "/Messaging/Settings"
       }
     ]
   },
@@ -43,7 +38,7 @@
         "Link": "/Accounts/SubAccounts"
       },
       {
-        "Name": "Profile",
+        "Name": "My Profile",
         "Icon": "fa fa-user",
         "Link": "/Accounts/Profile"
       }
@@ -68,9 +63,9 @@
         "Link": "/Credits/Transfer"
       },
       {
-        "Name": "Price List",
-        "Icon": "fa fa-tag",
-        "Link": "/Credits/PriceList"
+        "Name": "Pricing",
+        "Icon": "fa fa-dollar-sign",
+        "Link": "/Credits/Pricing"
       }
     ]
   },
@@ -78,19 +73,19 @@
     "Name": "Support",
     "Items": [
       {
-        "Name": "Contact Us",
-        "Icon": "fa fa-address-book",
-        "Link": "/Support/Contacts"
-      },
-      {
-        "Name": "Coverages",
-        "Icon": "fa fa-route",
-        "Link": "/Support/Coverages"
-      },
-      {
         "Name": "Tickets",
         "Icon": "fa fa-headset",
         "Link": "/Support/Tickets"
+      },
+      {
+        "Name": "Contact Us",
+        "Icon": "fa fa-address-book",
+        "Link": "/Support/Contact"
+      },
+      {
+        "Name": "Coverage",
+        "Icon": "fa fa-globe",
+        "Link": "/Support/Coverage"
       }
     ]
   },
@@ -98,14 +93,14 @@
     "Name": "Developers",
     "Items": [
       {
-        "Name": "Api Docs",
-        "Icon": "fa fa-book",
-        "Link": "https://smslive247api.readme.io/reference/introduction"
-      },
-      {
         "Name": "Api Keys",
         "Icon": "fa fa-code",
         "Link": "/Developers/ApiKeys"
+      },
+      {
+        "Name": "Api Docs",
+        "Icon": "fa fa-book",
+        "Link": "https://smslive247api.readme.io/reference/introduction"
       }
     ]
   }

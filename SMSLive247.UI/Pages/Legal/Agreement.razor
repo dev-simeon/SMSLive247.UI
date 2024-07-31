@@ -47,7 +47,7 @@
         </p>
     </Body>
     <Footer>
-        <button type="button" class="btn btn-secondary" @onclick="HideAgreementModal">Close</button>
+        <button type="button" class="btn btn-secondary" @onclick="Hide">Close</button>
     </Footer>
 </Modal>
 
@@ -60,7 +60,8 @@
         StateHasChanged();
     }
 
-    private void HideAgreementModal(){
+    private void Hide()
+    {
         hideModal = true;
         StateHasChanged();
     }

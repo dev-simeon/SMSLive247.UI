@@ -88,7 +88,7 @@
     protected override async Task OnInitializedAsync()
     {
         navItems = await httpClient.GetFromJsonAsync<MenuItem[]>
-        ($"{nav.BaseUri}/config/side-menu.json?i=1") ?? [];
+        ($"{nav.BaseUri}/config/side-menu.json?i=3") ?? [];
 
         nav.LocationChanged += HandleLocationChanged;
         base.OnInitialized();
@@ -113,7 +113,10 @@
 
     private bool IsExternalUrl(string? url)
     {
-        return !string.IsNullOrEmpty(url) && (url.StartsWith("http://") || url.StartsWith("https://"));
+        if (string.IsNullOrEmpty(url))
+            return false;
+        
+        return url.StartsWith("http://") || url.StartsWith("https://");
     }
 
     public class MenuItem
