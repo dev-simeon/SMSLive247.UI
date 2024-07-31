@@ -41,7 +41,8 @@
                     }
                 </Column>
                 <Column Header="">
-                    <Actions OnView="e => subAccountModal.Show(context)"
+                    <Actions OnEdit="e => subAccountModal.Show(context)"
+                             OnView="e => subAccountModal.Show(context)"
                              OnDelete="e => subAccountModal.Delete(context)">
                     </Actions>
                 </Column>
