@@ -9,8 +9,14 @@
 
             <FormField Label="Transfer Direction">
                 <InputRadioGroup @bind-Value="transferDirection">
-                    <InputRadio Value='@("ToParent")'>To Parent Account</InputRadio>
-                    <InputRadio Value='@("FromParent")'>From Parent Account</InputRadio>
+                    <div class="form-check form-check-inline">
+                        <InputRadio id="toParent" Value='@("ToParent")' />
+                        <label class="form-check-label" for="toParent">To Parent Account</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <InputRadio Value='@("FromParent")'></InputRadio>
+                        <label class="form-check-label" for="toParent">From Parent Account</label>
+                    </div>
                 </InputRadioGroup>
             </FormField>
             <FormField Label="Credits">
@@ -35,7 +41,7 @@
     private int currentBalance;
     private int newBalance;
     private TransferRequest transferRequest = new TransferRequest();
-    private string transferDirection = "FromParent";
+    private string transferDirection = "ToParent";
 
     protected override async Task OnInitializedAsync()
     {
