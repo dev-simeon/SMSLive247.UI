@@ -1,4 +1,6 @@
-﻿<Card HeaderTitle="Sub Account">
+﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
+
+<Card HeaderTitle="Sub Account">
     <Body>
         <SearchArea>
             <LeftRight>
@@ -7,6 +9,7 @@
                     </SearchBox>
                 </Left>
                 <Right>
+                    <Button Type="Button.Style.ADD" @onclick="() => subUserModal.Show()">Add Sub User</Button>
                 </Right>
             </LeftRight>
         </SearchArea>
@@ -38,7 +41,10 @@
                     }
                 </Column>
                 <Column>
-                    <Actions></Actions>
+                    <Actions 
+                        OnEdit="() => subUserModal.Show(context)"
+                        OnDelete="() => subUserModal.Delete(context)">
+                    </Actions>
                 </Column>
             </Columns>
         </Table>
@@ -48,14 +54,22 @@
     </Footer>
 </Card>
 
+<SubUserModal @ref="subUserModal" SubAccountId="@SubAccountId" OnCompleted="FetchData"></SubUserModal>
+
 
 @code {
     [Parameter] public string SubAccountId { get; set; }
     private SearchBox searchBox = new();
+    private SubUserModal subUserModal = new();
 
     private ApiDataSource<AccountResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
     {
         var account = await GetSubAccount(SubAccountId);
 

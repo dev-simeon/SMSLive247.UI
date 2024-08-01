@@ -1,0 +1,86 @@
+﻿<EditModal TItem="AccountResponse" @ref="editor" LabelText="Sub User"
+           OnCreate="OnCreate"
+           OnUpdate="OnUpdate"
+           OnDelete="OnDelete"
+           OnCompleted="OnCompleted">
+    <FormInputText Label="First Name" @bind-Value="model.FirstName" required></FormInputText>
+    <FormInputText Label="Last Name" @bind-Value="model.LastName" required></FormInputText>
+    <FormInputText Label="Phone Number" @bind-Value="model.Phone" required></FormInputText>
+    <FormInputText Label="Delivery Email" @bind-Value="model.Email" required></FormInputText>
+    @{
+        var stringApiKey = subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A";
+    }
+    @if(editor.EditMode == EditModal<AccountResponse>.EditModeEnum.EDIT)
+    {
+        <FormInputText Label="API Key" @bind-Value="@stringApiKey" readonly></FormInputText>
+    }
+</EditModal>
+
+
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public string SubAccountId { get; set; }
+
+    private EditModal<AccountResponse> editor = new();
+    private AccountResponse model => editor.Model;
+
+    private AccountResponse subAccount = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync(SubAccountId);
+
+            if (response.StatusCode == 200)
+            {
+                subAccount =  response.Result;
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    public void Show(AccountResponse? item = null) => editor.Show(item);
+    public void Delete(AccountResponse account) => editor.Delete(account);
+
+    private async Task OnCreate()
+    {
+        var request = new AccountCreateRequest
+        {
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            Phone = model.Phone,
+            Email = model.Email,        
+        };
+
+        await subClient.Impersonate(subAccount).AccountCreateAsync(request);
+    }
+
+    private async Task OnUpdate()
+    {
+        var updateRequest = new AccountUpdateRequest
+        {
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            Phone = model.Phone,
+            Email = model.Email,
+        };
+
+        await subClient.Impersonate(subAccount).AccountUpdateAsync(model.AccountID, updateRequest);
+    }
+
+    private async Task OnDelete()
+    {
+        var question = "Are you sure you want to delete this account?";
+        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+
+        if (confirmed)
+        {
+            await subClient.Impersonate(subAccount).AccountDeleteAsync(model.AccountID);
+        }
+    }
+}
