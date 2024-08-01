@@ -1,21 +1,18 @@
 ﻿<Modal Title="Transfer SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
-        <div class="alert alert-info" role="alert">
-            Minimum SMS credit quantity to transfer is 50 SMS credits.
-        </div>
         <EditForm id="Transfer" Model="transferRequest" OnValidSubmit="BeginTransfer">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <FormField Label="Transfer Direction">
+            <FormField Label="Transfer From">
                 <InputRadioGroup @bind-Value="transferDirection">
                     <div class="form-check-inline">
                         <InputRadio id="toParent" Value='@("ToParent")' />
-                        <label class="form-check-label" for="toParent">To Parent Account</label>
+                        <label class="form-check-label" for="toParent">@subAccount.AccountName - @parentAccount.AccountName</label>
                     </div>
                     <div class="form-check-inline">
                         <InputRadio id="fromParent" Value='@("FromParent")' />
-                        <label class="form-check-label" for="fromParent">From Parent Account</label>
+                        <label class="form-check-label" for="fromParent">@parentAccount.AccountName - @subAccount.AccountName</label>
                     </div>
                 </InputRadioGroup>
             </FormField>
@@ -37,7 +34,7 @@
 </Modal>
 
 @code {
-    [Parameter] public string SubAccountId { get; set; }
+    [Parameter] public string ParentId { get; set; }
     private bool hideModal = true;
     private AccountResponse parentAccount = new();
     private AccountResponse subAccount = new();
@@ -49,13 +46,12 @@
     {
         try
         {
-            var t1 = apiClient.AccountGetAsync("self");
-            var t2 = apiClient.AccountGetAsync(SubAccountId);
+            var response = await apiClient.AccountGetAsync(ParentId);
 
-            await Task.WhenAll(t1, t2);
-
-            parentAccount = t1.Result.Result;
-            subAccount = t2.Result.Result;
+            if(response.StatusCode == 200)
+            {
+                parentAccount = response.Result;
+            }
         }
         catch (Exception ex)
         {
@@ -63,9 +59,10 @@
         }
     }
 
-    public void Show()
+    public void Show(AccountResponse account)
     {
         hideModal = false;
+        subAccount = account;
         StateHasChanged();
     }
 

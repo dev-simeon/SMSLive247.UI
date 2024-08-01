@@ -1,4 +1,4 @@
-﻿<Modal Title="Transfer SMS Credits" Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
+﻿<Modal Title="Transfer SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
         <div class="alert alert-info" role="alert">
             Minimum SMS credit quantity to transfer is 50 sms credit.
@@ -24,7 +24,7 @@
 </Modal>
 
 @code {
-    private bool showModal = false;
+    private bool hideModal = true;
     private AccountResponse account = new();
     private int newBalance;
     private TransferRequest transferRequest = new TransferRequest();
@@ -46,7 +46,7 @@
 
     public void Show()
     {
-        showModal = true;
+        hideModal = false;
         StateHasChanged();
     }
 
@@ -71,6 +71,7 @@
         }
         finally
         {
+            hideModal = true;
             StateHasChanged();
         }
     }

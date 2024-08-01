@@ -28,7 +28,14 @@
                     @context.LastName
                 </Column>
                 <Column Header="Balance">
-                    <FormatNumber Number="@context.Credits"></FormatNumber>
+                    <div class="d-flex flex-column">
+                        <FormatNumber Number="@context.Credits"></FormatNumber>
+                        <div>
+                            <button class="btn btn-link btn-sm" @onclick="() => transferModal.Show(context)">
+                                Add Credit
+                            </button>
+                        </div>
+                    </div>
                 </Column>
                 <Column Header="Status">
                     @if (context.Active)
@@ -55,12 +62,14 @@
 </Card>
 
 <SubUserModal @ref="subUserModal" SubAccountId="@SubAccountId" OnCompleted="FetchData"></SubUserModal>
+<TransferModal @ref="transferModal" ParentId="@SubAccountId"></TransferModal>
 
 
 @code {
     [Parameter] public string SubAccountId { get; set; }
     private SearchBox searchBox = new();
     private SubUserModal subUserModal = new();
+    private TransferModal transferModal = new();
 
     private ApiDataSource<AccountResponse> ds = new();
 

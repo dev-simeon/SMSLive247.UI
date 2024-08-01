@@ -1,4 +1,6 @@
-﻿<style>
+﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals;
+
+<style>
     .card.account-details-container {
         max-width: 800px;
         background-color: #f9f9f9;
@@ -27,12 +29,22 @@
 @if (subAccount != null)
 {
     <div class="card account-details-container">
-        <div class="card-header d-flex justify-content-between align-items-center border-bottom py-3">
-            <div class="account-info">
-                <h2>@subAccount.AccountName</h2>
-                <span>ID: @subAccount.AccountID</span>
-            </div>
+        <div class="card-header border-bottom py-3">
+            <LeftRight>
+                <Left>
+                    <div class="account-info">
+                        <h2>@subAccount.AccountName</h2>
+                        <span>ID: @subAccount.AccountID</span>
+                    </div>
+                </Left>
+                <Right>
+                    <Button Type="Button.Style.ADD" @onclick="() => transferModal.Show(subAccount)">
+                        Add Credit
+                    </Button>
+                </Right>
+            </LeftRight>
         </div>
+       
         <div class="card-body">
             <div class="account-details-grid">
                 <div class="detail-item">
@@ -90,10 +102,13 @@ else
     <p>Loading...</p>
 }
 
+<TransferModal @ref="transferModal" ParentId="self"></TransferModal>
+
 @code {
     [Parameter] public string SubAccountId { get; set; }
 
     private AccountResponse subAccount = new();
+    private TransferModal transferModal = new();
 
     protected override async Task OnInitializedAsync()
     {

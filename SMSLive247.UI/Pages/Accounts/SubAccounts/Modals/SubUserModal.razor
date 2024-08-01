@@ -3,16 +3,29 @@
            OnUpdate="OnUpdate"
            OnDelete="OnDelete"
            OnCompleted="OnCompleted">
-    <FormInputText Label="First Name" @bind-Value="model.FirstName" required></FormInputText>
-    <FormInputText Label="Last Name" @bind-Value="model.LastName" required></FormInputText>
-    <FormInputText Label="Phone Number" @bind-Value="model.Phone" required></FormInputText>
-    <FormInputText Label="Delivery Email" @bind-Value="model.Email" required></FormInputText>
-    @{
-        var stringApiKey = subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A";
-    }
-    @if(editor.EditMode == EditModal<AccountResponse>.EditModeEnum.EDIT)
+    @if (editor.EditMode == EditModal<AccountResponse>.EditModeEnum.CREATE)
     {
+        <FormInputText Label="First Name" @bind-Value="model.FirstName" required></FormInputText>
+        <FormInputText Label="Last Name" @bind-Value="model.LastName" required></FormInputText>
+        <FormInputText Label="Phone Number" @bind-Value="model.Phone" required></FormInputText>
+        <FormInputText Label="Delivery Email" @bind-Value="model.Email" required></FormInputText>
+    }
+    else if (editor.EditMode == EditModal<AccountResponse>.EditModeEnum.EDIT)
+    {
+        <FormInputText Label="First Name" @bind-Value="model.FirstName" required></FormInputText>
+        <FormInputText Label="Last Name" @bind-Value="model.LastName" required></FormInputText>
+        <FormInputText Label="Phone Number" @bind-Value="model.Phone" required></FormInputText>
+        <FormInputText Label="Delivery Email" @bind-Value="model.Email" required></FormInputText>
+
+        var stringApiKey = subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A";
         <FormInputText Label="API Key" @bind-Value="@stringApiKey" readonly></FormInputText>
+    }
+    else
+    {
+        <FormInputText Label="First Name" @bind-Value="model.FirstName" readonly></FormInputText>
+        <FormInputText Label="Last Name" @bind-Value="model.LastName" readonly></FormInputText>
+        <FormInputText Label="Phone Number" @bind-Value="model.Phone" readonly></FormInputText>
+        <FormInputText Label="Delivery Email" @bind-Value="model.Email" readonly></FormInputText>
     }
 </EditModal>
 

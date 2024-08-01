@@ -9,7 +9,7 @@
                     </SearchBox>
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-paper-plane" @onclick="e => transferModal.Show()">
+                    <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-paper-plane" @onclick="e => transferModal.Show(subAccount)">
                         Transfer Credits...
                     </Button>
                 </Right>
@@ -40,24 +40,26 @@
     </Footer>
 </Card>
 
-<TransferModal @ref="transferModal" SubAccountId="@SubAccountId"></TransferModal>
+<TransferModal @ref="transferModal" ParentId="self"></TransferModal>
 
 @code {
     [Parameter] public string SubAccountId { get; set; }
     private SearchBox searchBox = new();
+
     private TransferModal transferModal = new();
+    private AccountResponse subAccount = new();
 
     private ApiDataSource<TransferResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var account = await GetSubAccount(SubAccountId);
+        subAccount = await GetSubAccount(SubAccountId);
 
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            if (account != null)
+            if (subAccount != null)
             {
-                return await subClient.Impersonate(account).TransferListAsync(
+                return await subClient.Impersonate(subAccount).TransferListAsync(
                     p.PageNumber, p.PageSize, searchBox.Text);
             }
             return ds.EmptyResponse;
