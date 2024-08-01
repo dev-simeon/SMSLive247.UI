@@ -30,7 +30,7 @@
                 <Column Header="Balance">
                     <div class="d-flex flex-column">
                         <FormatNumber Number="@context.Credits"></FormatNumber>
-                        <div>
+                        <div class="align-self-end pe-4">
                             <button class="btn btn-link btn-sm" @onclick="() => transferModal.Show(context)">
                                 Add Credit
                             </button>
