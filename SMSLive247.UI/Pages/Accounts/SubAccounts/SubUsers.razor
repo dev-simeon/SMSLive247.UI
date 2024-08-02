@@ -28,13 +28,11 @@
                     @context.LastName
                 </Column>
                 <Column Header="Balance">
-                    <div class="d-flex flex-column">
+                    <div class="d-flex">
                         <FormatNumber Number="@context.Credits"></FormatNumber>
-                        <div class="align-self-end pe-4">
-                            <button class="btn btn-link btn-sm" @onclick="() => transferModal.Show(context)">
-                                Add Credit
-                            </button>
-                        </div>
+                        <button class="btn btn-outline-primary" @onclick="() => transferModal.Show(context)">
+                            Add/Remove Credit
+                        </button>
                     </div>
                 </Column>
                 <Column Header="Status">
