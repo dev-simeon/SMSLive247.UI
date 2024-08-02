@@ -48,7 +48,7 @@
         {
             var response = await apiClient.AccountGetAsync(ParentId);
 
-            if(response.StatusCode == 200)
+            if (response.StatusCode == 200)
             {
                 parentAccount = response.Result;
             }
