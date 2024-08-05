@@ -1,46 +1,481 @@
-﻿@using SMSLive247.UI.Pages.Messaging.Compose.Modals
+﻿@using CsvHelper
+@using CsvHelper.Configuration
+@using SMSLive247.UI.Pages.Messaging.Contacts.Modals
+@using System.Globalization
 @inject Settings settings;
 
-<EditForm Model="model.Request" OnValidSubmit="SubmitMessage">
-    <ValidationSummary class="text-danger" />
-    <DataAnnotationsValidator />
+<style>
+    .step-wrapper {
+        display: none;
+    }
 
-    <Card HeaderTitle="Compose template SMS messages">
-        <Body>
-            <h6 class="mb-0">Upload A Customized Message</h6>
-             <MultiColumn Column1Width="5">
-                 <Column1>
-                    <FormInputFile Label="Select File" OnChange="e => FileSelected(e)" Accept='@(".csv")'></FormInputFile>
-                 </Column1>
-             </MultiColumn>
-        </Body>
-    </Card>
-</EditForm>
+        .step-wrapper.active {
+            display: block;
+        }
+
+    .step-indicator {
+        display: table;
+        table-layout: fixed;
+        text-align: center;
+        vertical-align: middle;
+        padding-left: 0;
+        padding-top: 20px;
+    }
+
+        .step-indicator li {
+            display: table-cell;
+            position: relative;
+            width: 1%;
+        }
+
+            .step-indicator li:after {
+                background-color: #ccc;
+                content: "";
+                display: block;
+                height: 1px;
+                position: absolute;
+                width: 100%;
+                top: 32px;
+            }
+
+            .step-indicator li:after {
+                left: 50%;
+            }
+
+            .step-indicator li:last-child:after {
+                display: none;
+            }
+
+            .step-indicator li.active .step {
+                border-color: #4183d7;
+                color: #4183d7;
+            }
+
+            .step-indicator li.active .caption {
+                color: #4183d7;
+            }
+
+            .step-indicator li.complete:after {
+                background-color: #e95420;
+            }
+
+            .step-indicator li.complete .step {
+                border-color: #e95420;
+                color: #e95420;
+            }
+
+            .step-indicator li.complete .caption {
+                color: #e95420;
+            }
+
+    .step {
+        background-color: #fff;
+        border-radius: 50%;
+        border: 1px solid #d9d9d9;
+        font-size: 24px;
+        height: 64px;
+        line-height: 64px;
+        margin: 0 auto;
+        position: relative;
+        width: 64px;
+        z-index: 1;
+    }
+
+        .step:hover {
+            cursor: pointer;
+        }
+</style>
+
+<div class="container">
+    <!-- Step Indicators -->
+    <ol class="step-indicator">
+        @foreach (var step in Steps)
+        {
+            <li class="@(step == CurrentStep ? "active" : "") @(Steps.IndexOf(step) < Steps.IndexOf(CurrentStep) ? "complete" : "")">
+                @if (Steps.IndexOf(step) == 0)
+                {
+                    <div class="step"><i class="fa fa-file"></i></div>
+                }
+                else if (Steps.IndexOf(step) == 1)
+                {
+                    <div class="step"><i class="fa fa-eye"></i></div>
+                }
+                else if (Steps.IndexOf(step) == 2)
+                {
+                    <div class="step"><i class="fa fa-comment"></i></div>
+                }
+                else
+                {
+                    <div class="step"><i class="fa fa-paper-plane"></i></div>
+                }
+
+                <div class="caption hidden-xs hidden-sm py-2 px-3">Step @(Steps.IndexOf(step) + 1): @step.Title</div>
+            </li>
+        }
+    </ol>
+
+    <!-- Step 1: Select CSV File -->
+    <div class="step-wrapper @(IsFirstStep ? "active" : "")">
+        @if (CurrentStep == Steps[0])
+        {
+            <div>
+                <h3>@Steps[0].Title</h3>
+                <Card>
+                    <Body>
+                        <SearchArea>
+                            <LeftRight>
+                                <Left>
+                                    <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
+                                </Left>
+                                <Right>
+                                    <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
+                                        Upload CSV File...
+                                    </Button>
+                                </Right>
+                            </LeftRight>
+                        </SearchArea>
+                        <Table Items="filteredItems">
+                            <Columns>
+                                <Column Width="15">
+                                    <input type="checkbox" @onclick="e => SelectFile(context)">
+                                </Column>
+                                <Column Header="File Name" Width="45%">@context.Description</Column>
+                                <Column Header="Total Numbers" Width="15%">
+                                    <FormatNumber Number="@context.TotalNumbers"></FormatNumber>
+                                </Column>
+                                <Column Header="Date Uploaded">
+                                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                                </Column>
+                                <Column Header="File Type">
+                                    <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
+                                </Column>
+                                <Column>
+                                    <Actions OnDownload="() => csvFileModal.Download(context)" OnDelete="() => csvFileModal.Delete(context)">
+                                    </Actions>
+                                </Column>
+                            </Columns>
+                        </Table>
+                    </Body>
+
+                </Card>
+            </div>
+
+        }
+    </div>
+
+    <!-- Step 2: Preview CSV File Content -->
+    <div class="step-wrapper @(CurrentStep == Steps[1] ? "active" : "")">
+        @if (CurrentStep == Steps[1])
+        {
+            <div>
+                <h3>@Steps[1].Title</h3>
+                <Card HeaderTitle="CSV Content">
+                    <Body>
+                        <Table Items="csvContent">
+                            <Columns>
+                                @foreach (var header in csvHeaders)
+                                {
+                                    <Column Header="@header">@context[header]</Column>
+                                }
+                            </Columns>
+                        </Table>
+                    </Body>
+                </Card>
+            </div>
+        }
+    </div>
+
+    <!-- Step 3: Select Field For Receipient Numbers and Type Message -->
+    <div class="step-wrapper @(CurrentStep == Steps[2] ? "active" : "")">
+        @if (CurrentStep == Steps[2])
+        {
+            <div>
+                <h3>@Steps[2].Title</h3>
+                <Card HeaderTitle="Compose Message">
+                    <Body>
+                        <FormField Label="Phone Number Column">
+                            <InputSelect @bind-Value="selectedColumn" class="form-select" required>
+                                @foreach (var header in csvHeaders)
+                                {
+                                    <option value="@header">@header</option>
+                                }
+                            </InputSelect>
+                        </FormField>
+                        <FormField Label="Message">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label" for="m2">@counterText</label>
+                                <button type="button" class="btn btn-close btn-sm" title="Clear Message" @onclick="ClearMessage"></button>
+                            </div>
+                            <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" @bind="messageContent" @oninput="OnTextChange"></textarea>
+                            <div class="form-text">
+                                Messages longer than 160 characters are charged per each page
+                            </div>
+                        </FormField>
+                    </Body>
+                </Card>
+            </div>
+        }
+    </div>
+
+    <!-- Step 4: Choose Option To Send Message Immediately Or Later -->
+    <div class="step-wrapper @(CurrentStep == Steps[3] ? "active" : "")">
+        @if (CurrentStep == Steps[3])
+        {
+            <div>
+                <h3>@Steps[3].Title</h3>
+                <Card HeaderTitle="Preview Message">
+                    <Body>
+                        <Table Items="csvContent">
+                            <Columns>
+                                <Column Header="Recipient Number">@context[selectedColumn]</Column>
+                                <Column Header="Message">@messageContent</Column>
+                            </Columns>
+                        </Table>
+                               
+                        <FormField Label="Sender ID">
+                            <InputSelect @bind-Value="model.Request.SenderID" class="form-select" required>
+                                @foreach (var senderId in senderIdList)
+                                {
+                                    <option value="@senderId">@senderId</option>
+                                }
+                            </InputSelect>
+                        </FormField>
+                        <FormField Label="Send Options">
+                            <InputRadioGroup @bind-Value="sendOption">
+                                <div class="form-check-inline">
+                                    <InputRadio id="sendNow" Value="@SendOption.SEND_NOW" />
+                                    <label class="form-check-label" for="sendNow">Send Now</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <InputRadio id="schedule" Value="@SendOption.SEND_LATER" />
+                                    <label class="form-check-label" for="schedule">Schedule for Later</label>
+                                </div>
+                            </InputRadioGroup>
+                        </FormField>
+                        @if (sendOption == SendOption.SEND_LATER)
+                        {
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <span class="input-group-text">Delivery Time</span>
+                                    <InputDate class="form-control" id="s5" Type="InputDateType.DateTimeLocal" @bind-Value="model.Request.DeliveryTime" />
+                                </div>
+                                <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
+                            </div>
+                        }
+                    </Body>
+                </Card>
+            </div>
+        }
+    </div>
+
+    <div class="">
+        <button type="button" class="btn btn-primary" @onclick="PreviousStep" disabled="@(IsFirstStep)">
+            Previous
+        </button>
+        <button type="button" class="btn btn-primary" @onclick="NextStep" disabled="@(IsLastStep)">
+            Next
+        </button>
+        <button type="submit" class="btn btn-primary" @onclick="HandleFinish" style="@(IsLastStep ? "display:inline-block;" : "display:none;")">
+            Submit Message
+        </button>
+    </div>
+</div>
+
+<BulkFileModal @ref="csvFileModal" ForCSV="true" OnCompleted="FetchData"></BulkFileModal>
+
 
 @code {
     private ComposeSimpleModel model = new();
+    private enum SendOption { SEND_NOW, SEND_LATER }
 
-    private IBrowserFile? browserFile;
+    private WizardStep CurrentStep { get; set; }
+    private List<WizardStep> Steps { get; set; } = new List<WizardStep>();
+    private string searchText = string.Empty;
+    private BulkFileModal csvFileModal = new();
+    private List<BatchFileResponse> items = [];
+    private List<BatchFileResponse> filteredItems = [];
+    private List<SenderIdResponse> senderIdList = [];
+    private List<Dictionary<string, string>> csvContent = new();
+    private List<string> csvHeaders = new();
+    private string selectedColumn = string.Empty;
+    private string messageContent = string.Empty;
+    private string counterText = "Type your Message here";
+    private SendOption sendOption = SendOption.SEND_NOW;
+    private BatchFileResponse selectedFile = new();
 
-    private async Task SubmitMessage()
+    protected override async Task OnInitializedAsync()
     {
-        // if (sendOption == SendOption.SEND_NOW)
-        //     model.Request.DeliveryTime = null;
+        Steps.Add(new WizardStep { Title = "Select CSV File" });
+        Steps.Add(new WizardStep { Title = "View CSV Content" });
+        Steps.Add(new WizardStep { Title = "Select Column For Numbers and Type Message" });
+        Steps.Add(new WizardStep { Title = "Preview and Send" });
 
-        model.Request.PhoneNumbers = model.Contacts
-            .Where(x => x.Selected).Select(x => x.Key).ToList();
+        if (Steps.Count > 0)
+        {
+            CurrentStep = Steps.First();
+        }
 
-        model.Request.BatchFileIDs = model.BatchFiles
-            .Where(x => x.Selected).Select(x => x.Key).ToList();
+        var response = await apiClient.SenderIdListAsync(1, 500);
 
-        model.Request.RawNumbers = string.Join(",",
-            model.Numbers.Select(x => x.Key));
+        if(response.StatusCode == 200)
+        {
+            senderIdList = response.Result.ToList();
+        }
 
-        await apiClient.SmsBatchCreateAsync(model.Request);
+        await FetchData();
     }
 
-    private void FileSelected(InputFileChangeEventArgs e)
+    private async Task NextStep()
     {
-        browserFile = e.File;
+        var index = Steps.IndexOf(CurrentStep);
+        if (index < Steps.Count - 1)
+        {
+            CurrentStep = Steps[index + 1];
+            if (CurrentStep == Steps[1])
+            {
+                await LoadCsvContent(selectedFile);
+            }
+        }
+    }
+
+    private void PreviousStep()
+    {
+        var index = Steps.IndexOf(CurrentStep);
+        if (index > 0)
+        {
+            CurrentStep = Steps[index - 1];
+        }
+    }
+
+    private bool IsFirstStep => Steps.IndexOf(CurrentStep) == 0;
+    private bool IsLastStep => Steps.IndexOf(CurrentStep) == Steps.Count - 1;
+
+    private async Task FetchData()
+    {
+        var response = await apiClient.BatchFileListAsync();
+
+        if (response.StatusCode == 200)
+        {
+            items = response.Result.Where(x => x.FileType == "csv").OrderByDescending(x => x.DateCreated).ToList();
+            filteredItems = items;
+        }
+    }
+
+    private void OnSearch(string input)
+    {
+        searchText = input;
+
+        if (string.IsNullOrEmpty(searchText))
+        {
+            filteredItems = items;
+        }
+        else
+        {
+            filteredItems = items.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+
+    private void SelectFile(BatchFileResponse file)
+    {
+        selectedFile = file;
+    }
+
+    private async Task LoadCsvContent(BatchFileResponse file)
+    {
+        try
+        {
+            var contentResponse = await apiClient.BatchFileDownloadAsync(file.BatchFileID);
+            if (contentResponse.StatusCode == 200)
+            {
+                using var reader = new StreamReader(contentResponse.Stream);
+                using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+                    {
+                        HeaderValidated = null,
+                        MissingFieldFound = null
+                    });
+
+                var records = new List<Dictionary<string, string>>();
+                await foreach (var record in csv.GetRecordsAsync<dynamic>())
+                {
+                    var dictionary = ((IDictionary<string, object>)record).ToDictionary(k => k.Key, k => k.Value?.ToString());
+                    records.Add(dictionary);
+                }
+
+                csvContent = records;
+                csvHeaders = csvContent.FirstOrDefault()?.Keys.ToList() ?? new List<string>();
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+
+    private async Task HandleFinish()
+    {
+        try
+        {
+            if (sendOption == SendOption.SEND_NOW)
+                model.Request.DeliveryTime = null;
+
+            model.Request.PhoneNumbers = csvContent.Select(row => row[selectedColumn]).ToList();
+            model.Request.MessageText = messageContent;
+
+            await apiClient.SmsBatchCreateAsync(model.Request);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private void ClearMessage()
+    {
+        messageContent = string.Empty;
+        counterText = "Type your Message here";
+    }
+
+    private async Task OnTextChange(ChangeEventArgs e)
+    {
+        var strSmsText = e.Value?.ToString();
+
+        if (string.IsNullOrWhiteSpace(strSmsText))
+        {
+            counterText = "Type your Message here";
+            return;
+        }
+
+        int intSmsLength = strSmsText.GetValidGsmTextLength();
+        int intSmsParts = GetMessageParts(intSmsLength);
+        int intNextMax = intSmsParts == 1 ? 160 : intSmsParts * 153;
+
+        if (intSmsParts > settings.SmsMaxParts)
+        {
+            await alert.Info("Maximum SMS characters reached!", "alert");
+            return;
+        }
+
+        if (intSmsParts > 1)
+        {
+            if (intSmsLength == 161)
+                await alert.Info($"You have just exceeded 160 characters. You will be charged {intSmsParts} pages for this message!", "alert");
+
+            if (intSmsLength == intNextMax - 153 + 1)
+                await alert.Info($"You have just exceeded {intNextMax - 153} characters. You will be charged {intSmsParts} pages for this message!", "alert");
+        }
+        counterText = $"{intSmsLength} / {intNextMax} . . . . . . {intSmsParts} page{(intSmsParts > 1 ? "s" : null)}";
+    }
+
+    private class WizardStep
+    {
+        public string Title { get; set; }
+    }
+
+    private static int GetMessageParts(int length)
+    {
+        if (length <= 160) return 1;
+
+        return (int)Math.Ceiling(length / 153.0);
     }
 }
