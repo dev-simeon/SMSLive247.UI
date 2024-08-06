@@ -50,8 +50,12 @@
                     </small>
                 </Column>
                 <Column Header="">
-                    <Actions OnView="e => sentMessageView.Show((int)context.BatchID)"
-                             OnDelete="e => messageModal.Delete(context)">
+                    @{
+                        string link = $"/Messaging/Messages/DeliveryReport/{context.BatchID}";
+                    }
+                    <Actions ViewLink="@link" 
+                        OnView="e => sentMessageView.Show((int)context.BatchID)"
+                        OnDelete="e => messageModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>

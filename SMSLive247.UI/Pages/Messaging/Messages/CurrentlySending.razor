@@ -38,6 +38,13 @@
                         </button>
                     </div>
                 </Column>
+                <Column>
+                    @{
+                        string link = $"/Messaging/Messages/DeliveryReport/{context.BatchID}";
+                    }
+                    <Actions ViewLink="@link">
+                    </Actions>
+                </Column>
             </Columns>
         </Table>
     </Body>
