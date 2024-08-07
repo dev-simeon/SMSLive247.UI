@@ -93,9 +93,7 @@
     }
 </style>
 
-<a href="https://new.smslive247.com/Support/Docs/Help/Html/Template%20SMS.htm" target="_blank" class="text-decortion-none">
-    Click here for step-by-step instruction on how to setup a template SMS.
-</a>
+
 
 <div class="container">
     <!-- Step Indicators -->
@@ -127,6 +125,9 @@
         {
             <div>
                 <h3>@Steps[0].Title</h3>
+                <a href="https://new.smslive247.com/Support/Docs/Help/Html/Template%20SMS.htm" target="_blank" class="text-decoration-none">
+                    Click here for step-by-step instruction on how to setup a template SMS.
+                </a>
                 <Card>
                     <Body>
                         @if (!showPreview)
@@ -158,21 +159,17 @@
                                     <Column Header="File Type">
                                         <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
                                     </Column>
-                                    <Column>
-                                        <Actions OnDownload="() => csvFileModal.Download(context)" OnDelete="() => csvFileModal.Delete(context)">
-                                        </Actions>
-                                    </Column>
                                 </Columns>
                             </Table>
                         }
                         else
                         {
                             <div class="table-container">
-                                <Table Items="csvContent">
+                                <Table Items="csvContent.Take(10).ToList()">
                                     <Columns>
                                         @foreach (var header in csvHeaders)
                                         {
-                                            <Column Header="@header">@context[header]</Column>
+                                            <Column Header="@header.Name">@context[header.Name]</Column>
                                         }
                                     </Columns>
                                 </Table>
@@ -198,12 +195,13 @@
                     <Body>
                         <MultiColumn>
                             <Column1>
-                                <EditForm Model="model.Request" OnValidSubmit="HandleFinish" FormName="Submit">
+                                <EditForm Model="model" OnValidSubmit="SubmitMessage">
                                     <ValidationSummary class="text-danger" />
                                     <DataAnnotationsValidator />
 
                                     <FormField Label="Sender ID">
-                                        <InputSelect @bind-Value="model.Request.SenderID" class="form-select" required>
+                                        <InputSelect @bind-Value="model.SenderID" class="form-select" required>
+                                            <option value="">-- select sender id --</option>
                                             @foreach (var senderId in senderIdList)
                                             {
                                                 <option value="@senderId">@senderId</option>
@@ -211,10 +209,10 @@
                                         </InputSelect>
                                     </FormField>
                                     <FormField Label="Phone Number Column">
-                                        <InputSelect @bind-Value="selectedColumn" class="form-select" required>
+                                        <InputSelect @bind-Value="model.PhoneNumberColumn" class="form-select" required>
                                             @foreach (var header in csvHeaders)
                                             {
-                                                <option value="@header">@header</option>
+                                                <option value="@header.Position">@header.Name</option>
                                             }
                                         </InputSelect>
                                     </FormField>
@@ -223,11 +221,12 @@
                                             <label class="form-label" for="m2">@counterText</label>
                                             <button type="button" class="btn btn-close btn-sm" title="Clear Message" @onclick="ClearMessage"></button>
                                         </div>
-                                        <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" @bind="messageContent" @oninput="OnTextChange" placeholder="Enter message template with placeholders like [FirstName], [AccountNumber], etc." required></textarea>
+                                        <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" @bind="model.MessageText" @oninput="OnTextChange" placeholder="Enter message template with placeholders like [FirstName], [AccountNumber], etc." required></textarea>
                                         <div class="form-text">
                                             Messages longer than 160 characters are charged per each page
                                         </div>
                                     </FormField>
+                                    <FormInputText Label="Send Delivery Report To Email" @bind-Value="deliveryEmail"></FormInputText>
                                     <FormField Label="Send Options">
                                         <InputRadioGroup @bind-Value="sendOption">
                                             <div class="form-check-inline">
@@ -245,7 +244,7 @@
                                         <div class="mb-4">
                                             <div class="input-group">
                                                 <span class="input-group-text">Delivery Time</span>
-                                                <InputDate class="form-control" id="s5" Type="InputDateType.DateTimeLocal" @bind-Value="model.Request.DeliveryTime" />
+                                                <InputDate class="form-control" id="s5" Type="InputDateType.DateTimeLocal" @bind-Value="model.DeliveryTime" />
                                             </div>
                                             <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
                                         </div>
@@ -256,23 +255,19 @@
                                 <h6>Message Preview</h6>
                                 @if (csvContent != null && csvContent.Count > 0)
                                 {
-                                    @if (!string.IsNullOrWhiteSpace(selectedColumn))
+                                    @if (!string.IsNullOrWhiteSpace(model.MessageText))
                                     {
-                                        <Table Items="csvContent">
+                                        <Table Items="csvContent.Take(10).ToList()">
                                             <Columns>
                                                 <Column Header="Recipient Number">
-                                                    @context[selectedColumn]
+                                                    @context[csvContent.First().Keys.ElementAt(model.PhoneNumberColumn)]
                                                 </Column>
                                                 <Column Header="Message">
-                                                    @ParseMessage(messageContent, @context.ToDictionary(header => header.Key, header => (object)header.Value))
+                                                    @ParseMessage(model.MessageText, @context.ToDictionary(header => header.Key, header => (object)header.Value))
                                                 </Column>
                                             </Columns>
                                         </Table>
                                     }
-                                }
-                                else
-                                {
-                                    <em>Enter a valid message template and select a CSV file to see a preview</em>
                                 }
                             </Column2>
 
@@ -282,21 +277,19 @@
                     <Footer>
                         @if (sendOption == SendOption.SEND_NOW)
                         {
-                            <button form="Submit" class="btn btn-primary" type="submit">
+                            <button form="TemplateMessageForm" type="submit" class="btn btn-primary" @onclick="SubmitMessage">
                                 <i class="fa fa-paper-plane me-2"></i>Send SMS Now!
                             </button>
                         }
                         else
                         {
-                            <button form="Submit" class="btn btn-primary" type="submit">
+                            <button form="TemplateMessageForm" type="submit" class="btn btn-primary" @onclick="SubmitMessage">
                                 <i class="fa fa-clock me-2"></i>Queue Message
                             </button>
                         }
                     </Footer>
                 </Card>
             </div>
-            
-            
         }
     </div>
 
@@ -304,7 +297,7 @@
         <button type="button" class="btn btn-primary" @onclick="PreviousStep" disabled="@(IsFirstStep)">
             Previous
         </button>
-        <button type="button" class="btn btn-primary" @onclick="NextStep" disabled="@(IsLastStep)">
+        <button type="button" class="btn btn-primary" @onclick="NextStep" disabled="@(CurrentStep == Steps[0] && !IsFileSelected || IsLastStep)">
             Next
         </button>
     </div>
@@ -314,7 +307,7 @@
 
 
 @code {
-    private ComposeSimpleModel model = new();
+    private SmsBatchCsvRequest model = new();
     private BulkFileModal csvFileModal = new();
 
     private enum SendOption { SEND_NOW, SEND_LATER }
@@ -331,15 +324,13 @@
     private bool IsFirstStep => CurrentStepIndex == 0;
     private bool IsLastStep => CurrentStepIndex == Steps.Count - 1;
 
-    private string searchText = string.Empty;
+    private string deliveryEmail = string.Empty;
     private bool showPreview = false;
-    private List<BatchFileResponse> items = [];
-    private List<BatchFileResponse> filteredItems = [];
-    private List<string> senderIdList = [];
+    private List<BatchFileResponse> items = new();
+    private List<BatchFileResponse> filteredItems = new();
+    private List<string> senderIdList = new();
     private List<Dictionary<string, string>> csvContent = new();
-    private List<string> csvHeaders = new();
-    private string selectedColumn = string.Empty;
-    private string messageContent = string.Empty;
+    private List<Column> csvHeaders = new();
     private string counterText = "Type your Message here";
     private SendOption sendOption = SendOption.SEND_NOW;
     private BatchFileResponse selectedFile = new();
@@ -384,6 +375,8 @@
         }
     }
 
+    private bool IsFileSelected => selectedFile != null && !string.IsNullOrEmpty(selectedFile.BatchFileID);
+
     private void OnSearch(string input)
     {
         searchText = input;
@@ -403,6 +396,8 @@
         selectedFile = file;
         await LoadCsvContent(selectedFile);
         showPreview = true;
+
+        model.BatchFileID = selectedFile.BatchFileID;
     }
 
     private async Task LoadCsvContent(BatchFileResponse csvFile)
@@ -419,9 +414,11 @@
                 using (var reader = new StreamReader(contentResponse.Stream))
                 using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = "," }))
                 {
-                    var records = csv.GetRecords<dynamic>().ToList();
-                    csvContent = records.Select(record => (IDictionary<string, object>)record).Select(record => record.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString() ?? "")).ToList();
-                    csvHeaders = csvContent.First().Keys.ToList();
+                    var records = csv.GetRecords<dynamic>();
+                    csvContent = records.Select(record => (IDictionary<string, object>)record)
+                                .Select(record => record.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString() ?? ""))
+                                .ToList();
+                    csvHeaders = csvContent.First().Keys.Select((k, i) => new Column() { Name = k, Position = i }).ToList();
                 }
             }
         }
@@ -431,27 +428,21 @@
         }
     }
 
-    private void HidePreview() => showPreview = false;
+    private void HidePreview()
+    {
+        selectedFile = new();
+        showPreview = false;
+    } 
 
-    private async Task HandleFinish()
+    private async Task SubmitMessage()
     {
         try
         {
             if (sendOption == SendOption.SEND_NOW)
-                model.Request.DeliveryTime = null;
+                model.DeliveryTime = null;
 
-            // Convert csvContent rows to IDictionary<string, object>
-            var personalizedMessages = csvContent.Select(row => new
-            {
-                PhoneNumber = row[selectedColumn],
-                MessageText = ParseMessage(messageContent, row.ToDictionary(kvp => kvp.Key, kvp => (object)kvp.Value))
-            }).ToList();
 
-            // Assign phone numbers and messages to the request model
-            model.Request.PhoneNumbers = personalizedMessages.Select(pm => pm.PhoneNumber).ToList();
-            model.Request.MessageText = string.Join("\n", personalizedMessages.Select(pm => pm.MessageText));
-
-            await apiClient.SmsBatchCreateAsync(model.Request);
+                var res = await apiClient.SmsBatchCsvCreateAsync(model);
         }
         catch (Exception ex)
         {
@@ -461,9 +452,10 @@
 
 
 
+
     private void ClearMessage()
     {
-        messageContent = string.Empty;
+        model.MessageText = string.Empty;
         counterText = "Type your Message here";
     }
 
@@ -509,8 +501,8 @@
     {
         foreach (var key in values.Keys)
         {
-            // Replace placeholders in the format [ColumnName] case-insensitively
-            template = Regex.Replace(template, $@"\[{Regex.Escape(key)}\]", values[key].ToString(), RegexOptions.IgnoreCase);
+            // Replace placeholders in the format {ColumnName} case-insensitively
+            template = Regex.Replace(template, $@"\{{{Regex.Escape(key)}\}}", values[key].ToString(), RegexOptions.IgnoreCase);
         }
         return template;
     }
@@ -518,5 +510,11 @@
     private class WizardStep
     {
         public string Title { get; set; }
+    }
+
+    private class Column
+    {
+        public string Name { get; set; }
+        public int Position { get; set; }
     }
 }

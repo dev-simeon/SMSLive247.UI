@@ -14,51 +14,59 @@
         <header class="mb-3 fs-3">
             SmsLive247
         </header>
-        <EditForm Model="Model" OnValidSubmit="RegisterAsync">
-            <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" />
+        @if (!showMore)
+        {
+            <EditForm EditContext="BasicInfoEditContext" OnValidSubmit="GotoNextView">
+                <DataAnnotationsValidator />
 
-            @if (!showMore)
-            {
+
                 <div class="mb-3">
                     <label class="form-label">First Name</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-user"></i></span>
-                        <InputText class="form-control" @bind-Value="Model.FirstName" required />
+                        <InputText class="form-control" @bind-Value="BasicInfoModel.FirstName" />
                     </div>
+                    <ValidationMessage class="text-danger" For="() => BasicInfoModel.FirstName" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Last Name</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-user"></i></span>
-                        <InputText class="form-control" @bind-Value="Model.LastName" required />
+                        <InputText class="form-control" @bind-Value="BasicInfoModel.LastName" />
                     </div>
+                    <ValidationMessage class="text-danger" For="() => BasicInfoModel.LastName" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                        <InputText class="form-control" @bind-Value="Model.Email" type="email" required />
+                        <InputText class="form-control" @bind-Value="BasicInfoModel.Email" type="email" />
                     </div>
+                    <ValidationMessage class="text-danger" For="() => BasicInfoModel.Email" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Phone</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-phone"></i></span>
-                        <InputText class="form-control" @bind-Value="Model.Phone" required />
+                        <InputText class="form-control" @bind-Value="BasicInfoModel.Phone" />
                     </div>
+                    <ValidationMessage class="text-danger" For="() => BasicInfoModel.Phone" />
                 </div>
-                <button class="btn btn-primary mt-4 w-100" @onclick="GotoNextView" type="button">
+                <button class="btn btn-primary mt-4 w-100" type="submit">
                     Continue...
                 </button>
-            }
-            else
-            {
+            </EditForm>
+        }
+        else
+        {
+            <EditForm EditContext="secondStepEditContext" OnValidSubmit="RegisterAsync">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
                 <div class="mb-3">
                     <label class="form-label">Country</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-globe"></i></span>
-                        <InputSelect class="form-select" @bind-Value="Model.CountryCode" required>
+                        <InputSelect class="form-select" @bind-Value="Model.CountryCode">
                             <option value="355">Albania </option>
                             <option value="213">Algeria</option>
                             <option value="376">Andorra</option>
@@ -225,12 +233,13 @@
                             <option value="263">Zimbabwe </option>
                         </InputSelect>
                     </div>
+                    <ValidationMessage class="text-danger" For="() => Model.CountryCode" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Time Zone</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-clock"></i></span>
-                        <InputSelect class="form-select" @bind-Value="Model.TimeZone" required>
+                        <InputSelect class="form-select" @bind-Value="Model.TimeZone">
                             <option value="-12">GMT -12</option>
                             <option value="-11">GMT -11</option>
                             <option value="-10">GMT -10</option>
@@ -258,39 +267,49 @@
                             <option value="12">GMT +12</option>
                         </InputSelect>
                     </div>
+                    <ValidationMessage class="text-danger" For="() => Model.TimeZone" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-key"></i></span>
-                        <InputText  class="form-control"@bind-Value="Model.Password" type="password" required />
+                        <InputText class="form-control" @bind-Value="Model.Password" type="password" />
                     </div>
+                    <ValidationMessage class="text-danger" For="() => Model.Password" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Confirm Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-key"></i></span>
-                        <InputText  class="form-control"@bind-Value="confirmPassword" type="password" required />
+                        <InputText class="form-control" @bind-Value="confirmPassword" type="password" />
                     </div>
+                    @if (!PasswordsMatch())
+                    {
+                        <div class="text-danger">Passwords do not match.</div>
+                    }
                 </div>
                 <div class="mb-3 form-check">
                     <InputCheckbox @bind-Value="acceptTerms" class="form-check-input" id="a1" />
                     <label class="form-check-label" for="a1">
                         I have read and accepted the
-                        <a href="#" @onclick="e => agreementModal.Show()" @onclick:preventDefault>Agreement</a> 
+                        <a href="#" @onclick="e => agreementModal.Show()" @onclick:preventDefault>Agreement</a>
                         and
                         <a href="#" @onclick="e => privacyModal.Show()" @onclick:preventDefault>Privacy Policy</a>
                     </label>
+                    <ValidationMessage class="text-danger" For="() => acceptTerms" />
                 </div>
                 <button class="btn btn-primary mt-4 w-100" disabled="@(!acceptTerms)" type="submit">
                     Sign Me Up!
                 </button>
-            }
-            <p class="mt-3">
-                Already have an account?
-                <a class="text-decoration-none" href="/Login">Click here to login</a>
-            </p>
-        </EditForm>
+                <button class="btn btn-secondary mt-2 w-100" @onclick="GotoPreviousView" type="button">
+                    Back
+                </button>
+            </EditForm>
+        }
+        <p class="mt-3">
+            Already have an account?
+            <a class="text-decoration-none" href="/Login">Click here to login</a>
+        </p>
     </aside>
 
     <aside class="col-md-6 col-lg-7 col-xl-8 d-none d-md-block bg-light">
@@ -313,9 +332,28 @@
     [SupplyParameterFromForm]
     public AccountCreateRequest Model { get; set; } = new() { TimeZone = 1, CountryCode = 234 };
 
+    private UserInfo BasicInfoModel { get; set; } = new();
+
+    private EditContext BasicInfoEditContext;
+    private EditContext secondStepEditContext;
+
+    protected override void OnInitialized()
+    {
+        BasicInfoEditContext = new EditContext(BasicInfoModel);
+        secondStepEditContext = new EditContext(Model);
+    }
+
     private void GotoNextView()
     {
-        showMore = true;
+        if (BasicInfoEditContext.Validate())
+        {
+            Model.FirstName = BasicInfoModel.FirstName;
+            Model.LastName = BasicInfoModel.LastName;
+            Model.Email = BasicInfoModel.Email;
+            Model.Phone = BasicInfoModel.Phone;
+            Model.AccountName = $"{Model.FirstName} {Model.LastName}";
+            showMore = true;
+        }
     }
 
     private void GotoPreviousView()
@@ -333,8 +371,6 @@
             if (Model.Password != confirmPassword)
                 throw new Exception("Passwords do not match");
 
-
-            Model.AccountName = $"{Model.FirstName} {Model.LastName}";
             var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", Model);
 
             if (response.StatusCode == 200)
@@ -351,4 +387,29 @@
             await alert.Error(ex.Message, "Error");
         }
     }
+
+    private bool PasswordsMatch()
+    {
+        return Model.Password == confirmPassword;
+    }
+
+    public class UserInfo
+    {
+        [Required(ErrorMessage = "First name is required")]
+        [StringLength(50, ErrorMessage = "First name can't be longer than 50 characters")]
+        public string FirstName { get; set; }
+
+        [Required(ErrorMessage = "Last name is required")]
+        [StringLength(50, ErrorMessage = "Last name can't be longer than 50 characters")]
+        public string LastName { get; set; }
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid Email Address")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Phone number is required")]
+        [Phone(ErrorMessage = "Invalid phone number")]
+        public string Phone { get; set; }
+    }
+
 }
