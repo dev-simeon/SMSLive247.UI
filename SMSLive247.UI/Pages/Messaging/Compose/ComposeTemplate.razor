@@ -165,7 +165,7 @@
                         else
                         {
                             <div class="table-container">
-                                <Table Items="csvContent.Take(10).ToList()">
+                                <Table Items="csvContent.Take(5).ToList()">
                                     <Columns>
                                         @foreach (var header in csvHeaders)
                                         {
@@ -255,23 +255,30 @@
                                 <h6>Message Preview</h6>
                                 @if (csvContent != null && csvContent.Count > 0)
                                 {
-                                    @if (!string.IsNullOrWhiteSpace(model.MessageText))
+                                    if (model.PhoneNumberColumn == detectedPhoneColumn)
                                     {
-                                        <Table Items="csvContent.Take(10).ToList()">
-                                            <Columns>
-                                                <Column Header="Recipient Number">
-                                                    @context[csvContent.First().Keys.ElementAt(model.PhoneNumberColumn)]
-                                                </Column>
-                                                <Column Header="Message">
-                                                    @ParseMessage(model.MessageText, context.ToDictionary(header => header.Key, header => (object)header.Value))
-                                                </Column>
-                                            </Columns>
-                                        </Table>
+                                        if (!string.IsNullOrWhiteSpace(model.MessageText))
+                                        {
+                                            <Table Items="csvContent.Take(5).ToList()">
+                                                <Columns>
+                                                    <Column Header="Recipient Number">
+                                                        @context[csvContent.First().Keys.ElementAt(model.PhoneNumberColumn)]
+                                                    </Column>
+                                                    <Column Header="Message">
+                                                        @ParseMessage(model.MessageText, context.ToDictionary(header => header.Key, header => (object)header.Value))
+                                                    </Column>
+                                                </Columns>
+                                            </Table>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-danger pt-3">
+                                            Please select the correct column with the recipient phone number.
+                                        </div>
                                     }
                                 }
                             </Column2>
-
-
                         </MultiColumn>
                     </Body>
                     <Footer>
@@ -325,6 +332,7 @@
     private bool IsLastStep => CurrentStepIndex == Steps.Count - 1;
 
     private string deliveryEmail = string.Empty;
+    public int detectedPhoneColumn;
     private string searchText = string.Empty;
     private bool showPreview = false;
     private List<BatchFileResponse> items = new();
@@ -415,11 +423,18 @@
                 using (var reader = new StreamReader(contentResponse.Stream))
                 using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = "," }))
                 {
-                    var records = csv.GetRecords<dynamic>();
+                    var records = csv.GetRecords<dynamic>().ToList();
                     csvContent = records.Select(record => (IDictionary<string, object>)record)
-                                .Select(record => record.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString() ?? ""))
-                                .ToList();
+                                        .Select(record => record.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString() ?? ""))
+                                        .ToList();
                     csvHeaders = csvContent.First().Keys.Select((k, i) => new Column() { Name = k, Position = i }).ToList();
+
+                    // Detect the column index for phone numbers
+                    if (csvContent.Any())
+                    {
+                        detectedPhoneColumn = DetectPhoneNumberColumn(csvContent.First().Keys.ToList(), csvContent);
+                        model.PhoneNumberColumn = detectedPhoneColumn;
+                    }
                 }
             }
         }
@@ -427,6 +442,31 @@
         {
             await alert.Error(ex.Message, "Error");
         }
+    }
+
+    private int DetectPhoneNumberColumn(IList<string> headers, List<Dictionary<string, string>> records)
+    {
+        for (int i = 0; i < headers.Count; i++)
+        {
+            if (records.All(record => IsPhoneNumber(record[headers[i]])))
+            {
+                return i;
+            }
+        }
+        return -1; // Return -1 if no phone number column is detected
+    }
+
+    private bool IsPhoneNumber(string value)
+    {
+        // Trim spaces from the value
+        value = value.Trim();
+
+        // Check if the value matches a common phone number pattern
+        // Length check: assuming phone numbers are between 7 and 15 digits long
+        // This regex allows for optional country code with +, spaces, dashes, and parentheses
+        var phonePattern = @"^(\+?\d{1,4}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?(\d{7,15})$";
+
+        return Regex.IsMatch(value, phonePattern);
     }
 
     private void HidePreview()
@@ -442,17 +482,13 @@
             if (sendOption == SendOption.SEND_NOW)
                 model.DeliveryTime = null;
 
-
-                var res = await apiClient.SmsBatchCsvCreateAsync(model);
+            var res = await apiClient.SmsBatchCsvCreateAsync(model);
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
         }
     }
-
-
-
 
     private void ClearMessage()
     {
@@ -502,11 +538,19 @@
     {
         foreach (var key in values.Keys)
         {
-            // Replace placeholders in the format {ColumnName} case-insensitively
-            template = Regex.Replace(template, $@"\{{{Regex.Escape(key)}\}}", values[key].ToString(), RegexOptions.IgnoreCase);
+            // Trim the key to remove any leading or trailing spaces
+            string trimmedKey = key.Trim();
+
+            // Create the regex pattern to match the placeholder with optional spaces inside the curly braces
+            string pattern = $@"\{{\s*{Regex.Escape(trimmedKey)}\s*\}}";
+
+            // Replace the placeholders with the corresponding values, trimmed of any leading or trailing spaces
+            template = Regex.Replace(template, pattern, values[key].ToString().Trim(), RegexOptions.IgnoreCase);
         }
         return template;
+        //Hello { First name}, you recently registered an account with us using email address "{email}".
     }
+
 
     private class WizardStep
     {
