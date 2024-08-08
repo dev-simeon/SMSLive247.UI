@@ -482,12 +482,26 @@
             if (sendOption == SendOption.SEND_NOW)
                 model.DeliveryTime = null;
 
+            model.MessageText = RemoveSpacesBetweenBraces(model.MessageText);
             var res = await apiClient.SmsBatchCsvCreateAsync(model);
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
         }
+    }
+
+    private string RemoveSpacesBetweenBraces(string msgText)
+    {
+        var SourceParts = msgText.Split(new[] { '{', '}' });
+        var IsEvenPositions = !msgText.StartsWith("{");
+
+        for (var P = 1; P <= SourceParts.Length; P++)
+        {
+            if (P % 2 == 0 & IsEvenPositions)
+                SourceParts[P - 1] = "{" + SourceParts[P - 1].Replace(" ", "").ToUpper() + "}";
+        }
+        return string.Join("", SourceParts);
     }
 
     private void ClearMessage()
