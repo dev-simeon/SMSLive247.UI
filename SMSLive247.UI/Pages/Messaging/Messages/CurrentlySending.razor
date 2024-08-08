@@ -39,10 +39,10 @@
                     </div>
                 </Column>
                 <Column>
-                    @{
-                        string link = $"/Messaging/Messages/DeliveryReport/{context.BatchID}";
-                    }
-                    <Actions ViewLink="@link">
+                    <Actions>
+                        <button class="btn btn-outline-secondary" @onclick="e => deliveryReportModal.Show(context)" title="View Delivery Report">
+                            <i class="fa fa-envelope-open-text"></i>
+                        </button>
                     </Actions>
                 </Column>
             </Columns>
@@ -50,7 +50,11 @@
     </Body>
 </Card>
 
+<DeliveryReport @ref="deliveryReportModal"></DeliveryReport>
+
 @code {
+    private DeliveryReport deliveryReportModal = new();
+
     private string searchText = string.Empty;
     private List<SmsBatchResponse> items = [];
 

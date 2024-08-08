@@ -1,8 +1,10 @@
 ﻿<div class="btn-group float-end">
+    @ChildContent
+
     @if (ViewLink != null)
     {
-    <a class="@ButtonClass" disabled="@Disabled" href="@ViewLink" title="View Report">
-            <i class="fa fa-envelope-open-text"></i>
+    <a class="@ButtonClass" disabled="@Disabled" href="@ViewLink" title="View">
+            <i class="fa fa-eye"></i>
     </a>
     }
     @if (EditLink != null)
@@ -54,8 +56,6 @@
         <i class="fa fa-times-circle"></i>
     </button>
     }
-    
-    @ChildContent
 </div>
 
 @code {

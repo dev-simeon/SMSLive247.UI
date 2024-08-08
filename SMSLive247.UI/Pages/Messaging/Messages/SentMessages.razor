@@ -50,12 +50,13 @@
                     </small>
                 </Column>
                 <Column Header="">
-                    @{
-                        string link = $"/Messaging/Messages/DeliveryReport/{context.BatchID}";
-                    }
-                    <Actions ViewLink="@link" 
+                    <Actions
                         OnView="e => sentMessageView.Show((int)context.BatchID)"
                         OnDelete="e => messageModal.Delete(context)">
+
+                        <button class="btn btn-outline-secondary" @onclick="e => deliveryReportModal.Show(context)" title="View Delivery Report">
+                            <i class="fa fa-envelope-open-text"></i>
+                        </button>
                     </Actions>
                 </Column>
             </Columns>
@@ -66,6 +67,7 @@
     </Footer>
 </Card>
 
+<DeliveryReport @ref="deliveryReportModal"></DeliveryReport>
 <DownloadModal @ref="downloadModal"></DownloadModal>
 <SentMessageModal @ref="messageModal" OnCompleted="ReloadData"></SentMessageModal>
 <SentMessageView @ref="sentMessageView"></SentMessageView>
@@ -75,6 +77,7 @@
     private DateRange dateRange = new();
 
     private DownloadModal downloadModal = new();
+    private DeliveryReport deliveryReportModal = new();
     private SentMessageModal messageModal = new();
     private SentMessageView sentMessageView = new();
     private ApiDataSource<SmsBatchResponse> ds = new();
