@@ -263,7 +263,7 @@
                                                     @context[csvContent.First().Keys.ElementAt(model.PhoneNumberColumn)]
                                                 </Column>
                                                 <Column Header="Message">
-                                                    @ParseMessage(model.MessageText, @context.ToDictionary(header => header.Key, header => (object)header.Value))
+                                                    @ParseMessage(model.MessageText, context.ToDictionary(header => header.Key, header => (object)header.Value))
                                                 </Column>
                                             </Columns>
                                         </Table>
@@ -325,6 +325,7 @@
     private bool IsLastStep => CurrentStepIndex == Steps.Count - 1;
 
     private string deliveryEmail = string.Empty;
+    private string searchText = string.Empty;
     private bool showPreview = false;
     private List<BatchFileResponse> items = new();
     private List<BatchFileResponse> filteredItems = new();
