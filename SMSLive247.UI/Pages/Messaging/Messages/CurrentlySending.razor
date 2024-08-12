@@ -38,12 +38,23 @@
                         </button>
                     </div>
                 </Column>
+                <Column>
+                    <Actions>
+                        <button class="btn btn-outline-secondary" @onclick="e => deliveryReportModal.Show(context)" title="View Delivery Report">
+                            <i class="fa fa-envelope-open-text"></i>
+                        </button>
+                    </Actions>
+                </Column>
             </Columns>
         </Table>
     </Body>
 </Card>
 
+<DeliveryReport @ref="deliveryReportModal"></DeliveryReport>
+
 @code {
+    private DeliveryReport deliveryReportModal = new();
+
     private string searchText = string.Empty;
     private List<SmsBatchResponse> items = [];
 

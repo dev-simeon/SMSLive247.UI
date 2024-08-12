@@ -5,6 +5,7 @@
            OnCompleted="OnCompleted">
     @if (editor.EditMode == EditModal<AccountResponse>.EditModeEnum.CREATE)
     {
+        <FormInputText Label="UserName" @bind-Value="model.AccountName"></FormInputText>
         <FormInputText Label="First Name" @bind-Value="model.FirstName" required></FormInputText>
         <FormInputText Label="Last Name" @bind-Value="model.LastName" required></FormInputText>
         <FormInputText Label="Phone Number" @bind-Value="model.Phone" required></FormInputText>
@@ -12,10 +13,11 @@
     }
     else if (editor.EditMode == EditModal<AccountResponse>.EditModeEnum.EDIT)
     {
+        <FormInputText Label="UserName" @bind-Value="model.AccountName" readonly></FormInputText>
         <FormInputText Label="First Name" @bind-Value="model.FirstName" required></FormInputText>
         <FormInputText Label="Last Name" @bind-Value="model.LastName" required></FormInputText>
-        <FormInputText Label="Phone Number" @bind-Value="model.Phone" required></FormInputText>
-        <FormInputText Label="Delivery Email" @bind-Value="model.Email" required></FormInputText>
+        <FormInputText Label="Phone Number" @bind-Value="model.Phone" readonly></FormInputText>
+        <FormInputText Label="Delivery Email" @bind-Value="model.Email" readonly></FormInputText>
 
         var stringApiKey = subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A";
         <FormInputText Label="API Key" @bind-Value="@stringApiKey" readonly></FormInputText>
@@ -67,7 +69,9 @@
             FirstName = model.FirstName,
             LastName = model.LastName,
             Phone = model.Phone,
-            Email = model.Email,        
+            Email = model.Email,
+            AccountName = model.AccountName,
+            Password = GeneratePassword(12)
         };
 
         await subClient.Impersonate(subAccount).AccountCreateAsync(request);
@@ -96,4 +100,19 @@
             await subClient.Impersonate(subAccount).AccountDeleteAsync(model.AccountID);
         }
     }
+
+    public static string GeneratePassword(int length)
+    {
+        const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        Random random = new Random();
+        char[] passwordChars = new char[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            passwordChars[i] = validChars[random.Next(validChars.Length)];
+        }
+
+        return new string(passwordChars);
+    }
+
 }
