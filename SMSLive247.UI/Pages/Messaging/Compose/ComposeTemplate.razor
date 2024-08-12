@@ -3,194 +3,84 @@
 @using SMSLive247.UI.Pages.Messaging.Contacts.Modals
 @using System.Globalization
 @using System.Text.RegularExpressions
+@using System.Data
 @inject Settings settings;
-
-<style>
-    .step-wrapper {
-        display: none;
-    }
-
-        .step-wrapper.active {
-            display: block;
-        }
-
-    .step-indicator {
-        display: table;
-        table-layout: fixed;
-        text-align: center;
-        vertical-align: middle;
-        padding-left: 0;
-        padding-top: 20px;
-    }
-
-        .step-indicator li {
-            display: table-cell;
-            position: relative;
-            width: 1%;
-        }
-
-            .step-indicator li:after {
-                background-color: #ccc;
-                content: "";
-                display: block;
-                height: 1px;
-                position: absolute;
-                width: 100%;
-                top: 32px;
-            }
-
-            .step-indicator li:after {
-                left: 50%;
-            }
-
-            .step-indicator li:last-child:after {
-                display: none;
-            }
-
-            .step-indicator li.active .step {
-                border-color: #4183d7;
-                color: #4183d7;
-            }
-
-            .step-indicator li.active .caption {
-                color: #4183d7;
-            }
-
-            .step-indicator li.complete:after {
-                background-color: #e95420;
-            }
-
-            .step-indicator li.complete .step {
-                border-color: #e95420;
-                color: #e95420;
-            }
-
-            .step-indicator li.complete .caption {
-                color: #e95420;
-            }
-
-    .step {
-        background-color: #fff;
-        border-radius: 50%;
-        border: 1px solid #d9d9d9;
-        font-size: 24px;
-        height: 64px;
-        line-height: 64px;
-        margin: 0 auto;
-        position: relative;
-        width: 64px;
-        z-index: 1;
-    }
-
-        .step:hover {
-            cursor: pointer;
-        }
-
-    .table-container {
-        max-height: 25rem;
-        overflow-y: auto;
-        margin-bottom: 1rem;
-    }
-</style>
-
-
 
 <div class="container">
     <!-- Step Indicators -->
     <ol class="step-indicator">
-        @foreach (var step in Steps)
-        {
-            <li class="@(step == CurrentStep ? "active" : "") @(Steps.IndexOf(step) < Steps.IndexOf(CurrentStep) ? "complete" : "")">
-                @if (Steps.IndexOf(step) == 0)
-                {
-                    <div class="step"><i class="fa fa-file"></i></div>
-                }
-                else if (Steps.IndexOf(step) == 1)
-                {
-                    <div class="step"><i class="fa fa-comment"></i></div>
-                }
-                else
-                {
-                    <div class="step"><i class="fa fa-paper-plane"></i></div>
-                }
-
-                <div class="caption hidden-xs hidden-sm py-2 px-3">Step @(Steps.IndexOf(step) + 1): @step.Title</div>
-            </li>
-        }
+        <li class=@(currentStepIndex == 0 ? "active" : "completed")>
+            <div class="step"><i class="fa fa-file"></i></div>
+            <div class="caption hidden-xs hidden-sm py-2 px-3">Step 1: @GetStepTitle(0)</div>
+        </li>
+        <li class=@(currentStepIndex == 0 ? "active" : "completed")>
+            <div class="step"><i class="fa fa-comment"></i></div>
+            <div class="caption hidden-xs hidden-sm py-2 px-3">Step 2: @GetStepTitle(1)</div>
+        </li>
     </ol>
 
     <!-- Combined Step 1: Select CSV File and Preview Content -->
-    <div class="step-wrapper @(IsFirstStep ? "active" : "")">
-        @if (CurrentStep == Steps[0])
-        {
-            <div>
-                <h3>@Steps[0].Title</h3>
-                <a href="https://new.smslive247.com/Support/Docs/Help/Html/Template%20SMS.htm" target="_blank" class="text-decoration-none">
-                    Click here for step-by-step instruction on how to setup a template SMS.
-                </a>
-                <Card>
-                    <Body>
-                        @if (!showPreview)
-                        {
-                            <SearchArea>
-                                <LeftRight>
-                                    <Left>
-                                        <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
-                                    </Left>
-                                    <Right>
-                                        <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
-                                            Upload CSV File...
-                                        </Button>
-                                    </Right>
-                                </LeftRight>
-                            </SearchArea>
-                            <Table Items="filteredItems">
+    @if (currentStepIndex == 0)
+    {
+        <div>
+            <h3>@GetStepTitle()</h3>
+            <a href="https://new.smslive247.com/Support/Docs/Help/Html/Template%20SMS.htm" target="_blank" class="text-decoration-none">
+                Click here for step-by-step instruction on how to setup a template SMS.
+            </a>
+            <Card>
+                <Body>
+                    <SearchArea>
+                        <LeftRight>
+                            <Left>
+                                <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
+                            </Left>
+                            <Right>
+                                <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
+                                    Upload CSV File...
+                                </Button>
+                            </Right>
+                        </LeftRight>
+                    </SearchArea>
+                    <Table Items="visibleCsvFiles">
+                        <Columns>
+                            <Column Width="15">
+                                <input type="radio" name="file" @onclick="e => SelectFile(context)">
+                            </Column>
+                            <Column Header="File Name" Width="45%">@context.Description</Column>
+                            <Column Header="Total Numbers" Width="15%">
+                                <FormatNumber Number="@context.TotalNumbers"></FormatNumber>
+                            </Column>
+                            <Column Header="Date Uploaded">
+                                <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                            </Column>
+                            <Column Header="File Type">
+                                <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
+                            </Column>
+                        </Columns>
+                    </Table>
+                    @if (isFileSelected)
+                    {
+                        <div class="table-container">
+                            <Table Items="dataTable.Rows.OfType<DataRow>().ToList()" TItem="DataRow" Context="row">
                                 <Columns>
-                                    <Column Width="15">
-                                        <input type="radio" name="file" @onclick="e => SelectFile(context)">
-                                    </Column>
-                                    <Column Header="File Name" Width="45%">@context.Description</Column>
-                                    <Column Header="Total Numbers" Width="15%">
-                                        <FormatNumber Number="@context.TotalNumbers"></FormatNumber>
-                                    </Column>
-                                    <Column Header="Date Uploaded">
-                                        <FormatDate DateTime="@context.DateCreated"></FormatDate>
-                                    </Column>
-                                    <Column Header="File Type">
-                                        <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
-                                    </Column>
+                                    @foreach (var col in columns)
+                                    {
+                                        <Column Header="@col.ColumnName">@row[col.Ordinal]</Column>
+                                    }
                                 </Columns>
                             </Table>
-                        }
-                        else
-                        {
-                            <div class="table-container">
-                                <Table Items="csvContent.Take(5).ToList()">
-                                    <Columns>
-                                        @foreach (var header in csvHeaders)
-                                        {
-                                            <Column Header="@header.Name">@context[header.Name]</Column>
-                                        }
-                                    </Columns>
-                                </Table>
-                            </div>
-
-                            <Button Type="Button.Style.DEFAULT" @onclick="HidePreview">
-                                Back to List
-                            </Button>
-                        }
-                    </Body>
-                </Card>
-            </div>
-        }
-    </div>
+                        </div>
+                    }
+                </Body>
+            </Card>
+        </div>
+    }
 
     <!-- Step 2: Select Field For Recipient Numbers and Type Message -->
-    <div class="step-wrapper @(CurrentStep == Steps[1] ? "active" : "")">
-        @if (CurrentStep == Steps[1])
+    @if (currentStepIndex == 1)
         {
             <div>
-                <h3>@Steps[1].Title</h3>
+            <h3>@GetStepTitle()</h3>
                 <Card HeaderTitle="Compose Message">
                     <Body>
                         <MultiColumn>
@@ -210,9 +100,9 @@
                                     </FormField>
                                     <FormField Label="Phone Number Column">
                                         <InputSelect @bind-Value="model.PhoneNumberColumn" class="form-select" required>
-                                            @foreach (var header in csvHeaders)
+                                            @foreach (var header in columns)
                                             {
-                                                <option value="@header.Position">@header.Name</option>
+                                                <option value="@header.Ordinal">@header.ColumnName</option>
                                             }
                                         </InputSelect>
                                     </FormField>
@@ -221,7 +111,9 @@
                                             <label class="form-label" for="m2">@counterText</label>
                                             <button type="button" class="btn btn-close btn-sm" title="Clear Message" @onclick="ClearMessage"></button>
                                         </div>
-                                        <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" @bind="model.MessageText" @oninput="OnTextChange" placeholder="Enter message template with placeholders like [FirstName], [AccountNumber], etc." required></textarea>
+                                        <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" 
+                                                    @bind="model.MessageText" @oninput="OnTextChange"
+                                                    placeholder="Enter message template with placeholders like [FirstName], [AccountNumber], etc." required></textarea>
                                         <div class="form-text">
                                             Messages longer than 160 characters are charged per each page
                                         </div>
@@ -253,29 +145,26 @@
                             </Column1>
                             <Column2>
                                 <h6>Message Preview</h6>
-                                @if (csvContent != null && csvContent.Count > 0)
+                                @if (dataTable != null && dataTable.Rows.Count > 0)
                                 {
-                                    if (model.PhoneNumberColumn == detectedPhoneColumn)
+                                    if (!dataTable.IsPhoneNumberColumn(model.PhoneNumberColumn))
                                     {
-                                        if (!string.IsNullOrWhiteSpace(model.MessageText))
-                                        {
-                                            <Table Items="csvContent.Take(5).ToList()">
-                                                <Columns>
-                                                    <Column Header="Recipient Number">
-                                                        @context[csvContent.First().Keys.ElementAt(model.PhoneNumberColumn)]
-                                                    </Column>
-                                                    <Column Header="Message">
-                                                        @ParseMessage(model.MessageText, context.ToDictionary(header => header.Key, header => (object)header.Value))
-                                                    </Column>
-                                                </Columns>
-                                            </Table>
-                                        }
+                                        <div class="text-danger pt-3">
+                                            The selected phone number column contains invalid characters
+                                        </div>
                                     }
                                     else
                                     {
-                                        <div class="text-danger pt-3">
-                                            Please select the correct column with the recipient phone number.
-                                        </div>
+                                        <Table Items="dataTable.Rows.OfType<DataRow>().ToList()" TItem="DataRow" Context="row">
+                                            <Columns>
+                                                <Column Header="Recipient Number">
+                                                    @row[model.PhoneNumberColumn]
+                                                </Column>
+                                                <Column Header="Message">
+                                                    @ParseMessage(row)
+                                                </Column>
+                                            </Columns>
+                                        </Table>
                                     }
                                 }
                             </Column2>
@@ -298,13 +187,14 @@
                 </Card>
             </div>
         }
-    </div>
 
-    <div class="">
-        <button type="button" class="btn btn-primary" @onclick="PreviousStep" disabled="@(IsFirstStep)">
+    <div>
+        <button type="button" class="btn btn-primary" disabled="@(currentStepIndex == 0)" 
+                @onclick="e => currentStepIndex--">
             Previous
         </button>
-        <button type="button" class="btn btn-primary" @onclick="NextStep" disabled="@(CurrentStep == Steps[0] && !IsFileSelected || IsLastStep)">
+        <button type="button" class="btn btn-primary" disabled="@(currentStepIndex == 1 || !isFileSelected)"
+                @onclick="e => currentStepIndex++">
             Next
         </button>
     </div>
@@ -312,37 +202,27 @@
 
 <BulkFileModal @ref="csvFileModal" ForCSV="true" OnCompleted="FetchData"></BulkFileModal>
 
-
 @code {
-    private SmsBatchCsvRequest model = new();
-    private BulkFileModal csvFileModal = new();
-
     private enum SendOption { SEND_NOW, SEND_LATER }
 
-    private List<WizardStep> Steps = new()
-    {
-        new WizardStep { Title = "Select & Preview CSV" },
-        new WizardStep { Title = "Compose Message" }
-    };
+    private SmsBatchCsvRequest model = new();
+    private string deliveryEmail = string.Empty; //TODO; add to API model
 
-    private int CurrentStepIndex { get; set; }
-    private WizardStep CurrentStep => Steps[CurrentStepIndex];
+    private BulkFileModal csvFileModal = new();
 
-    private bool IsFirstStep => CurrentStepIndex == 0;
-    private bool IsLastStep => CurrentStepIndex == Steps.Count - 1;
+    private int currentStepIndex; //0/1
+    private string? searchText;
+    private bool isFileSelected => !string.IsNullOrEmpty(model.BatchFileID);
 
-    private string deliveryEmail = string.Empty;
-    public int detectedPhoneColumn;
-    private string searchText = string.Empty;
-    private bool showPreview = false;
-    private List<BatchFileResponse> items = new();
-    private List<BatchFileResponse> filteredItems = new();
-    private List<string> senderIdList = new();
-    private List<Dictionary<string, string>> csvContent = new();
-    private List<Column> csvHeaders = new();
+    private List<BatchFileResponse> allCsvFiles = new();
+    private List<BatchFileResponse> visibleCsvFiles = new();
+
+    private List<string> senderIdList = [];
+    private DataTable dataTable = new();
+    private List<DataColumn> columns = [];
+
     private string counterText = "Type your Message here";
     private SendOption sendOption = SendOption.SEND_NOW;
-    private BatchFileResponse selectedFile = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -358,9 +238,9 @@
 
             await Task.WhenAll(t1, t2);
 
-            items = t1.Result.Result.Where(x => x.FileType == "csv").OrderByDescending(x => x.DateCreated).ToList();
+            allCsvFiles = t1.Result.Result.Where(x => x.FileType == "csv").OrderByDescending(x => x.DateCreated).ToList();
             senderIdList = t2.Result.Result.Select(x => x.SenderID).ToList();
-            filteredItems = items;
+            visibleCsvFiles = allCsvFiles;
         }
         catch (Exception ex)
         {
@@ -368,23 +248,15 @@
         }
     }
 
-    private void NextStep()
+    private string GetStepTitle(int? index = null)
     {
-        if (CurrentStepIndex < Steps.Count - 1)
-        {
-            CurrentStepIndex++;
-        }
-    }
+        if (index == null)
+            index = currentStepIndex;
 
-    private void PreviousStep()
-    {
-        if (CurrentStepIndex > 0)
-        {
-            CurrentStepIndex--;
-        }
+        if (index == 0)
+            return "Select & Preview CSV";
+        return "Compose Message";
     }
-
-    private bool IsFileSelected => selectedFile != null && !string.IsNullOrEmpty(selectedFile.BatchFileID);
 
     private void OnSearch(string input)
     {
@@ -392,50 +264,38 @@
 
         if (string.IsNullOrEmpty(searchText))
         {
-            filteredItems = items;
+            visibleCsvFiles = allCsvFiles;
         }
         else
         {
-            filteredItems = items.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+            visibleCsvFiles = allCsvFiles.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }
 
     private async Task SelectFile(BatchFileResponse file)
     {
-        selectedFile = file;
-        await LoadCsvContent(selectedFile);
-        showPreview = true;
-
-        model.BatchFileID = selectedFile.BatchFileID;
+        model.BatchFileID = file.BatchFileID;
+        await LoadCsvContent(file.BatchFileID);
     }
 
-    private async Task LoadCsvContent(BatchFileResponse csvFile)
+    private async Task LoadCsvContent(string batchFileId)
     {
         try
         {
-            if (selectedFile == null)
-                return;
-
-            var contentResponse = await apiClient.BatchFileDownloadAsync(csvFile.BatchFileID);
+            dataTable.Clear();
+            var contentResponse = await apiClient.BatchFileDownloadAsync(batchFileId);
 
             if (contentResponse.StatusCode == 200)
             {
-                using (var reader = new StreamReader(contentResponse.Stream))
-                using (var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture) { Delimiter = "," }))
-                {
-                    var records = csv.GetRecords<dynamic>().ToList();
-                    csvContent = records.Select(record => (IDictionary<string, object>)record)
-                                        .Select(record => record.ToDictionary(kv => kv.Key, kv => kv.Value?.ToString() ?? ""))
-                                        .ToList();
-                    csvHeaders = csvContent.First().Keys.Select((k, i) => new Column() { Name = k, Position = i }).ToList();
+                using var reader = new StreamReader(contentResponse.Stream);
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                using var dr = new CsvDataReader(csv);
 
-                    // Detect the column index for phone numbers
-                    if (csvContent.Any())
-                    {
-                        detectedPhoneColumn = DetectPhoneNumberColumn(csvContent.First().Keys.ToList(), csvContent);
-                        model.PhoneNumberColumn = detectedPhoneColumn;
-                    }
-                }
+                dataTable.Load(dr);
+                columns = dataTable.Columns.Cast<DataColumn>().ToList();
+
+                // Detect the column index for phone numbers
+                model.PhoneNumberColumn = dataTable.DetectPhoneNumberColumn();
             }
         }
         catch (Exception ex)
@@ -443,37 +303,6 @@
             await alert.Error(ex.Message, "Error");
         }
     }
-
-    private int DetectPhoneNumberColumn(IList<string> headers, List<Dictionary<string, string>> records)
-    {
-        for (int i = 0; i < headers.Count; i++)
-        {
-            if (records.All(record => IsPhoneNumber(record[headers[i]])))
-            {
-                return i;
-            }
-        }
-        return -1; // Return -1 if no phone number column is detected
-    }
-
-    private bool IsPhoneNumber(string value)
-    {
-        // Trim spaces from the value
-        value = value.Trim();
-
-        // Check if the value matches a common phone number pattern
-        // Length check: assuming phone numbers are between 7 and 15 digits long
-        // This regex allows for optional country code with +, spaces, dashes, and parentheses
-        var phonePattern = @"^(\+?\d{1,4}[-.\s]?)?(\(?\d{1,4}\)?[-.\s]?)?(\d{7,15})$";
-
-        return Regex.IsMatch(value, phonePattern);
-    }
-
-    private void HidePreview()
-    {
-        selectedFile = new();
-        showPreview = false;
-    } 
 
     private async Task SubmitMessage()
     {
@@ -482,7 +311,7 @@
             if (sendOption == SendOption.SEND_NOW)
                 model.DeliveryTime = null;
 
-            model.MessageText = RemoveSpacesBetweenBraces(model.MessageText);
+            model.MessageText = strSmsText ?? "";
             var res = await apiClient.SmsBatchCsvCreateAsync(model);
         }
         catch (Exception ex)
@@ -491,89 +320,38 @@
         }
     }
 
-    private string RemoveSpacesBetweenBraces(string msgText)
-    {
-        var SourceParts = msgText.Split(new[] { '{', '}' });
-        var IsEvenPositions = !msgText.StartsWith("{");
-
-        for (var P = 1; P <= SourceParts.Length; P++)
-        {
-            if (P % 2 == 0 & IsEvenPositions)
-                SourceParts[P - 1] = "{" + SourceParts[P - 1].Replace(" ", "").ToUpper() + "}";
-        }
-        return string.Join("", SourceParts);
-    }
-
     private void ClearMessage()
     {
         model.MessageText = string.Empty;
         counterText = "Type your Message here";
     }
 
+    private string? strSmsText;
     private async Task OnTextChange(ChangeEventArgs e)
     {
-        var strSmsText = e.Value?.ToString();
+        strSmsText = e.Value?.ToString();//.RemoveSpacesBetweenBraces();
+        counterText = await Extensions.CountSmsMessages(alert, strSmsText, settings.SmsMaxParts);
+    }
 
+    private string ParseMessage(DataRow row)
+    {
         if (string.IsNullOrWhiteSpace(strSmsText))
-        {
-            counterText = "Type your Message here";
-            return;
-        }
+            return string.Empty;
 
-        int intSmsLength = strSmsText.GetValidGsmTextLength();
-        int intSmsParts = GetMessageParts(intSmsLength);
-        int intNextMax = intSmsParts == 1 ? 160 : intSmsParts * 153;
+        string template = strSmsText;
 
-        if (intSmsParts > settings.SmsMaxParts)
-        {
-            await alert.Info("Maximum SMS characters reached!", "alert");
-            return;
-        }
-
-        if (intSmsParts > 1)
-        {
-            if (intSmsLength == 161)
-                await alert.Info($"You have just exceeded 160 characters. You will be charged {intSmsParts} pages for this message!", "alert");
-
-            if (intSmsLength == intNextMax - 153 + 1)
-                await alert.Info($"You have just exceeded {intNextMax - 153} characters. You will be charged {intSmsParts} pages for this message!", "alert");
-        }
-        counterText = $"{intSmsLength} / {intNextMax} . . . . . . {intSmsParts} page{(intSmsParts > 1 ? "s" : null)}";
-    }
-
-    private static int GetMessageParts(int length)
-    {
-        if (length <= 160) return 1;
-
-        return (int)Math.Ceiling(length / 153.0);
-    }
-
-    private string ParseMessage(string template, IDictionary<string, object> values)
-    {
-        foreach (var key in values.Keys)
+        foreach (var col in columns)
         {
             // Trim the key to remove any leading or trailing spaces
-            string trimmedKey = key.Trim();
+            string columnName = col.ColumnName.Trim();//.Replace(" ", "");
 
             // Create the regex pattern to match the placeholder with optional spaces inside the curly braces
-            string pattern = $@"\{{\s*{Regex.Escape(trimmedKey)}\s*\}}";
+            string pattern = $@"\{{\s*{Regex.Escape(columnName)}\s*\}}";
 
             // Replace the placeholders with the corresponding values, trimmed of any leading or trailing spaces
-            template = Regex.Replace(template, pattern, values[key].ToString().Trim(), RegexOptions.IgnoreCase);
+            template = Regex.Replace(template, pattern, row[columnName].ToString() ?? "", RegexOptions.IgnoreCase);
         }
+
         return template;
-        //Hello { First name}, you recently registered an account with us using email address "{email}".
-    }
-
-
-    private class WizardStep
-    {
-        public string Title { get; set; }
-    }
-
-    private class Column
-    {
-        public string Name { get; set; }
-        public int Position { get; set; }
     }
 }

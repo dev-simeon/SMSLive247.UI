@@ -206,38 +206,6 @@
     private async Task OnTextChange(ChangeEventArgs e)
     {
         var strSmsText = e.Value?.ToString();
-
-        if (string.IsNullOrWhiteSpace(strSmsText))
-        {
-            counterText = "Type your Message here";
-            return;
-        }
-
-        int intSmsLength = strSmsText.GetValidGsmTextLength();
-        int intSmsParts = GetMessageParts(intSmsLength);
-        int intNextMax = intSmsParts == 1 ? 160 : intSmsParts * 153;
-
-        if (intSmsParts > settings.SmsMaxParts)
-        {
-            await alert.Info("Maximum SMS characters reached!", "alert");
-            return;
-        }
-
-        if (intSmsParts > 1)
-        {
-            if (intSmsLength == 161)
-                await alert.Info($"You have just exceeded 160 characters. You will be charged {intSmsParts} pages for this message!", "alert");
-
-            if (intSmsLength == intNextMax - 153 + 1)
-                await alert.Info($"You have just exceeded {intNextMax - 153} characters. You will be charged {intSmsParts} pages for this message!", "alert");
-        }
-        counterText = $"{intSmsLength} / {intNextMax} . . . . . . {intSmsParts} page{(intSmsParts > 1 ? "s" : null)}";
-    }
-
-    private static int GetMessageParts(int length)
-    {
-        if (length <= 160) return 1;
-
-        return (int)Math.Ceiling(length / 153.0);
+        counterText = await Extensions.CountSmsMessages(alert, strSmsText, settings.SmsMaxParts);
     }
 }
