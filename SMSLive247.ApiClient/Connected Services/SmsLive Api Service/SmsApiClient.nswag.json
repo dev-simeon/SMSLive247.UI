@@ -38,6 +38,13 @@
             }
           },
           {
+            "name": "CacheTag",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "SearchText",
             "in": "query",
             "schema": {
@@ -645,26 +652,25 @@
           "Credit Pricing"
         ],
         "operationId": "PriceCalculate",
-        "parameters": [
-          {
-            "name": "amount",
-            "in": "query",
-            "schema": {
-              "type": "number",
-              "format": "double",
-              "default": 0
-            }
-          },
-          {
-            "name": "quantity",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int64",
-              "default": 0
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceCalcRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceCalcRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceCalcRequest"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "OK",
@@ -727,6 +733,13 @@
               "format": "int32",
               "maximum": 500.0,
               "minimum": 5.0
+            }
+          },
+          {
+            "name": "CacheTag",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -846,6 +859,13 @@
               "format": "int32",
               "maximum": 500.0,
               "minimum": 5.0
+            }
+          },
+          {
+            "name": "CacheTag",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -972,6 +992,13 @@
               "format": "int32",
               "maximum": 500.0,
               "minimum": 5.0
+            }
+          },
+          {
+            "name": "CacheTag",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -1256,6 +1283,13 @@
             }
           },
           {
+            "name": "CacheTag",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "batchId",
             "in": "path",
             "required": true,
@@ -1344,6 +1378,13 @@
               "format": "int32",
               "maximum": 500.0,
               "minimum": 5.0
+            }
+          },
+          {
+            "name": "CacheTag",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -1820,6 +1861,13 @@
               "maximum": 500.0,
               "minimum": 5.0
             }
+          },
+          {
+            "name": "CacheTag",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2192,14 +2240,14 @@
             "readOnly": true,
             "format": "int32"
           },
-          "countryName": {
-            "type": "string",
-            "readOnly": true
-          },
           "networkID": {
             "type": "integer",
             "readOnly": true,
             "format": "int32"
+          },
+          "countryName": {
+            "type": "string",
+            "readOnly": true
           },
           "networkName": {
             "type": "string",
@@ -2272,6 +2320,15 @@
             "readOnly": true,
             "format": "double"
           },
+          "fxCurrency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fxRate": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
           "reference": {
             "type": "string",
             "readOnly": true
@@ -2325,6 +2382,26 @@
           }
         }
       },
+      "PriceCalcRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "fxCurrency": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
       "PriceCalcResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -2343,6 +2420,15 @@
             "format": "double"
           },
           "fee": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fxCurrency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fxRate": {
             "type": "number",
             "readOnly": true,
             "format": "double"
@@ -2367,6 +2453,15 @@
             "type": "number",
             "readOnly": true,
             "format": "double"
+          },
+          "fxCurrency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fxRate": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
           }
         }
       },
@@ -2385,6 +2480,10 @@
             "type": "integer",
             "format": "int64"
           },
+          "fxCurrency": {
+            "type": "string",
+            "nullable": true
+          },
           "callback": {
             "type": "string",
             "nullable": true
@@ -2395,16 +2494,7 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "dateCreated": {
-            "type": "string",
-            "readOnly": true,
-            "format": "date-time"
-          },
           "providerID": {
-            "type": "string",
-            "readOnly": true
-          },
-          "reference": {
             "type": "string",
             "readOnly": true
           },
@@ -2427,6 +2517,24 @@
             "type": "number",
             "readOnly": true,
             "format": "double"
+          },
+          "fxCurrency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fxRate": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "reference": {
+            "type": "string",
+            "readOnly": true
           },
           "isPaid": {
             "type": "boolean",
