@@ -234,7 +234,7 @@
         try
         {
             var t1 = apiClient.BatchFileListAsync();
-            var t2 = apiClient.SenderIdListAsync(1, 500);
+            var t2 = apiClient.SenderIdListAsync(1, 500, null);
 
             await Task.WhenAll(t1, t2);
 

@@ -17,11 +17,11 @@
             <div class="alert alert-info" role="alert">
                 Minimum SMS credit quantity to purchase is 500 sms credit.
             </div>
-            <EditForm id="Purchase" Model="quantity" OnValidSubmit="ConfirmPrice">
+            <EditForm id="Purchase" Model="model" OnValidSubmit="ConfirmPrice">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <FormField Label="Sms Quantity">
-                    <InputNumber class="form-control" min="500" @bind-Value="quantity" required></InputNumber>
+                    <InputNumber class="form-control" min="500" @bind-Value="model.Quantity" required></InputNumber>
                 </FormField>
             </EditForm>
         }
@@ -42,7 +42,7 @@
 @code {
     private bool hideModal = true;
     private PriceCalcResponse? price;
-    private long quantity = 100;
+    private PriceCalcRequest model = new() { Quantity = 100, FxCurrency = "Naira" };
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,7 +67,7 @@
     {
         try
         {
-            var response = await apiClient.PriceCalculateAsync(null, quantity);
+            var response = await apiClient.PriceCalculateAsync(model);
 
             if (response.StatusCode == 200)
             {
@@ -92,7 +92,7 @@
             // Get the total amount including the transaction fee
             var totalAmount = (decimal)price.Amount + (decimal)price.Amount * 0.015M;
 
-            var request = new PurchaseRequest { ProviderID = "PAYSTACK", Quantity = quantity };
+            var request = new PurchaseRequest { ProviderID = "PAYSTACK", Quantity = model.Quantity ?? 0 };
             var response = await apiClient.PurchaseBeginAsync(request);
 
             if (response.StatusCode != 200)

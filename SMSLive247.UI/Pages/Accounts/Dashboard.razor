@@ -90,8 +90,8 @@
             var dateTo = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
 
             var t1 = apiClient.AccountGetAsync("self");
-            var t2 = apiClient.SmsBatchListAsync(1, 500, dateFrom, dateTo, null);
-            var t5 = apiClient.PurchaseListAsync(1, 8, null);
+            var t2 = apiClient.SmsBatchListAsync(1, 500, null, dateFrom, dateTo, null);
+            var t5 = apiClient.PurchaseListAsync(1, 8, null, null);
             var t6 = apiClient.BatchFileListAsync();
 
             await Task.WhenAll(t1, t2, t5, t6);

@@ -43,7 +43,7 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, searchBox.Text);
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, null, null, searchBox.Text);
         });
     }
 }

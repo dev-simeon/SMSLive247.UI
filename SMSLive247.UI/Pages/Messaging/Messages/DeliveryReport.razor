@@ -141,7 +141,7 @@
     {
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            var response = await apiClient.SmsBatchReportsListAsync(p.PageNumber, p.PageSize, messageBatch.BatchID);
+            var response = await apiClient.SmsBatchReportsListAsync(p.PageNumber, p.PageSize, null, messageBatch.BatchID);
             CalculateSummary(response.Result);
             return response;
         });

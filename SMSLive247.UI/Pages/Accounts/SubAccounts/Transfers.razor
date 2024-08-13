@@ -60,7 +60,7 @@
             if (subAccount != null)
             {
                 return await subClient.Impersonate(subAccount).TransferListAsync(
-                    p.PageNumber, p.PageSize, searchBox.Text);
+                    p.PageNumber, p.PageSize, null, searchBox.Text);
             }
             return ds.EmptyResponse;
         });

@@ -12,7 +12,7 @@
                     </header>
 
                     <div class="card-body">
-                        <InputNumber class="form-control" @bind-Value="quantity" placeholder="SMS Quantity" />
+                        <InputNumber class="form-control" @bind-Value="model.Quantity" placeholder="SMS Quantity" />
 
                         <div class="mt-4">
                             <div class="d-flex justify-content-between">
@@ -55,7 +55,7 @@
 </Card>
 
 @code {
-    private long quantity = 1000;
+    private PriceCalcRequest model = new() { Quantity = 1000, FxCurrency = "Naira" };
     private string currencyName = "Naira";
     private string currencySymbol = "₦";
 
@@ -82,7 +82,7 @@
     {
         try
         {
-            var result = await apiClient.PriceCalculateAsync(null, quantity);
+            var result = await apiClient.PriceCalculateAsync(model);
 
             if (result.StatusCode == 200)
                 price = result.Result;
