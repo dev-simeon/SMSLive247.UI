@@ -9,11 +9,11 @@
 <div class="container">
     <!-- Step Indicators -->
     <ol class="step-indicator">
-        <li class=@(currentStepIndex == 0 ? "active" : "completed")>
+        <li class="@GetStepClass(0)">
             <div class="step"><i class="fa fa-file"></i></div>
             <div class="caption hidden-xs hidden-sm py-2 px-3">Step 1: @GetStepTitle(0)</div>
         </li>
-        <li class=@(currentStepIndex == 0 ? "active" : "completed")>
+        <li class="@GetStepClass(1)">
             <div class="step"><i class="fa fa-comment"></i></div>
             <div class="caption hidden-xs hidden-sm py-2 px-3">Step 2: @GetStepTitle(1)</div>
         </li>
@@ -258,6 +258,22 @@
         return "Compose Message";
     }
 
+    private string GetStepClass(int stepIndex)
+    {
+        if (stepIndex < currentStepIndex)
+        {
+            return "complete";
+        }
+        else if (stepIndex == currentStepIndex)
+        {
+            return "active";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+
     private void OnSearch(string input)
     {
         searchText = input;
@@ -329,7 +345,7 @@
     private string? strSmsText;
     private async Task OnTextChange(ChangeEventArgs e)
     {
-        strSmsText = e.Value?.ToString();//.RemoveSpacesBetweenBraces();
+        strSmsText = e.Value?.ToString().RemoveSpacesBetweenBraces();
         counterText = await Extensions.CountSmsMessages(alert, strSmsText, settings.SmsMaxParts);
     }
 
@@ -343,13 +359,13 @@
         foreach (var col in columns)
         {
             // Trim the key to remove any leading or trailing spaces
-            string columnName = col.ColumnName.Trim();//.Replace(" ", "");
+            string columnName = col.ColumnName.Trim().Replace(" ", "").ToUpper();
 
-            // Create the regex pattern to match the placeholder with optional spaces inside the curly braces
+            // Create the regex pattern to match the double placeholder with optional spaces inside the curly braces
             string pattern = $@"\{{\s*{Regex.Escape(columnName)}\s*\}}";
 
             // Replace the placeholders with the corresponding values, trimmed of any leading or trailing spaces
-            template = Regex.Replace(template, pattern, row[columnName].ToString() ?? "", RegexOptions.IgnoreCase);
+            template = Regex.Replace(template, pattern, row[col.ColumnName].ToString() ?? "", RegexOptions.IgnoreCase);
         }
 
         return template;
