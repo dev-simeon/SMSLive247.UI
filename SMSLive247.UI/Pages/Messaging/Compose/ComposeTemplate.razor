@@ -78,115 +78,115 @@
 
     <!-- Step 2: Select Field For Recipient Numbers and Type Message -->
     @if (currentStepIndex == 1)
-        {
-            <div>
-            <h3>@GetStepTitle()</h3>
-                <Card HeaderTitle="Compose Message">
-                    <Body>
-                        <MultiColumn>
-                            <Column1>
-                                <EditForm Model="model" OnValidSubmit="SubmitMessage">
-                                    <ValidationSummary class="text-danger" />
-                                    <DataAnnotationsValidator />
+    {
+        <div>
+        <h3>@GetStepTitle()</h3>
+            <Card HeaderTitle="Compose Message">
+                <Body>
+                    <MultiColumn>
+                        <Column1>
+                            <EditForm Model="model" OnValidSubmit="SubmitMessage">
+                                <ValidationSummary class="text-danger" />
+                                <DataAnnotationsValidator />
 
-                                    <FormField Label="Sender ID">
-                                        <InputSelect @bind-Value="model.SenderID" class="form-select" required>
-                                            <option value="">-- select sender id --</option>
-                                            @foreach (var senderId in senderIdList)
-                                            {
-                                                <option value="@senderId">@senderId</option>
-                                            }
-                                        </InputSelect>
-                                    </FormField>
-                                    <FormField Label="Phone Number Column">
-                                        <InputSelect @bind-Value="model.PhoneNumberColumn" class="form-select" required>
-                                            @foreach (var header in columns)
-                                            {
-                                                <option value="@header.Ordinal">@header.ColumnName</option>
-                                            }
-                                        </InputSelect>
-                                    </FormField>
-                                    <FormField Label="Message">
-                                        <div class="d-flex justify-content-between">
-                                            <label class="form-label" for="m2">@counterText</label>
-                                            <button type="button" class="btn btn-close btn-sm" title="Clear Message" @onclick="ClearMessage"></button>
+                                <FormField Label="Sender ID">
+                                    <InputSelect @bind-Value="model.SenderID" class="form-select" required>
+                                        <option value="">-- select sender id --</option>
+                                        @foreach (var senderId in senderIdList)
+                                        {
+                                            <option value="@senderId">@senderId</option>
+                                        }
+                                    </InputSelect>
+                                </FormField>
+                                <FormField Label="Phone Number Column">
+                                    <InputSelect @bind-Value="model.PhoneNumberColumn" class="form-select" required>
+                                        @foreach (var header in columns)
+                                        {
+                                            <option value="@header.Ordinal">@header.ColumnName</option>
+                                        }
+                                    </InputSelect>
+                                </FormField>
+                                <FormField Label="Message">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="form-label" for="m2">@counterText</label>
+                                        <button type="button" class="btn btn-close btn-sm" title="Clear Message" @onclick="ClearMessage"></button>
+                                    </div>
+                                    <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" 
+                                                @bind="model.MessageText" @oninput="OnTextChange"
+                                                placeholder="Enter message template with placeholders like [FirstName], [AccountNumber], etc." required></textarea>
+                                    <div class="form-text">
+                                        Messages longer than 160 characters are charged per each page
+                                    </div>
+                                </FormField>
+                                <FormInputText Label="Send Delivery Report To Email" @bind-Value="deliveryEmail"></FormInputText>
+                                <FormField Label="Send Options">
+                                    <InputRadioGroup @bind-Value="sendOption">
+                                        <div class="form-check-inline">
+                                            <InputRadio id="sendNow" Value="@SendOption.SEND_NOW" />
+                                            <label class="form-check-label" for="sendNow">Send Now</label>
                                         </div>
-                                        <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" 
-                                                    @bind="model.MessageText" @oninput="OnTextChange"
-                                                    placeholder="Enter message template with placeholders like [FirstName], [AccountNumber], etc." required></textarea>
-                                        <div class="form-text">
-                                            Messages longer than 160 characters are charged per each page
+                                        <div class="form-check-inline">
+                                            <InputRadio id="schedule" Value="@SendOption.SEND_LATER" />
+                                            <label class="form-check-label" for="schedule">Schedule for Later</label>
                                         </div>
-                                    </FormField>
-                                    <FormInputText Label="Send Delivery Report To Email" @bind-Value="deliveryEmail"></FormInputText>
-                                    <FormField Label="Send Options">
-                                        <InputRadioGroup @bind-Value="sendOption">
-                                            <div class="form-check-inline">
-                                                <InputRadio id="sendNow" Value="@SendOption.SEND_NOW" />
-                                                <label class="form-check-label" for="sendNow">Send Now</label>
-                                            </div>
-                                            <div class="form-check-inline">
-                                                <InputRadio id="schedule" Value="@SendOption.SEND_LATER" />
-                                                <label class="form-check-label" for="schedule">Schedule for Later</label>
-                                            </div>
-                                        </InputRadioGroup>
-                                    </FormField>
-                                    @if (sendOption == SendOption.SEND_LATER)
-                                    {
-                                        <div class="mb-4">
-                                            <div class="input-group">
-                                                <span class="input-group-text">Delivery Time</span>
-                                                <InputDate class="form-control" id="s5" Type="InputDateType.DateTimeLocal" @bind-Value="model.DeliveryTime" />
-                                            </div>
-                                            <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
-                                        </div>
-                                    }
-                                </EditForm>
-                            </Column1>
-                            <Column2>
-                                <h6>Message Preview</h6>
-                                @if (dataTable != null && dataTable.Rows.Count > 0)
+                                    </InputRadioGroup>
+                                </FormField>
+                                @if (sendOption == SendOption.SEND_LATER)
                                 {
-                                    if (!dataTable.IsPhoneNumberColumn(model.PhoneNumberColumn))
-                                    {
-                                        <div class="text-danger pt-3">
-                                            The selected phone number column contains invalid characters
+                                    <div class="mb-4">
+                                        <div class="input-group">
+                                            <span class="input-group-text">Delivery Time</span>
+                                            <InputDate class="form-control" id="s5" Type="InputDateType.DateTimeLocal" @bind-Value="model.DeliveryTime" />
                                         </div>
-                                    }
-                                    else
-                                    {
-                                        <Table Items="dataTable.Rows.OfType<DataRow>().ToList()" TItem="DataRow" Context="row">
-                                            <Columns>
-                                                <Column Header="Recipient Number">
-                                                    @row[model.PhoneNumberColumn]
-                                                </Column>
-                                                <Column Header="Message">
-                                                    @ParseMessage(row)
-                                                </Column>
-                                            </Columns>
-                                        </Table>
-                                    }
+                                        <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
+                                    </div>
                                 }
-                            </Column2>
-                        </MultiColumn>
-                    </Body>
-                    <Footer>
-                        @if (sendOption == SendOption.SEND_NOW)
-                        {
-                            <button form="TemplateMessageForm" type="submit" class="btn btn-primary" @onclick="SubmitMessage">
-                                <i class="fa fa-paper-plane me-2"></i>Send SMS Now!
-                            </button>
-                        }
-                        else
-                        {
-                            <button form="TemplateMessageForm" type="submit" class="btn btn-primary" @onclick="SubmitMessage">
-                                <i class="fa fa-clock me-2"></i>Queue Message
-                            </button>
-                        }
-                    </Footer>
-                </Card>
-            </div>
-        }
+                            </EditForm>
+                        </Column1>
+                        <Column2>
+                            <h6>Message Preview</h6>
+                            @if (dataTable != null && dataTable.Rows.Count > 0)
+                            {
+                                if (!dataTable.IsPhoneNumberColumn(model.PhoneNumberColumn))
+                                {
+                                    <div class="text-danger pt-3">
+                                        The selected phone number column contains invalid characters
+                                    </div>
+                                }
+                                else
+                                {
+                                    <Table Items="dataTable.Rows.OfType<DataRow>().ToList()" TItem="DataRow" Context="row">
+                                        <Columns>
+                                            <Column Header="Recipient Number">
+                                                @row[model.PhoneNumberColumn]
+                                            </Column>
+                                            <Column Header="Message">
+                                                @ParseMessage(row)
+                                            </Column>
+                                        </Columns>
+                                    </Table>
+                                }
+                            }
+                        </Column2>
+                    </MultiColumn>
+                </Body>
+                <Footer>
+                    @if (sendOption == SendOption.SEND_NOW)
+                    {
+                        <button form="TemplateMessageForm" type="submit" class="btn btn-primary" @onclick="SubmitMessage">
+                            <i class="fa fa-paper-plane me-2"></i>Send SMS Now!
+                        </button>
+                    }
+                    else
+                    {
+                        <button form="TemplateMessageForm" type="submit" class="btn btn-primary" @onclick="SubmitMessage">
+                            <i class="fa fa-clock me-2"></i>Queue Message
+                        </button>
+                    }
+                </Footer>
+            </Card>
+        </div>
+    }
 
     <div>
         <button type="button" class="btn btn-primary" disabled="@(currentStepIndex == 0)" 
