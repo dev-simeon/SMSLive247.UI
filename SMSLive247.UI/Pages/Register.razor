@@ -374,9 +374,13 @@
             var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", Model);
 
             if (response.StatusCode == 200)
+            {
                 nav.NavigateTo("/Login?email=" + Model.Email);
-
-            throw new Exception("Registration failed");
+            }
+            else
+            {
+                throw new Exception("Registration failed");
+            }
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {

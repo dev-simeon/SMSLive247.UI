@@ -136,7 +136,9 @@
                                     <div class="mb-4">
                                         <div class="input-group">
                                             <span class="input-group-text">Delivery Time</span>
-                                            <InputDate class="form-control" id="s5" Type="InputDateType.DateTimeLocal" @bind-Value="model.DeliveryTime" />
+                                            <InputDate class="form-control" id="s5"
+                                                       Type="InputDateType.DateTimeLocal"
+                                                       @bind-Value="model.DeliveryTime" />
                                         </div>
                                         <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
                                     </div>
@@ -226,6 +228,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        model.DeliveryTime = DateTime.Now;
         await FetchData();
     }
 

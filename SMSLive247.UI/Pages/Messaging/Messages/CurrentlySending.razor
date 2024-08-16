@@ -20,9 +20,17 @@
                     @context.MessageText.Left(160)
                     <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
                 </Column>
-                <Column>
-                    Sent:<FormatNumber Number="@context.TotalProcessed"></FormatNumber>
-                    Failed:<FormatNumber Number="@context.TotalFailed"></FormatNumber>
+                <Column Width="5%">
+                    <div class="d-flex flex-column">
+                        <div class="d-flex gap-2">
+                            <span>Sent:</span>
+                            <FormatNumber Number="@context.TotalProcessed"></FormatNumber>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span>Failed:</span>
+                            <FormatNumber Number="@context.TotalFailed"></FormatNumber>
+                        </div>
+                    </div>
                 </Column>
                 <Column>
                     <div class="btn-group float-end">
