@@ -1,6 +1,7 @@
-﻿@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
-@page "/Accounts/Profile"
+﻿@page "/Accounts/Profile"
 @attribute [Authorize]
+
+@using SMSLive247.UI.Pages.Accounts.Modals
 
 <PageTitle>SMSLive247 - Profile</PageTitle>
 <Title>My Profile</Title>
@@ -9,16 +10,16 @@
     <Body>
         <MultiColumn Column1Width="4" Column2Width="8">
             <Column1>
-                <div class="card">
+                @* <div class="card"> *@
                     <div class="card-body">
                         <div>
                             <div class="mb-3">
                                 <i class="bi bi-person-circle h1 text-primary"></i>
                             </div>
                             <div>
-                                <h5 class="mb-0">@account.LastName @account.FirstName</h5>
-                                <p class="text-muted mb-0">@account.Email</p>
-                                <p class="text-muted mb-0">@account.Email</p>
+                                <h4 class="mb-0">@account.LastName @account.FirstName</h4>
+                                <p class="text-muted mb-0">@account.AccountID</p>
+                                <p class="text-muted mb-0">@account.AccountName</p>
                                 <p class="text-muted mb-0">@account.Phone</p>
                                 <p class="text-muted mb-0">+@account.CountryCode [GMT + @account.TimeZone]</p>
                             </div>
@@ -29,30 +30,28 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div>
-                                    <p class="fw-medium mb-2">Wallet Balance:</p>
-                                    <h4>N 6,134.39</h4>
+                                    <p class="fw-medium mb-2">Wallet Balance</p>
+                                    <h4>N x,xxx.00</h4>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div>
-                                    <p class="fw-medium mb-2">SMS Credit Balance:</p>
-                                    <h4>C @account.Credits.ToString("#,##0")</h4>
+                                    <p class="fw-medium mb-2">Credit Balance</p>
+                                    <h4>@account.Credits.ToString("#,##0.00")</h4>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @* </div> *@
             </Column1>
             <Column2>
                 <div class="alert alert-info mb-3">
-                    Setup a default SenderID here. Note that you can override this when actually sending.
+                    Set a default SenderID here. Note that you can override this when actually sending.
                     The signature text is appended to the end of every message. Delivery email receives
                     failure reports for bulk sending.
                 </div>
                 <StaticText Label="Default Route" Text="@account.Traffic"></StaticText>
                 <StaticText Label="Sender ID" Text="@senderId"></StaticText>
-                <StaticText Label="Delivery Email" Text="@account.AccountID"></StaticText>
-                <StaticText Label="Signature" Text="@signature"></StaticText>
                 @{
                     string sign = account.TimeZone > 0 ? "+" : "-";
                     string timeZone = $"GMT {sign}{account.TimeZone}";
@@ -62,7 +61,7 @@
         </MultiColumn>
     </Body>
     <Footer>
-        <div class="btn-group" role="group">
+        <div class="btn-group">
             <button type="button" class="btn btn-outline-primary" @onclick="() => profileModal.show()">
                 Edit Basic Info...
             </button>
@@ -82,11 +81,11 @@
 <SettingsModal @ref="settingsModal"></SettingsModal>
 
 @code {
-    private AccountResponse account = new();
+    private SettingsModal settingsModal = new();
     private ProfileInfoModal profileModal = new();
     private ChangePasswordModal passwordModal = new();
-    private SettingsModal settingsModal = new();
-    private string signature = "";
+
+    private AccountResponse account = new();
     private string senderId = "";
 
     protected override async Task OnInitializedAsync()

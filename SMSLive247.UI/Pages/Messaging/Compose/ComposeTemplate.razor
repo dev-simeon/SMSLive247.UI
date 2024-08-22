@@ -1,234 +1,224 @@
 ﻿@using CsvHelper
 @using CsvHelper.Configuration
 @using SMSLive247.UI.Pages.Messaging.Contacts.Modals
-@using System.Globalization
+@using SMSLive247.UI.Pages.Messaging.Compose.Modals
 @using System.Text.RegularExpressions
+@using System.Globalization
 @using System.Data
+
 @inject Settings settings;
 
-<div class="container">
-    <!-- Step Indicators -->
-    <ol class="step-indicator">
-        <li class="@GetStepClass(0)">
-            <div class="step"><i class="fa fa-file"></i></div>
-            <div class="caption hidden-xs hidden-sm py-2 px-3">Step 1: @GetStepTitle(0)</div>
-        </li>
-        <li class="@GetStepClass(1)">
-            <div class="step"><i class="fa fa-comment"></i></div>
-            <div class="caption hidden-xs hidden-sm py-2 px-3">Step 2: @GetStepTitle(1)</div>
-        </li>
-    </ol>
+<Loading NullCheckObject="model">
+    <Card HeaderTitle="@GetStepTitle()">
+        <Body>
+        <!-- Step 1: Select CSV File and Preview Content -->
+        @if (currentStepIndex == 0)
+        {
+            <SearchArea>
+                <LeftRight>
+                    <Left>
+                        <input class="form-control" type="search" placeholder="Search..."
+                                @oninput="e => OnSearch(e.Value?.ToString()!)" />
+                    </Left>
+                    <Right>
+                        <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
+                            Upload CSV File...
+                        </Button>
+                    </Right>
+                </LeftRight>
+            </SearchArea>
+            <Table Items="visibleCsvFiles">
+                <Columns>
+                    <Column Width="15">
+                        <input type="radio" name="file_radios" 
+                            checked="@(model.Request.BatchFileID == context.BatchFileID)" 
+                            @onchange="e => SelectFile(context)" />
+                    </Column>
+                    <Column Header="File Name" Width="45%">@context.Description</Column>
+                    <Column Header="Total Numbers" Width="15%">
+                        <FormatNumber Number="@context.TotalNumbers"></FormatNumber>
+                    </Column>
+                    <Column Header="Date Uploaded">
+                        <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                    </Column>
+                    <Column Header="File Type">
+                        <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
+                    </Column>
+                </Columns>
+            </Table>
 
-    <!-- Combined Step 1: Select CSV File and Preview Content -->
-    @if (currentStepIndex == 0)
-    {
-        <div>
-            <h3>@GetStepTitle()</h3>
-            <a href="https://new.smslive247.com/Support/Docs/Help/Html/Template%20SMS.htm" target="_blank" class="text-decoration-none">
-                Click here for step-by-step instruction on how to setup a template SMS.
-            </a>
-            <Card>
-                <Body>
-                    <SearchArea>
-                        <LeftRight>
-                            <Left>
-                                <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
-                            </Left>
-                            <Right>
-                                <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
-                                    Upload CSV File...
-                                </Button>
-                            </Right>
-                        </LeftRight>
-                    </SearchArea>
-                    <Table Items="visibleCsvFiles">
-                        <Columns>
-                            <Column Width="15">
-                                <input type="radio" name="file" @onclick="e => SelectFile(context)">
-                            </Column>
-                            <Column Header="File Name" Width="45%">@context.Description</Column>
-                            <Column Header="Total Numbers" Width="15%">
-                                <FormatNumber Number="@context.TotalNumbers"></FormatNumber>
-                            </Column>
-                            <Column Header="Date Uploaded">
-                                <FormatDate DateTime="@context.DateCreated"></FormatDate>
-                            </Column>
-                            <Column Header="File Type">
-                                <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
-                            </Column>
-                        </Columns>
-                    </Table>
-                    @if (isFileSelected)
+            <h5 class="mt-4">File Content Preview</h5>
+
+            @if (previewFileIndex == 0)
+            {
+                <p class="">Select a bulk file above, a preview of its contents will be displayed below.</p>
+            }
+            else if(previewFileIndex == 1 || previewFileIndex == 2)
+            {
+            <Loading BoolCheck="model.IsLoaded">
+                <Table Items="@(previewFileIndex == 2)" 
+                       TItem="DataRow" Context="row">
+                    <Columns>
+                        @foreach (var col in model.DataColumns)
+                        {
+                            <Column Header="@col.ColumnName">@row[col.Ordinal]</Column>
+                        }
+                    </Columns>
+                </Table>
+            </Loading>
+            }
+            else if(previewFileIndex == 3)
+            {
+                <p class="text-error">Error loading preview, please select another file</p>
+            }
+        }
+
+        <!-- Step 2: Select Field For Recipient Numbers and Type Message -->
+        @if (currentStepIndex == 1)
+        {
+            <MultiColumn>
+                <Column1>
+                    <EditForm Model="model" OnValidSubmit="SubmitMessage">
+                        <ValidationSummary class="text-danger" />
+                        <DataAnnotationsValidator />
+
+                        <FormField Label="Sender ID">
+                            <InputSelect @bind-Value="model.Request.SenderID" class="form-select" required>
+                                <option value="">-- select sender id --</option>
+                                @foreach (var senderId in model.SenderIds)
+                                {
+                                    <option value="@senderId">@senderId</option>
+                                }
+                            </InputSelect>
+                        </FormField>
+                        <FormField Label="Phone Number Column">
+                            <InputSelect @bind-Value="model.Request.PhoneNumberColumn" class="form-select" required>
+                                @foreach (var col in model.DataColumns)
+                                {
+                                    <option value="@col.Ordinal">@col.ColumnName</option>
+                                }
+                            </InputSelect>
+                        </FormField>
+                        <FormField Label="Message">
+                            <div class="d-flex justify-content-between">
+                                <label class="form-label" for="m2">@model.CounterText</label>
+                                <button class="btn btn-close btn-sm" type="button" title="Clear Message" @onclick="e => model.ClearMessage()"></button>
+                            </div>
+                            <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" 
+                                        @bind="model.Request.MessageText" @oninput="OnTextChange"
+                                        placeholder="Enter message template with placeholders like [FirstName], [AccountNumber], etc." required></textarea>
+                            <div class="form-text">
+                                Messages longer than 160 characters are charged per each page
+                            </div>
+                        </FormField>
+                        <FormInputText Label="Send Delivery Report To Email" @bind-Value="model.DeliveryEmail"></FormInputText>
+                        <FormField Label="Send Options">
+                            <InputRadioGroup @bind-Value="model.SendOption">
+                                <div class="form-check-inline">
+                                    <InputRadio id="sendNow" Value="@SendOption.SEND_NOW" />
+                                    <label class="form-check-label" for="sendNow">Send Now</label>
+                                </div>
+                                <div class="form-check-inline">
+                                    <InputRadio id="schedule" Value="@SendOption.SEND_LATER" />
+                                    <label class="form-check-label" for="schedule">Schedule for Later</label>
+                                </div>
+                            </InputRadioGroup>
+                        </FormField>
+                        @if (model.SendOption == SendOption.SEND_LATER) 
+                        {
+                            <div class="mb-4">
+                                <div class="input-group">
+                                    <span class="input-group-text">Delivery Time</span>
+                                    <InputDate class="form-control" id="s5"
+                                                Type="InputDateType.DateTimeLocal"
+                                                @bind-Value="model.Request.DeliveryTime" /> 
+                                </div>
+                                <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
+                            </div>
+                        }
+                    </EditForm>
+                </Column1>
+                <Column2>
+                    <h6>Message Preview</h6>
+                    @if (model.DataRows.Count > 0)
                     {
-                        <div class="table-container">
-                            <Table Items="dataTable.Rows.OfType<DataRow>().ToList()" TItem="DataRow" Context="row">
+                        if (model.IsValidPhoneColumn == false)
+                        {
+                            <div class="text-danger pt-3">
+                                The selected phone number column contains invalid characters
+                            </div>
+                        }
+                        else
+                        {
+                            <Table Items="model.DataRows" TItem="DataRow" Context="row">
                                 <Columns>
-                                    @foreach (var col in columns)
-                                    {
-                                        <Column Header="@col.ColumnName">@row[col.Ordinal]</Column>
-                                    }
+                                    <Column Header="Recipient Number">
+                                        @row[model.Request.PhoneNumberColumn]
+                                    </Column>
+                                    <Column Header="Message">
+                                        @ParseMessage(row)
+                                    </Column>
                                 </Columns>
                             </Table>
-                        </div>
+                        }
                     }
-                </Body>
-            </Card>
-        </div>
-    }
-
-    <!-- Step 2: Select Field For Recipient Numbers and Type Message -->
-    @if (currentStepIndex == 1)
-    {
-        <div>
-        <h3>@GetStepTitle()</h3>
-            <Card HeaderTitle="Compose Message">
-                <Body>
-                    <MultiColumn>
-                        <Column1>
-                            <EditForm Model="model" OnValidSubmit="SubmitMessage">
-                                <ValidationSummary class="text-danger" />
-                                <DataAnnotationsValidator />
-
-                                <FormField Label="Sender ID">
-                                    <InputSelect @bind-Value="model.SenderID" class="form-select" required>
-                                        <option value="">-- select sender id --</option>
-                                        @foreach (var senderId in senderIdList)
-                                        {
-                                            <option value="@senderId">@senderId</option>
-                                        }
-                                    </InputSelect>
-                                </FormField>
-                                <FormField Label="Phone Number Column">
-                                    <InputSelect @bind-Value="model.PhoneNumberColumn" class="form-select" required>
-                                        @foreach (var header in columns)
-                                        {
-                                            <option value="@header.Ordinal">@header.ColumnName</option>
-                                        }
-                                    </InputSelect>
-                                </FormField>
-                                <FormField Label="Message">
-                                    <div class="d-flex justify-content-between">
-                                        <label class="form-label" for="m2">@counterText</label>
-                                        <button type="button" class="btn btn-close btn-sm" title="Clear Message" @onclick="ClearMessage"></button>
-                                    </div>
-                                    <textarea class="form-control" id="m2" rows="5" maxlength="@settings.MaxCharacter" 
-                                                @bind="model.MessageText" @oninput="OnTextChange"
-                                                placeholder="Enter message template with placeholders like [FirstName], [AccountNumber], etc." required></textarea>
-                                    <div class="form-text">
-                                        Messages longer than 160 characters are charged per each page
-                                    </div>
-                                </FormField>
-                                <FormInputText Label="Send Delivery Report To Email" @bind-Value="deliveryEmail"></FormInputText>
-                                <FormField Label="Send Options">
-                                    <InputRadioGroup @bind-Value="sendOption">
-                                        <div class="form-check-inline">
-                                            <InputRadio id="sendNow" Value="@SendOption.SEND_NOW" />
-                                            <label class="form-check-label" for="sendNow">Send Now</label>
-                                        </div>
-                                        <div class="form-check-inline">
-                                            <InputRadio id="schedule" Value="@SendOption.SEND_LATER" />
-                                            <label class="form-check-label" for="schedule">Schedule for Later</label>
-                                        </div>
-                                    </InputRadioGroup>
-                                </FormField>
-                                @if (sendOption == SendOption.SEND_LATER)
-                                {
-                                    <div class="mb-4">
-                                        <div class="input-group">
-                                            <span class="input-group-text">Delivery Time</span>
-                                            <InputDate class="form-control" id="s5"
-                                                       Type="InputDateType.DateTimeLocal"
-                                                       @bind-Value="model.DeliveryTime" />
-                                        </div>
-                                        <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
-                                    </div>
-                                }
-                            </EditForm>
-                        </Column1>
-                        <Column2>
-                            <h6>Message Preview</h6>
-                            @if (dataTable != null && dataTable.Rows.Count > 0)
-                            {
-                                if (!dataTable.IsPhoneNumberColumn(model.PhoneNumberColumn))
-                                {
-                                    <div class="text-danger pt-3">
-                                        The selected phone number column contains invalid characters
-                                    </div>
-                                }
-                                else
-                                {
-                                    <Table Items="dataTable.Rows.OfType<DataRow>().ToList()" TItem="DataRow" Context="row">
-                                        <Columns>
-                                            <Column Header="Recipient Number">
-                                                @row[model.PhoneNumberColumn]
-                                            </Column>
-                                            <Column Header="Message">
-                                                @ParseMessage(row)
-                                            </Column>
-                                        </Columns>
-                                    </Table>
-                                }
-                            }
-                        </Column2>
-                    </MultiColumn>
-                </Body>
-                <Footer>
-                    @if (sendOption == SendOption.SEND_NOW)
-                    {
-                        <button form="TemplateMessageForm" type="submit" class="btn btn-primary" @onclick="SubmitMessage">
-                            <i class="fa fa-paper-plane me-2"></i>Send SMS Now!
+                </Column2>
+            </MultiColumn>
+        }
+        </Body>
+        <Footer>
+            <LeftRight>
+                <Left>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary" type="button" disabled="@(currentStepIndex == 0)"
+                                @onclick="e => currentStepIndex--">
+                            <i class="fa fa-arrow-left me-2"></i>Previous
                         </button>
-                    }
-                    else
-                    {
-                        <button form="TemplateMessageForm" type="submit" class="btn btn-primary" @onclick="SubmitMessage">
-                            <i class="fa fa-clock me-2"></i>Queue Message
+                        <button class="btn btn-outline-primary" type="button" disabled="@(currentStepIndex == 1 || !isFileSelected)"
+                                @onclick="e => currentStepIndex++">
+                            Next<i class="fa fa-arrow-right ms-2"></i>
                         </button>
-                    }
-                </Footer>
-            </Card>
-        </div>
-    }
+                    </div>
+                </Left>
+                <Right>
+                    <div hidden="@(currentStepIndex != 1)">
+                        @if (model.SendOption == SendOption.SEND_NOW)
+                        {
+                            <button class="btn btn-primary" type="submit" form="TemplateMessageForm" @onclick="SubmitMessage">
+                                <i class="fa fa-paper-plane me-2"></i>Send SMS Now!
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" type="submit" form="TemplateMessageForm" @onclick="SubmitMessage">
+                                <i class="fa fa-clock me-2"></i>Queue Message
+                            </button>
+                        }
+                    </div>
+                </Right>
+            </LeftRight>
+        </Footer>
+    </Card>
 
-    <div>
-        <button type="button" class="btn btn-primary" disabled="@(currentStepIndex == 0)" 
-                @onclick="e => currentStepIndex--">
-            Previous
-        </button>
-        <button type="button" class="btn btn-primary" disabled="@(currentStepIndex == 1 || !isFileSelected)"
-                @onclick="e => currentStepIndex++">
-            Next
-        </button>
-    </div>
-</div>
+    <BulkFileModal @ref="csvFileModal" ForCSV="true" OnCompleted="FetchData"></BulkFileModal>
+</Loading>
 
-<BulkFileModal @ref="csvFileModal" ForCSV="true" OnCompleted="FetchData"></BulkFileModal>
+<a href="https://new.smslive247.com/Support/Docs/Help/Html/Template%20SMS.htm"
+   target="_blank" class="text-decoration-none">
+    Click here for step-by-step instruction on how to setup a template SMS.
+</a>
 
 @code {
-    private enum SendOption { SEND_NOW, SEND_LATER }
-
-    private SmsBatchCsvRequest model = new();
-    private string deliveryEmail = string.Empty; //TODO; add to API model
-
     private BulkFileModal csvFileModal = new();
 
+    private ComposeTemplateModel? model;
     private int currentStepIndex; //0/1
-    private string? searchText;
-    private bool isFileSelected => !string.IsNullOrEmpty(model.BatchFileID);
+    private int previewFileIndex; //0=no file selected 1=loading preview 2=preview success 3=preview failed
 
-    private List<BatchFileResponse> allCsvFiles = new();
-    private List<BatchFileResponse> visibleCsvFiles = new();
-
-    private List<string> senderIdList = [];
-    private DataTable dataTable = new();
-    private List<DataColumn> columns = [];
-
-    private string counterText = "Type your Message here";
-    private SendOption sendOption = SendOption.SEND_NOW;
+    private List<BatchFileResponse> visibleCsvFiles = [];
 
     protected override async Task OnInitializedAsync()
     {
-        model.DeliveryTime = DateTime.Now;
         await FetchData();
     }
 
@@ -240,10 +230,8 @@
             var t2 = apiClient.SenderIdListAsync(1, 500, null);
 
             await Task.WhenAll(t1, t2);
-
-            allCsvFiles = t1.Result.Result.Where(x => x.FileType == "csv").OrderByDescending(x => x.DateCreated).ToList();
-            senderIdList = t2.Result.Result.Select(x => x.SenderID).ToList();
-            visibleCsvFiles = allCsvFiles;
+            model = new(t2.Result.Result, t1.Result.Result);
+            visibleCsvFiles = model.BatchCsvFiles;
         }
         catch (Exception ex)
         {
@@ -257,81 +245,66 @@
             index = currentStepIndex;
 
         if (index == 0)
-            return "Select & Preview CSV";
+            return "Select & Preview File";
+
         return "Compose Message";
     }
 
     private string GetStepClass(int stepIndex)
     {
         if (stepIndex < currentStepIndex)
-        {
             return "complete";
-        }
-        else if (stepIndex == currentStepIndex)
-        {
+
+        if (stepIndex == currentStepIndex)
             return "active";
-        }
-        else
-        {
-            return string.Empty;
-        }
+
+        return string.Empty;
     }
 
-    private void OnSearch(string input)
+    private void OnSearch(string searchText)
     {
-        searchText = input;
+        if (model == null) return;
 
         if (string.IsNullOrEmpty(searchText))
-        {
-            visibleCsvFiles = allCsvFiles;
-        }
+            visibleCsvFiles = model.BatchCsvFiles;
         else
-        {
-            visibleCsvFiles = allCsvFiles.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+            visibleCsvFiles = model.BatchCsvFiles.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
     private async Task SelectFile(BatchFileResponse file)
     {
-        model.BatchFileID = file.BatchFileID;
-        await LoadCsvContent(file.BatchFileID);
-    }
-
-    private async Task LoadCsvContent(string batchFileId)
-    {
+        if (model == null) return;
         try
         {
-            dataTable.Clear();
-            var contentResponse = await apiClient.BatchFileDownloadAsync(batchFileId);
+            previewFileIndex = 1;
+            model.ClearData();
+            StateHasChanged();
+            var contentResponse = await apiClient.BatchFileDownloadAsync(file.BatchFileID);
 
-            if (contentResponse.StatusCode == 200)
-            {
-                using var reader = new StreamReader(contentResponse.Stream);
-                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                using var dr = new CsvDataReader(csv);
-
-                dataTable.Load(dr);
-                columns = dataTable.Columns.Cast<DataColumn>().ToList();
-
-                // Detect the column index for phone numbers
-                model.PhoneNumberColumn = dataTable.DetectPhoneNumberColumn();
-            }
+            model.LoadData(contentResponse.Stream, file.BatchFileID);
+            previewFileIndex = 2;
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
+            previewFileIndex = 3;
+        }
+        finally
+        {
+            StateHasChanged();
         }
     }
 
     private async Task SubmitMessage()
     {
+        if (model == null) return;
         try
         {
-            if (sendOption == SendOption.SEND_NOW)
-                model.DeliveryTime = null;
+            if (model.SendOption == SendOption.SEND_NOW)
+                model.Request.DeliveryTime = null;
 
-            model.MessageText = strSmsText ?? "";
-            var res = await apiClient.SmsBatchCsvCreateAsync(model);
+            model.Request.MessageText = strSmsText ?? "";
+            var res = await apiClient.SmsBatchCsvCreateAsync(model.Request);
         }
         catch (Exception ex)
         {
@@ -339,27 +312,25 @@
         }
     }
 
-    private void ClearMessage()
-    {
-        model.MessageText = string.Empty;
-        counterText = "Type your Message here";
-    }
-
     private string? strSmsText;
     private async Task OnTextChange(ChangeEventArgs e)
     {
+        if (model == null) return;
         strSmsText = e.Value?.ToString().RemoveSpacesBetweenBraces();
-        counterText = await Extensions.CountSmsMessages(alert, strSmsText, settings.SmsMaxParts);
+        model.CounterText = await ComposeExtensions.CountSmsMessages(alert, strSmsText, settings.SmsMaxParts);
     }
 
     private string ParseMessage(DataRow row)
     {
+        if (model == null) 
+            return string.Empty;
+ 
         if (string.IsNullOrWhiteSpace(strSmsText))
             return string.Empty;
 
         string template = strSmsText;
 
-        foreach (var col in columns)
+        foreach (var col in model.DataColumns)
         {
             // Trim the key to remove any leading or trailing spaces
             string columnName = col.ColumnName.Trim().Replace(" ", "").ToUpper();

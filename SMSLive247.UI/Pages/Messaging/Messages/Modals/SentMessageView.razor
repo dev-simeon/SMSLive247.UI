@@ -1,35 +1,37 @@
-﻿<Modal Title="@title" 
-       Hidden="@(!showModal)" 
-       VAlign="Modal.ModalVAlign.CENTER">
+﻿<Modal Title="@($"View Message - {@batchId}")"
+        Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
     <Body>
-        <FormInputNumber Label="Batch ID" @bind-Value="message.BatchID" disabled></FormInputNumber>
-        <FormInputText Label="Sender ID" @bind-Value="message.SenderID" disabled></FormInputText>
-        <FormField Label="Message">
-            <InputTextArea class="form-control" @bind-Value="message.MessageText" rows="5" disabled></InputTextArea>
-        </FormField>
-        <FormInputNumber Label="Total Processed" @bind-Value="message.TotalProcessed" disabled></FormInputNumber>
-        <FormInputNumber Label="Total Failed" @bind-Value="message.TotalFailed" disabled></FormInputNumber>
-        <FormInputNumber Label="Unit Charged" @bind-Value="message.CreditsCharged" disabled></FormInputNumber>
+        <Loading NullCheckObject="message"> 
+            <FormInputNumber Label="Batch ID" @bind-Value="message.BatchID" disabled></FormInputNumber>
+            <FormInputText Label="Sender ID" @bind-Value="message.SenderID" disabled></FormInputText>
+            <FormField Label="Message">
+                <InputTextArea class="form-control" @bind-Value="message.MessageText" rows="5" disabled></InputTextArea>
+            </FormField>
+            <FormInputNumber Label="Total Processed" @bind-Value="message.TotalProcessed" disabled></FormInputNumber>
+            <FormInputNumber Label="Total Failed" @bind-Value="message.TotalFailed" disabled></FormInputNumber>
+            <FormInputNumber Label="Unit Charged" @bind-Value="message.CreditsCharged" disabled></FormInputNumber>
+        </Loading>
     </Body>
     <Footer>
-        <Button Type="Button.Style.CANCEL" @onclick="@(e => showModal = !showModal)">Cancel</Button>
+        <Button Type="Button.Style.CANCEL" @onclick="@(e => showModal = false)">Cancel</Button>
     </Footer>
 </Modal>
 
 @code {
-    private string? title;
+    private long batchId;
     private bool showModal = false;
-    private SmsBatchResponse message = new();
+    private SmsBatchResponse? message;
 
-    public async Task Show(int id)
+    public async Task Show(long id)
     {
         try
         {
-            title = $"View Message - {id.ToString()}";
+            batchId = id;
+            message = null;
             showModal = true;
             StateHasChanged();
 
-            var response = await apiClient.SmsBatchGetAsync(id);
+            var response = await apiClient.SmsBatchGetAsync(batchId);
 
             if (response.StatusCode > 299)
                 throw new Exception("No message was found");

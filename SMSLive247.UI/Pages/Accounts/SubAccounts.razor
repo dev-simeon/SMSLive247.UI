@@ -1,14 +1,13 @@
 ﻿@page "/Accounts/SubAccounts"
-
-@using SMSLive247.UI.Pages.Accounts.SubAccounts.Modals
-@using SMSLive247.UI.Pages.Accounts.Components
 @inject NavigationManager nav
 
-<PageTitle>Sub Accounts</PageTitle>
+@using SMSLive247.UI.Pages.Accounts.Components
+@using SMSLive247.UI.Pages.Accounts.Modals
 
+<PageTitle>Sub Accounts</PageTitle>
 <Title>My Sub Accounts</Title>
 
-<Card HeaderTitle="Sub Account">
+<Card>
     <Body>
         <SearchArea>
             <LeftRight>
@@ -79,6 +78,6 @@
 
     private void NavigateToSubAccountDetails(AccountResponse account)
     {
-        nav.NavigateTo($"/Accounts/SubAccounts/Details/{account.AccountID}");
+        nav.NavigateTo($"/Accounts/{account.AccountID}");
     }
 }

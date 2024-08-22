@@ -24,7 +24,7 @@ namespace SMSLive247.UI.Services
         }    
     }
 
-    public static class Extensions
+    public static class CacheExtensions
     {
         public static async Task TrySet(this IMemoryCache cache, string key, 
             HttpResponseMessage response, CancellationToken cancellationToken)  

@@ -1,9 +1,10 @@
 ﻿@page "/Support/Coverage"
 
 <PageTitle>SMSLive247 - Coverage</PageTitle>
-<Title>Worldwide Coverage</Title>
+<Title>Coverage List</Title>
 
-<Card HeaderTitle="Coverage List">
+<Loading NullCheckObject="items">
+<Card>
     <Body>
         <SearchArea>
             <LeftRight>
@@ -13,22 +14,22 @@
                 </Left>
             </LeftRight>
         </SearchArea>
-        <Table Items="filteredItems">
-            <Columns>
-                <Column Header="Country">
-                    @context.CountryName
-                </Column>
-                <Column Header="Network">
-                    @context.NetworkName
-                </Column>
-            </Columns>
-        </Table>
-    </Body>
+            <Table Items="filteredItems">
+                <Columns>
+                    <Column Header="Country">
+                        @context.CountryName
+                    </Column>
+                    <Column Header="Network">
+                        @context.NetworkName
+                    </Column>
+                </Columns>
+            </Table>
+        </Body>
 </Card>
-
+</Loading>
 @code {
     private string searchText = "";
-    private List<CoverageResponse> items = [];
+    private List<CoverageResponse>? items;
     private List<CoverageResponse> filteredItems = [];
 
     protected override async Task OnInitializedAsync()

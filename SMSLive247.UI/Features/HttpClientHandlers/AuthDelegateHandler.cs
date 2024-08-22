@@ -13,6 +13,8 @@ namespace SMSLive247.UI.Services
             if (apiKey != null)
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
 
+            await Task.Delay(1000, cancellationToken);
+
             return await base.SendAsync(request, cancellationToken);
         }
     }

@@ -1,0 +1,32 @@
+﻿@if (NullCheckObject != null || BoolCheck == true)
+{
+    @ChildContent
+}
+else
+{
+    <div class="progress" style="height: 7px">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: @value%"></div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool BoolCheck { get; set; } = false;
+    [Parameter, MemberNotNull] public object NullCheckObject { get; set; } 
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private int value;
+    private double intervalMs = 100;
+    private System.Timers.Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        timer = new System.Timers.Timer(intervalMs);
+        timer.Elapsed += async (s, e) =>
+        {
+            value += 1; 
+            if (value >= 100) value = 0;
+            await InvokeAsync(StateHasChanged);
+        };
+        timer.Enabled = true;
+    }
+}

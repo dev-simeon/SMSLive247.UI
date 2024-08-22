@@ -1419,18 +1419,31 @@ namespace SMSLive247.OpenApi
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<SwaggerResponse<PriceCalcResponse>> PriceCalculateAsync(PriceCalcRequest? body)
+        public virtual System.Threading.Tasks.Task<SwaggerResponse<PriceCalcResponse>> PriceCalculateAsync(double? amount, long? quantity, string? fxCurrency)
         {
-            return PriceCalculateAsync(body, System.Threading.CancellationToken.None);
+            return PriceCalculateAsync(amount, quantity, fxCurrency, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<SwaggerResponse<PriceCalcResponse>> PriceCalculateAsync(PriceCalcRequest? body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<SwaggerResponse<PriceCalcResponse>> PriceCalculateAsync(double? amount, long? quantity, string? fxCurrency, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/v5/credits/pricing/calc");
+            urlBuilder_.Append("api/v5/credits/pricing/calc?");
+            if (amount != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("Amount") + "=").Append(System.Uri.EscapeDataString(ConvertToString(amount, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (quantity != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("Quantity") + "=").Append(System.Uri.EscapeDataString(ConvertToString(quantity, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (fxCurrency != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("FxCurrency") + "=").Append(System.Uri.EscapeDataString(ConvertToString(fxCurrency, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1438,10 +1451,6 @@ namespace SMSLive247.OpenApi
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    var json_ = System.Text.Json.JsonSerializer.Serialize(body, _settings.Value);
-                    var content_ = new System.Net.Http.StringContent(json_);
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
@@ -4276,6 +4285,11 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public string AccountName { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("wallet")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double Wallet { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("credits")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
@@ -4319,7 +4333,12 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonPropertyName("traffic")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string Traffic { get; set; } = default!;
+        public string? Traffic { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("senderID")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string? SenderID { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("key")]
 
@@ -4635,27 +4654,6 @@ namespace SMSLive247.OpenApi
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
-    public partial class PriceCalcRequest
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("amount")]
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double? Amount { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("quantity")]
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public long? Quantity { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("fxCurrency")]
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public string? FxCurrency { get; set; } = default!;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.19.0.0 (NJsonSchema v10.9.0.0 (Newtonsoft.Json v13.0.3.0))")]
     public partial class PriceCalcResponse
     {
 
@@ -4736,6 +4734,11 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         public long Quantity { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("amount")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double? Amount { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("fxCurrency")]
 
@@ -4886,6 +4889,11 @@ namespace SMSLive247.OpenApi
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string MessageText { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("deliveryEmail")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string? DeliveryEmail { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("deliveryTime")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
@@ -4924,6 +4932,11 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string MessageText { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("deliveryEmail")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string? DeliveryEmail { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("deliveryTime")]
 

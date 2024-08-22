@@ -1,86 +1,85 @@
 ﻿@page "/"
 @page "/Accounts/Dashboard"
 @inject IJSRuntime js
-@attribute [Authorize]
+
 @using SMSLive247.UI.Pages.Accounts.Components
 
 <PageTitle>SMSLive247 - Dashboard</PageTitle>
-<Title>Welcome, @account.FirstName</Title>
+<Title>Welcome, @account?.FirstName</Title>
 
-<div class="row mt-4">
-    <div class="col-md-3">
-        <SmallCard 
-            Caption="Wallet Balance" 
-            Value="N 6,134.39" 
-            Icon="fa fa-wallet">
-        </SmallCard>
+<Loading NullCheckObject="account">
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <SmallCard Caption="Wallet Balance"
+                       Value="N X,XXX.39"
+                       Icon="fa fa-wallet">
+            </SmallCard>
+        </div>
+        <div class="col-md-3">
+            <SmallCard Caption="SMS Credit Balance"
+                       Value="@account.Credits.ToString("#,###")"
+                       Icon="fa fa-coins">
+            </SmallCard>
+        </div>
+        <div class="col-md-3">
+            <SmallCard Caption="Total SMS Sent Today"
+                       Value="@totalSmsSent.ToString("#,###")"
+                       Icon="fa fa-envelope-open">
+            </SmallCard>
+        </div>
+        <div class="col-md-3">
+            <SmallCard Caption="Total Batch Files"
+                       Value="@batchFiles.Count.ToString("#,###")"
+                       Icon="fa fa-folder-open">
+            </SmallCard>
+        </div>
     </div>
-    <div class="col-md-3">
-        <SmallCard 
-            Caption="SMS Credit Balance" 
-            Value="@account.Credits.ToString("#,###")" 
-            Icon="fa fa-coins">
-        </SmallCard>
-    </div>
-    <div class="col-md-3">
-        <SmallCard 
-            Caption="Total SMS Sent Today"
-            Value="@totalSmsSent.ToString("#,###")" 
-            Icon="fa fa-envelope-open">
-        </SmallCard>
-    </div>
-    <div class="col-md-3">
-        <SmallCard 
-            Caption="Total Batch Files"
-                   Value="@batchFiles.Count.ToString("#,###")"
-                   Icon="fa fa-folder-open">
-        </SmallCard>
-    </div>
-</div>
 
-<div class="row mt-5">
-    <div class="col-md-6">
-        <Card HeaderTitle="Messages Delivery Summary">
-            <Body>
-                <div id="summaryChart"></div>
-            </Body>
-        </Card>
-    </div>
-    <div class="col-md-6">
-        <Card HeaderTitle="Recent Purchases">
-            <Body>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Channel</th>
-                            <th>Quantity</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var p in recentPurchases)
-                        {
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <Card>
+                <Body>
+                    <div id="summaryChart"></div>
+                </Body>
+            </Card>
+        </div>
+        <div class="col-md-6">
+            <Card>
+                <Body>
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td><FormatDate DateTime="@p.DateCreated"></FormatDate></td>
-                                <td>@p.ProviderID</td>
-                                <td><FormatNumber Number="@p.Quantity"></FormatNumber></td>
-                                <td><FormatNumber Currency="@p.Amount"></FormatNumber></td>
+                                <th>Date</th>
+                                <th>Channel</th>
+                                <th>Quantity</th>
+                                <th>Amount</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </Body>
-        </Card>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in recentPurchases)
+                            {
+                                <tr>
+                                    <td><FormatDate DateTime="@p.DateCreated"></FormatDate></td>
+                                    <td>@p.ProviderID</td>
+                                    <td><FormatNumber Number="@p.Quantity"></FormatNumber></td>
+                                    <td><FormatNumber Currency="@p.Amount"></FormatNumber></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </Body>
+            </Card>
+        </div>
     </div>
-</div>
+</Loading>
 
 @code {
-    private AccountResponse account = new();
     private List<BatchFileResponse> batchFiles = [];
     private List<SmsBatchResponse> recentMessages =[];
     private List<PurchaseResponse> recentPurchases = [];
-    private long totalSmsSent = 0;
+
+    private AccountResponse? account;
+    private long totalSmsSent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,12 +95,13 @@
 
             await Task.WhenAll(t1, t2, t5, t6);
 
-            account = t1.Result.Result;
             recentMessages = t2.Result.Result.ToList();
             recentPurchases = t5.Result.Result.ToList();
             batchFiles = t6.Result.Result.ToList();
 
+            account = t1.Result.Result;
             totalSmsSent = recentMessages.Sum(x => x.TotalProcessed);
+            StateHasChanged();
 
             await RenderDeliveryStatistics(recentMessages);
         }

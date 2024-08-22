@@ -4,7 +4,7 @@ The following are the terms and conditions for use of the SMSLive247 Service ("S
 
 IMPORTANT: In terms of section 11 of the Electronic Communications and Transactions (ECT) Act 25 of 2002 and the common law of contract, these terms and conditions are valid binding and enforceable against all persons that access the SMSLive247 website, web pages or any part thereof.   If you do not agree to be bound by these terms and conditions you may not use the SMSLive247 website. Reasonable use of the SMSLive247 website shall automatically bound the user to this agreement. 
 
-This is an agreement between You ("You") and LOREX, operating under the website name SMSLive247.com (the "Company"). "We" and "Us" means both You and the Company. The effective date of this Agreement is when You accept this Agreement in accordance with the procedure set out above. You must agree to abide by all of the Terms and Conditions contained in this Agreement in order to become or remain an authorized user of the services offered in this website.
+This is an agreement between You ("You") and iDevWorks Technologies, operating under the website name smslive247.com (the "Company"). "We" and "Us" means both You and the Company. The effective date of this Agreement is when You accept this Agreement in accordance with the procedure set out above. You must agree to abide by all of the Terms and Conditions contained in this Agreement in order to become or remain an authorized user of the services offered in this website.
 BY PLACING SMSLIVE247 PRODUCTS ON A WEBSITE AND/OR ACCESSING ANY PART OF THE SMSLIVE247 SERVICE, THE USER IS AGREEING TO ALL THE TERMS AND CONDITIONS OF THIS SERVICE AGREEMENT, AND CONSENT TO BE BOUND BY AND BECOME A PARTY TO THIS SERVICE AGREEMENT. SHOULD THE USER NOT AGREE TO ALL THE TERMS AND CONDITIONS OF THIS SERVICE AGREEMENT, OR CANNOT COMPLY WITH THESE TERMS AND CONDITIONS, HE/SHE/IT SHOULD CLOSE THE BROWSER WINDOW; THEREFORE TERMINATING THE REGISTRATION PROCESS WILLFULLY, AND AGREEING TO STOP ALL USE OF THE SERVICE AND SURRENDERING ANY AND ALL AUTHORITY TO USE THE SERVICE. 
 
 IF THE USER IS DEEMED TO HAVE ORDERED THE SERVICE, SMSLIVE247'S ACCEPTANCE IS EXPRESSLY CONDITIONED UPON ASSENT TO ALL THE TERMS AND CONDITIONS OF THIS SERVICE AGREEMENT, TO THE EXCLUSION OF ALL OTHER TERMS; IF THESE TERMS ARE CONSIDERED AN OFFER BY SMSLIVE247, ACCEPTANCE IS EXPRESSLY LIMITED TO THESE TERMS. 
@@ -12,9 +12,9 @@ IF THE USER IS DEEMED TO HAVE ORDERED THE SERVICE, SMSLIVE247'S ACCEPTANCE IS EX
 THE USER AGREES THAT ALL TERMS AND CONDITIONS HEREWITH PUBLISHED SHALL BE BINDING AND THAT SHOULD THERE BE A CONTRADICTION BETWEEN PRODUCT- SPECIFIC TERMS AND CONDITIONS, AND GENERAL TERMS AND CONDITIONS, THE PRODUCT-SPECIFIC TERMS AND CONDITIONS SHALL APPLY 
 DEFINITIONS AND INTERPRETATION
 
-The SMSLive247 website means the SMSLive247 website located at www.SMSLive247.com, including any page, part or element thereof, as owned and operated by SMSLive247. 
+The SMSLive247 website means the SMSLive247 website located at smslive247.com, including any page, part or element thereof, as owned and operated by SMSLive247. 
 
-SMSLive247 means SMSLive247 Technologies Limited, registration number RC611295, including its subsidiaries, owners, shareholders and business units. 
+IdevWorks means iDevWorks Technologies Limited, registration number RC611295, including its subsidiaries, owners, shareholders and business units. 
 
 User/User means any person or entity who enters or uses the SMSLive247 website, notwithstanding the fact that such person only visits the home page of the SMSLive247 website. 
 

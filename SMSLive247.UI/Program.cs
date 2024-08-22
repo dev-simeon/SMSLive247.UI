@@ -29,12 +29,12 @@ namespace SMSLive247.UI
 
 
             builder.Services.AddHttpClient<ApiClient>(ConfigureUrl)
-                   .AddHttpMessageHandler<AuthDelegateHandler>()
-                   .AddHttpMessageHandler<CacheDelegateHandler>()
-                  .AddHttpMessageHandler<SpinnerDelegateHandler>();
+                   .AddHttpMessageHandler<AuthDelegateHandler>();
+                //.AddHttpMessageHandler<CacheDelegateHandler>();
+                //.AddHttpMessageHandler<SpinnerDelegateHandler>();
 
-            builder.Services.AddHttpClient<SubAccountClient>(ConfigureUrl)
-                   .AddHttpMessageHandler<SpinnerDelegateHandler>();
+            builder.Services.AddHttpClient<SubAccountClient>(ConfigureUrl);
+                   //.AddHttpMessageHandler<SpinnerDelegateHandler>();
 
             builder.Services.AddMemoryCache();
             builder.Services.AddSmsAuthProvider();

@@ -2,7 +2,7 @@
 
 <Title>Price List</Title>
 
-<Card HeaderTitle="Price List">
+<Card>
     <Body>
         <MultiColumn Column1Width="5" Column2Width="7">
             <Column1>
@@ -12,17 +12,19 @@
                     </header>
 
                     <div class="card-body">
-                        <InputNumber class="form-control" @bind-Value="model.Quantity" placeholder="SMS Quantity" />
+                        <FormField Label="Quantity">
+                            <InputNumber class="form-control" @bind-Value="quantity" placeholder="SMS Quantity" />
+                        </FormField>
 
                         <div class="mt-4">
                             <div class="d-flex justify-content-between">
-                                <label class="form-label">Rate (@currencyName)</label>
-                                <FormatNumber Currency="@price.Price"></FormatNumber>
+                                <label class="form-label">Unit Price</label>
+                                <FormatNumber Currency="@priceCalc.Price"></FormatNumber>
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <label class="form-label">Price (@currencyName)</label>
-                                <FormatNumber Currency="@price.Amount"></FormatNumber>
+                                <label class="form-label">Total Amount</label>
+                                <FormatNumber Currency="@priceCalc.Amount"></FormatNumber>
                             </div>
                         </div>
                     </div>
@@ -38,13 +40,13 @@
                         <Column Header="SN">
                             1.
                         </Column>
-                        <Column Align="right" Header="Quantity from">
+                        <Column Align="right" Header="Min Qty">
                             <FormatNumber Number="@context.MinQuantity"></FormatNumber>
                         </Column>
-                        <Column Align="right" Header="Quantity to">
+                        <Column Align="right" Header="Max Qty">
                             <FormatNumber Number="@context.MaxQuantity"></FormatNumber>
                         </Column>
-                        <Column Align="right" Header="@($"Price in {@currencyName}")">
+                        <Column Align="right" Header="Price">
                             <FormatNumber Currency="@context.Price" Symbol="@currencySymbol"></FormatNumber>
                         </Column>
                     </Columns>
@@ -55,22 +57,23 @@
 </Card>
 
 @code {
-    private PriceCalcRequest model = new() { Quantity = 1000, FxCurrency = "Naira" };
-    private string currencyName = "Naira";
+    private long quantity = 1000;
     private string currencySymbol = "₦";
 
-    private PriceCalcResponse price = new();
+    private PriceCalcResponse priceCalc = new();
     private List<PriceSlotResponse> priceSlots = new();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await CalculatePrice();
-            var response = await apiClient.PriceListAsync();
+            var t1 = apiClient.PriceCalculateAsync(null, quantity, "N");
+            var t2 = apiClient.PriceListAsync();
 
-            if (response.StatusCode == 200)
-                priceSlots = response.Result.ToList();
+            await Task.WhenAll(t1, t2);
+
+            priceSlots = t2.Result.Result.ToList();
+            priceCalc = t1.Result.Result;
         }
         catch (Exception ex)
         {
@@ -82,10 +85,10 @@
     {
         try
         {
-            var result = await apiClient.PriceCalculateAsync(model);
+            var result = await apiClient.PriceCalculateAsync(null, quantity, "N");
 
             if (result.StatusCode == 200)
-                price = result.Result;
+                priceCalc = result.Result;
         }
         catch (Exception ex)
         {

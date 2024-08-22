@@ -2,38 +2,12 @@
 
 <Modal Size="Modal.ModalSize.XLARGE" @bind-Hidden="hideModal" Title="Delivery Report">
     <Body>
-        @if (loading)
+        @if (ds.Items == null)
         {
             <div>loading..</div>
         }
         else
         {
-            <div class="alert alert-info" role="alert">
-                <h4 class="text-info">Note</h4>
-                Multi-part messages (longer than 160) are repeated for each part in these statistics.
-            </div>
-
-            <div class="accordion mb-4" id="statusAccordion">
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingStatus">
-                        <button @onclick="ToggleAccordionVisibility" class='accordion-button @(isAccordionVisible ? "" : "collapsed") ' type="button" data-bs-toggle="collapse" data-bs-target="#collapseStatus" aria-expanded='@(isAccordionVisible ? "true" : "false")' aria-controls="collapseStatus">
-                            Delivery Status Explanations
-                        </button>
-                    </h2>
-                    <div id="collapseStatus" class="accordion-collapse collapse @(isAccordionVisible ? "show" : "")" aria-labelledby="headingStatus" data-bs-parent="#statusAccordion">
-                        <div class="accordion-body">
-                            <ul>
-                                <li><strong>DELIVRD:</strong> Message is delivered to destination.</li>
-                                <li><strong>ACCEPTD:</strong> The message was accepted by the Network server. Awaiting delivery status.</li>
-                                <li><strong>EXPIRED:</strong> Message validity period has expired. (e.g., phone off or not in coverage area)</li>
-                                <li><strong>UNDELIV:</strong> The message is undeliverable.</li>
-                                <li><strong>REJECTD:</strong> The message was rejected.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="row mb-4">
                 <div class="col-md-3">
                     <SmallCard Caption="Messages Sent"
@@ -70,6 +44,7 @@
                                     @foreach (var report in context.Reports)
                                     {
                                         <span class="badge text-bg-@GetStatusCssColor(report.Status)">@report.Status</span>
+                                        <br />
                                     }
                                 }
                             </Column>
@@ -81,24 +56,19 @@
                                         if (report.ReportDate.HasValue)
                                         {
                                             <FormatDate DateTime="report.ReportDate.Value"></FormatDate>
+                                            <br />
                                         }
                                         else
                                         {
                                             <span class="text-muted">N/A</span>
+                                            <br />
                                         }
                                     }
                                 }
                             </Column>
                             <Column Header="Unit Charged">
                                 <div class="text-end text-nowrap pe-4">
-                                    @if (context.CreditsCharged % 1 == 0)
-                                    {
-                                        @context.CreditsCharged.ToString("#,##0")
-                                    }
-                                    else
-                                    {
-                                        @context.CreditsCharged.ToString("#,##0.0")
-                                    }
+                                    @context.CreditsCharged.ToString("#,##0.00")
                                 </div>
                             </Column>
                             <Column Header="SMSC Message ID">
@@ -107,6 +77,7 @@
                                     @foreach (var report in context.Reports)
                                     {
                                         @report.SmscID
+                                        <br />
                                     }
                                 }
                             </Column>
@@ -117,16 +88,42 @@
                     <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
                 </Footer>
             </Card>
+
+            <div class="accordion mb-4">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button @onclick="e => showAccordion = !showAccordion"
+                                class='accordion-button @(showAccordion ? "" : "collapsed")' 
+                                type="button">
+                            Delivery Status Explanations
+                        </button>
+                    </h2>
+                    <div class="accordion-collapse collapse @(showAccordion ? "show" : "")">
+                        <div class="accordion-body">
+                            <ul>
+                                <li><strong>DELIVRD:</strong> Message is delivered to destination.</li>
+                                <li><strong>ACCEPTD:</strong> The message was accepted by the Network server. Awaiting delivery status.</li>
+                                <li><strong>EXPIRED:</strong> Message validity period has expired. (e.g., phone off or not in coverage area)</li>
+                                <li><strong>UNDELIV:</strong> The message is undeliverable.</li>
+                                <li><strong>REJECTD:</strong> The message was rejected.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info" role="alert">
+                <h4 class="text-info">Note</h4>
+                Multi-part messages (longer than 160) are repeated for each part in these statistics.
+            </div>
         }
     </Body>
 </Modal>
 
 @code {
+    private long batchId;
     private bool hideModal = true;
-
-    private SmsBatchResponse messageBatch = new();
-    private SearchBox searchBox = new();
-    private DateRange dateRange = new();
+    private bool showAccordion = true;
 
     private ApiDataSource<SmsMessageResponse> ds = new();
 
@@ -134,34 +131,30 @@
     private decimal TotalCreditsCharged;
     private int TotalDeliveredMessages;
     private int TotalUndeliveredMessages;
-    private bool isAccordionVisible = true;
-    private bool loading = true;
 
     private async Task LoadDataAsync()
     {
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            var response = await apiClient.SmsBatchReportsListAsync(p.PageNumber, p.PageSize, null, messageBatch.BatchID);
+            var response = await apiClient.SmsBatchReportsListAsync(p.PageNumber, p.PageSize, null, batchId);
             CalculateSummary(response.Result);
+            StateHasChanged();
             return response;
         });
         await ds.LoadData(alert);
-        loading = false;
-        StateHasChanged();
     }
 
-    public async void Show(SmsBatchResponse smsBatch)
+    public async void Show(long batchID)
     {
-        messageBatch = smsBatch;
+        batchId = batchID;
         hideModal = false;
-        loading = true;
         StateHasChanged();
         await LoadDataAsync();
     }
 
     private void ToggleAccordionVisibility()
     {
-        isAccordionVisible = !isAccordionVisible;
+        showAccordion = !showAccordion;
     }
 
     private void CalculateSummary(ICollection<SmsMessageResponse> response)

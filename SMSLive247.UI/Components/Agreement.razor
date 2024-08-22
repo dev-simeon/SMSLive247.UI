@@ -1,0 +1,39 @@
+﻿@inject HttpClient httpClient
+
+<Modal Title=@Title Size="Modal.ModalSize.LARGE" @bind-Hidden="hideModal">
+    <Body>
+        @foreach(string para in paragraphs)
+        {
+            <p>@para</p>
+        }
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-secondary" @onclick="Hide">Close</button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? RequestUri { get; set; }
+
+    private bool hideModal = true;
+    private string[] paragraphs = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var raw = await httpClient.GetStringAsync(RequestUri);
+        paragraphs = raw.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    public void Show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    private void Hide()
+    {
+        hideModal = true;
+        StateHasChanged();
+    }
+}

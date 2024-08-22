@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SMSLive247.UI
 {
-    public static class Extensions
+    public static partial class Extensions
     {
         private static readonly TextInfo _textInfo = new CultureInfo("en-US", false).TextInfo;
 
@@ -105,7 +105,6 @@ namespace SMSLive247.UI
                     return exception.Message;
             }
         }
-
 
         public static List<string> ConvertRawUploadToList(this string rawString, int countryCode)
         {

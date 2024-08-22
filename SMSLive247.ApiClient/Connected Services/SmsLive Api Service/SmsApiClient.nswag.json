@@ -652,25 +652,31 @@
           "Credit Pricing"
         ],
         "operationId": "PriceCalculate",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PriceCalcRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PriceCalcRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/PriceCalcRequest"
-              }
+        "parameters": [
+          {
+            "name": "Amount",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "Quantity",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "FxCurrency",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2048,6 +2054,11 @@
             "type": "string",
             "readOnly": true
           },
+          "wallet": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
           "credits": {
             "type": "number",
             "readOnly": true,
@@ -2086,7 +2097,13 @@
           },
           "traffic": {
             "type": "string",
-            "readOnly": true
+            "readOnly": true,
+            "nullable": true
+          },
+          "senderID": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
           },
           "key": {
             "type": "string",
@@ -2382,26 +2399,6 @@
           }
         }
       },
-      "PriceCalcRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "amount": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "quantity": {
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "fxCurrency": {
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
       "PriceCalcResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -2479,6 +2476,11 @@
           "quantity": {
             "type": "integer",
             "format": "int64"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           },
           "fxCurrency": {
             "type": "string",
@@ -2617,6 +2619,10 @@
           "messageText": {
             "type": "string"
           },
+          "deliveryEmail": {
+            "type": "string",
+            "nullable": true
+          },
           "deliveryTime": {
             "type": "string",
             "format": "date-time",
@@ -2648,6 +2654,10 @@
           },
           "messageText": {
             "type": "string"
+          },
+          "deliveryEmail": {
+            "type": "string",
+            "nullable": true
           },
           "deliveryTime": {
             "type": "string",

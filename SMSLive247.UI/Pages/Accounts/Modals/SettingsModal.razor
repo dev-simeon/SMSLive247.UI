@@ -5,7 +5,7 @@
            OnCompleted="OnCompleted">
     <FormField Label="Sender ID">
         <InputSelect class="form-select" @bind-Value="senderId">
-            <option value="">-- select --</option>
+            <option>-- select --</option>
             @foreach (var item in senderIds)
             {
                 <option value="@item.SenderID">@item.SenderID</option>

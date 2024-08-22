@@ -1,4 +1,4 @@
-﻿<Card HeaderTitle="Currently Sending Messages">
+﻿<Card>
     <Body>
         <SearchArea>
             <LeftRight>
@@ -9,14 +9,14 @@
         </SearchArea>
         <Table Items="GetFilteredItems()">
             <Columns>
-                <Column Header="Scheduled Time">
+                <Column Header="Scheduled Time" Width="140px">
                     <FormatDate DateTime="@context.DateSubmitted"></FormatDate><br />
                     <span class="badge text-bg-warning">@context.Status</span>
                 </Column>
-                <Column Header="Sender ID">
+                <Column Header="Sender ID" Width="100px">
                     @context.SenderID
                 </Column>
-                <Column Header="Message" Width="50%">
+                <Column Header="Message">
                     @context.MessageText.Left(160)
                     <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
                 </Column>
@@ -32,23 +32,21 @@
                         </div>
                     </div>
                 </Column>
-                <Column>
-                    <div class="btn-group float-end">
-                        <button class="btn btn-outline-primary"
+                <Column Width="5%">
+                    <Actions>
+                        <button class="btn btn-outline-secondary"
                                 @onclick="e => ResumeBatch(context.BatchID)"
                                 @onclick:stopPropagation="true" title="Resume Batch">
-                            <i class="fa fa-play me-1"></i> Resume
+                            <i class="fa fa-play"></i>
                         </button>
-                        <button class="btn btn-outline-primary"
+                        <button class="btn btn-outline-secondary"
                                 @onclick="e => AbortBatch(context.BatchID)"
                                 @onclick:stopPropagation="true" title="Abort Batch">
-                            <i class="fa fa-stop me-2"></i> Abort
+                            <i class="fa fa-stop"></i>
                         </button>
-                    </div>
-                </Column>
-                <Column>
-                    <Actions>
-                        <button class="btn btn-outline-secondary" @onclick="e => deliveryReportModal.Show(context)" title="View Delivery Report">
+                        <button class="btn btn-outline-secondary" 
+                                @onclick="e => dlrModal.Show(context.BatchID)"
+                                @onclick:stopPropagation="true" title="View Delivery Report">
                             <i class="fa fa-envelope-open-text"></i>
                         </button>
                     </Actions>
@@ -58,10 +56,10 @@
     </Body>
 </Card>
 
-<DeliveryReport @ref="deliveryReportModal"></DeliveryReport>
+<DeliveryReport @ref="dlrModal"></DeliveryReport>
 
 @code {
-    private DeliveryReport deliveryReportModal = new();
+    private DeliveryReport dlrModal = new();
 
     private string searchText = string.Empty;
     private List<SmsBatchResponse> items = [];

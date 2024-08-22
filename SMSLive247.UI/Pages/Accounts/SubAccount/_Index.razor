@@ -1,4 +1,5 @@
-﻿@page "/Accounts/SubAccounts/Details/{subAccountId}"
+﻿@page "/Accounts/{subAccountId}"
+
 
 <PageTitle>Sub-Account Details</PageTitle>
 
@@ -6,7 +7,7 @@
 
 <Tabs>
     <TabPage Title="Details" Icon="fa fa-info">
-        <Index SubAccountId="@subAccountId"></Index>
+        <Details SubAccountId="@subAccountId"></Details>
     </TabPage>
     <TabPage Title="Sent Messages" Icon="fa fa-envelope">
         <SentMessages SubAccountId="@subAccountId"></SentMessages>
@@ -20,6 +21,6 @@
 </Tabs>
 
 @code {
-    [Parameter] public string subAccountId { get; set; }
+    [Parameter] public string? subAccountId { get; set; }
 
 }

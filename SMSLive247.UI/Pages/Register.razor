@@ -1,9 +1,8 @@
 ﻿@page "/Register"
 @layout EmptyLayout;
 @inject NavigationManager nav
-@inject HttpClient httpClient
 
-@using SMSLive247.UI.Pages.Legal
+@using System.ComponentModel.DataAnnotations
 
 <PageTitle>SmsLive247 - Register</PageTitle>
 <AutoSpinner />
@@ -14,43 +13,41 @@
         <header class="mb-3 fs-3">
             SmsLive247
         </header>
-        @if (!showMore)
+        @if (!showSecondView)
         {
-            <EditForm EditContext="BasicInfoEditContext" OnValidSubmit="GotoNextView">
+            <EditForm EditContext="firstEditContext" OnValidSubmit="ShowNextView">
                 <DataAnnotationsValidator />
-
-
                 <div class="mb-3">
                     <label class="form-label">First Name</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-user"></i></span>
-                        <InputText class="form-control" @bind-Value="BasicInfoModel.FirstName" />
+                        <InputText class="form-control" @bind-Value="firstViewModel.FirstName" />
                     </div>
-                    <ValidationMessage class="text-danger" For="() => BasicInfoModel.FirstName" />
+                    <ValidationMessage class="text-danger" For="() => firstViewModel.FirstName" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Last Name</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-user"></i></span>
-                        <InputText class="form-control" @bind-Value="BasicInfoModel.LastName" />
+                        <InputText class="form-control" @bind-Value="firstViewModel.LastName" />
                     </div>
-                    <ValidationMessage class="text-danger" For="() => BasicInfoModel.LastName" />
+                    <ValidationMessage class="text-danger" For="() => firstViewModel.LastName" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                        <InputText class="form-control" @bind-Value="BasicInfoModel.Email" type="email" />
+                        <InputText class="form-control" @bind-Value="firstViewModel.Email" type="email" />
                     </div>
-                    <ValidationMessage class="text-danger" For="() => BasicInfoModel.Email" />
+                    <ValidationMessage class="text-danger" For="() => firstViewModel.Email" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Phone</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-phone"></i></span>
-                        <InputText class="form-control" @bind-Value="BasicInfoModel.Phone" />
+                        <InputText class="form-control" @bind-Value="firstViewModel.Phone" />
                     </div>
-                    <ValidationMessage class="text-danger" For="() => BasicInfoModel.Phone" />
+                    <ValidationMessage class="text-danger" For="() => firstViewModel.Phone" />
                 </div>
                 <button class="btn btn-primary mt-4 w-100" type="submit">
                     Continue...
@@ -59,14 +56,14 @@
         }
         else
         {
-            <EditForm EditContext="secondStepEditContext" OnValidSubmit="RegisterAsync">
+            <EditForm EditContext="secondEditContext" OnValidSubmit="RegisterAsync">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <div class="mb-3">
                     <label class="form-label">Country</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-globe"></i></span>
-                        <InputSelect class="form-select" @bind-Value="Model.CountryCode">
+                        <InputSelect class="form-select" @bind-Value="secondViewModel.CountryCode">
                             <option value="355">Albania </option>
                             <option value="213">Algeria</option>
                             <option value="376">Andorra</option>
@@ -233,13 +230,13 @@
                             <option value="263">Zimbabwe </option>
                         </InputSelect>
                     </div>
-                    <ValidationMessage class="text-danger" For="() => Model.CountryCode" />
+                    <ValidationMessage class="text-danger" For="() => secondViewModel.CountryCode" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Time Zone</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-clock"></i></span>
-                        <InputSelect class="form-select" @bind-Value="Model.TimeZone">
+                        <InputSelect class="form-select" @bind-Value="secondViewModel.TimeZone">
                             <option value="-12">GMT -12</option>
                             <option value="-11">GMT -11</option>
                             <option value="-10">GMT -10</option>
@@ -267,15 +264,15 @@
                             <option value="12">GMT +12</option>
                         </InputSelect>
                     </div>
-                    <ValidationMessage class="text-danger" For="() => Model.TimeZone" />
+                    <ValidationMessage class="text-danger" For="() => secondViewModel.TimeZone" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fa fa-key"></i></span>
-                        <InputText class="form-control" @bind-Value="Model.Password" type="password" />
+                        <InputText class="form-control" @bind-Value="secondViewModel.Password" type="password" />
                     </div>
-                    <ValidationMessage class="text-danger" For="() => Model.Password" />
+                    <ValidationMessage class="text-danger" For="() => secondViewModel.Password" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Confirm Password</label>
@@ -283,7 +280,7 @@
                         <span class="input-group-text"><i class="fa fa-key"></i></span>
                         <InputText class="form-control" @bind-Value="confirmPassword" type="password" />
                     </div>
-                    @if (!PasswordsMatch())
+                    @if (secondViewModel.Password != confirmPassword)
                     {
                         <div class="text-danger">Passwords do not match.</div>
                     }
@@ -301,7 +298,7 @@
                 <button class="btn btn-primary mt-4 w-100" disabled="@(!acceptTerms)" type="submit">
                     Sign Me Up!
                 </button>
-                <button class="btn btn-secondary mt-2 w-100" @onclick="GotoPreviousView" type="button">
+                <button class="btn btn-secondary mt-2 w-100" @onclick="ShowPreviousView" type="button">
                     Back
                 </button>
             </EditForm>
@@ -318,47 +315,51 @@
     </aside>
 </main>
 
-<Agreement @ref="agreementModal"></Agreement>
-<PrivacyPolicy @ref="privacyModal"></PrivacyPolicy>
+<Agreement @ref="agreementModal" Title="Terms and Conditions" RequestUri=@GetRequestUri("agreement.txt")></Agreement>
+<Agreement @ref="privacyModal" Title="Privacy Policy" RequestUri=@GetRequestUri("privacy.txt")></Agreement>
 
 @code {
     private Agreement agreementModal = new();
-    private PrivacyPolicy privacyModal = new();
+    private Agreement privacyModal = new();
 
     private string? confirmPassword;
     private bool acceptTerms;
-    private bool showMore;
+    private bool showSecondView;
 
     [SupplyParameterFromForm]
-    public AccountCreateRequest Model { get; set; } = new() { TimeZone = 1, CountryCode = 234 };
+    private AccountCreateRequest secondViewModel { get; set; } = new() { TimeZone = 1, CountryCode = 234 };
+    private AccountBasicRequest firstViewModel { get; set; } = new();
 
-    private UserInfo BasicInfoModel { get; set; } = new();
-
-    private EditContext BasicInfoEditContext;
-    private EditContext secondStepEditContext;
+    private EditContext firstEditContext;
+    private EditContext secondEditContext;
 
     protected override void OnInitialized()
     {
-        BasicInfoEditContext = new EditContext(BasicInfoModel);
-        secondStepEditContext = new EditContext(Model);
+        firstEditContext = new EditContext(firstViewModel);
+        secondEditContext = new EditContext(secondViewModel);
     }
 
-    private void GotoNextView()
+    private string GetRequestUri(string file)
     {
-        if (BasicInfoEditContext.Validate())
+        return $"{nav.BaseUri}/config/{file}";
+    }
+
+    private void ShowPreviousView()
+    {
+        showSecondView = false;
+    }
+
+    private void ShowNextView()
+    {
+        if (firstEditContext.Validate())
         {
-            Model.FirstName = BasicInfoModel.FirstName;
-            Model.LastName = BasicInfoModel.LastName;
-            Model.Email = BasicInfoModel.Email;
-            Model.Phone = BasicInfoModel.Phone;
-            Model.AccountName = $"{Model.FirstName} {Model.LastName}";
-            showMore = true;
+            secondViewModel.FirstName = firstViewModel.FirstName;
+            secondViewModel.LastName = firstViewModel.LastName;
+            secondViewModel.Email = firstViewModel.Email;
+            secondViewModel.Phone = firstViewModel.Phone;
+            secondViewModel.AccountName = $"{secondViewModel.FirstName} {secondViewModel.LastName}";
+            showSecondView = true;
         }
-    }
-
-    private void GotoPreviousView()
-    {
-        showMore = false;
     }
 
     private async Task RegisterAsync()
@@ -368,14 +369,14 @@
             if (!acceptTerms)
                 throw new Exception("You must accept the agreement and privacy policy to register");
 
-            if (Model.Password != confirmPassword)
+            if (secondViewModel.Password != confirmPassword)
                 throw new Exception("Passwords do not match");
 
-            var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", Model);
+            var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", secondViewModel);
 
             if (response.StatusCode == 200)
             {
-                nav.NavigateTo("/Login?email=" + Model.Email);
+                nav.NavigateTo("/Login?email=" + secondViewModel.Email);
             }
             else
             {
@@ -392,28 +393,21 @@
         }
     }
 
-    private bool PasswordsMatch()
-    {
-        return Model.Password == confirmPassword;
-    }
-
-    public class UserInfo
+    public class AccountBasicRequest
     {
         [Required(ErrorMessage = "First name is required")]
-        [StringLength(50, ErrorMessage = "First name can't be longer than 50 characters")]
-        public string FirstName { get; set; }
+        public string FirstName { get; set; } = "";
 
         [Required(ErrorMessage = "Last name is required")]
-        [StringLength(50, ErrorMessage = "Last name can't be longer than 50 characters")]
-        public string LastName { get; set; }
+        public string LastName { get; set; } = "";
 
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
-        public string Email { get; set; }
+        public string Email { get; set; } = "";
 
         [Required(ErrorMessage = "Phone number is required")]
         [Phone(ErrorMessage = "Invalid phone number")]
-        public string Phone { get; set; }
+        public string Phone { get; set; } = "";
     }
 
 }
