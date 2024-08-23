@@ -5,10 +5,10 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
+                    <input type="search" class="form-control" placeholder="Search..." @oninput="e => OnSearch(e.Value?.ToString())" />
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.ADD" @onclick="e => csvFileModal.Show()">
+                    <Button Type="Button.Style.ADD" @onclick="e => batchFileModal.Show()">
                         Upload CSV File...
                     </Button>
                 </Right>
@@ -27,8 +27,8 @@
                     <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
                 </Column>
                 <Column>
-                    <Actions OnDownload="() => csvFileModal.Download(context)"
-                             OnDelete="() => csvFileModal.Delete(context)">
+                    <Actions OnDownload="e => batchFileModal.Download(context)"
+                             OnDelete="e => batchFileModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -36,18 +36,18 @@
     </Body>
 </Card>
 
-<a href="https://new.smslive247.com/Support/Docs/Help/Html/Template%20SMS.htm" target="_blank" class="text-decortion-none mb-2">
+<a href="https://new.smslive247.com/Support/Docs/Help/Html/Template%20SMS.htm" target="_blank" class="text-decoration-none mb-2">
     Click here for step-by-step instruction on how to setup a template SMS.
 </a>
 
 
-<BulkFileModal @ref="csvFileModal" ForCSV="true" OnCompleted="FetchData"></BulkFileModal>
+<BulkFileModal @ref="batchFileModal" ForCSV="true" OnCompleted="FetchData"></BulkFileModal>
 
 @code {
-    private string searchText = string.Empty;
-    private BulkFileModal csvFileModal = new();
-    private List<BatchFileResponse> items = [];
-    private List<BatchFileResponse> filteredItems = [];
+    private BulkFileModal batchFileModal = new();
+
+    private List<BatchFileResponse>? items;
+    private List<BatchFileResponse>? filteredItems;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,17 +65,11 @@
         }
     }
 
-    private void OnSearch(string input)
+    private void OnSearch(string? input)
     {
-        searchText = input;
-
-        if (string.IsNullOrEmpty(searchText))
-        {
+        if (string.IsNullOrEmpty(input))
             filteredItems = items;
-        }
         else
-        {
-            filteredItems = items.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+            filteredItems = items?.Where(x => x.Description.Contains(input, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 }

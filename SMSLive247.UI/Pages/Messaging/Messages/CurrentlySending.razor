@@ -62,7 +62,7 @@
     private DeliveryReport dlrModal = new();
 
     private string searchText = string.Empty;
-    private List<SmsBatchResponse> items = [];
+    private List<SmsBatchResponse>? items;
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,12 +104,12 @@
         searchText = e.Value?.ToString() ?? string.Empty;
     }
 
-    private List<SmsBatchResponse> GetFilteredItems()
+    private List<SmsBatchResponse>? GetFilteredItems()
     {
         if (string.IsNullOrWhiteSpace(searchText))
             return items;
 
-        return items.Where(x => x.MessageText.Contains(searchText, 
+        return items?.Where(x => x.MessageText.Contains(searchText, 
             StringComparison.OrdinalIgnoreCase)).ToList();
     }
 }

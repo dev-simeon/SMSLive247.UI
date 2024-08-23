@@ -80,10 +80,10 @@
 @code {
     private SenderIdModal senderIdModal = new();
 
-    private string searchStatus = "";
-    private string searchQuery = "";
-    private List<SenderIdResponse> items = [];
-    private List<SenderIdResponse> filteredItems = [];
+    private string? searchStatus;
+    private string? searchQuery;
+    private List<SenderIdResponse>? items;
+    private List<SenderIdResponse>? filteredItems;
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,12 +107,12 @@
 
         if (!string.IsNullOrWhiteSpace(searchStatus))
         {
-            filteredItems = filteredItems.Where(x => x.Status == searchStatus).ToList();
+            filteredItems = filteredItems?.Where(x => x.Status == searchStatus).ToList();
         }
 
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
-            filteredItems = filteredItems.Where(x => x.SenderID.Contains(
+            filteredItems = filteredItems?.Where(x => x.SenderID.Contains(
                 searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }

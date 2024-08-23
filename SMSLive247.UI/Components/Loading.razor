@@ -7,12 +7,14 @@ else
     <div class="progress" style="height: 7px">
         <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: @value%"></div>
     </div>
+    <p>Loading...</p>
 }
 
 @code {
     [Parameter] public bool BoolCheck { get; set; } = false;
     [Parameter, MemberNotNull] public object NullCheckObject { get; set; } 
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? AltView { get; set; }
 
     private int value;
     private double intervalMs = 100;

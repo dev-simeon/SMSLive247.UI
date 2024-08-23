@@ -42,10 +42,10 @@
                     <small class="text-muted">@context.MessageParts Page (@context.MessageText.Length)</small>
                 </Column>
                 <Column Header="Delivery">
-                    <small class="text-muted">
+                    <small class="text-muted text-nowrap">
                         @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
                     </small><br />
-                    <small class="text-muted">
+                    <small class="text-muted text-nowrap">
                         <em>Credits:</em> @context.CreditsCharged.ToString("#,##0.00")
                     </small>
                 </Column>

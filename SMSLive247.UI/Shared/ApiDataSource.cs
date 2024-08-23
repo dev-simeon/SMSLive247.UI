@@ -11,12 +11,6 @@ namespace SMSLive247.UI
             return this;
         }
 
-        public ApiDataSource<T> SetFilter(FilterState state)
-        {
-            FilterState = state;
-            return this;
-        }
-
         public async Task LoadData(AlertService alert)
         {
             try
@@ -55,6 +49,5 @@ namespace SMSLive247.UI
             new(204, new Dictionary<string, IEnumerable<string>>(), []);
     }
 
-    public record class SortState();
     public record class FilterState();
 }

@@ -6,11 +6,12 @@
 <PageTitle>SMSLive247 - Profile</PageTitle>
 <Title>My Profile</Title>
 
-<Card>
-    <Body>
-        <MultiColumn Column1Width="4" Column2Width="8">
-            <Column1>
-                @* <div class="card"> *@
+<Loading NullCheckObject="account">
+    <Card>
+        <Body>
+            <MultiColumn Column1Width="4" Column2Width="8">
+                <Column1>
+                    @* <div class="card"> *@
                     <div class="card-body">
                         <div>
                             <div class="mb-3">
@@ -42,51 +43,50 @@
                             </div>
                         </div>
                     </div>
-                @* </div> *@
-            </Column1>
-            <Column2>
-                <div class="alert alert-info mb-3">
-                    Set a default SenderID here. Note that you can override this when actually sending.
-                    The signature text is appended to the end of every message. Delivery email receives
-                    failure reports for bulk sending.
-                </div>
-                <StaticText Label="Default Route" Text="@account.Traffic"></StaticText>
-                <StaticText Label="Sender ID" Text="@senderId"></StaticText>
-                @{
-                    string sign = account.TimeZone > 0 ? "+" : "-";
-                    string timeZone = $"GMT {sign}{account.TimeZone}";
-                }
-                <StaticText Label="TimeZone" Text="@timeZone"></StaticText>
-            </Column2>
-        </MultiColumn>
-    </Body>
-    <Footer>
-        <div class="btn-group">
-            <button type="button" class="btn btn-outline-primary" @onclick="() => profileModal.show()">
-                Edit Basic Info...
-            </button>
-            <button type="button" class="btn btn-outline-primary" @onclick="() => passwordModal.Show()">
-                Change Password...
-            </button>
-            <button type="button" class="btn btn-outline-primary" @onclick="e => settingsModal.Show(account)">
-                Edit Settings...
-            </button>
-        </div>
-    </Footer>
-</Card>
+                    @* </div> *@
+                </Column1>
+                <Column2>
+                    <div class="alert alert-info mb-3">
+                        Set a default SenderID here. Note that you can override this when actually sending.
+                        The signature text is appended to the end of every message. Delivery email receives
+                        failure reports for bulk sending.
+                    </div>
+                    <StaticText Label="Default Route" Text="@account.Traffic"></StaticText>
+                    <StaticText Label="Sender ID" Text="@account.SenderID"></StaticText>
+                    @{
+                        string sign = account.TimeZone > 0 ? "+" : "-";
+                        string timeZone = $"GMT {sign}{account.TimeZone}";
+                    }
+                    <StaticText Label="TimeZone" Text="@timeZone"></StaticText>
+                </Column2>
+            </MultiColumn>
+        </Body>
+        <Footer>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-primary" @onclick="e => profileModal.show()">
+                    Edit Basic Info...
+                </button>
+                <button type="button" class="btn btn-outline-primary" @onclick="e => passwordModal.Show()">
+                    Change Password...
+                </button>
+                <button type="button" class="btn btn-outline-primary" @onclick="e => settingsModal.Show(account)">
+                    Edit Settings...
+                </button>
+            </div>
+        </Footer>
+    </Card>
 
-
-<ProfileInfoModal @ref="profileModal" account="account" OnCompleted="FetchData"></ProfileInfoModal>
-<ChangePasswordModal @ref="passwordModal" account="account"></ChangePasswordModal>
-<SettingsModal @ref="settingsModal"></SettingsModal>
+    <ProfileInfoModal @ref="profileModal" account="account" OnCompleted="FetchData"></ProfileInfoModal>
+    <ChangePasswordModal @ref="passwordModal" account="account"></ChangePasswordModal>
+    <SettingsModal @ref="settingsModal"></SettingsModal>
+</Loading>
 
 @code {
     private SettingsModal settingsModal = new();
     private ProfileInfoModal profileModal = new();
     private ChangePasswordModal passwordModal = new();
 
-    private AccountResponse account = new();
-    private string senderId = "";
+    private AccountResponse? account;
 
     protected override async Task OnInitializedAsync()
     {

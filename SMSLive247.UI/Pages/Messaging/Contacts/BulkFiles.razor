@@ -5,10 +5,10 @@
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <input type="search" class="form-control" placeholder="Search..." @bind="searchText" @oninput="e => OnSearch(e.Value?.ToString()!)" />
+                    <input type="search" class="form-control" placeholder="Search..." @oninput="e => OnSearch(e.Value?.ToString())" />
                 </Left>
                 <Right>
-                    <Button Type="Button.Style.ADD" @onclick="e => bulkFileModal.Show()">
+                    <Button Type="Button.Style.ADD" @onclick="e => batchFileModal.Show()">
                         Upload Bulk File...
                     </Button>
                 </Right>
@@ -27,8 +27,8 @@
                     <span class="badge text-bg-info">.@context.FileType.ToUpper()</span>
                 </Column>
                 <Column>
-                    <Actions OnDownload="() => bulkFileModal.Download(context)"
-                             OnDelete="() => bulkFileModal.Delete(context)">
+                    <Actions OnDownload="e => batchFileModal.Download(context)"
+                             OnDelete="e => batchFileModal.Delete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -36,13 +36,13 @@
     </Body>
 </Card>
 
-<BulkFileModal @ref="bulkFileModal" OnCompleted="FetchData"></BulkFileModal>
+<BulkFileModal @ref="batchFileModal" OnCompleted="FetchData"></BulkFileModal>
 
 @code {
-    private string searchText = string.Empty;
-    private BulkFileModal bulkFileModal = new();
-    private List<BatchFileResponse> items = [];
-    private List<BatchFileResponse> filteredItems = [];
+    private BulkFileModal batchFileModal = new();
+
+    private List<BatchFileResponse>? items;
+    private List<BatchFileResponse>? filteredItems;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,17 +60,11 @@
         }
     }
 
-    private void OnSearch(string input)
+    private void OnSearch(string? input)
     {
-        searchText = input;
-
-        if (string.IsNullOrEmpty(searchText))
-        {
+        if (string.IsNullOrEmpty(input))
             filteredItems = items;
-        }
         else
-        {
-            filteredItems = items.Where(x => x.Description.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+            filteredItems = items?.Where(x => x.Description.Contains(input, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 }

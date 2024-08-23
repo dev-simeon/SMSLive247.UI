@@ -37,7 +37,7 @@ namespace SMSLive247.UI.Services
             if (!string.IsNullOrEmpty(content))
             {
                 var headers = response.Headers.AsString();
-                cache.Set(key, $"{headers}\n\n\n{content}", TimeSpan.FromMinutes(3));
+                cache.Set(key, $"{headers}\n\n\n{content}", TimeSpan.FromMinutes(1));
             }
         }
 

@@ -2,122 +2,124 @@
 
 <Modal Size="Modal.ModalSize.XLARGE" @bind-Hidden="hideModal" Title="Delivery Report">
     <Body>
-        @if (ds.Items == null)
-        {
-            <div>loading..</div>
-        }
-        else
-        {
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <SmallCard Caption="Messages Sent"
-                               Value="@TotalMessagesSent.ToString()"
-                               Icon="bi bi-envelope" />
-                </div>
-                <div class="col-md-3">
-                    <SmallCard Caption="Credit Charged"
-                               Value="@TotalCreditsCharged.ToString("#,##0.0")"
-                               Icon="bi bi-credit-card" />
-                </div>
-                <div class="col-md-3">
-                    <SmallCard Caption="Delivered Messages"
-                               Value="@TotalDeliveredMessages.ToString()"
-                               Icon="bi bi-check-circle" />
-                </div>
-                <div class="col-md-3">
-                    <SmallCard Caption="Undelivered Messages"
-                               Value="@TotalUndeliveredMessages.ToString()"
-                               Icon="bi bi-x-circle" />
-                </div>
+@*         <div class="row mb-4">
+            <div class="col-md-3">
+                <SmallCard Caption="Messages Sent"
+                           Value="@totalSubmitted.ToString("#,##0")"
+                           Icon="bi bi-envelope" />
             </div>
-
-            <Card HeaderTitle="Sent Messages">
-                <Body>
-                    <Table DataSource="ds">
-                        <Columns>
-                            <Column Header="Recipient Number">
-                                @context.PhoneNumber
-                            </Column>
-                            <Column Header="Delivery Status">
-                                @if (context.Reports != null)
+            <div class="col-md-3">
+                <SmallCard Caption="Credit Charged"
+                           Value="@totalCharged.ToString("#,##0.00")"
+                           Icon="bi bi-credit-card" />
+            </div>
+            <div class="col-md-3">
+                <SmallCard Caption="Delivered Messages"
+                           Value="@totalDelivered.ToString("#,##0")"
+                           Icon="bi bi-check-circle" />
+            </div>
+            <div class="col-md-3">
+                <SmallCard Caption="Undelivered Messages"
+                           Value="@totalUndelivered.ToString("#,##0")"
+                           Icon="bi bi-x-circle" />
+            </div>
+        </div>
+ *@
+        <Card BodyPadding="0">
+            <Body>
+                <Table DataSource="ds">
+                    <Columns>
+                        <Column Header="Recipient Number">
+                            @context.PhoneNumber
+                        </Column>
+                        <Column Header="Delivery Status">
+                            @if (context.Reports != null)
+                            {
+                                @foreach (var report in context.Reports)
                                 {
-                                    @foreach (var report in context.Reports)
+                                    <span class="badge text-bg-@GetStatusCssColor(report.Status)">@report.Status</span>
+                                    <br />
+                                }
+                            }
+                        </Column>
+                        <Column Header="Report Date">
+                            @if (context.Reports != null)
+                            {
+                                @foreach (var report in context.Reports)
+                                {
+                                    if (report.ReportDate.HasValue)
                                     {
-                                        <span class="badge text-bg-@GetStatusCssColor(report.Status)">@report.Status</span>
+                                        <FormatDate DateTime="report.ReportDate.Value"></FormatDate>
+                                        <br />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">N/A</span>
                                         <br />
                                     }
                                 }
-                            </Column>
-                            <Column Header="Report Date">
-                                @if (context.Reports != null)
+                            }
+                        </Column>
+                        <Column Header="Unit Charged">
+                            <div class="text-end text-nowrap pe-4">
+                                @context.CreditsCharged.ToString("#,##0.00")
+                            </div>
+                        </Column>
+                        <Column Header="SMSC Message ID">
+                            @if (context.Reports != null)
+                            {
+                                @foreach (var report in context.Reports)
                                 {
-                                    @foreach (var report in context.Reports)
-                                    {
-                                        if (report.ReportDate.HasValue)
-                                        {
-                                            <FormatDate DateTime="report.ReportDate.Value"></FormatDate>
-                                            <br />
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">N/A</span>
-                                            <br />
-                                        }
-                                    }
+                                    @report.SmscID
+                                    <br />
                                 }
-                            </Column>
-                            <Column Header="Unit Charged">
-                                <div class="text-end text-nowrap pe-4">
-                                    @context.CreditsCharged.ToString("#,##0.00")
-                                </div>
-                            </Column>
-                            <Column Header="SMSC Message ID">
-                                @if (context.Reports != null)
-                                {
-                                    @foreach (var report in context.Reports)
-                                    {
-                                        @report.SmscID
-                                        <br />
-                                    }
-                                }
-                            </Column>
-                        </Columns>
-                    </Table>
-                </Body>
-                <Footer>
-                    <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
-                </Footer>
-            </Card>
+                            }
+                        </Column>
+                    </Columns>
+                </Table>
+            </Body>
+            <Footer>
+                <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+            </Footer>
+        </Card>
 
-            <div class="accordion mb-4">
-                <div class="accordion-item">
-                    <h2 class="accordion-header">
-                        <button @onclick="e => showAccordion = !showAccordion"
-                                class='accordion-button @(showAccordion ? "" : "collapsed")' 
-                                type="button">
-                            Delivery Status Explanations
-                        </button>
-                    </h2>
-                    <div class="accordion-collapse collapse @(showAccordion ? "show" : "")">
-                        <div class="accordion-body">
-                            <ul>
-                                <li><strong>DELIVRD:</strong> Message is delivered to destination.</li>
-                                <li><strong>ACCEPTD:</strong> The message was accepted by the Network server. Awaiting delivery status.</li>
-                                <li><strong>EXPIRED:</strong> Message validity period has expired. (e.g., phone off or not in coverage area)</li>
-                                <li><strong>UNDELIV:</strong> The message is undeliverable.</li>
-                                <li><strong>REJECTD:</strong> The message was rejected.</li>
-                            </ul>
-                        </div>
+        <div class="accordion mb-4">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button @onclick="e => showAccordion = !showAccordion"
+                            class='accordion-button @(showAccordion ? "" : "collapsed")' 
+                            type="button">
+                        Delivery Status Explanations
+                    </button>
+                </h2>
+                <div class="accordion-collapse collapse @(showAccordion ? "show" : "")">
+                    <div class="accordion-body">
+                        <ul>
+                            <li><strong class="badge text-bg-success">DELIVRD</strong> 
+                                Message is delivered to destination.</li>
+                            <li>
+                                <strong class="badge text-bg-info">ACCEPTD</strong>
+                                The message was accepted by the Network server. Awaiting delivery status.</li>
+                            <li>
+                                <strong class="badge text-bg-secondary">EXPIRED</strong>
+                                Message validity period has expired. (e.g. phone off or not in coverage area)</li>
+                            <li>
+                                <strong class="badge text-bg-warning">UNDELIV</strong>
+                                The message is undeliverable.</li>
+                            <li>
+                                <strong class="badge text-bg-danger">REJECTD</strong>
+                                The message was rejected.</li>
+                        </ul>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="alert alert-info" role="alert">
-                <h4 class="text-info">Note</h4>
-                Multi-part messages (longer than 160) are repeated for each part in these statistics.
-            </div>
-        }
-    </Body>
+@*         <div class="alert alert-info" role="alert">
+            <h4 class="text-info">Note</h4>
+            Multi-part messages (longer than 160) are repeated for each part in these statistics.
+        </div>
+ *@    </Body>
 </Modal>
 
 @code {
@@ -127,21 +129,18 @@
 
     private ApiDataSource<SmsMessageResponse> ds = new();
 
-    private int TotalMessagesSent;
-    private decimal TotalCreditsCharged;
-    private int TotalDeliveredMessages;
-    private int TotalUndeliveredMessages;
+    //this should be SmsReportResponse object
+    private int totalSubmitted;
+    private int totalDelivered;
+    private int totalUndelivered;
+    private decimal totalCharged;
 
-    private async Task LoadDataAsync()
+    protected override void OnInitialized()
     {
-        ds.Callback = new(async (PageState p, FilterState? f) =>
+        ds.Callback = new((PageState p, FilterState? f) =>
         {
-            var response = await apiClient.SmsBatchReportsListAsync(p.PageNumber, p.PageSize, null, batchId);
-            CalculateSummary(response.Result);
-            StateHasChanged();
-            return response;
+            return apiClient.SmsBatchReportsListAsync(p.PageNumber, p.PageSize, null, batchId);
         });
-        await ds.LoadData(alert);
     }
 
     public async void Show(long batchID)
@@ -149,24 +148,20 @@
         batchId = batchID;
         hideModal = false;
         StateHasChanged();
-        await LoadDataAsync();
+        await ds.LoadData(alert);
+        StateHasChanged();
     }
 
-    private void ToggleAccordionVisibility()
-    {
-        showAccordion = !showAccordion;
-    }
-
-    private void CalculateSummary(ICollection<SmsMessageResponse> response)
-    {
-        if (response != null)
-        {
-            TotalMessagesSent = response.Count();
-            TotalDeliveredMessages = response.Sum(r => r.Reports.Count(report => report.Status == "DELIVRD"));
-            TotalUndeliveredMessages = response.Sum(r => r.Reports.Count(report => report.Status != "DELIVRD"));
-            TotalCreditsCharged = (decimal)response.Sum(r => r.CreditsCharged);
-        }
-    }
+    // private void CalculateSummary(ICollection<SmsMessageResponse> response)
+    // {
+    //     if (response != null)
+    //     {
+    //         totalSubmitted = response.Count();
+    //         totalDelivered = response.Sum(r => r.Reports.Count(report => report.Status == "DELIVRD"));
+    //         totalUndelivered = response.Sum(r => r.Reports.Count(report => report.Status != "DELIVRD"));
+    //         totalCharged = (decimal)response.Sum(r => r.CreditsCharged);
+    //     }
+    // }
 
     private string GetStatusCssColor(string status)
     {

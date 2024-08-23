@@ -55,9 +55,8 @@
             }
             else if(previewFileIndex == 1 || previewFileIndex == 2)
             {
-            <Loading BoolCheck="model.IsLoaded">
-                <Table Items="@(previewFileIndex == 2)" 
-                       TItem="DataRow" Context="row">
+            <Loading BoolCheck="@(previewFileIndex == 2)">
+                <Table Items="model.DataRows" TItem="DataRow" Context="row">
                     <Columns>
                         @foreach (var col in model.DataColumns)
                         {
@@ -174,7 +173,7 @@
                                 @onclick="e => currentStepIndex--">
                             <i class="fa fa-arrow-left me-2"></i>Previous
                         </button>
-                        <button class="btn btn-outline-primary" type="button" disabled="@(currentStepIndex == 1 || !isFileSelected)"
+                        <button class="btn btn-outline-primary" type="button" disabled="@(currentStepIndex > 0 || previewFileIndex != 2)"
                                 @onclick="e => currentStepIndex++">
                             Next<i class="fa fa-arrow-right ms-2"></i>
                         </button>

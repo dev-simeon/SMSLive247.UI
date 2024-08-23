@@ -3,7 +3,7 @@
 
 @if (Columns == null)
 {
-<p><em>No columns were specified</em></p>
+<p><em>No columns were specified for Table component</em></p>
 }
 else
 {
@@ -17,23 +17,26 @@ else
         @if (IsLoading())
         {
             <tr>
-                <CascadingValue Name="IsLoading" Value=@true>
-                    @Columns(default)
-                </CascadingValue>
+                <td colspan="20">
+                    <Loading BoolCheck="false"></Loading>
+                </td>
             </tr> 
         }
         else if (items == null)
         {
             <tr>
                 <td colspan="20">
-                    <span class="badge text-bg-info">Click search above</span>
+                    <span class="badge text-bg-info">NULL items </span>
                 </td>
             </tr>
         }
+
         else if (items.Count == 0)
         {
             <tr>
-                <td colspan="20"><p><em>No items found</em></p></td>
+                <td colspan="20">
+                    <span class="badge text-bg-info">@EmptyMessage</span>
+                </td>
             </tr>
         }
         else
@@ -77,6 +80,7 @@ else
     [Parameter] public ApiDataSource<TItem>? DataSource { get; set; }
     [Parameter] public RenderFragment<TItem?>? Columns { get; set; }
 
+    [Parameter] public string? EmptyMessage { get; set; } = "No items found";
     [Parameter] public bool AllowSelect { get; set; } = true;
     [Parameter] public bool SelectMultiple { get; set; } = false;
     [Parameter] public EventCallback<TItem> OnSelectedItemChanged { get; set; }
@@ -85,8 +89,8 @@ else
 
     protected override void OnParametersSet()
     {
-        if (DataSource == null && Items == null)
-            throw new InvalidOperationException("Please set either DataSource or Items properties");
+        // if (DataSource == null && Items == null)
+        //     throw new InvalidOperationException("Please set either DataSource or Items properties");
 
         if (DataSource != null && Items != null)
             throw new InvalidOperationException("You should set only one of DataSource and Items properties");
@@ -100,12 +104,13 @@ else
         base.OnParametersSet();
     }
 
-    //Private Methods
+    [MemberNotNullWhen(false, nameof(items))]
     private bool IsLoading()
     {
         if (DataSource != null)
             return DataSource.IsLoading;
-        return false;
+
+        return items == null;
     }
 
     private async Task ToggleRow(TItem item)

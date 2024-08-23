@@ -16,17 +16,19 @@
                             <InputNumber class="form-control" @bind-Value="quantity" placeholder="SMS Quantity" />
                         </FormField>
 
-                        <div class="mt-4">
-                            <div class="d-flex justify-content-between">
-                                <label class="form-label">Unit Price</label>
-                                <FormatNumber Currency="@priceCalc.Price"></FormatNumber>
-                            </div>
+                        <Loading NullCheckObject="priceCalc">
+                            <div class="mt-4">
+                                <div class="d-flex justify-content-between">
+                                    <label class="form-label">Unit Price</label>
+                                    <FormatNumber Currency="@priceCalc.Price"></FormatNumber>
+                                </div>
 
-                            <div class="d-flex justify-content-between">
-                                <label class="form-label">Total Amount</label>
-                                <FormatNumber Currency="@priceCalc.Amount"></FormatNumber>
+                                <div class="d-flex justify-content-between">
+                                    <label class="form-label">Total Amount</label>
+                                    <FormatNumber Currency="@priceCalc.Amount"></FormatNumber>
+                                </div>
                             </div>
-                        </div>
+                        </Loading>
                     </div>
 
                     <div class="card-footer border-top py-2">
@@ -60,8 +62,8 @@
     private long quantity = 1000;
     private string currencySymbol = "₦";
 
-    private PriceCalcResponse priceCalc = new();
-    private List<PriceSlotResponse> priceSlots = new();
+    private PriceCalcResponse? priceCalc;
+    private List<PriceSlotResponse>? priceSlots;
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,6 +87,9 @@
     {
         try
         {
+            priceCalc = null;
+            StateHasChanged();
+
             var result = await apiClient.PriceCalculateAsync(null, quantity, "N");
 
             if (result.StatusCode == 200)
