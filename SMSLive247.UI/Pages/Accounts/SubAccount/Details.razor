@@ -119,9 +119,7 @@ else
             var response = await apiClient.AccountGetAsync(SubAccountId);
 
             if (response.StatusCode == 200)
-            {
                 subAccount = response.Result;
-            }
         }
         catch (Exception ex)
         {

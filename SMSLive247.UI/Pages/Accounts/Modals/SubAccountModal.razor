@@ -10,7 +10,8 @@
     </div>
     <MultiColumn>
         <Column1>
-            <FormInputText Label="Account Name" @bind-Value="model.AccountName" required disabled="@(editor.EditMode == EditModal<AccountResponse>.EditModeEnum.CREATE ? false : true)"></FormInputText>
+            <FormInputText Label="Account Name" @bind-Value="model.AccountName" required 
+                disabled="@(editor.EditMode == EditModal<AccountResponse>.EditModeEnum.CREATE ? false : true)"></FormInputText>
             <FormField Label="Sender ID">
                 <InputSelect class="form-select" @bind-Value="senderId">
                     <option value="">-- Select --</option>
@@ -36,14 +37,15 @@
 
 @code {
     [Parameter] public EventCallback OnCompleted { get; set; }
+
     private EditModal<AccountResponse> editor = new();
     private List<SenderIdResponse> senderIds = new();
-    private string senderId = string.Empty;
-    private string suffix = string.Empty;
-    private string prefix = string.Empty;
+    private string senderId = "TODO";
+    private string suffix = "TODO";
+    private string prefix = "TODO";
     private string password = "";
-    private string oldPassword = string.Empty;
-    private string callbackUrl = string.Empty;
+    private string oldPassword = "TODO";
+    private string callbackUrl = "TODO";
     private AccountResponse model => editor.Model;
 
     protected override async Task OnInitializedAsync()
@@ -71,8 +73,7 @@
     {
         var request = new AccountCreateRequest
         {
-            AccountName = model.AccountName,
-             
+            AccountName = model.AccountName,         
             Password = password
         };
 
@@ -95,8 +96,6 @@
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
 
         if (confirmed)
-        {
             await apiClient.AccountDeleteAsync(model.AccountID);
-        }
     }
 }

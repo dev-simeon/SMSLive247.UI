@@ -4,11 +4,6 @@
     "title": "SMSLive247 API v5",
     "version": "v5"
   },
-  "servers": [
-    {
-      "url": "https://api.smslive247.com"
-    }
-  ],
   "paths": {
     "/api/v5/accounts": {
       "get": {
@@ -358,22 +353,25 @@
           "Authentication"
         ],
         "operationId": "ResetPassword",
-        "parameters": [
-          {
-            "name": "username",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "parentID",
-            "in": "query",
-            "schema": {
-              "type": "string"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -1139,29 +1137,6 @@
         }
       }
     },
-    "/api/v5/sms/batch/pending": {
-      "get": {
-        "tags": [
-          "Messages"
-        ],
-        "operationId": "SmsBatchPendingList",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SmsBatchResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v5/sms/batch/{batchId}": {
       "get": {
         "tags": [
@@ -1211,6 +1186,29 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v5/sms/batch/pending": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "operationId": "SmsBatchPendingList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SmsBatchResponse"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -1268,33 +1266,6 @@
         ],
         "operationId": "SmsBatchReportsList",
         "parameters": [
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 1000.0,
-              "minimum": 1.0
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 500.0,
-              "minimum": 5.0
-            }
-          },
-          {
-            "name": "CacheTag",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "batchId",
             "in": "path",
@@ -2387,7 +2358,8 @@
         "additionalProperties": false,
         "properties": {
           "accessToken": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "tokenType": {
             "type": "string",

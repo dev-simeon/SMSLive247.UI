@@ -57,7 +57,9 @@ namespace SMSLive247.UI.Pages.ViewModels
             IEnumerable<BatchFileResponse> batchFiles)
         {
             SenderIds = senderIds.Select(x => x.SenderID).ToList();
-            BatchCsvFiles = batchFiles.Where(x => x.FileType == "csv").OrderByDescending(x => x.DateCreated).ToList();
+            BatchCsvFiles = batchFiles.Where(x => x.FileType == "csv")
+                                      .OrderByDescending(x => x.DateCreated)
+                                      .ToList();
             Request.DeliveryTime = DateTime.Now;
         }
 
@@ -67,6 +69,7 @@ namespace SMSLive247.UI.Pages.ViewModels
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
             using var dr = new CsvDataReader(csv);
 
+            dataTable.Columns.Clear(); // ??
             dataTable.Load(dr);
             // Detect the column index for phone numbers
             Request.PhoneNumberColumn = dataTable.DetectPhoneNumberColumn();

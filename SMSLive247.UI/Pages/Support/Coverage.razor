@@ -14,17 +14,17 @@
                 </Left>
             </LeftRight>
         </SearchArea>
-            <Table Items="filteredItems">
-                <Columns>
-                    <Column Header="Country">
-                        @context.CountryName
-                    </Column>
-                    <Column Header="Network">
-                        @context.NetworkName
-                    </Column>
-                </Columns>
-            </Table>
-        </Body>
+        <Table Items="filteredItems">
+            <Columns>
+                <Column Header="Country">
+                    @context.CountryName
+                </Column>
+                <Column Header="Network">
+                    @context.NetworkName
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
 </Card>
 </Loading>
 @code {
@@ -55,12 +55,9 @@
         searchText = input;
 
         if (string.IsNullOrEmpty(searchText))
-        {
-            filteredItems = items;
-        }
+            filteredItems = items ?? [] ;
         else
-        {
-            filteredItems = items.Where(x => x.CountryName.Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+            filteredItems = items?.Where(x => x.CountryName.Contains(searchText, 
+                StringComparison.OrdinalIgnoreCase)).ToList() ?? [];
     }
 }
