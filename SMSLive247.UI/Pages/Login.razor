@@ -90,13 +90,6 @@
 
     private async Task LoginAsync()
     {
-        // var response = await apiClient.LoginAsync(LoginRequestDto);
-        // var apiKey = $"MA-{response.Data.AccessToken}";
-        // var member = new Member(LoginRequestDto.Username, apiKey);
-        // apiClient.SetApikey(apiKey);
-
-        // await ((SmsAuthProvider)auth).SaveAuthenticationState(member);
-        // Nav.NavigateTo("/Accounts/Dashboard");
         try
         {
             var response = await apiClient.LoginAsync(Model);
@@ -104,7 +97,7 @@
             if (response.StatusCode == 200)
             {
                 httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", response.Result.AccessToken);
+                    new AuthenticationHeaderValue("Bearer", response.Result.AccessToken.ToString());
 
                 var apiKey = $"MA-{response.Result.AccessToken}";
                 var member = new Authentication.SmsAuthProvider.UserClaims(Model.Username, apiKey);
@@ -135,12 +128,10 @@
     {
         try
         {
-            var res = await apiClient.ResetPasswordAsync(Model.Username, "a044b5a7-1147-45cb-871a-76546896c4f3");
+            var res = await apiClient.ResetPasswordAsync(Model);
 
             if(res.StatusCode == 200)
-            {
                 await alert.Success($"Reset instructions have been sent to your email at {Model.Username}", "Reset Instruction");
-            }
         }
         catch (Exception ex)
         {

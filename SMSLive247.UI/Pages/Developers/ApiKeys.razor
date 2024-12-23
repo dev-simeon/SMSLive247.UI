@@ -31,7 +31,7 @@
                 <tbody>
                     <tr>
                         <td style="width:40%">
-                            @mainAccount.AccountID
+                            @mainAccount?.AccountID
                         </td>
                         <td>
                             @Guid.NewGuid().ToString().ToUpper()
@@ -97,7 +97,7 @@
     {
         try
         {
-            // var response = await apiClient.AccountUpdateProviderKeyAsync(accountrequest);
+            // var response = await apiClient.AccountUpdateProviderKeyAsync(account-request);
             //if (response.StatusCode == 200)
             // {
             //     await alert.Success("API key reset successfully.", "Success");

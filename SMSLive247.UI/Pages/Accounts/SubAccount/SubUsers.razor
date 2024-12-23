@@ -1,4 +1,4 @@
-﻿@using SMSLive247.UI.Pages.Accounts.SubAccount.Modals
+﻿ @using SMSLive247.UI.Pages.Accounts.SubAccount.Modals
 
 <Card HeaderTitle="Sub Account">
     <Body>
@@ -61,7 +61,6 @@
 
 <SubUserModal @ref="subUserModal" SubAccountId="@SubAccountId" OnCompleted="FetchData"></SubUserModal>
 <TransferModal @ref="transferModal" ParentId="@SubAccountId"></TransferModal>
-
 
 @code {
     [Parameter] public string SubAccountId { get; set; }

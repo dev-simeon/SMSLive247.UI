@@ -49,9 +49,7 @@
             var response = await apiClient.AccountGetAsync(SubAccountId);
 
             if (response.StatusCode == 200)
-            {
                 subAccount =  response.Result;
-            }
         }
         catch (Exception ex)
         {
@@ -96,21 +94,17 @@
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
 
         if (confirmed)
-        {
             await subClient.Impersonate(subAccount).AccountDeleteAsync(model.AccountID);
-        }
     }
 
     public static string GeneratePassword(int length)
     {
         const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-        Random random = new Random();
         char[] passwordChars = new char[length];
+        var random = new Random();
 
         for (int i = 0; i < length; i++)
-        {
             passwordChars[i] = validChars[random.Next(validChars.Length)];
-        }
 
         return new string(passwordChars);
     }

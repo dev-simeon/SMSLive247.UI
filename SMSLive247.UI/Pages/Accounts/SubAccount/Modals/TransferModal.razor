@@ -7,11 +7,11 @@
             <FormField Label="Transfer From">
                 <InputRadioGroup @bind-Value="transferDirection">
                     <div class="form-check-inline">
-                        <InputRadio id="toParent" Value='@("ToParent")' />
+                        <InputRadio id="toParent" Value='@("TO_PARENT")' />
                         <label class="form-check-label" for="toParent">@subAccount.AccountName - @parentAccount.AccountName</label>
                     </div>
                     <div class="form-check-inline">
-                        <InputRadio id="fromParent" Value='@("FromParent")' />
+                        <InputRadio id="fromParent" Value='@("FROM_PARENT")' />
                         <label class="form-check-label" for="fromParent">@parentAccount.AccountName - @subAccount.AccountName</label>
                     </div>
                 </InputRadioGroup>
@@ -20,7 +20,7 @@
                 <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required></InputNumber>
             </FormField>
             @{
-                int currentBalance = transferDirection == "ToParent" ? (int)subAccount.Credits : (int)parentAccount.Credits;
+                int currentBalance = transferDirection == "TO_PARENT" ? (int)subAccount.Credits : (int)parentAccount.Credits;
             }
             <FormInputNumber Label="Old Balance" @bind-Value="@currentBalance" disabled="true"></FormInputNumber>
             <FormField Label="New Balance">
@@ -35,12 +35,13 @@
 
 @code {
     [Parameter] public string ParentId { get; set; }
+
     private bool hideModal = true;
     private AccountResponse parentAccount = new();
     private AccountResponse subAccount = new();
     private int newBalance;
     private TransferRequest transferRequest = new TransferRequest();
-    private string transferDirection = "ToParent";
+    private string transferDirection = "TO_PARENT";
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,9 +50,7 @@
             var response = await apiClient.AccountGetAsync(ParentId);
 
             if (response.StatusCode == 200)
-            {
                 parentAccount = response.Result;
-            }
         }
         catch (Exception ex)
         {
@@ -70,25 +69,17 @@
     {
         try
         {
-            if (transferDirection == "ToParent")
-            {
+            if (transferDirection == "TO_PARENT")
                 transferRequest.Recipient = parentAccount.AccountID;
-            }
             else
-            {
                 transferRequest.Recipient = subAccount.AccountID;
-            }
 
             var task = await apiClient.TransferCreditAsync(transferRequest);
 
             if (task.StatusCode == 200)
-            {
                 await alert.Success($"Your transfer of {transferRequest.Credits} was successful", "Success");
-            }
             else
-            {
                 await alert.Error("Failed to initialize transfer.", "Error");
-            }
         }
         catch (Exception ex)
         {
@@ -103,16 +94,12 @@
 
     private void UpdateNewBalance(ChangeEventArgs e)
     {
-        if (int.TryParse(e.Value.ToString(), out int credits))
+        if (int.TryParse(e.Value?.ToString(), out int credits))
         {
-            if (transferDirection == "ToParent")
-            {
+            if (transferDirection == "TO_PARENT")
                 newBalance = (int)subAccount.Credits - credits;
-            }
             else
-            {
                 newBalance = (int)parentAccount.Credits - credits;
-            }
         }
     }
 }

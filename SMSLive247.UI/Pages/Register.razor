@@ -330,8 +330,8 @@
     private AccountCreateRequest secondViewModel { get; set; } = new() { TimeZone = 1, CountryCode = 234 };
     private AccountBasicRequest firstViewModel { get; set; } = new();
 
-    private EditContext firstEditContext;
-    private EditContext secondEditContext;
+    private EditContext? firstEditContext;
+    private EditContext? secondEditContext;
 
     protected override void OnInitialized()
     {

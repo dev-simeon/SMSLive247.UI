@@ -8,7 +8,7 @@
     "ServiceName": "SmsLive Api Service",
     "AcceptAllUntrustedCertificates": true,
     "GeneratedFileName": "SmsApiClient",
-    "Endpoint": "https://smslive-api-service-staging.azurewebsites.net/api-docs/v5/openapi.json",
+    "Endpoint": "https://api.smslive247.com/api-docs/v5/openapi.json",
     "GeneratedFileNamePrefix": null,
     "GenerateCSharpClient": true,
     "GenerateTypeScriptClient": false,

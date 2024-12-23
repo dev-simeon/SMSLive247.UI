@@ -18,11 +18,11 @@
                                 <i class="bi bi-person-circle h1 text-primary"></i>
                             </div>
                             <div>
-                                <h4 class="mb-0">@account.LastName @account.FirstName</h4>
-                                <p class="text-muted mb-0">@account.AccountID</p>
-                                <p class="text-muted mb-0">@account.AccountName</p>
-                                <p class="text-muted mb-0">@account.Phone</p>
-                                <p class="text-muted mb-0">+@account.CountryCode [GMT + @account.TimeZone]</p>
+                                <h4 class="mb-0">@account?.LastName @account?.FirstName</h4>
+                                <p class="text-muted mb-0">@account?.AccountID</p>
+                                <p class="text-muted mb-0">@account?.AccountName</p>
+                                <p class="text-muted mb-0">@account?.Phone</p>
+                                <p class="text-muted mb-0">+@account?.CountryCode [GMT + @account?.TimeZone]</p>
                             </div>
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                             <div class="col-sm-6">
                                 <div>
                                     <p class="fw-medium mb-2">Credit Balance</p>
-                                    <h4>@account.Credits.ToString("#,##0.00")</h4>
+                                    <h4>@account?.Credits.ToString("#,##0.00")</h4>
                                 </div>
                             </div>
                         </div>
@@ -51,11 +51,11 @@
                         The signature text is appended to the end of every message. Delivery email receives
                         failure reports for bulk sending.
                     </div>
-                    <StaticText Label="Default Route" Text="@account.Traffic"></StaticText>
-                    <StaticText Label="Sender ID" Text="@account.SenderID"></StaticText>
+                    <StaticText Label="Default Route" Text="@account?.Traffic"></StaticText>
+                    <StaticText Label="Sender ID" Text="@account?.SenderID"></StaticText>
                     @{
-                        string sign = account.TimeZone > 0 ? "+" : "-";
-                        string timeZone = $"GMT {sign}{account.TimeZone}";
+                        string sign = account?.TimeZone > 0 ? "+" : "-";
+                        string timeZone = $"GMT {sign}{account?.TimeZone}";
                     }
                     <StaticText Label="TimeZone" Text="@timeZone"></StaticText>
                 </Column2>

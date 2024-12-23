@@ -24,9 +24,9 @@
 </Modal>
 
 @code {
+    private int newBalance;
     private bool hideModal = true;
     private AccountResponse account = new();
-    private int newBalance;
     private TransferRequest transferRequest = new TransferRequest();
 
     protected override async Task OnInitializedAsync()
@@ -57,13 +57,10 @@
             var task = await apiClient.TransferCreditAsync(transferRequest);
 
             if (task.StatusCode == 200)
-            {
-                await alert.Success($"Your transfer of {transferRequest.Credits} to: {transferRequest.Recipient} was successful", "Success");
-            }
+                await alert.Success($@"Your transfer of {transferRequest.Credits} to: 
+                    {transferRequest.Recipient} was successful", "Success");
             else
-            {
                 await alert.Error("Failed to initialize transfer.", "Error");
-            }
         }
         catch (Exception ex)
         {
@@ -78,7 +75,7 @@
 
     private void UpdateNewBalance(ChangeEventArgs e)
     {
-        if (int.TryParse(e.Value.ToString(), out int credits))
+        if (int.TryParse(e.Value?.ToString(), out int credits))
         {
             newBalance = (int)account.Credits - credits;
         }
