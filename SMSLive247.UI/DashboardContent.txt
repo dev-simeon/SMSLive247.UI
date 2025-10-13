@@ -1,0 +1,78 @@
+========================================================
+BULK SMS DASHBOARD CONTENT (MoSCoW PRIORITIZATION)
+========================================================
+
+--------------------------------------------------------
+MUST HAVE (core, essential for MVP)
+--------------------------------------------------------
+- Account Overview
+  � Account Balance (SMS credits remaining)
+  � Account Status (Active, Suspended, etc.)
+  � Basic Profile Info (name, email, contact)
+
+- Key Metrics (period-based via picker)
+  � Total SMS Sent (Today, This Week, This Month)
+  � Delivery Rate (% delivered successfully)
+  � Delivery Status Pie Chart (Delivered, Failed, Pending)
+
+- Recent Activity
+  � Recent Messages (last 5�10 messages with date, recipient, status)
+  � Recent Transactions (credit purchases, deductions)
+
+- Contacts & Groups
+  � Contact List Overview (total contacts and groups)
+  � Recent Additions (last few contacts or groups added)
+
+- Quick Actions
+  � Send SMS (primary CTA)
+  � Buy Credits (shortcut)
+
+- System Notifications
+  � Low balance alerts
+  � Scheduled maintenance / service updates
+
+--------------------------------------------------------
+SHOULD HAVE (important, but not critical for first release)
+--------------------------------------------------------
+- Usage Statistics
+  � Daily/Monthly SMS usage trend (line or bar chart)
+  � Export option for reports (CSV/PDF)
+
+- Contact Management (extended)
+  � Quick access to �Manage Contacts� and �Manage Groups�
+  � Import/Export contacts
+
+- Support and Help
+  � Help Center (FAQs, guides)
+  � Contact Support (email or chat link)
+
+--------------------------------------------------------
+COULD HAVE (nice-to-have, future enhancements)
+--------------------------------------------------------
+- User Personalization
+  � Allow users to customize which cards/metrics appear on their dashboard
+
+- Tooltips & Info Icons
+  � Contextual help for metrics (e.g., what �Delivery Rate� means)
+
+- Recent Templates
+  � Quick access to last used SMS templates
+
+--------------------------------------------------------
+WON�T HAVE (explicitly excluded for this app)
+--------------------------------------------------------
+- Campaign Performance (no campaigns supported)
+- Click-Through Rates (not tracked)
+- Response Rates (not tracked)
+- Detailed Campaign Analysis (not applicable)
+- Template Usage Analytics (not core right now)
+- Top Contacts/Groups (not needed for MVP)
+
+--------------------------------------------------------
+UX CONSIDERATIONS
+--------------------------------------------------------
+- Hierarchy: Balance + Quick Actions at the top, Metrics in the middle,
+  Contacts/Groups + Reports below.
+- Period Picker: Drives Total Sent, Delivery Rate, and Pie Chart.
+- Consistency: Use app�s existing color theme, not demo colors.
+- Responsiveness: Ensure mobile-friendly layout.

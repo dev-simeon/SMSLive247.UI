@@ -1,72 +1,181 @@
 ﻿@page "/"
 @page "/Accounts/Dashboard"
 @inject IJSRuntime js
+@inject NavigationManager nav
 
 @using SMSLive247.UI.Pages.Accounts.Components
 
+<style>
+    .metric-card {
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: none;
+    }
+
+        .metric-card .metric-label {
+            color: var(--bs-secondary-color, #6c757d);
+            font-size: 13px;
+            margin-bottom: 6px;
+            letter-spacing: .2px;
+        }
+
+        .metric-card .metric-value {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 0;
+        }
+
+        .metric-card .metric-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: var(--bs-tertiary-bg, #f8f9fa);
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+        }
+
+            .metric-card .metric-icon i {
+                font-size: 24px;
+            }
+
+    @@media (max-width: 992px) {
+        .metric-card .metric-value {
+            font-size: 24px;
+        }
+    }
+
+    .section-title {
+        font-weight: 700;
+        letter-spacing: .2px;
+    }
+
+    .chart-container {
+        max-width: 100%;
+    }
+
+    .dashboard-list li + li {
+        border-top: 1px solid rgba(0,0,0,.05);
+    }
+</style>
+
 <PageTitle>SMSLive247 - Dashboard</PageTitle>
-<Title>Welcome, @account?.FirstName</Title>
+<Title>
+    <ChildContent>
+        Welcome, @account?.FirstName
+    </ChildContent>
+    <RightContent>
+        <div class="d-flex align-items-center justify-content-end flex-wrap gap-2">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Period picker">
+                <button type="button" class="btn btn-outline-secondary @(selectedPeriod == Period.Today ? "active" : string.Empty)" @onclick="async () => await ReloadForPeriodAsync(Period.Today)">Today</button>
+                <button type="button" class="btn btn-outline-secondary @(selectedPeriod == Period.Yesterday ? "active" : string.Empty)" @onclick="async () => await ReloadForPeriodAsync(Period.Yesterday)">Yesterday</button>
+                <button type="button" class="btn btn-outline-secondary @(selectedPeriod == Period.Week ? "active" : string.Empty)" @onclick="async () => await ReloadForPeriodAsync(Period.Week)">Week</button>
+                <button type="button" class="btn btn-outline-secondary @(selectedPeriod == Period.Month ? "active" : string.Empty)" @onclick="async () => await ReloadForPeriodAsync(Period.Month)">Month</button>
+                <button type="button" class="btn btn-outline-secondary @(selectedPeriod == Period.Custom ? "active" : string.Empty)" @onclick="async () => await ReloadForPeriodAsync(Period.Custom)">Custom</button>
+            </div>
+            @if (selectedPeriod == Period.Custom)
+            {
+                <div class="d-flex align-items-center gap-2 ms-2">
+                    <InputDate @bind-Value="customFrom" Type="InputDateType.Date" class="form-control form-control-sm" style="width: auto;" />
+                    <span class="text-muted">to</span>
+                    <InputDate @bind-Value="customTo" Type="InputDateType.Date" class="form-control form-control-sm" style="width: auto;" />
+                    <button type="button" class="btn btn-sm btn-primary" @onclick="ApplyCustomRange">Apply</button>
+                </div>
+            }
+        </div>
+    </RightContent>
+</Title>
 
 <Loading NullCheckObject="account">
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <SmallCard Caption="Wallet Balance"
-                       Value="N X,XXX.39"
-                       Icon="fa fa-wallet">
-            </SmallCard>
+    <div class="row mt-3 g-3">
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="metric-card card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="metric-content">
+                            <div class="metric-label">Credits Remaining</div>
+                            <div class="metric-value">@account!.Credits.ToString("#,###")</div>
+                        </div>
+                        <div class="metric-icon bg-body">
+                            <i class="fa fa-coins text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3">
-            <SmallCard Caption="SMS Credit Balance"
-                       Value="@account.Credits.ToString("#,###")"
-                       Icon="fa fa-coins">
-            </SmallCard>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="metric-card card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="metric-content">
+                            <div class="metric-label">@($"SMS Sent ({GetPeriodLabel()})")</div>
+                            <div class="metric-value">@totalSmsSentPeriod.ToString("#,##0")</div>
+                        </div>
+                        <div class="metric-icon bg-body">
+                            <i class="fa fa-envelope-open text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-3">
-            <SmallCard Caption="Total SMS Sent Today"
-                       Value="@totalSmsSent.ToString("#,###")"
-                       Icon="fa fa-envelope-open">
-            </SmallCard>
-        </div>
-        <div class="col-md-3">
-            <SmallCard Caption="Total Batch Files"
-                       Value="@batchFiles.Count.ToString("#,###")"
-                       Icon="fa fa-folder-open">
-            </SmallCard>
+        <div class="col-12 col-sm-6 col-lg-4">
+            <div class="metric-card card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="metric-content">
+                            <div class="metric-label">@($"Delivery Rate ({GetPeriodLabel()})")</div>
+                            <div class="metric-value">@deliveryRatePeriod.ToString("0.0%")</div>
+                        </div>
+                        <div class="metric-icon bg-body">
+                            <i class="fa fa-check-circle text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="row mt-5">
         <div class="col-md-6">
-            <Card>
+            <Card HeaderTitle="Delivery Status">
                 <Body>
-                    <div id="summaryChart"></div>
+                    <div class="chart-container" style="position:relative; height:350px;">
+                        <canvas id="deliveryPieCanvas"></canvas>
+                    </div>
                 </Body>
             </Card>
         </div>
         <div class="col-md-6">
-            <Card>
+            <Card HeaderTitle="Recent Messages">
                 <Body>
-                    <table class="table">
+                    <div class="table-responsive" style="height:350px; overflow:auto;">
+                    <table class="table table-sm align-middle mb-0">
                         <thead>
                             <tr>
                                 <th>Date</th>
-                                <th>Channel</th>
-                                <th>Quantity</th>
-                                <th>Amount</th>
+                                <th>Message</th>
+                                <th title="Total processed/sent by the system">Processed</th>
+                                <th title="Failed to be processed by the system">Failed</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var p in recentPurchases)
+                            @foreach (var m in recentMessages.Take(8))
                             {
                                 <tr>
-                                    <td><FormatDate DateTime="@p.DateCreated"></FormatDate></td>
-                                    <td>@p.ProviderID</td>
-                                    <td><FormatNumber Number="@p.Quantity"></FormatNumber></td>
-                                    <td><FormatNumber Currency="@p.Amount"></FormatNumber></td>
+                                    <td><FormatDate DateTime="@m.DateSubmitted"></FormatDate></td>
+                                    <td>
+                                        <div title="@m.MessageText" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            @m.MessageText
+                                        </div>
+                                    </td>
+                                    <td><FormatNumber Number="@m.TotalProcessed"></FormatNumber></td>
+                                    <td><FormatNumber Number="@m.TotalFailed"></FormatNumber></td>
                                 </tr>
                             }
                         </tbody>
                     </table>
+                    </div>
                 </Body>
             </Card>
         </div>
@@ -74,36 +183,35 @@
 </Loading>
 
 @code {
-    private List<BatchFileResponse> batchFiles = [];
     private List<SmsBatchResponse> recentMessages =[];
-    private List<PurchaseResponse> recentPurchases = [];
 
     private AccountResponse? account;
     private long totalSmsSent;
+
+    private Period selectedPeriod = Period.Today;
+    private List<SmsBatchResponse> periodBatches = [];
+    private long totalSmsSentPeriod;
+    private double deliveryRatePeriod;
+    private long deliveredCount;
+    private long acceptedCount;
+    private long undeliveredCount;
+    private long expiredCount;
+    private long rejectedCount;
+    private DateTimeOffset periodFrom;
+    private DateTimeOffset periodTo;
+    private DateTime? customFrom;
+    private DateTime? customTo;
+    private bool needsChartUpdate;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var dateFrom = DateTimeOffset.UtcNow.Date.AddMonths(-12);
-            var dateTo = DateTimeOffset.UtcNow.Date.AddDays(1).AddTicks(-1);
+            account = (await apiClient.AccountGetAsync("self")).Result;
 
-            var t1 = apiClient.AccountGetAsync("self");
-            var t2 = apiClient.SmsBatchListAsync(1, 500, null, dateFrom, dateTo, null);
-            var t5 = apiClient.PurchaseListAsync(1, 8, null, null);
-            var t6 = apiClient.BatchFileListAsync();
+            await LoadRecentActivityAsync();
 
-            await Task.WhenAll(t1, t2, t5, t6);
-
-            recentMessages = t2.Result.Result.ToList();
-            recentPurchases = t5.Result.Result.ToList();
-            batchFiles = t6.Result.Result.ToList();
-
-            account = t1.Result.Result;
-            totalSmsSent = recentMessages.Sum(x => x.TotalProcessed);
-            StateHasChanged();
-
-            await RenderDeliveryStatistics(recentMessages);
+           await ReloadForPeriodAsync(Period.Today);
         }
         catch (Exception ex)
         {
@@ -111,62 +219,252 @@
         }
     }
 
-    private ValueTask RenderDeliveryStatistics(List<SmsBatchResponse> messages)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        var groupedMessages = messages
-            .GroupBy(m => m.DateSubmitted.Date)
-            .Select(g => new
-            {
-                Date = g.Key,
-                TotalSuccessful = g.Sum(m => m.TotalProcessed - m.TotalFailed),
-                TotalFailed = g.Sum(m => m.TotalFailed)
-            })
-            .OrderBy(g => g.Date)
-            .ToList();
-
-        var successSeriesData = groupedMessages.Select(g => g.TotalSuccessful).ToArray();
-        var failedSeriesData = groupedMessages.Select(g => g.TotalFailed).ToArray();
-        var categories = groupedMessages.Select(g => g.Date.ToString("dd MMM")).ToArray();
-
-        var options = new
+        if (firstRender || needsChartUpdate)
         {
-            chart = new
+            needsChartUpdate = false;
+            await RenderDeliveryPie();
+        }
+    }
+
+    private async Task LoadRecentActivityAsync()
+    {
+        try
+        {
+            var response = await apiClient.SmsBatchListAsync(pageNumber: 1, pageSize: 8, cacheTag: null, dateFrom: null, dateTo: null, searchText: null);
+            recentMessages = (response.Result ?? []).OrderByDescending(m => m.DateSubmitted).ToList();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error loading recent activity");
+        }
+    }
+
+    private async Task ApplyPeriodAsync()
+    {
+        try
+        {
+            var response = await apiClient.SmsBatchListAsync(pageNumber: null, pageSize: null, cacheTag: null, dateFrom: periodFrom, dateTo: periodTo, searchText: null);
+            periodBatches = (response.Result ?? []).OrderByDescending(m => m.DateSubmitted).ToList();
+
+            totalSmsSentPeriod = periodBatches.Sum(x => (long)x.TotalProcessed);
+
+            await AggregateDeliveryStatusesAsync(periodBatches);
+
+            // Always reconcile with batch-level totals in case detailed reports are missing or delayed
+            var deliveredFromBatches = periodBatches.Sum(x => (long)(x.TotalProcessed - x.TotalFailed));
+            var failedFromBatches = periodBatches.Sum(x => (long)x.TotalFailed);
+
+            if (deliveredCount < deliveredFromBatches)
+                deliveredCount = deliveredFromBatches;
+            if (undeliveredCount < failedFromBatches)
+                undeliveredCount = failedFromBatches;
+
+            var messagesTotal = deliveredCount + acceptedCount + undeliveredCount + expiredCount + rejectedCount;
+            deliveryRatePeriod = messagesTotal == 0 ? 0 : (double)deliveredCount / messagesTotal;
+            needsChartUpdate = true;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error loading period data");
+        }
+    }
+
+    private async Task AggregateDeliveryStatusesAsync(List<SmsBatchResponse> batches)
+    {
+        deliveredCount = acceptedCount = undeliveredCount = expiredCount = rejectedCount = 0;
+
+        var tasks = batches.Select(async b =>
+        {
+            try
             {
-                type = "bar"
-            },
-            plotOptions = new
-            {
-                bar = new
+                var reportsResp = await apiClient.SmsBatchReportsListAsync(b.BatchID);
+                var messages = reportsResp.Result ?? [];
+                long batchDelivered = 0, batchAccepted = 0, batchUndelivered = 0, batchExpired = 0, batchRejected = 0;
+
+                // Deduplicate by phone number (recipient) to avoid counting multi-part messages multiple times
+                var byPhone = messages
+                    .GroupBy(m => (m.PhoneNumber ?? string.Empty).Trim())
+                    .ToDictionary(g => g.Key, g => g.ToList());
+
+                foreach (var kvp in byPhone)
                 {
-                    colors = new
+                    var allReports = kvp.Value
+                        .SelectMany(m => m.Reports ?? Array.Empty<DeliveryReportResponse>())
+                        .OrderByDescending(r => r.ReportDate ?? DateTimeOffset.MinValue)
+                        .ToList();
+
+                    string finalStatus = "";
+                    if (allReports.Any(r => string.Equals(r.Status, "DELIVD", StringComparison.OrdinalIgnoreCase))) finalStatus = "DELIVD";
+                    else if (allReports.Any(r => string.Equals(r.Status, "UNDELIV", StringComparison.OrdinalIgnoreCase))) finalStatus = "UNDELIV";
+                    else if (allReports.Any(r => string.Equals(r.Status, "EXPIRED", StringComparison.OrdinalIgnoreCase))) finalStatus = "EXPIRED";
+                    else if (allReports.Any(r => string.Equals(r.Status, "REJECTD", StringComparison.OrdinalIgnoreCase))) finalStatus = "REJECTD";
+                    else if (allReports.Any(r => string.Equals(r.Status, "ACCEPTD", StringComparison.OrdinalIgnoreCase))) finalStatus = "ACCEPTD";
+
+                    switch (finalStatus)
                     {
-                        backgroundBarColors = new[] { "#F0F0F0" },
-                        backgroundBarOpacity = 1,
+                        case "DELIVD": batchDelivered++; break;
+                        case "UNDELIV": batchUndelivered++; break;
+                        case "EXPIRED": batchExpired++; break;
+                        case "REJECTD": batchRejected++; break;
+                        case "ACCEPTD": batchAccepted++; break;
+                        default: break;
                     }
                 }
-            },
-            colors = new[] { "#F15B46", "#FF4560" }, // Colors for received and failed messages
-            series = new[]
-            {
-            new { name = "Successful Messages", data = successSeriesData },
-            new { name = "Failed Messages", data = failedSeriesData }
-        },
-            xaxis = new
-            {
-                categories
-            }
-        };
 
-        return js.InvokeVoidAsync("apexChartsInterop.renderChart", "summaryChart", options);
+                Interlocked.Add(ref deliveredCount, batchDelivered);
+                Interlocked.Add(ref undeliveredCount, batchUndelivered);
+                Interlocked.Add(ref expiredCount, batchExpired);
+                Interlocked.Add(ref rejectedCount, batchRejected);
+                Interlocked.Add(ref acceptedCount, batchAccepted);
+            }
+            catch
+            {
+                // Ignore per-batch report errors to avoid breaking the dashboard
+            }
+        }).ToArray();
+
+        await Task.WhenAll(tasks);
     }
+
+    private async Task RenderDeliveryPie()
+    {
+        long delivered = deliveredCount;
+        long accepted = acceptedCount;
+        long undelivered = undeliveredCount;
+        long expired = expiredCount;
+        long rejected = rejectedCount;
+
+        var total = delivered + accepted + undelivered + expired + rejected;
+
+        long[] values = new[] { delivered, accepted, undelivered, expired, rejected };
+        // Labels shown to the user; values remain mapped to API statuses
+        string[] baseLabels = new[] { "Delivered", "Accepted", "Undelivered", "Expired", "Rejected" };
+        string[] labels = values
+            .Select((v, i) =>
+            {
+                var pct = total == 0 ? 0 : (double)v / total;
+                return $"{baseLabels[i]} {v:#,0} ({pct:0.##%})";
+            })
+            .ToArray();
+
+        await js.InvokeVoidAsync("dashboardCharts.renderDeliveryPie", new
+        {
+            elementId = "deliveryPieCanvas",
+            labels,
+            data = values.Cast<object>().ToArray(),
+            colors = new[] { "#38b44a", "#17a2b8", "#efb73e", "#aea79f", "#df382c" }
+        });
+    }
+
+    private async Task ReloadForPeriodAsync(Period period)
+    {
+        selectedPeriod = period;
+        var now = DateTimeOffset.UtcNow;
+        switch (period)
+        {
+            case Period.Today:
+                periodFrom = StartOfDay(now);
+                periodTo = EndOfDay(now);
+                break;
+            case Period.Yesterday:
+                var y = now.AddDays(-1);
+                periodFrom = StartOfDay(y);
+                periodTo = EndOfDay(y);
+                break;
+            case Period.Week:
+                periodTo = EndOfDay(now);
+                periodFrom = StartOfDay(now.AddDays(-6));
+                break;
+            case Period.Month:
+                periodTo = EndOfDay(now);
+                periodFrom = StartOfDay(now.AddDays(-29));
+                break;
+            case Period.Custom:
+                // Wait for ApplyCustomRange to set periodFrom/periodTo
+                break;
+        }
+
+        await ApplyPeriodAsync();
+        StateHasChanged();
+    }
+
+    private string GetPeriodLabel()
+    {
+        return selectedPeriod switch
+        {
+            Period.Today => "Today",
+            Period.Yesterday => "Yesterday",
+            Period.Week => "Week",
+            Period.Month => "Month",
+            Period.Custom => "Custom",
+            _ => ""
+        };
+    }
+
+    private enum Period
+    {
+        Today,
+        Yesterday,
+        Week,
+        Month,
+        Custom
+    }
+
+    // Removed mock data; loading from API instead
+
+    private async Task ApplyCustomRange()
+    {
+        if (customFrom.HasValue && customTo.HasValue)
+        {
+            var from = new DateTimeOffset(customFrom.Value, TimeSpan.Zero);
+            var to = new DateTimeOffset(customTo.Value, TimeSpan.Zero);
+            periodFrom = StartOfDay(from);
+            periodTo = EndOfDay(to);
+            await ApplyPeriodAsync();
+            StateHasChanged();
+        }
+        else
+        {
+            await alert.Error("Please select a valid date range.", "Invalid Range");
+        }
+    }
+
+
+    private static DateTimeOffset StartOfDay(DateTimeOffset dt) => new DateTimeOffset(dt.Year, dt.Month, dt.Day, 0, 0, 0, TimeSpan.Zero);
+    private static DateTimeOffset EndOfDay(DateTimeOffset dt) => new DateTimeOffset(dt.Year, dt.Month, dt.Day, 23, 59, 59, TimeSpan.Zero).AddTicks(9999999);
 }
 
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    window.apexChartsInterop = {
-        renderChart: function (elementId, options) {
-            var chart = new ApexCharts(document.querySelector("#" + elementId), options);
-            chart.render();
+    window.dashboardCharts = {
+        charts: {},
+        renderDeliveryPie: function (cfg) {
+            var el = document.getElementById(cfg.elementId);
+            if (!el) return;
+            if (this.charts[cfg.elementId]) {
+                this.charts[cfg.elementId].destroy();
+            }
+            var chart = new Chart(el.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: cfg.labels,
+                    datasets: [{
+                        data: cfg.data,
+                        backgroundColor: cfg.colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+            this.charts[cfg.elementId] = chart;
         }
     };
 </script>
+

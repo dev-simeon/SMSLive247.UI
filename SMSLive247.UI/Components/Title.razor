@@ -1,15 +1,21 @@
 ﻿<SectionContent SectionName="title">
-    <div class="d-flex">
-        <a class="link-underline me-3
-                  link-underline-opacity-0 
-                  link-underline-opacity-75-hover"
-           href="javascript:history.back();"
-           hidden="@(!CanGoBack)">&lt; Return </a>
-        <h5 class="fw-bold">@ChildContent</h5>
+    <div class="d-flex justify-content-between align-items-center w-100">
+        <div class="d-flex">
+            <a class="link-underline me-3
+                      link-underline-opacity-0 
+                      link-underline-opacity-75-hover"
+               href="javascript:history.back();"
+               hidden="@(!CanGoBack)">&lt; Return </a>
+            <h5 class="fw-bold mb-0">@ChildContent</h5>
+        </div>
+        <div class="ms-3">
+            @RightContent
+        </div>
     </div>
-</SectionContent>
+ </SectionContent>
 
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? RightContent { get; set; }
     [Parameter] public bool? CanGoBack { get; set; } = false;
 }

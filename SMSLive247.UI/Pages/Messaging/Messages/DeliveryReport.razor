@@ -146,6 +146,7 @@
     public async void Show(long batchID)
     {
         batchId = batchID;
+        Console.WriteLine(batchID);
         hideModal = false;
         StateHasChanged();
         await ds.LoadData(alert);
