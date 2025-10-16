@@ -95,6 +95,10 @@
             // Get the total amount including the transaction fee
             var totalAmount = (decimal)price.Amount + (decimal)price.Amount * 0.015M;
 
+            // Paystack expects amount in Kobo, so multiply by 100 and cast to int/long.
+            // Use Math.Round to handle potential floating point issues before casting.
+            var totalAmountKobo = (long)Math.Round(totalAmount * 100M);
+
             var request = new PurchaseRequest { ProviderID = "PAYSTACK", Quantity = quantity };
             var response = await apiClient.PurchaseBeginAsync(request);
 
