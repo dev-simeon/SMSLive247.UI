@@ -1,36 +1,42 @@
 ﻿<Modal Title="Select Bulk Files" @bind-Hidden="hideModal">
     <Body>
-        <input class="form-control mb-2" 
-               type="text" placeholder="Search..."
-               @oninput="OnSearchChanged" />
+        <div class="d-flex flex-column flex-fill">
+            <!-- Header: search + select all -->
+            <div class="mb-2">
+                <input class="form-control mb-2"
+                       type="text" placeholder="Search..."
+                       @oninput="OnSearchChanged" />
 
-        <div class="form-check mb-1">
-            <input class="form-check-input" type="checkbox"
-                   @onchange="OnSelectAll" id="bf-all">
-            <label class="form-check-label" for="bf-all">Select All</label>
-        </div>
-
-        <div>
-            @if (Model?.BatchFiles == null)
-            {
-                <p><em>Loading...</em></p>
-            }
-            else if (Model.BatchFiles.Count == 0)
-            {
-                <p>No bulk file found</p>
-            }
-            else
-            {
-                @foreach (var item in Model.BatchFiles.Where(x => x.Visible).OrderBy(x => x.Name))
-                {
                 <div class="form-check mb-1">
                     <input class="form-check-input" type="checkbox"
-                            value="@item.Key" checked="@item.Selected"
-                            id="bf-@item.Key" @onchange="e => OnSelect(item, e)">
-                    <label class="form-check-label" for="bf-@item.Key">@item.Name</label>
+                           @onchange="OnSelectAll" id="bf-all">
+                    <label class="form-check-label" for="bf-all">Select All</label>
                 </div>
+            </div>
+
+            <!-- Results: scrollable area (prevents modal resizing) -->
+            <div class="bulk-results overflow-auto" style="flex:1 1 auto; max-height:50vh;">
+                @if (Model?.BatchFiles == null)
+                {
+                    <p><em>Loading...</em></p>
                 }
-            }
+                else if (Model.BatchFiles.Count == 0)
+                {
+                    <p>No bulk file found</p>
+                }
+                else
+                {
+                    @foreach (var item in Model.BatchFiles.Where(x => x.Visible).OrderBy(x => x.Name))
+                    {
+                    <div class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox"
+                                value="@item.Key" checked="@item.Selected"
+                                id="bf-@item.Key" @onchange="e => OnSelect(item, e)">
+                        <label class="form-check-label" for="bf-@item.Key">@item.Name</label>
+                    </div>
+                    }
+                }
+            </div>
         </div>
     </Body>
     <Footer>

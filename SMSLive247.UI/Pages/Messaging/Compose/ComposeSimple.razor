@@ -28,7 +28,9 @@
                                 </InputSelect>
                             </div>
                             <ValidationMessage class="text-danger" For="@(() => model.Request.SenderID)" />
-                            <div class="form-text">You can request for more SenderIDs here</div>
+                            <NavLink class="text-decoration-none" href="/Messaging/SenderIds">
+                                <span>Click here to request for more SenderIDs</span>
+                            </NavLink>
                         </div>
 
                         <div class="mb-4">

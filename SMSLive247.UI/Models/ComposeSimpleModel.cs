@@ -28,7 +28,10 @@ namespace SMSLive247.UI.Pages.ViewModels
         {
             SenderIds = senderIds.Select(x => x.SenderID).ToList();
             Contacts = contacts.Select(x => new ContactModel(x)).ToList();
-            BatchFiles = batchFiles.Select(x => new ContactModel(x)).ToList();
+            BatchFiles = batchFiles
+               .Where(x => !string.Equals(x.FileType, "csv", StringComparison.OrdinalIgnoreCase))
+               .Select(x => new ContactModel(x))
+               .ToList();
 
             Request.DeliveryTime = DateTime.Now;
         }

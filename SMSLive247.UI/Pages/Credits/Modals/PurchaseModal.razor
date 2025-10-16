@@ -44,6 +44,9 @@
     private PriceCalcResponse? price;
     private long quantity = 1000;
 
+    // keep a reference so JS can call back into this instance
+    private DotNetObjectReference<PurchaseModal>? dotNetRef;
+
     protected override async Task OnInitializedAsync()
     {
         var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
@@ -98,12 +101,15 @@
             if (response.StatusCode != 200)
                 throw new Exception("apiClient.PurchaseBeginAsync() Failed");
 
-            var myRef = DotNetObjectReference.Create(this);
-            await js.InvokeVoidAsync("paystackPopup", response.Result.AccessCode);
-
-            // await js.InvokeVoidAsync("paystackPopup",
-            //                           response.Result.AccessCode,
-            //                           OnLoad, OnSuccess, OnCancel, OnError);
+            // Create a DotNetObjectReference to allow JS to call back into this component
+            dotNetRef = DotNetObjectReference.Create(this);
+            
+            // Ensure access code is a string
+            var accessCode = response.Result?.AccessCode?.ToString() ?? "";
+            if (string.IsNullOrEmpty(accessCode))
+                throw new Exception("No access code received from server");
+                
+            await js.InvokeVoidAsync("paystackPopup", accessCode, dotNetRef);
         }
         catch (Exception ex)
         {
@@ -111,6 +117,7 @@
         }
         finally
         {
+            // keep modal open until callback completes; only hide if you want
             hideModal = true;
         }
     }
@@ -118,101 +125,90 @@
 
 
     [JSInvokable("OnLoad")]
-    private void OnLoad(dynamic response)
+    public void OnLoad(string? info)
     {
-        //response.id             String  This is the transaction id
-        //response.accessCode     String  This is a unique payment code used for creating the payment link and loading the Popup
-        //response.customer       Object  The details of the customer making the payment
-        
-        Console.WriteLine(response);
+        Console.WriteLine(info);
     }
 
     [JSInvokable("OnSuccess")]
-    private async Task OnSuccess(dynamic transaction)
+    public async Task OnSuccess(string transactionReference)
     {
-        //transaction.reference  String  This is the unique payment reference that can be used for reconciliation
-        //transaction.status     String  The final state of the transaction
-        //transaction.message    String  Complimentary note of the transaction status
-        //transaction.transaction String  This is the transaction id
-        
         try
         {
-            await apiClient.PurchaseCompleteAsync(transaction.transaction);
+            await apiClient.PurchaseCompleteAsync(transactionReference);
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
         }
+        finally
+        {
+            // dispose the DotNet reference after completion
+            dotNetRef?.Dispose();
+            dotNetRef = null;
+        }
     }
 
     [JSInvokable("OnCancel")]
-    private void OnCancel()
+    public void OnCancel()
     {
         Console.WriteLine("canceled");
+        dotNetRef?.Dispose();
+        dotNetRef = null;
     }
 
     [JSInvokable("OnError")]
-    private Task OnError(dynamic error)
+    public Task OnError(string errorMessage)
     {
-        return alert.Error(error.message, "Error");
+        dotNetRef?.Dispose();
+        dotNetRef = null;
+        return alert.Error(errorMessage, "Error");
     }
 }
 
 <script src="https://js.paystack.co/v2/inline.js"></script>
 <script>
-    function paystackPopup(accessCode) {
+    function paystackPopup(accessCode, dotNetRef) {
         const popup = new PaystackPop();
-        popup.resumeTransaction({
-            access_code: accessCode,
-            onSuccess: (transaction) => {
-                alert(transaction);
-            },
-            onLoad: (response) => {
-                alert("onLoad: ", response);
-            },
-            onCancel: () => {
-                alert("onCancel");
-            },
-            onError: (error) => {
-                alert("Error: ", error.message);
-            }
 
-            //onSuccess: async function (e) { alert('hello'); }
-            //onCancel: on_cancel,
-            //onError: on_error,
-            //onload: on_load
-        });
+        function messageHandler(e) {
+            try {
+                if (!e.data) return;
+
+                // Ensure it's from Paystack
+                if (e.origin && !e.origin.includes('paystack')) return;
+
+                const data = e.data;
+                let safePayload = {};
+
+                // Extract only safe serializable fields
+                if (typeof data === 'object') {
+                    safePayload = {
+                        reference: data.reference || data.transaction || null,
+                        message: data.message || null,
+                        event: data.event || null,
+                        status: data.status || null
+                    };
+                }
+
+                // Route events properly
+                if (safePayload.reference) {
+                    dotNetRef?.invokeMethodAsync('OnSuccess', safePayload.reference);
+                } else if (safePayload.message && safePayload.message.toLowerCase().includes('cancel')) {
+                    dotNetRef?.invokeMethodAsync('OnCancel');
+                } else if (safePayload.message) {
+                    dotNetRef?.invokeMethodAsync('OnError', safePayload.message);
+                } else {
+                    dotNetRef?.invokeMethodAsync('OnLoad', JSON.stringify(safePayload));
+                }
+            } catch (err) {
+                console.error('Handler error:', err);
+            }
+        }
+
+        window.addEventListener('message', messageHandler);
+
+        popup.resumeTransaction(accessCode);
     }
 
-
-
-    // function paystackPopup222(accessCode) {
-    //     const popup = new PaystackPop();
-    //     popup.resumeTransaction({
-    //         access_code: accessCode,
-    //         onSuccess: async function (transaction) {
-    //             console.log("Transaction successful:", transaction);
-    //             try {
-    //                 await DotNet.invokeMethodAsync('PurchaseModal', 'OnSuccess', transaction.reference);
-    //             } catch (error) {
-    //                 console.error("Error completing purchase:", error);
-    //             }
-    //         },
-    //         onCancel: async function () {
-    //             try {
-    //                 await DotNet.invokeMethodAsync('PurchaseModal', 'OnError', 'Transaction was canceled.');
-    //             } catch (error) {
-    //                 console.error("Error handling cancelation:", error);
-    //             }
-    //         },
-    //         onError: async function (error) {
-    //             console.error("Transaction error:", error);
-    //             try {
-    //                 await DotNet.invokeMethodAsync('PurchaseModal', 'OnError', error.message);
-    //             } catch (err) {
-    //                 console.error("Error handling error:", err);
-    //             }
-    //         }
-    //     });
-    // }
 </script>

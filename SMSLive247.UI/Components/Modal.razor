@@ -1,15 +1,20 @@
 ﻿<div class="modal-backdrop fade show" hidden="@isHidden" style="z-index:99;"></div>
-<div class="modal " tabindex="-1" hidden="@isHidden" style="z-index:100;display:block;">
-    <div class="modal-dialog @GetVAlignCss() @GetSizeCss() modal-dialog-scrollable">
+<div class="modal" tabindex="-1" hidden="@isHidden" style="z-index:100; display:block;">
+    <div class="modal-dialog @GetVAlignCss() @GetSizeCss()">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" hidden="@string.IsNullOrEmpty(Title)">@Title</h5>
                 <button class="btn-close" type="button" @onclick="Close" />
                 @Header
             </div>
-            <div class="modal-body">
+
+            @* Make the modal body a vertical flex container with stable min-height and capped max-height.
+               This prevents the modal from shrinking/growing wildly while still allowing internal scrolling. *@
+            <div class="modal-body d-flex flex-column"
+                 style="min-height:400px; max-height:70vh; overflow:hidden; padding:1rem; transition: max-height 0.18s ease;">
                 @Body
             </div>
+
             <div class="modal-footer">
                 @Footer
             </div>
@@ -28,7 +33,7 @@
     [Parameter] public ModalSize Size { get; set; } = ModalSize.MEDIUM;
     [Parameter] public EventCallback<bool> HiddenChanged { get; set; }
 
-    public enum ModalVAlign {TOP, CENTER}
+    public enum ModalVAlign { TOP, CENTER }
     public enum ModalSize { SMALL, MEDIUM, LARGE, XLARGE }
 
     private bool isHidden => Hidden;
@@ -65,5 +70,4 @@
                 return "";
         }
     }
-
 }
