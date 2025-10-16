@@ -5,7 +5,9 @@
         <Body>
             <DataAnnotationsValidator />
             <ValidationSummary class="text-danger" />
-            @ChildContent(Model)
+            <div class="d-flex flex-column flex-fill">
+                @ChildContent(Model)
+            </div>
         </Body>
         <Footer>
             <Button Type="@buttonStyle">@buttonText</Button>

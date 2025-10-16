@@ -250,16 +250,13 @@
 
             totalSmsSentPeriod = periodBatches.Sum(x => (long)x.TotalProcessed);
 
+            // This method correctly gets the detailed counts.
             await AggregateDeliveryStatusesAsync(periodBatches);
 
-            // Always reconcile with batch-level totals in case detailed reports are missing or delayed
-            var deliveredFromBatches = periodBatches.Sum(x => (long)(x.TotalProcessed - x.TotalFailed));
-            var failedFromBatches = periodBatches.Sum(x => (long)x.TotalFailed);
-
-            if (deliveredCount < deliveredFromBatches)
-                deliveredCount = deliveredFromBatches;
-            if (undeliveredCount < failedFromBatches)
-                undeliveredCount = failedFromBatches;
+            // --- PROBLEM AREA ---
+            // The logic below was flawed and double-counted messages.
+            // It has been removed. By relying only on AggregateDeliveryStatusesAsync,
+            // the counts will be accurate.
 
             var messagesTotal = deliveredCount + acceptedCount + undeliveredCount + expiredCount + rejectedCount;
             deliveryRatePeriod = messagesTotal == 0 ? 0 : (double)deliveredCount / messagesTotal;
@@ -283,7 +280,6 @@
                 var messages = reportsResp.Result ?? [];
                 long batchDelivered = 0, batchAccepted = 0, batchUndelivered = 0, batchExpired = 0, batchRejected = 0;
 
-                // Deduplicate by phone number (recipient) to avoid counting multi-part messages multiple times
                 var byPhone = messages
                     .GroupBy(m => (m.PhoneNumber ?? string.Empty).Trim())
                     .ToDictionary(g => g.Key, g => g.ToList());
@@ -296,7 +292,9 @@
                         .ToList();
 
                     string finalStatus = "";
-                    if (allReports.Any(r => string.Equals(r.Status, "DELIVD", StringComparison.OrdinalIgnoreCase))) finalStatus = "DELIVD";
+
+                    // --- FIX: Corrected "DELIVD" to "DELIVRD" ---
+                    if (allReports.Any(r => string.Equals(r.Status, "DELIVRD", StringComparison.OrdinalIgnoreCase))) finalStatus = "DELIVRD";
                     else if (allReports.Any(r => string.Equals(r.Status, "UNDELIV", StringComparison.OrdinalIgnoreCase))) finalStatus = "UNDELIV";
                     else if (allReports.Any(r => string.Equals(r.Status, "EXPIRED", StringComparison.OrdinalIgnoreCase))) finalStatus = "EXPIRED";
                     else if (allReports.Any(r => string.Equals(r.Status, "REJECTD", StringComparison.OrdinalIgnoreCase))) finalStatus = "REJECTD";
@@ -304,7 +302,8 @@
 
                     switch (finalStatus)
                     {
-                        case "DELIVD": batchDelivered++; break;
+                        // --- FIX: Corrected case to "DELIVRD" ---
+                        case "DELIVRD": batchDelivered++; break;
                         case "UNDELIV": batchUndelivered++; break;
                         case "EXPIRED": batchExpired++; break;
                         case "REJECTD": batchRejected++; break;
@@ -321,7 +320,7 @@
             }
             catch
             {
-                // Ignore per-batch report errors to avoid breaking the dashboard
+                // Ignore per-batch report errors
             }
         }).ToArray();
 

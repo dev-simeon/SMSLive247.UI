@@ -1,32 +1,79 @@
 ﻿@using SMSLive247.UI.Pages.Accounts.Components
 
-<Modal Size="Modal.ModalSize.XLARGE" @bind-Hidden="hideModal" Title="Delivery Report">
+<Modal Size="Modal.ModalSize.XLARGE" @bind-Hidden="hideModal" Title="Delivery Report Summary">
+
     <Body>
-@*         <div class="row mb-4">
-            <div class="col-md-3">
-                <SmallCard Caption="Messages Sent"
-                           Value="@totalSubmitted.ToString("#,##0")"
-                           Icon="bi bi-envelope" />
+        <div class="d-flex flex-column flex-fill overflow-x-hidden overflow-y-auto">
+            <div class="row mb-3">
+                <div class="col-md-4 d-flex flex-fill">
+                    <div class="card w-100">
+                        <div class="card-header" style="background-color: #fbddd2; padding-block: 0.8490rem">
+                            Delivery Status Summary
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm table-borderless mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td><span class="p-1 d-block text-white bg-success">Delivered</span></td>
+                                        <td class="text-end">@totalDelivered</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="p-1 d-block text-white bg-info">Accepted</span></td>
+                                        <td class="text-end">@totalAccepted</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="p-1 d-block text-white bg-warning">Undelivered</span></td>
+                                        <td class="text-end">@totalUndelivered</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="p-1 d-block text-white bg-danger">Rejected</span></td>
+                                        <td class="text-end">@totalRejected</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="p-1 d-block text-white bg-secondary">Expired</span></td>
+                                        <td class="text-end">@totalExpired</td>
+                                    </tr>
+                                    <tr class="fw-bold">
+                                        <td>Total</td>
+                                        <td class="text-end">@totalMessages</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8 d-flex flex-fill">
+                    <div class="accordion w-100">
+                        <div class="accordion-item h-100" style="@(showAccordion ? "" : "border: 0;")">
+                            <h2 class="accordion-header">
+                                <button @onclick="e => showAccordion = !showAccordion"
+                                    class='accordion-button @(showAccordion ? "" : "collapsed")' type="button"
+                                    style="background-color: #fbddd2;">
+                                    Status Legend
+                                </button>
+                            </h2>
+                            <div class="accordion-collapse collapse @(showAccordion ? "show" : "")">
+                                <div class="accordion-body">
+                                    <ul>
+                                        <li><strong class="badge text-bg-success">DELIVRD</strong> - Message is
+                                            delivered to destination.</li>
+                                        <li><strong class="badge text-bg-info">ACCEPTD</strong> - The message was
+                                            accepted by the Network server. Awaiting delivery status.</li>
+                                        <li><strong class="badge text-bg-secondary">EXPIRED</strong> - Message validity
+                                            period has expired. (e.g. phone off or not in coverage area)</li>
+                                        <li><strong class="badge text-bg-warning">UNDELIV</strong> - The message is
+                                            undeliverable.</li>
+                                        <li><strong class="badge text-bg-danger">REJECTD</strong> - The message was
+                                            rejected.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="col-md-3">
-                <SmallCard Caption="Credit Charged"
-                           Value="@totalCharged.ToString("#,##0.00")"
-                           Icon="bi bi-credit-card" />
-            </div>
-            <div class="col-md-3">
-                <SmallCard Caption="Delivered Messages"
-                           Value="@totalDelivered.ToString("#,##0")"
-                           Icon="bi bi-check-circle" />
-            </div>
-            <div class="col-md-3">
-                <SmallCard Caption="Undelivered Messages"
-                           Value="@totalUndelivered.ToString("#,##0")"
-                           Icon="bi bi-x-circle" />
-            </div>
-        </div>
- *@
-        <Card BodyPadding="0">
-            <Body>
+
+            <div class="mt-3" style="flex: 1 1 auto; overflow-y: auto;">
                 <Table DataSource="ds">
                     <Columns>
                         <Column Header="Recipient Number">
@@ -77,49 +124,12 @@
                         </Column>
                     </Columns>
                 </Table>
-            </Body>
-            <Footer>
-                <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
-            </Footer>
-        </Card>
-
-        <div class="accordion mb-4">
-            <div class="accordion-item">
-                <h2 class="accordion-header">
-                    <button @onclick="e => showAccordion = !showAccordion"
-                            class='accordion-button @(showAccordion ? "" : "collapsed")' 
-                            type="button">
-                        Delivery Status Explanations
-                    </button>
-                </h2>
-                <div class="accordion-collapse collapse @(showAccordion ? "show" : "")">
-                    <div class="accordion-body">
-                        <ul>
-                            <li><strong class="badge text-bg-success">DELIVRD</strong> 
-                                Message is delivered to destination.</li>
-                            <li>
-                                <strong class="badge text-bg-info">ACCEPTD</strong>
-                                The message was accepted by the Network server. Awaiting delivery status.</li>
-                            <li>
-                                <strong class="badge text-bg-secondary">EXPIRED</strong>
-                                Message validity period has expired. (e.g. phone off or not in coverage area)</li>
-                            <li>
-                                <strong class="badge text-bg-warning">UNDELIV</strong>
-                                The message is undeliverable.</li>
-                            <li>
-                                <strong class="badge text-bg-danger">REJECTD</strong>
-                                The message was rejected.</li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
-
-@*         <div class="alert alert-info" role="alert">
-            <h4 class="text-info">Note</h4>
-            Multi-part messages (longer than 160) are repeated for each part in these statistics.
-        </div>
- *@    </Body>
+    </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
 </Modal>
 
 @code {
@@ -129,40 +139,89 @@
 
     private ApiDataSource<SmsMessageResponse> ds = new();
 
-    //this should be SmsReportResponse object
-    private int totalSubmitted;
     private int totalDelivered;
+    private int totalAccepted;
     private int totalUndelivered;
-    private decimal totalCharged;
+    private int totalRejected;
+    private int totalExpired;
+    private int totalMessages;
+
+    // This will continue to hold ALL reports fetched from the API.
+    private ICollection<SmsMessageResponse> _allReports = [];
 
     protected override void OnInitialized()
     {
-        ds.Callback = new((PageState p, FilterState? f) =>
+        // --- MODIFIED: The callback now performs proper client-side paging ---
+        // It uses the incoming PageState to slice the _allReports collection.
+        ds.Callback = (p, f) =>
         {
-            return apiClient.SmsBatchReportsListAsync(batchId);
-        });
+            // 1. Get the correct "page" of data from the local collection
+            //    using both the page number and page size.
+            var pageData = _allReports
+                .Skip((p.PageNumber - 1) * p.PageSize)
+                .Take(p.PageSize)
+                .ToList();
+
+            // 2. Create headers that reflect the TRUE state of the data.
+            //    'x-total-count' is the count of the ENTIRE local collection.
+            var headers = new Dictionary<string, IEnumerable<string>>
+            {
+                { "x-page-size", new[] { p.PageSize.ToString() } },
+                { "x-page-number", new[] { p.PageNumber.ToString() } },
+                { "x-total-count", new[] { _allReports.Count.ToString() } } // Use the total count
+            };
+
+            // 3. Construct and return a SwaggerResponse manually.
+            var response = new SwaggerResponse<ICollection<SmsMessageResponse>>(200, headers, pageData);
+
+            // Return it as a completed task.
+            return Task.FromResult(response);
+        };
     }
 
-    public async void Show(long batchID)
+    public async Task Show(long batchID)
     {
         batchId = batchID;
-        Console.WriteLine(batchID);
         hideModal = false;
+
+        // Reset state before showing
+        _allReports = [];
+        totalMessages = 0;
+        // ... reset other totals ...
         StateHasChanged();
-        await ds.LoadData(alert);
+
+        try
+        {
+            // Fetch ALL data from the API once and store it locally.
+            var summaryResponse = await apiClient.SmsBatchReportsListAsync(batchId);
+            _allReports = summaryResponse.Result;
+
+            // Calculate summary totals from the full dataset.
+            CalculateSummary(_allReports);
+
+            // Load the initial page of data into the table.
+            await ds.LoadData(alert);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error loading report");
+        }
+
         StateHasChanged();
     }
 
-    // private void CalculateSummary(ICollection<SmsMessageResponse> response)
-    // {
-    //     if (response != null)
-    //     {
-    //         totalSubmitted = response.Count();
-    //         totalDelivered = response.Sum(r => r.Reports.Count(report => report.Status == "DELIVRD"));
-    //         totalUndelivered = response.Sum(r => r.Reports.Count(report => report.Status != "DELIVRD"));
-    //         totalCharged = (decimal)response.Sum(r => r.CreditsCharged);
-    //     }
-    // }
+    private void CalculateSummary(ICollection<SmsMessageResponse> response)
+    {
+        if (response == null) return;
+
+        var allReports = response.SelectMany(r => r.Reports ?? Enumerable.Empty<DeliveryReportResponse>()).ToList();
+        totalDelivered = allReports.Count(r => r.Status == "DELIVRD");
+        totalAccepted = allReports.Count(r => r.Status == "ACCEPTD");
+        totalUndelivered = allReports.Count(r => r.Status == "UNDELIV");
+        totalRejected = allReports.Count(r => r.Status == "REJECTD");
+        totalExpired = allReports.Count(r => r.Status == "EXPIRED");
+        totalMessages = allReports.Count;
+    }
 
     private string GetStatusCssColor(string status)
     {

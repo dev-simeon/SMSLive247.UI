@@ -1,4 +1,4 @@
-﻿<div class="d-flex flex-column flex-fill">
+﻿﻿<div class="d-flex flex-column flex-fill">
     <!-- Header area (search + select all) - stays visible -->
     <div class="mb-2">
         <input class="form-control mb-2 w-50"
@@ -15,7 +15,7 @@
     @* Results area - will take remaining vertical space and scroll internally.
        Because Modal.modal-body is already limited (min-height / max-height),
        this area won't cause the outer modal to resize on search changes. *@
-    <div class="contact-results" style="flex:1 1 auto; overflow-x: hidden; overflow-y: auto;">
+    <div class="contact-results overflow-x-hidden overflow-y-auto" style="flex:1 1 auto;">
         @if (Contacts == null)
         {
             <p><em>Loading...</em></p>

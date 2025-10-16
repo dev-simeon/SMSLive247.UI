@@ -70,9 +70,3 @@
     .step:hover {
         cursor: pointer;
     }
-
-.table-container {
-    max-height: 25rem;
-    overflow-y: auto;
-    margin-bottom: 1rem;
-}
