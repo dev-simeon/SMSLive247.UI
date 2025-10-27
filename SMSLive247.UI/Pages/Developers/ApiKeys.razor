@@ -34,7 +34,7 @@
                             @mainAccount?.AccountID
                         </td>
                         <td>
-                            @Guid.NewGuid().ToString().ToUpper()
+                            @((new Guid(mainAccount.Key)).ToString().ToUpper())
                         </td>
                         <td>
                             <button class="btn btn-outline-secondary" title="Reset API Key">
@@ -54,7 +54,7 @@
                         <SubAccountName Name="@context.AccountName"></SubAccountName>
                     </Column>
                     <Column Header="Api Key">
-                        @((new Guid(context.Key!)).ToString().ToUpper())
+                        @((new Guid(context.Key)).ToString().ToUpper())
                     </Column>
                     <Column Header="">
                         <button class="btn btn-outline-secondary" title="Reset API Key"
@@ -90,6 +90,7 @@
         {
             return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchBox.Text);
         });
+        mainAccount.Key = Guid.NewGuid().ToByteArray();
         await ds.LoadData(alert);
     }
 

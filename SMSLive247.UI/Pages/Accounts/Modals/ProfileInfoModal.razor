@@ -1,17 +1,43 @@
 ﻿<Modal Title="Update Profile" @bind-Hidden="hideModal">
+
     <Body>
         <EditForm id="BasicInfo" Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <FormInputText Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required></FormInputText>
-            <FormInputText Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required></FormInputText>
-            <FormInputText Label="Email" @bind-Value="accountUpdateRequest.Email" disabled="true"></FormInputText>
-            <FormInputText Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true"></FormInputText>
+
+            <FormInputText Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required>
+            </FormInputText>
+            <FormInputText Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required>
+            </FormInputText>
+            <FormInputText Label="Email Address" @bind-Value="accountUpdateRequest.Email" disabled="true">
+            </FormInputText>
+            <FormInputText Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true">
+            </FormInputText>
+            <FormField Label="Country">
+                <InputSelect class="form-select" @bind-Value:after="() => { }" @bind-Value="CountryCodeString">
+                    <option value="">Select Country</option>
+                    @foreach (var country in CountryList)
+                    {
+                        <option value="@country.Code">@country.Name (@country.Code)</option>
+                    }
+                </InputSelect>
+            </FormField>
+            <FormField Label="Time Zone">
+                <InputSelect class="form-select" @bind-Value="accountUpdateRequest.TimeZone">
+                    @foreach (var tz in TimeZones)
+                    {
+                        <option value="@tz.Value">@tz.Label</option>
+                    }
+                </InputSelect>
+            </FormField>
         </EditForm>
     </Body>
+
     <Footer>
-        <button type="submit" class="btn btn-primary" form="BasicInfo">Save Changes</button>
+        <button type="submit" class="btn btn-primary w-100 py-2" form="BasicInfo">
+            Save Changes
+        </button>
     </Footer>
 </Modal>
 
@@ -21,6 +47,23 @@
 
     private bool hideModal = true;
     private AccountUpdateRequest accountUpdateRequest = new();
+    private string? CountryCodeString { get; set; }
+
+    // ✅ Country list with code & label
+    private List<(string Name, string Code)> CountryList = new()
+{
+("Nigeria", "+234"),
+("Ghana", "+233"),
+("Kenya", "+254"),
+("South Africa", "+27"),
+("United Kingdom", "+44"),
+("United States", "+1")
+};
+
+    // ✅ Time zones cleanly represented
+    private List<(string Label, int Value)> TimeZones = Enumerable.Range(-12, 25)
+    .Select(i => ($"GMT {(i >= 0 ? "+" + i : i.ToString())}", i))
+    .ToList();
 
     protected override void OnParametersSet()
     {
@@ -28,18 +71,31 @@
         accountUpdateRequest.LastName = account.LastName;
         accountUpdateRequest.Email = account.AccountName;
         accountUpdateRequest.Phone = account.Phone;
+        accountUpdateRequest.TimeZone = account.TimeZone;
+        accountUpdateRequest.CountryCode = account.CountryCode;
+
+        var country = CountryList.FirstOrDefault(c => c.Code.TrimStart('+') == account.CountryCode.ToString());
+        if (country.Code != null)
+        {
+            CountryCodeString = country.Code;
+        }
     }
 
     public void show()
     {
         hideModal = false;
         StateHasChanged();
-    } 
+    }
 
     private async Task HandleValidSubmit()
     {
         try
         {
+            if (!string.IsNullOrEmpty(CountryCodeString))
+            {
+                accountUpdateRequest.CountryCode = int.Parse(CountryCodeString.TrimStart('+'));
+            }
+
             var response = await apiClient.AccountUpdateAsync(account.AccountID, accountUpdateRequest);
 
             if (response.StatusCode == 200)

@@ -156,20 +156,20 @@
         ds.Callback = (p, f) =>
         {
             // 1. Get the correct "page" of data from the local collection
-            //    using both the page number and page size.
+            // using both the page number and page size.
             var pageData = _allReports
-                .Skip((p.PageNumber - 1) * p.PageSize)
-                .Take(p.PageSize)
-                .ToList();
+    .Skip((p.PageNumber - 1) * p.PageSize)
+    .Take(p.PageSize)
+    .ToList();
 
             // 2. Create headers that reflect the TRUE state of the data.
-            //    'x-total-count' is the count of the ENTIRE local collection.
+            // 'x-total-count' is the count of the ENTIRE local collection.
             var headers = new Dictionary<string, IEnumerable<string>>
-            {
-                { "x-page-size", new[] { p.PageSize.ToString() } },
-                { "x-page-number", new[] { p.PageNumber.ToString() } },
-                { "x-total-count", new[] { _allReports.Count.ToString() } } // Use the total count
-            };
+        {
+{ "x-page-size", new[] { p.PageSize.ToString() } },
+{ "x-page-number", new[] { p.PageNumber.ToString() } },
+{ "x-total-count", new[] { _allReports.Count.ToString() } } // Use the total count
+        };
 
             // 3. Construct and return a SwaggerResponse manually.
             var response = new SwaggerResponse<ICollection<SmsMessageResponse>>(200, headers, pageData);

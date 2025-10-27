@@ -1,0 +1,52 @@
+@inject IJSRuntime JSRuntime
+@inject AlertService alert
+
+@if (Key is not null)
+{
+    <div class="d-flex align-items-center gap-2">
+        <span class="font-monospace">
+            @if (isKeyVisible)
+            {
+                @ApiKeyString
+            }
+            else
+            {
+                @("••••••••••••••••••••••••••••••••")
+            }
+        </span>
+        <div class="d-flex">
+            <button class="btn btn-sm btn-icon" title="@(isKeyVisible ? "Hide key" : "Show key")"
+                @onclick="ToggleVisibility">
+                <i class="fa @(isKeyVisible ? "fa-eye-slash" : "fa-eye")"></i>
+            </button>
+            <button class="btn btn-sm btn-icon" title="Copy to clipboard" @onclick="CopyToClipboard">
+                <i class="fa fa-copy"></i>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired] public byte[]? Key { get; set; }
+
+    private bool isKeyVisible;
+    private string ApiKeyString => new Guid(Key!).ToString().ToUpper();
+
+    private void ToggleVisibility()
+    {
+        isKeyVisible = !isKeyVisible;
+    }
+
+    private async Task CopyToClipboard()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("copyToClipboard", ApiKeyString);
+            await alert.Success("API Key copied to clipboard.", "Copied");
+        }
+        catch (Exception)
+        {
+            await alert.Error("Could not copy API Key to clipboard.", "Error");
+        }
+    }
+}

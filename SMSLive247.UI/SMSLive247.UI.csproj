@@ -6,11 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <PublishTrimmed>true</PublishTrimmed>
-    <BlazorWebAssemblyEnableLinking>true</BlazorWebAssemblyEnableLinking>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Components\Forms\Select\**" />
     <Content Remove="Components\Forms\Select\**" />
@@ -38,16 +33,17 @@
     <ProjectReference Include="..\SMSLive247.ApiClient\SMSLive247.ApiClient.csproj" />
   </ItemGroup>
 
-  <!-- <ItemGroup>
+   <ItemGroup>
     <UpToDateCheckInput Remove="Pages\Messaging\Messages\Modals\DeliveryReport.razor" />
   </ItemGroup>
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Pages\Messaging\Messages\Modals\DeliveryReport.razor" />
-  </ItemGroup> -->
+  </ItemGroup> 
 
   <ItemGroup>
     <None Include="Pages\Messaging\Messages\DeliveryReport.razor" />
+    <None Include="wwwroot\js\clipboard.js" />
   </ItemGroup>
 
 </Project>
