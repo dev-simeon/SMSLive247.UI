@@ -130,48 +130,60 @@ ul.sb-menu li:has(ul).open a span::after {
 }
 
 
+/* Collapsed sidebar styles */
+.collapsed .sb-main {
+    margin-left: 70px !important;
+}
+
+.collapsed .sb {
+    width: 70px;
+}
+
+.collapsed .sb-menu i {
+    font-weight: bold;
+    font-size: larger;
+}
+
+.collapsed .sb-brand-icon {
+    display: block;
+}
+
+.collapsed .sb-group,
+.collapsed .sb-brand,
+.collapsed .sb-menu span,
+.collapsed ul.sb-menu ul {
+    display: none;
+}
+
+/* Small screens (mobile) */
 @media screen and (max-width: 767px) {
-    body:not(.override) .sb-main {
+    /* By default, menu is hidden */
+    .sb-main {
         margin-left: 0px !important;
     }
 
-    body:not(.override) .sb {
+    .sb {
         width: 0px;
     }
 
-    body:not(.override) .sb-menu,
-    body:not(.override) .sb-header a {
+    .sb-menu,
+    .sb-header a {
         display: none;
     }
-}
 
-@media screen and (min-width: 768px) and (max-width: 1400px) {
-    body:not(.override) .sb-main {
-        margin-left: 70px !important;
+    /* When toggled, show full menu */
+    .override .sb {
+        width: 260px;
     }
 
-    body:not(.override) .sb {
-        width: 70px;
-    }
-
-    body:not(.override) .sb-menu i {
-        font-weight: bold;
-        font-size: larger;
-    }
-
-    body:not(.override) .sb-brand-icon {
+    .override .sb-menu,
+    .override .sb-header a {
         display: block;
     }
-
-    body:not(.override) .sb-group,
-    body:not(.override) .sb-brand,
-    body:not(.override) .sb-menu span,
-    body:not(.override) ul.sb-menu ul {
-        display: none;
-    }
 }
 
-@media screen and (min-width: 1401px) {
+/* Medium and large screens */
+@media screen and (min-width: 768px) {
     .override .sb-main {
         margin-left: 70px !important;
     }
@@ -183,7 +195,6 @@ ul.sb-menu li:has(ul).open a span::after {
     .override .sb-menu i {
         font-weight: bold;
         font-size: larger;
-        color: var(--bs-white);
     }
 
     .override .sb-brand-icon {
@@ -195,5 +206,29 @@ ul.sb-menu li:has(ul).open a span::after {
     .override .sb-menu span,
     .override ul.sb-menu ul {
         display: none;
+    }
+
+    /* On medium screens, sidebar is collapsed by default */
+    @media screen and (max-width: 1400px) {
+        body:not(.override) .sb-main {
+            margin-left: 70px !important;
+        }
+
+        body:not(.override) .sb {
+            width: 70px;
+        }
+
+        body:not(.override) .sb-menu i {
+            font-weight: bold;
+            font-size: larger;
+        }
+
+        body:not(.override) .sb-brand-icon {
+            display: block;
+        }
+
+        body:not(.override) .sb-group, body:not(.override) .sb-brand, body:not(.override) .sb-menu span, body:not(.override) ul.sb-menu ul {
+            display: none;
+        }
     }
 }

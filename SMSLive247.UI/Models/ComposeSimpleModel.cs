@@ -14,12 +14,19 @@ namespace SMSLive247.UI.Pages.ViewModels
         public string CounterText { get; set; } = "Type your Message here";
         public SendOption SendOption { get; set; } = SendOption.SEND_NOW;
 
+        // [GEMINI] 1. ADDED: The new property for the UI summary
+        public int TotalRecipientCount { get; private set; }
+
         public List<string>? SenderIds { get; private set; }  
         public SmsBatchRequest Request { get; private set; } = new();
 
         public List<ContactModel> Contacts { get; private set; } = [];
         public List<ContactModel> BatchFiles { get; private set; } = [];
         public List<ContactModel> Numbers { get; set; } = [];
+
+        // [GEMINI] 2. ADDED: Private field to store the original batch file data
+        // This is necessary to access the recipient count for each file.
+        private IEnumerable<BatchFileResponse> _batchFilesData = [];
 
         public ComposeSimpleModel(
             IEnumerable<SenderIdResponse> senderIds,
@@ -28,12 +35,49 @@ namespace SMSLive247.UI.Pages.ViewModels
         {
             SenderIds = senderIds.Select(x => x.SenderID).ToList();
             Contacts = contacts.Select(x => new ContactModel(x)).ToList();
+
+            // [GEMINI] 3. UPDATED: Store the raw file data first
+            _batchFilesData = batchFiles
+               .Where(x => !string.Equals(x.FileType, "csv", StringComparison.OrdinalIgnoreCase));
+
             BatchFiles = batchFiles
                .Where(x => !string.Equals(x.FileType, "csv", StringComparison.OrdinalIgnoreCase))
                .Select(x => new ContactModel(x))
                .ToList();
 
             Request.DeliveryTime = DateTime.Now;
+
+            // [GEMINI] 4. ADDED: Run the initial calculation on load
+            UpdateRecipientCount();
+        }
+
+        // [GEMINI] 5. ADDED: The public method to calculate the total
+        // This is called by the component's 'OnSelected' event.
+        public void UpdateRecipientCount()
+        {
+            // 1. Count recipients from selected individual contacts
+            int contactCount = Contacts?.Count(x => x.Selected) ?? 0;
+
+            // 2. Count recipients from raw pasted numbers
+            int rawCount = Numbers?.Count ?? 0;
+
+            // 3. Count recipients from selected batch files
+
+            // Get the Keys (IDs) of the selected files from the UI list
+            var selectedFileKeys = BatchFiles
+                .Where(x => x.Selected)
+                .Select(x => x.Key) // Assuming ContactModel.Key maps to the file's unique ID
+                .ToHashSet(); // Use a HashSet for an efficient lookup
+
+            // Now, sum the recipient counts from our original data store
+            int fileRecipientCount = _batchFilesData
+                // [GEMINI] UPDATED: Changed 'bf.Id' to 'bf.BatchFileID'
+                .Where(bf => selectedFileKeys.Contains(bf.BatchFileID))
+                // [GEMINI] UPDATED: Changed 'bf.Count' to 'bf.TotalNumbers'
+                .Sum(bf => bf.TotalNumbers);
+
+            // 4. Set the total
+            TotalRecipientCount = contactCount + rawCount + fileRecipientCount;
         }
     }
 

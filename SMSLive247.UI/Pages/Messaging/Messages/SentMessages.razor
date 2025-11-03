@@ -24,10 +24,12 @@
                 <Right>
                     <Button Type="Button.Style.DOWNLOAD" @onclick="e => downloadModal.Download()">
                         Download...
+
                     </Button>
                 </Right>
             </LeftRight>
         </SearchArea>
+        <div class="table-responsive">
         <Table DataSource="ds">
             <Columns>
                 <Column Header="Time" Width="140px">
@@ -63,6 +65,7 @@
                 </Column>
             </Columns>
         </Table>
+        </div>
     </Body>
     <Footer>
         <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />

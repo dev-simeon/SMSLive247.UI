@@ -5,130 +5,155 @@
     <EditForm Model="model.Request" OnValidSubmit="SubmitMessage">
         <ValidationSummary class="text-danger" />
         <DataAnnotationsValidator />
-        <Card>
-            <Body>
-                <MultiColumn Column1Width="5" Column2Width="7">
-                    <Column1>
-                        <div class="mb-4 mt-3">
-                            <div class="input-group">
-                                <span class="input-group-text">Sender ID</span>
-                                <InputSelect class="form-select" id="s1" @bind-Value="model.Request.SenderID">
-                                    @if (model.SenderIds == null)
+
+        <div class="row g-4">
+
+            <div class="col-lg-8">
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <label for="senderId" class="form-label fw-bold">From (Sender ID)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa fa-user-check"></i></span>
+                            <InputSelect class="form-select" id="senderId" @bind-Value="model.Request.SenderID">
+                                @if (model.SenderIds == null)
+                                {
+                                    <option>Loading...</option>
+                                }
+                                else
+                                {
+                                    <option value="">Please select Sender ID</option>
+                                    @foreach (var senderId in model.SenderIds)
                                     {
-                                        <option>Loading...</option>
+                                        <option value="@senderId">@senderId</option>
                                     }
-                                    else
-                                    {
-                                        <option value="">Please select Sender ID</option>
-                                        @foreach (var senderId in model.SenderIds)
-                                        {
-                                            <option value="@senderId">@senderId</option>
-                                        }
-                                    }
-                                </InputSelect>
-                            </div>
-                            <ValidationMessage class="text-danger" For="@(() => model.Request.SenderID)" />
+                                }
+                            </InputSelect>
+                        </div>
+                        <ValidationMessage class="text-danger" For="@(() => model.Request.SenderID)" />
+                        <div class="form-text mt-2">
                             <NavLink class="text-decoration-none" href="/Messaging/SenderIds">
-                                <span>Click here to request for more SenderIDs</span>
+                                Click here to request for more SenderIDs
                             </NavLink>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="mb-4">
-                            <div class="d-flex justify-content-between">
-                                <label class="form-label" for="m2">@model.CounterText</label>
-                                <button type="button" class="btn btn-close btn-sm" title="Clear Message" @onclick="ClearMessage"></button>
-                            </div>
-                            <textarea class="form-control" id="m2" rows="5"
-                                      maxlength="@settings.MaxCharacter"
-                                      @bind="model.Request.MessageText"
-                                      @oninput="OnTextChange"></textarea>
-                            <ValidationMessage class="text-danger" For="@(() => model.Request.MessageText)" />
-                            <div class="form-text">
-                                Messages longer than 160 characters are charged per each page
-                            </div>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <h4 class="card-title">To (Recipients)</h4>
+
+                        <RecipientList Caption="Raw Numbers" Recipients="model.Numbers" @onclick="e => rawNumberModal.Show()">
+                            <button type="button" class="btn btn-outline-primary" @onclick="e => rawNumberModal.Show()">
+                                <i class="fa fa-paste me-2"></i>Paste...
+                            </button>
+                            <p class="form-text">Type or paste your recipients phone numbers.</p>
+                        </RecipientList>
+
+                        <hr class="my-3">
+
+                        <RecipientList Caption="From Contacts" Recipients="model.Contacts" @onclick="e => contactsModal.Show()">
+                            <button type="button" class="btn btn-outline-primary" @onclick="e => contactsModal.Show()">
+                                <i class="fa fa-user me-2"></i>Contacts...
+                            </button>
+                            <p class="form-text">Select numbers from your Phonebook or Groups.</p>
+                        </RecipientList>
+
+                        <hr class="my-3">
+
+                        <RecipientList Caption="From Bulk Files" Recipients="model.BatchFiles" @onclick="e => bulkFileModal.Show()">
+                            <button type="button" class="btn btn-outline-primary" @onclick="e => bulkFileModal.Show()">
+                                <i class="fa fa-book me-2"></i>Bulk Files...
+                            </button>
+                            <p class="form-text">Include your Batch Files numbers.</p>
+                        </RecipientList>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <label class="form-label fw-bold" for="messageText">What (Your Message)</label>
+                            <span class="text-muted small">@model.CounterText</span>
                         </div>
+                        <textarea class="form-control" id="messageText" rows="7"
+                                  maxlength="@settings.MaxCharacter"
+                                  @bind="model.Request.MessageText"
+                                  @oninput="OnTextChange"></textarea>
+                        <ValidationMessage class="text-danger" For="@(() => model.Request.MessageText)" />
 
-                        <div class="mb-4">
-                            <InputRadioGroup @bind-Value="model.SendOption">
-                                <div class="form-check form-check-inline">
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div class="form-text">
+                                Messages longer than 160 characters are charged per page.
+                            </div>
+                            <button type="button" class="btn btn-link btn-sm text-danger" title="Clear Message" @onclick="ClearMessage">
+                                <i class="fa fa-times me-1"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 2rem;">
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <label class="form-label fw-bold">When (Schedule)</label>
+                            <InputRadioGroup @bind-Value="model.SendOption" class="mt-2">
+                                <div class="form-check">
                                     <InputRadio class="form-check-input" id="r3" Value=@SendOption.SEND_NOW />
                                     <label class="form-check-label" for="r3">Send Immediately</label>
                                 </div>
-                                <div class="form-check form-check-inline">
+                                <div class="form-check">
                                     <InputRadio class="form-check-input" id="r4" Value=@SendOption.SEND_LATER />
                                     <label class="form-check-label" for="r4">Schedule for Later</label>
                                 </div>
                             </InputRadioGroup>
-                        </div>
 
-                        @if (model.SendOption == SendOption.SEND_LATER)
-                        {
-                        <div class="mb-4">
-                            <div class="input-group">
-                                <span class="input-group-text">Delivery Time</span>
-                                <InputDate class="form-control" id="s5" 
-                                    Type="InputDateType.DateTimeLocal" 
-                                    @bind-Value="model.Request.DeliveryTime" />
+                            @if (model.SendOption == SendOption.SEND_LATER)
+                            {
+                                <div class="mt-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fa fa-calendar-alt"></i></span>
+                                        <InputDate class="form-control" id="s5"
+                                                   Type="InputDateType.DateTimeLocal"
+                                                   @bind-Value="model.Request.DeliveryTime" />
+                                    </div>
+                                    <div class="form-text mt-2">Your time zone is: West/Central Africa GMT +1</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm">
+                        <div class="card-body d-grid gap-2">
+                            @if (model.SendOption == SendOption.SEND_NOW)
+                            {
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fa fa-paper-plane me-2"></i>Send SMS Now!
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-info btn-lg">
+                                    <i class="fa fa-clock me-2"></i>Queue Message
+                                </button>
+                            }
+
+                            <div class="text-center text-muted mt-2">
+                                <strong>Total Recipients: @model.TotalRecipientCount</strong>
                             </div>
-                            <div class="form-text">Your time zone is: West/Central Africa GMT +1</div>
                         </div>
-                        }
-                    </Column1>
-                    <Column2>
-                        <div style="height: 480px; overflow-y: auto; scrollbar-width: none;">
-                            <h4>Recipients</h4>
+                    </div>
 
-                            <RecipientList Caption="Raw Numbers" Recipients="model.Numbers" 
-                                            @onclick="e => rawNumberModal.Show()">
-                                <button type="button" class="btn btn-outline-primary"
-                                        @onclick="e => rawNumberModal.Show()">
-                                    <i class="fa fa-paste me-2"></i>Paste...
-                                </button>
-                                <p class="form-text">
-                                    Type or paste your recipients phone numbers. 
-                                    Click the [Paste] button above.
-                                </p>
-                            </RecipientList>
+                </div>
+            </div>
 
-                            <RecipientList Caption="From Contacts" Recipients="model.Contacts"
-                                           @onclick="e => contactsModal.Show()">
-                                <button type="button" class="btn btn-outline-primary"
-                                        @onclick="e => contactsModal.Show()">
-                                    <i class="fa fa-user me-2"></i>Contacts...
-                                </button>
-                                <p class="form-text">
-                                    You can also select numbers from your Phonebook or Groups. 
-                                    Click the [Contacts] button above.
-                                </p>
-                            </RecipientList>
-
-                            <RecipientList Caption="From Bulk Files" Recipients="model.BatchFiles"
-                                           @onclick="e => bulkFileModal.Show()">
-                                <button type="button" class="btn btn-outline-primary"
-                                        @onclick="e => bulkFileModal.Show()">
-                                    <i class="fa fa-book me-2"></i>Bulk Files...
-                                </button>
-                                <p class="form-text">
-                                    You may also include your Batch Files numbers. 
-                                    Click the [Bulk File] button above.
-                                </p>
-                            </RecipientList>
-                        </div>
-                    </Column2>
-                </MultiColumn>
-            </Body>
-            <Footer>
-                @if (model.SendOption == SendOption.SEND_NOW)
-                {
-                    <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-paper-plane">Send SMS Now!</Button>
-                }
-                else
-                {
-                    <Button Type="Button.Style.CUSTOM" CustomIcon="fa fa-clock">Queue Message</Button>
-                }
-            </Footer>
-        </Card>
+        </div>
     </EditForm>
+
     <ContactsModal @ref="contactsModal" Model="model" OnSelected="OnSelected" />
     <BulkFilesModal @ref="bulkFileModal" Model="model" OnSelected="OnSelected" />
     <RawNumberModal @ref="rawNumberModal" Model="model" OnSelected="OnSelected" />
@@ -193,6 +218,7 @@
 
     private void OnSelected()
     {
+        model.UpdateRecipientCount();
         StateHasChanged();
     }
 

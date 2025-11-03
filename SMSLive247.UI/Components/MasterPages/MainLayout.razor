@@ -11,12 +11,12 @@
 
     <main class="sb-main pb-3 h-100">
         <header class="navbar py-2 bg-primary-subtle shadow">
-            <div class="container-fluid">
-                <left class="d-flex gap-2">
+            <div class="container-fluid justify-content-between">
+                <div class="d-flex gap-2 align-items-center">
                     <button class="btn btn-toolbar" @onclick="ToggleMenu">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <ul class="nav">
+                    <ul class="nav d-none d-md-flex">
                         <li class="nav-item">
                             <a class="nav-link" href="/Messaging/Compose">Messaging</a>
                         </li>
@@ -24,17 +24,27 @@
                             <a class="nav-link" href="/Accounts/Dashboard">Accounts</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/Credits/Buy">Wallet</a>
+                            <a class="nav-link" href="/Credits/Buy">Buy Credits</a>
                         </li>
                     </ul>
-                </left>
-                <right class="d-flex gap-3 align-items-center">
+                    <div class="dropdown d-md-none">
+                        <button class="btn btn-primary dropdown-toggle" type="button" @onclick="ToggleNavDropdown">
+                            Menu
+                        </button>
+                        <div class="dropdown-menu @(hideNavDropdown ? "" : "show")">
+                            <a class="dropdown-item" href="/Messaging/Compose">Messaging</a>
+                            <a class="dropdown-item" href="/Accounts/Dashboard">Accounts</a>
+                            <a class="dropdown-item" href="/Credits/Buy">Buy Credits</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
                     <a class="nav-link" href="/Support/Tickets">
                         <i class="bi bi-bell-fill fs-4"></i>
                     </a>
                     <div class="dropdown" @onfocusout="HideDropdown">
                         <a class="dropdown-toggle nav-link d-flex gap-3 align-items-center" href="#"
-                                 @onclick="ToggleDropdown" @onclick:preventDefault>
+                            @onclick="ToggleDropdown" @onclick:preventDefault>
                             <span>@fullName</span>
                         </a>
                         <div class="dropdown-menu w-100 @(hideDropdown ? "" : "show")">
@@ -43,12 +53,12 @@
                             <a class="dropdown-item" href="/Logout">Logout</a>
                         </div>
                     </div>
-                </right>
+                </div>
             </div>
         </header>
 
         <section class="p-4">
-            <header class="d-flex justify-content-between pb-2">
+            <header class="d-flex flex-column flex-lg-row justify-content-between pb-2 gap-3 gap-lg-0">
                 <SectionOutlet SectionName="title" />
                 <nav>
                     <Breadcrumb />
@@ -62,11 +72,18 @@
 @code {
     private bool hideMainMenu = false;
     private bool hideDropdown = true;
+    private bool hideNavDropdown = true;
 
     private string? avatarUrl;
     private string? fullName;
 
     private void ToggleMenu() => hideMainMenu = !hideMainMenu;
+    private void ToggleNavDropdown() => hideNavDropdown = !hideNavDropdown;
+    private async Task HideNavDropdown()
+    {
+        await Task.Delay(200);
+        hideNavDropdown = true;
+    }
     private void ToggleDropdown() => hideDropdown = !hideDropdown;
     private async Task HideDropdown()
     {

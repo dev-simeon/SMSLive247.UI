@@ -1,34 +1,32 @@
 ﻿@if (PageState != null && PageState.TotalPages != null)
 {
-<div class="d-flex justify-content-between w-100">
-    <div class="my-auto">
-        <select class="me-2" @onchange="SelectPageSize">
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-        </select>
-        <span>@GetPagerText()</span>
-    </div>
-    @if (PageState.TotalPages.Value > 1)
-    {
-    <div class="btn-44group">
-        @*<button class="btn btn-secondary" disabled="@(!PageState.HasPrevious)"
-            @onclick="e => SelectPage(PageState.PageNumber - 1)">Prev
-        </button> *@
-        @for (int i = 1; i <= Math.Min(10, PageState.TotalPages.Value); i++)
+    @* UPDATED: Use flex-column on mobile and flex-row on medium screens and up *@
+    <div class="d-flex flex-column flex-md-row justify-content-between w-100 gap-2">
+        @* UPDATED: Add 'd-flex' for inline items and center alignment *@
+        <div class="my-auto d-flex align-items-center">
+            <select class="form-select-sm me-2" @onchange="SelectPageSize" style="width: auto;">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <span class="text-nowrap">@GetPagerText()</span> @* Prevents wrapping on small counts *@
+        </div>
+        @if (PageState.TotalPages.Value > 1)
         {
-            int captured = i;
-            <button @onclick="e => SelectPageNumber(captured)"
-                    class="btn @GetActiveCss(captured) mx-1">@captured
-            </button>
+            @* UPDATED: Use a scrollable container for the buttons on small screens *@
+            <div class="btn-group flex-nowrap overflow-auto py-1" role="group">
+                @for (int i = 1; i <= Math.Min(10, PageState.TotalPages.Value); i++)
+                {
+                    int captured = i;
+                    <button @onclick="e => SelectPageNumber(captured)"
+                                      class="btn @GetActiveCss(captured)">
+                        @captured
+                    </button>
+                }
+            </div>
         }
-        @*<button class="btn btn-secondary" disabled="@(!PageState.HasNext)"
-            @onclick="e => SelectPage(PageState.PageNumber + 1)">Next
-        </button> *@   
     </div>
-    }
-</div>
 }
 
 @code {
