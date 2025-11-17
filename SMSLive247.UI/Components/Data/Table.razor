@@ -3,55 +3,57 @@
 
 @if (Columns == null)
 {
-<p><em>No columns were specified for Table component</em></p>
+    <p><em>No columns were specified for Table component</em></p>
 }
 else
 {
-<table class="table table-hover align-middle mb-0">
-    <thead class="table-primary bg-primary-subtle">
-        <tr>
-            @Columns(default)
-        </tr>
-    </thead>
-    <tbody>
-        @if (IsLoading())
-        {
-            <tr>
-                <td colspan="20">
-                    <Loading BoolCheck="false"></Loading>
-                </td>
-            </tr> 
-        }
-        else if (items == null)
-        {
-            <tr>
-                <td colspan="20">
-                    <span class="badge text-bg-info">NULL items </span>
-                </td>
-            </tr>
-        }
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-primary bg-primary-subtle">
+                <tr>
+                    @Columns(default)
+                </tr>
+            </thead>
+            <tbody>
+                @if (IsLoading())
+                {
+                    <tr>
+                        <td colspan="20">
+                            <Loading BoolCheck="false"></Loading>
+                        </td>
+                    </tr>
+                }
+                else if (items == null)
+                {
+                    <tr>
+                        <td colspan="20">
+                            <span class="badge text-bg-info">NULL items </span>
+                        </td>
+                    </tr>
+                }
 
-        else if (items.Count == 0)
-        {
-            <tr>
-                <td colspan="20">
-                    <span class="badge text-bg-info">@EmptyMessage</span>
-                </td>
-            </tr>
-        }
-        else
-        {
-            @foreach (TItem item in items)
-            {
-            <tr class="@GetSelectedCss(item)" @onclick="e => ToggleRow(item)">
-                <CascadingValue Value="item">
-                    @Columns(item)
-                </CascadingValue>
-            </tr>
-            }
-        }
-    </tbody>
-</table>
+                else if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="20">
+                            <span class="badge text-bg-info">@EmptyMessage</span>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (TItem item in items)
+                    {
+                        <tr class="@GetSelectedCss(item)" @onclick="e => ToggleRow(item)">
+                            <CascadingValue Value="item">
+                                @Columns(item)
+                            </CascadingValue>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 <style>
@@ -90,7 +92,7 @@ else
     protected override void OnParametersSet()
     {
         // if (DataSource == null && Items == null)
-        //     throw new InvalidOperationException("Please set either DataSource or Items properties");
+        // throw new InvalidOperationException("Please set either DataSource or Items properties");
 
         if (DataSource != null && Items != null)
             throw new InvalidOperationException("You should set only one of DataSource and Items properties");

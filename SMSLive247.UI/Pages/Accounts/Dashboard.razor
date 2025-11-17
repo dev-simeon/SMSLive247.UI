@@ -1,9 +1,11 @@
 ﻿@page "/"
 @page "/Accounts/Dashboard"
+@attribute [Authorize]
 @inject IJSRuntime js
 @inject NavigationManager nav
 
 @using SMSLive247.UI.Pages.Accounts.Components
+@using Microsoft.AspNetCore.Authorization
 
 <style>
     .metric-card {

@@ -7,6 +7,9 @@
             <span class="sb-brand">SMSLive247</span>
             <span class="sb-brand-icon">247</span>
         </a>
+        <button class="sb-close-btn" @onclick="OnClose" title="Close Menu">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </header>
 
     <ul class="sb-menu flex-column">
@@ -18,9 +21,7 @@
                 if (item.Items.Count > 0)
                 {
                     <li class="@item.Css">
-                        <a href="#" title="@group.Name / @item.Name"
-                           @onclick="@item.ToggleOpen"
-                        @onclick:preventDefault>
+                        <a href="#" title="@group.Name / @item.Name" @onclick="@item.ToggleOpen" @onclick:preventDefault>
                             <i class="@item.Icon"></i>
                             <span>@item.Name</span>
                         </a>
@@ -82,6 +83,8 @@
 </style>
 
 @code {
+    [Parameter] public EventCallback OnClose { get; set; }
+
     private MenuItem[] navItems = [];
     private string currentMenu = "";
 
@@ -115,7 +118,7 @@
     {
         if (string.IsNullOrEmpty(url))
             return false;
-        
+
         return url.StartsWith("http://") || url.StartsWith("https://");
     }
 

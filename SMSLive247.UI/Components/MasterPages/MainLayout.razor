@@ -6,7 +6,7 @@
 
 <body class="vh-100 hideMenuClass @(hideMainMenu ? "override" : "")">
     <AutoSpinner />
-    <SideMenu />
+    <SideMenu OnClose="ToggleMenu" />
     <Alert />
 
     <main class="sb-main pb-3 h-100">
@@ -42,12 +42,13 @@
                     <a class="nav-link" href="/Support/Tickets">
                         <i class="bi bi-bell-fill fs-4"></i>
                     </a>
-                    <div class="dropdown" @onfocusout="HideDropdown">
+                    <div class="dropdown position-relative" @onfocusout="HideDropdown">
                         <a class="dropdown-toggle nav-link d-flex gap-3 align-items-center" href="#"
                             @onclick="ToggleDropdown" @onclick:preventDefault>
                             <span>@fullName</span>
                         </a>
-                        <div class="dropdown-menu w-100 @(hideDropdown ? "" : "show")">
+                        <div style=" left: auto;right: 0;transform: none;max-width: calc(100vw - 2rem);"
+                            class="dropdown-menu dropdown-menu-end @(hideDropdown ? "" : "show")">
                             <a class="dropdown-item" href="/Accounts/Profile">Account Profile</a>
                             <hr class="dropdown-divider" />
                             <a class="dropdown-item" href="/Logout">Logout</a>

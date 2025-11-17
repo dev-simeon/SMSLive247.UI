@@ -10,6 +10,7 @@ html {
     height: 100%;
     width: 260px;
     left: 0;
+    z-index: 1020; /* z-index for sidebars is often between 1020 and 1040 */
 }
 
 .sb-main {
@@ -49,6 +50,20 @@ html {
 
 .sb-brand-icon {
     display: none;
+}
+
+.sb-close-btn {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--bs-gray-400);
+    font-size: 1.2rem;
+}
+.sb-close-btn:hover {
+    color: var(--bs-white);
 }
 
 .sb-menu {
@@ -174,11 +189,16 @@ ul.sb-menu li:has(ul).open a span::after {
     /* When toggled, show full menu */
     .override .sb {
         width: 260px;
+        z-index: 1040; /* Higher z-index to appear over main content */
     }
 
     .override .sb-menu,
     .override .sb-header a {
         display: block;
+    }
+
+    .override .sb-close-btn {
+        display: block; /* Show close button on mobile when menu is open */
     }
 }
 

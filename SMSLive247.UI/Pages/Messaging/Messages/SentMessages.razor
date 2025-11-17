@@ -1,12 +1,12 @@
-﻿@using SMSLive247.UI.Pages.Messaging.Messages.Modals
+﻿﻿@using SMSLive247.UI.Pages.Messaging.Messages.Modals
 
 <Card>
+
     <Body>
         <SearchArea>
             <LeftRight>
                 <Left>
-                    <SearchBox @ref="searchBox"
-                               @onclick="e => ds.LoadData(alert)">
+                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
                         <InputSelect @bind-Value="dateRange.Filter" class="form-select">
                             @foreach (var item in Enum.GetValues<DateRangeFilter>())
                             {
@@ -16,8 +16,10 @@
 
                         @if (dateRange.Filter == DateRangeFilter.CUSTOM)
                         {
-                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.StartDate"></InputDate>
-                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy" @bind-Value="dateRange.EndDate"></InputDate>
+                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy"
+                                @bind-Value="dateRange.StartDate"></InputDate>
+                            <InputDate class="form-control" Type="InputDateType.Date" @bind-Value:format="dd-MM-yyyy"
+                                @bind-Value="dateRange.EndDate"></InputDate>
                         }
                     </SearchBox>
                 </Left>
@@ -29,7 +31,6 @@
                 </Right>
             </LeftRight>
         </SearchArea>
-        <div class="table-responsive">
         <Table DataSource="ds">
             <Columns>
                 <Column Header="Time" Width="140px">
@@ -52,20 +53,17 @@
                     </small>
                 </Column>
                 <Column>
-                    <Actions
-                        OnView="e => sentMessageView.Show((int)context.BatchID)"
+                    <Actions OnView="e => sentMessageView.Show((int)context.BatchID)"
                         OnDelete="e => messageModal.Delete(context)">
 
-                        <button class="btn btn-outline-secondary" 
-                                @onclick="e => dlrModal.Show(context.BatchID)"
-                                title="View Delivery Report">
+                        <button class="btn btn-outline-secondary" @onclick="e => dlrModal.Show(context.BatchID)"
+                            title="View Delivery Report">
                             <i class="fa fa-envelope-open-text"></i>
                         </button>
                     </Actions>
                 </Column>
             </Columns>
         </Table>
-        </div>
     </Body>
     <Footer>
         <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
@@ -91,7 +89,8 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, dateRange.StartDate, dateRange.EndDate, searchBox.Text);
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, dateRange.StartDate, dateRange.EndDate,
+    searchBox.Text);
         });
         await ds.LoadData(alert);
     }
