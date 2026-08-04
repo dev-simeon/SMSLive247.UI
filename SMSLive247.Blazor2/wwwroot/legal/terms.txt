@@ -1,0 +1,45 @@
+SMSLive247 Terms and Conditions 
+
+The following are the terms and conditions for use of the SMSLive247 Service ("SMSLive247 Service" or "the Service") by any customer (hereinafter referred to as "the User"). 
+
+IMPORTANT: In terms of section 11 of the Electronic Communications and Transactions (ECT) Act 25 of 2002 and the common law of contract, these terms and conditions are valid binding and enforceable against all persons that access the SMSLive247 website, web pages or any part thereof.   If you do not agree to be bound by these terms and conditions you may not use the SMSLive247 website. Reasonable use of the SMSLive247 website shall automatically bound the user to this agreement. 
+
+This is an agreement between You ("You") and LOREX, operating under the website name SMSLive247.com (the "Company"). "We" and "Us" means both You and the Company. The effective date of this Agreement is when You accept this Agreement in accordance with the procedure set out above. You must agree to abide by all of the Terms and Conditions contained in this Agreement in order to become or remain an authorized user of the services offered in this website.
+BY PLACING SMSLIVE247 PRODUCTS ON A WEBSITE AND/OR ACCESSING ANY PART OF THE SMSLIVE247 SERVICE, THE USER IS AGREEING TO ALL THE TERMS AND CONDITIONS OF THIS SERVICE AGREEMENT, AND CONSENT TO BE BOUND BY AND BECOME A PARTY TO THIS SERVICE AGREEMENT. SHOULD THE USER NOT AGREE TO ALL THE TERMS AND CONDITIONS OF THIS SERVICE AGREEMENT, OR CANNOT COMPLY WITH THESE TERMS AND CONDITIONS, HE/SHE/IT SHOULD CLOSE THE BROWSER WINDOW; THEREFORE TERMINATING THE REGISTRATION PROCESS WILLFULLY, AND AGREEING TO STOP ALL USE OF THE SERVICE AND SURRENDERING ANY AND ALL AUTHORITY TO USE THE SERVICE. 
+
+IF THE USER IS DEEMED TO HAVE ORDERED THE SERVICE, SMSLIVE247'S ACCEPTANCE IS EXPRESSLY CONDITIONED UPON ASSENT TO ALL THE TERMS AND CONDITIONS OF THIS SERVICE AGREEMENT, TO THE EXCLUSION OF ALL OTHER TERMS; IF THESE TERMS ARE CONSIDERED AN OFFER BY SMSLIVE247, ACCEPTANCE IS EXPRESSLY LIMITED TO THESE TERMS. 
+
+THE USER AGREES THAT ALL TERMS AND CONDITIONS HEREWITH PUBLISHED SHALL BE BINDING AND THAT SHOULD THERE BE A CONTRADICTION BETWEEN PRODUCT- SPECIFIC TERMS AND CONDITIONS, AND GENERAL TERMS AND CONDITIONS, THE PRODUCT-SPECIFIC TERMS AND CONDITIONS SHALL APPLY 
+DEFINITIONS AND INTERPRETATION
+
+The SMSLive247 website means the SMSLive247 website located at www.SMSLive247.com, including any page, part or element thereof, as owned and operated by SMSLive247. 
+
+SMSLive247 means SMSLive247 Technologies Limited, registration number RC611295, including its subsidiaries, owners, shareholders and business units. 
+
+User/User means any person or entity who enters or uses the SMSLive247 website, notwithstanding the fact that such person only visits the home page of the SMSLive247 website. 
+
+Hyperlinks herein should be deemed to be part of these terms and conditions in terms of section 11(3) of the ECT Act .
+
+1. THE SERVICE
+The Service consists of a browser interface, message application, SMS gateway access, e-mail facility, data encryption, data transmission, data access, data storage and, if applicable, synchronization software. The User is responsible for obtaining and maintaining all computer hardware, software and communications equipment needed to access the Service, and for paying all access charges (e.g., ISP, telecommunications) incurred while using the Service. These costs will be displayed during the registration process. All fees are payable upfront, prior to credits being activated. 
+
+SMSLive247 makes no guarantees as to the continuous availability of the Service or any specific feature(s) of the Service. SMSLive247 reserves the right to change or terminate the Service and/ or alter the terms and conditions of this Agreement at any time with on 14 days ' notice. All fees paid to SMSLive247 when such termination occurs are addressed in the sections below.
+
+Messages shall be deemed to have been delivered when SMSLive247 has delivered/sent the messages to the immediate destination that SMSLive247's software is programmed to do, including SMTP servers, Mobile telephone networks, or any other intermediary server or API that is deemed to be the point of dispatch of the message. SMSLive247 does not guarantee delivery on behalf of Mobile telephone networks or mail servers.
+
+SMSLive247 lays no claims to its network coverage. Although SMSLive247 focuses on providing extensive coverage aggregation services, mobile networks may choose from time to time to not be part of SMSLive247 or its service providers' networks. This may result in messages not being delivered. 
+
+2. USE OF PROPRIETARY SOFTWARE
+Subject to the terms and conditions of this Service Agreement, SMSLive247 grants the User an individual, personal, non-sub licensable, non-exclusive and non-transferable license ("the License") to use its proprietary software and/or application service, in object code form only, and only in accordance with the applicable end user documentation, if any, and only in conjunction with the SMSLive247 Service Agreement. The User will not, directly or indirectly, reverse engineer, de-compile, disassemble or otherwise attempt to establish the source code or underlying ideas or algorithms of the software; modify, translate, or create derivative works based on the software/ application; or copy (except for archival purposes), rent, lease, distribute, assign, or otherwise transfer rights to the software/application; use the software/application for timesharing or service bureau purposes or otherwise for the benefit of a third party; or remove any proprietary notices or labels with regard to SMSLive247 products and/or services. As between the parties, the User acknowledges that SMSLive247, and its licensors retain ownership of all propriety applications, software, intellectual property "IP" (Intellectual Property) and any portions or copies thereof, and all rights therein. Upon termination of this Service Agreement for any reason, this License will terminate and the User shall destroy and cease to use all software and applications. THE SOFTWARE IS PROVIDED AND APPLICATIONS ARE OFFERED, "AS IS" AND SUBJECT TO THE WARRANTY DISCLAIMERS AND LIMITATIONS OF LIABILITY FOUND IN THIS SERVICE AGREEMENT AND SUBJECT TO TESTING BY THE USER OR User PRIOR TO ENTERING INTO THIS AGREEMENT. 
+
+3. MEMBER ACCOUNT, PASSWORD, AND SECURITY
+To open an account for usage of the Service, the User must complete the registration process by providing SMSLive247 with current, complete and accurate information as prompted by the Membership/registration Form. Inaccurate details will result in suspension. The User will also choose a password and an account name will be assigned. The User is entirely responsible for maintaining confidentiality with regard to its password and account information. Furthermore, the User is entirely responsible for any and all activities that occur under its account. SMSLive247 will not be held liable to any third party claims and/or actions taken with respect to services offered. 
+
+The User agrees to notify SMSLive247 immediately of any unauthorized use of its account or any other breach of security. 
+
+4. MEMBER PRIVACY
+It is SMSLive247's policy to respect the privacy of the User. SMSLive247 will not monitor, edit, or disclose any personal information about the User or the User's SMSLive247 account, including its contents, without the User's prior permission unless SMSLive247 has a good faith belief that such action is necessary to: (1) conform to legal requirements or comply with legal process; (2) protect and defend the rights or property of SMSLive247; (3) enforce this Service Agreement or protect SMSLive247's business or reputation, including without limitation upon termination, cancellation or suspension of this Agreement by SMSLive247; (4) respond to request for identification in connection with claim of copyright or trademark infringement by the User, or a claim by a third party that the User is using the Service in connection with an infringing, illegal or improper activity; or (5) act to protect the interests of the User or others. SMSLive247's service transmits the Sender's name (From field) and/or email address with each message that the end-user sends. For more information, see SMSLive247's Privacy Policy . 
+
+The User agrees that SMSLive247 may access its account, including its contents, as stated above or to respond to service or technical issues. 
+
+THE USER HEREBY GRANTS SMSLIVE247 THE RIGHT TO SEND THE USER COMMUNICATION VIA E-MAIL OF ANY UPDATES, UPGRADES, NOTICES, OR OTHER INFORMATION THAT SMSLive247 DEEMS IMPORTANT FOR THE USER TO KNOW, RELATING TO THE SERVICE. 
