@@ -22,60 +22,53 @@
         </p>
     </div>
 
-    @* Server error *@
-    @if (!string.IsNullOrEmpty(serverError))
-    {
-        <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 flex items-start gap-2 animate-in fade-in slide-in-from-top-2">
-            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="w-4 h-4 mt-0.5 shrink-0" />
-            <span>@serverError</span>
-        </div>
-    }
-
-        <EditForm Model="@model" OnValidSubmit="LoginAsync" FormName="f1">
-    <div class="space-y-6">
+    <EditForm Model="@model" OnValidSubmit="LoginAsync" FormName="f1">
+        <FormRow Cols="1">
             <FormInput @bind-Value="model.Username"
                        Type="email"
                        IconStyle="Icon.IconStyle.Mail"
                        PlaceHolder="Enter your email"
                        ErrorMessage="Please enter a valid email address." />
+        </FormRow>
 
+        <FormRow Cols="1">
             <FormInput @bind-Value="model.Password" Type="password"
                        PlaceHolder="Enter your password"
                        ErrorMessage="Password is required" />
+        </FormRow>
 
-            <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                    <input id="remember-me"
-                           name="remember-me"
-                           type="checkbox"
-                           class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
-                    <label class="ml-2 block text-sm text-slate-600"
-                           htmlFor="remember-me">
-                        Remember me for 30 days
-                    </label>
-                </div>
-                <div class="text-sm">
-                    <a href="/forgot" class="font-medium text-brand-500 hover:text-brand-600">
-                        Forgot password?
-                    </a>
-                </div>
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center">
+                <input id="remember-me"
+                       name="remember-me"
+                       type="checkbox"
+                       class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
+                <label class="ml-2 block text-sm text-slate-600"
+                       htmlFor="remember-me">
+                    Remember me for 30 days
+                </label>
             </div>
+            <div class="text-sm">
+                <a href="/forgot" class="font-medium text-brand-500 hover:text-brand-600">
+                    Forgot password?
+                </a>
+            </div>
+        </div>
 
-            <div>
-                <button type="submit"
-                        disabled="@isSubmitting"
-                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
-                 
-                    @if (isSubmitting)
-                    {
-                        <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    }
-                    else
-                    {
-                        <span>Sign in to Dashboard</span>
-                    }
-                </button>
-            </div>
+        <div>
+            <button type="submit"
+                    disabled="@isSubmitting"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+
+                @if (isSubmitting)
+                {
+                    <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                }
+                else
+                {
+                    <span>Sign in to Dashboard</span>
+                }
+            </button>
         </div>
     </EditForm>
 
@@ -110,7 +103,7 @@
     <p class="text-sm text-center text-slate-500 mt-8">
         Don't have an account?
         <a href="/register"
-               class="text-brand-500 font-semibold hover:text-brand-600">
+           class="text-brand-500 font-semibold hover:text-brand-600">
             Sign up now
         </a>
     </p>
@@ -118,16 +111,16 @@
     <p class="text-xs text-center text-slate-400 mt-6 prose-slate">
         By clicking "Sign in", you agree to our
         <a href="/legal/terms.txt"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="underline hover:text-slate-600 dark:hover:text-slate-300">
+           target="_blank"
+           rel="noopener noreferrer"
+           class="underline hover:text-slate-600 dark:hover:text-slate-300">
             Terms of Service
         </a>
         and
         <a href="/legal/privacy.txt"
-               target="_blank"
-               rel="noopener noreferrer"
-               class="underline hover:text-slate-600 dark:hover:text-slate-300">
+           target="_blank"
+           rel="noopener noreferrer"
+           class="underline hover:text-slate-600 dark:hover:text-slate-300">
             Privacy Policy
         </a>
         .
@@ -135,7 +128,6 @@
 </div>
 
 @code {
-    private string? serverError;
     private bool isSubmitting = false;
 
     public LoginRequest model { get; set; } = new();
@@ -181,5 +173,5 @@
             isSubmitting = false;
         }
     }
-    
+
 }

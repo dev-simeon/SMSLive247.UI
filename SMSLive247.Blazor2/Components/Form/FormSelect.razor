@@ -1,0 +1,103 @@
+﻿@inherits InputBase<int>
+<div>
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="block text-sm font-medium text-slate-700">
+            @Label
+        </label>
+    }
+    <div class="mt-1 relative">
+        <select 
+            value="@CurrentValueAsString"
+            @onchange="OnChange"
+            class="appearance-none block w-full px-3 py-3 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300">
+            @if (Type == SelectType.Country)
+            {
+                @foreach (var country in countries)
+                {
+                    <option value="@country.Key">@country.Value</option>
+                }
+            }
+            else if (Type == SelectType.TimeZone)
+            {
+                @foreach (var timeZone in timeZones)
+                {
+                    var offset = timeZone.BaseUtcOffset.Hours;
+                    <option value="@offset">@timeZone.DisplayName</option>
+                }
+            }
+        </select>
+        @if (IconStyle != null)
+        {
+            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 transition-colors">
+                <Icon Style="@((Icon.IconStyle)IconStyle)" />
+            </div>
+        }
+    </div>
+    @if (showError)
+    {
+        <p class="mt-1 text-xs text-red-500">
+            <Icon Style="Icon.IconStyle.Close" CssClass="mr-2" />@ErrorMessage
+        </p>
+    }
+    else if (!string.IsNullOrEmpty(HelpText))
+    {
+        <p class="mt-1 text-xs text-slate-500">
+            <Icon Style="Icon.IconStyle.Info" CssClass="mr-2" />@HelpText
+        </p>
+    }
+</div>
+
+
+@code {
+    public enum SelectType
+    {
+        Country,
+        TimeZone
+    }
+
+
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public SelectType Type { get; set; } = SelectType.Country;
+    [Parameter] public Icon.IconStyle? IconStyle { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public string? HelpText { get; set; }
+
+    private string inputType = "text";
+    private bool showPassword = false;
+    private bool showError = false;
+    private TimeZoneInfo[] timeZones = TimeZoneInfo.GetSystemTimeZones().ToArray();
+
+    private static readonly Dictionary<int, string> countries = new()
+    {  
+        { 234, "Nigeria" },
+        { 233, "Ghana" },
+        { 254, "Kenya" },
+        { 27, "South Africa" },
+        { 1, "United States of America" },
+        { 44, "United Kingdom" }
+    };
+
+    private void OnChange(ChangeEventArgs e)
+    {
+        CurrentValueAsString = e.Value?.ToString();
+    }
+
+    protected override bool TryParseValueFromString(string? value, 
+        [MaybeNullWhen(false)] out int result, 
+        [NotNullWhen(false)] out string validationErrorMessage)
+    {
+        result = int.Parse(value ?? "0");
+        validationErrorMessage = null;
+        return true;
+    }
+
+    // protected override bool TryParseValueFromString(int? value,
+    //     [MaybeNullWhen(false)] out string result,
+    //     [NotNullWhen(false)] out string? validationErrorMessage)
+    // {
+    //     result = value ?? string.Empty;
+    //     validationErrorMessage = null;
+    //     return true;
+    // }
+}

@@ -14,63 +14,33 @@
         <p class="mt-2 text-slate-500">Join the SMSLive247 enterprise platform today.</p>
     </div>
 
-    @if (!string.IsNullOrEmpty(serverError))
-    {
-        <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 flex items-start gap-2 animate-in fade-in slide-in-from-top-2">
-            <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-4 h-4 mt-0.5 shrink-0" />
-            <span>@serverError</span>
-        </div>
-    }
-
-    <EditForm Model="Model" OnValidSubmit="RegisterAsync" class="space-y-5">
+    <EditForm Model="@model" OnValidSubmit="RegisterAsync" FormName="R1">
         <DataAnnotationsValidator />
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormInput @bind-Value="Model.FirstName" Label="First Name" PlaceHolder="John" IconStyle="Icon.IconStyle.User" />
-            <FormInput @bind-Value="Model.LastName" Label="Last Name" PlaceHolder="Doe" IconStyle="Icon.IconStyle.User" />
-        </div>
+        <FormRow Cols="2">
+            <FormInput @bind-Value="model.FirstName" Label="First Name" PlaceHolder="John" IconStyle="Icon.IconStyle.User" />
+            <FormInput @bind-Value="model.LastName" Label="Last Name" PlaceHolder="Doe" IconStyle="Icon.IconStyle.User" />
+        </FormRow>
 
-        <FormInput @bind-Value="Model.Email" Type="email" Label="Email" PlaceHolder="john@company.com" IconStyle="Icon.IconStyle.Mail" />
-        <FormInput @bind-Value="Model.Phone" Type="tel" Label="Phone Number" PlaceHolder="+234 800 000 0000" IconStyle="Icon.IconStyle.Phone" />
+        <FormRow Cols="1">
+            <FormInput @bind-Value="model.Email" Type="email" Label="Email" PlaceHolder="john@company.com" IconStyle="Icon.IconStyle.Mail" />
+        </FormRow>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-slate-700" for="country">Country</label>
-                <div class="mt-1 relative">
-                    <InputSelect @bind-Value="Model.CountryCode" id="country" class="appearance-none block w-full px-3 py-3 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300">
-                        <option value="234">Nigeria</option>
-                        <option value="233">Ghana</option>
-                        <option value="254">Kenya</option>
-                        <option value="27">South Africa</option>
-                        <option value="1">United States of America</option>
-                        <option value="44">United Kingdom</option>
-                    </InputSelect>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <Icon Style="Icon.IconStyle.Globe" />
-                    </div>
-                </div>
-            </div>
+        <FormRow Cols="1">
+            <FormInput @bind-Value="model.Phone" Type="tel" Label="Phone Number" PlaceHolder="+234 800 000 0000" IconStyle="Icon.IconStyle.Phone" />
+        </FormRow>
 
-            <div>
-                <label class="block text-sm font-medium text-slate-700" for="timezone">Time Zone</label>
-                <div class="mt-1 relative">
-                    <InputSelect @bind-Value="Model.TimeZone" id="timezone" class="appearance-none block w-full px-3 py-3 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300">
-                        <option value="1">West Africa Time (UTC+1)</option>
-                        <option value="0">Greenwich Mean Time (UTC+0)</option>
-                        <option value="3">East Africa Time (UTC+3)</option>
-                    </InputSelect>
-                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                        <Icon Style="Icon.IconStyle.Clock" />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <FormRow Cols="2">
+            <FormSelect @bind-Value="model.CountryCode" Label="Country" Type="FormSelect.SelectType.Country"></FormSelect>
+            <FormSelect @bind-Value="model.TimeZone" Label="Time Zone" Type="FormSelect.SelectType.TimeZone"></FormSelect>
+        </FormRow>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <FormInput @bind-Value="Model.Password" Type="password" Label="Password" PlaceHolder="••••••••" />
+        <FormRow Cols="2">
+            <FormInput @bind-Value="model.Password" Type="password" Label="Password" PlaceHolder="••••••••" />
             <FormInput @bind-Value="confirmPassword" Type="password" Label="Confirm Password" PlaceHolder="••••••••" />
-        </div>
-        @if (Model.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
+        </FormRow>
+
+        @if (model.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
         {
             <p class="mt-1 text-xs text-red-500">Passwords do not match</p>
         }
@@ -82,7 +52,10 @@
             </label>
         </div>
 
-        <button type="submit" disabled="@isSubmitting" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+        <button 
+            type="submit" 
+            disabled="@isSubmitting" 
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
             @if (isSubmitting)
             {
                 <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -111,12 +84,11 @@
 </div>
 
 @code {
-    private string? serverError;
     private bool isSubmitting = false;
     private bool acceptTerms = false;
     private string confirmPassword = "";
 
-    public AccountCreateRequest Model { get; set; } = new() { TimeZone = 1, CountryCode = 234 };
+    private AccountCreateRequest model = new() { TimeZone = 1, CountryCode = 234 };
 
     private async Task RegisterAsync()
     {
@@ -127,16 +99,16 @@
             if (!acceptTerms)
                 throw new Exception("You must accept the agreement and privacy policy to register");
 
-            if (Model.Password != confirmPassword)
+            if (model.Password != confirmPassword)
                 throw new Exception("Passwords do not match");
 
-            Model.AccountName = $"{Model.FirstName} {Model.LastName}";
-            var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", Model);
+            model.AccountName = $"{model.FirstName} {model.LastName}";
+            var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", model);
 
             if (response.StatusCode == 200)
             {
                 await alert.Success("Account created successfully!", "title");
-                nav.NavigateTo("/login?email=" + Model.Email);
+                nav.NavigateTo("/login?email=" + model.Email);
             }
             else
             {
