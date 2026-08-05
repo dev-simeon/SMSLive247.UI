@@ -38,6 +38,9 @@
         Fingerprint,
         Terminal,
         BookOpen,
+        Phone,
+        Clock,
+        AlertCircle,
     }
 
     public string GetIconCss()
@@ -67,7 +70,7 @@
             case IconStyle.CreditCard:
                 return "bi bi-credit-card";
             case IconStyle.ArrowRightLeft:
-                return "bi bi-arrow-right-left";
+                return "bi bi-arrow-left-right";
             case IconStyle.Tag:
                 return "bi bi-tag";
             case IconStyle.Headphones:
@@ -99,7 +102,13 @@
             case IconStyle.Terminal:
                 return "bi bi-terminal-fill";
             case IconStyle.BookOpen:
-                return "bi bi-book-open-fill";
+                return "bi bi-book";
+            case IconStyle.Phone:
+                return "bi bi-telephone";
+            case IconStyle.Clock:
+                return "bi bi-clock";
+            case IconStyle.AlertCircle:
+                return "bi bi-exclamation-circle";
             default:
                 throw new ArgumentOutOfRangeException();
         }
