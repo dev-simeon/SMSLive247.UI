@@ -135,7 +135,7 @@
 
             if (response.StatusCode == 200)
             {
-                await alert.Success("Account created successfully!");
+                await alert.Success("Account created successfully!", "title");
                 nav.NavigateTo("/login?email=" + Model.Email);
             }
             else

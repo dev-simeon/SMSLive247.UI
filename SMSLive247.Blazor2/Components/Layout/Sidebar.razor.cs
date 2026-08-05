@@ -1,4 +1,6 @@
-namespace SMSLive247.Blazor2.Components;
+using SMSLive247.Blazor2.Components.Utilities;
+
+namespace SMSLive247.Blazor2.Components.Layout;
 
 public partial class Sidebar
 {
