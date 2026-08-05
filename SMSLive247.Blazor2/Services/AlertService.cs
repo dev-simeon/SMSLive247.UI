@@ -7,32 +7,30 @@
         public event Func<string, string, Task>? OnSuccess;
         public event Func<string, string, Task<bool>>? OnConfirm;
 
-        public Task Info(string message, string title)
+        public async Task Info(string message, string title)
         {
-            if (OnInfo != null)
-                return OnInfo.Invoke(message, title);
-            return Task.CompletedTask;
+            if (OnInfo is not null)
+                await OnInfo.Invoke(message, title);
         }
 
-        public Task Error(string message, string title)
+        public async Task Error(string message, string title)
         {
-            if (OnError != null)
-                return OnError.Invoke(message, title);
-            return Task.CompletedTask;
+            if (OnError is not null)
+                await OnError.Invoke(message, title);
         }
 
-        public Task Success(string message, string title)
+        public async Task Success(string message, string title)
         {
-            if (OnSuccess != null)
-                return OnSuccess.Invoke(message, title);
-            return Task.CompletedTask;
+            if (OnSuccess is not null)
+                await OnSuccess.Invoke(message, title);
         }
 
-        public Task<bool> Confirm(string message, string title)
+        public async Task<bool> Confirm(string message, string title)
         {
-            if (OnConfirm != null)
-                return OnConfirm.Invoke(message, title);
-            return Task.FromResult(false);
+            if (OnConfirm is not null)
+                return await OnConfirm.Invoke(message, title);
+
+            return false;
         }
     }
 }

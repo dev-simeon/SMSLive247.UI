@@ -1,10 +1,11 @@
 ﻿//using Blazored.LocalStorage;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 
 namespace SMSLive247.Authentication
 {
-    public class SmsAuthProvider(/*ILocalStorageService*/ dynamic storage) : AuthenticationStateProvider
+    public class SmsAuthProvider(ILocalStorageService storage) : AuthenticationStateProvider
     {
         private readonly string storageKey = "UserSession";
         private readonly AuthenticationState anonymousState = new(new(new ClaimsIdentity()));
@@ -66,8 +67,7 @@ namespace SMSLive247.Authentication
 
         private static ClaimsPrincipal GetClaimsPrincipal(UserClaims member)
         {
-            List<Claim> claims =
-                [
+            List<Claim> claims = [
                 new(ClaimTypes.Email, member.Email),
                 new ("SmsBalance", member.ApiKey),
                 new ("Key", member.ApiKey)

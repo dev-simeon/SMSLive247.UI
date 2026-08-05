@@ -18,19 +18,19 @@
         @* Breadcrumb *@
         <div class="hidden md:flex items-center gap-2 text-sm text-slate-500">
             <span class="text-slate-400 hover:text-slate-600 cursor-pointer">
-                @details.Category
+                @crumb1
             </span>
             <Icon Style="Icon.IconStyle.ChevronRight" CssClass="w-4 h-4 text-slate-300" />
 
-            @if (!string.IsNullOrEmpty(details.SubCategory))
+            @if (!string.IsNullOrEmpty(crumb2))
             {
                 <span class="text-slate-400 hover:text-slate-600 cursor-pointer">
-                    @details.SubCategory
+                    @crumb2
                 </span>
                 <Icon Style="Icon.IconStyle.ChevronRight" CssClass="w-4 h-4 text-slate-300" />
             }
 
-            <span class="text-brand-600 font-medium">@details.Title</span>
+            <span class="text-brand-600 font-medium">@crumb3</span>
         </div>
     </div>
 
@@ -49,7 +49,7 @@
         </div>
 
         @* Actions *@
-        <button @onclick="NavigateToTopUp"
+        <button @onclick="NavigateToTopup"
                 class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-brand-500/30 flex items-center gap-2">
             <Icon Style="Icon.IconStyle.PlusCircle" CssClass="w-4 h-4" />
             <span>Top Up</span>
@@ -63,10 +63,10 @@
 </header>
 
 @code {
-    [Parameter]
-    public EventCallback OnMenuClick { get; set; }
+    [Parameter] public EventCallback OnMenuClick { get; set; }
 
-    private ViewDetails details = new ViewDetails("App", "Page");
+    // private ViewDetails details = new ViewDetails("App", "Page");
+    private string? crumb1, crumb2, crumb3;
 
     protected override void OnInitialized()
     {
@@ -74,7 +74,7 @@
         UpdateDetails(NavigationManager.Uri);
     }
 
-    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         UpdateDetails(e.Location);
         InvokeAsync(StateHasChanged);
@@ -83,7 +83,12 @@
     private void UpdateDetails(string uri)
     {
         var path = "/" + NavigationManager.ToBaseRelativePath(uri);
-        details = GetViewDetails(path);
+        var details = GetViewDetails(path);
+        crumb1 = details.Category;
+        crumb2 = details.SubCategory;
+        crumb3 = details.Title;
+
+        //Sidebar.Categories.Where(x => x.)
     }
 
     private ViewDetails GetViewDetails(string path)
@@ -113,10 +118,10 @@
         if (path.StartsWith("/developer/api-docs")) return new ViewDetails("Developer", "API Documentation");
         if (path.StartsWith("/developer/api-keys")) return new ViewDetails("Developer", "API Keys");
 
-        return new ViewDetails("App", "Page");
+        return new ViewDetails("Not", "Found");
     }
 
-    private void NavigateToTopUp()
+    private void NavigateToTopup()
     {
         NavigationManager.NavigateTo("/wallet/buy-credits");
     }

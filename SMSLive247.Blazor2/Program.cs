@@ -1,7 +1,9 @@
-using SMSLive247.Blazor2.Components;
-using SMSLive247.OpenApi;
+using Microsoft.AspNetCore.Components.Authorization;
 using SMSLive247.UI;
 using SMSLive247.UI.Services;
+using SMSLive247.OpenApi;
+using SMSLive247.Authentication;
+using SMSLive247.Blazor2.Components;
 
 public partial class Program
 {
@@ -21,12 +23,11 @@ public partial class Program
             .AddCookie(options => { options.LoginPath = "/"; });
 
         builder.Services.AddHttpClient<ApiClient>(ConfigureUrl);
-        //builder.Services.AddHttpClient();
         builder.Services.AddSingleton<AlertService>();
-        //builder.Services.AddSingleton(settings);
-        //builder.Services.AddScoped<AuthenticationStateProvider, SmsAuthProvider>();
+        builder.Services.AddScoped<AuthenticationStateProvider, SmsAuthProvider>();
         //builder.Services.AddScoped<BackOfficeClient.Client>();
         //builder.Services.AddScoped<NotificationService>();
+        builder.Services.AddLocalStorageServices();
 
         // ── Middleware ───────────────────────────────────────────────────────
         var app = builder.Build();
@@ -47,33 +48,4 @@ public partial class Program
             client.BaseAddress = new Uri(settings.BaseUrl);
         }
     }
-
-    //private static void Main(string[] args)
-    //{
-    //    var builder = WebApplication.CreateBuilder(args);
-
-    //    // Add services to the container.
-    //    builder.Services.AddRazorComponents()
-    //        .AddInteractiveServerComponents();
-
-    //    var app = builder.Build();
-
-    //    // Configure the HTTP request pipeline.
-    //    if (!app.Environment.IsDevelopment())
-    //    {
-    //        app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    //        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    //        app.UseHsts();
-    //    }
-    //    app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-    //    app.UseHttpsRedirection();
-
-    //    app.UseAntiforgery();
-
-    //    app.MapStaticAssets();
-    //    app.MapRazorComponents<App>()
-    //        .AddInteractiveServerRenderMode();
-
-    //    app.Run();
-    //}
 }

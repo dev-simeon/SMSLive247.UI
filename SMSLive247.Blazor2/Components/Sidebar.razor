@@ -19,7 +19,7 @@
     </div>
 
     <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
-        @foreach (var category in GetCategories())
+        @foreach (var category in Categories)
         {
             if (!string.IsNullOrEmpty(category.Title))
             {
@@ -35,7 +35,7 @@
 
             foreach (var item in category.Items)
             {
-                <NavLink href="@item.Url" Match="@item.Match" ActiveClass="active"
+                <NavLink href="@item.Url" Match="NavLinkMatch.Prefix" ActiveClass="active"
                          class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium text-sm group cursor-pointer text-slate-600 hover:bg-slate-50 hover:text-brand-600 [&.active]:bg-brand-50 [&.active]:text-brand-600 [&.active]:hover:bg-brand-50 [&.active]:hover:text-brand-600 mb-1">
                     <Icon Style="@item.Icon" />
                     @item.Title

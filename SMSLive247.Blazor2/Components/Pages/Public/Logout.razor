@@ -1,0 +1,13 @@
+@page "/logout"
+@page "/logoff"
+@inject NavigationManager nav
+@inject AuthenticationStateProvider auth;
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ((Authentication.SmsAuthProvider)auth).ClearAuthenticationState();
+        var shouldForceReload = !nav.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase);
+        nav.NavigateTo("/login", shouldForceReload);
+    }
+}

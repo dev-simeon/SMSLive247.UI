@@ -15,4 +15,8 @@
     <Folder Include="Components\Form\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Blazor.LocalStorage" Version="10.1.0" />
+  </ItemGroup>
+
 </Project>

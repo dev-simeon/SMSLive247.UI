@@ -3,40 +3,28 @@
 <div>
     @if (!string.IsNullOrEmpty(Label))
     {
-        <label class="block text-sm font-medium text-slate-700"
-               htmlFor="input1">
+        <label class="block text-sm font-medium text-slate-700">
             @Label
         </label>
     }
     <div class="mt-1 relative">
-        <input id="input1" 
-               @onblur="ValidateInput"
-               @bind="@CurrentValueAsString"
+        <input @attributes="AdditionalAttributes" 
                type="@inputType"
-               placeholder="@PlaceHolder" 
+               placeholder="@PlaceHolder"
+               value="@CurrentValueAsString"
+               @onchange="OnChange"
+               @onblur="OnBlur" 
                class="appearance-none block w-full px-3 py-3 border rounded-lg placeholder-slate-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white text-slate-900 transition-all @GetErrorClass()" />
-        @* <input
-                  {...register("password")}
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  placeholder="••••••••"
-                  class={`appearance-none block w-full px-3 py-3 border rounded-lg placeholder-slate-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm bg-white text-slate-900 transition-all ${
-                    errors.password
-                      ? "border-red-300 ring-1 ring-red-300"
-                      : "border-slate-300"
-                  }`}
-                /> *@
         @if (IconStyle != null)
         {
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 transition-colors">
                 <Icon Style="@((Icon.IconStyle)IconStyle)" />
             </div>
         }
-        @if(Type == "password")
+        @if (Type == "password")
         {
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 transition-colors"
-                 @onclick="TogglePasswordField">
+                 @onclick="TogglePasswordType">
                 @if (showPassword)
                 {
                     <Icon Style="Icon.IconStyle.EyeOff" />                
@@ -49,7 +37,7 @@
         }
     </div>
 
-    @if (!string.IsNullOrEmpty(ErrorMessage))
+    @if (showError)
     {
         <p class="mt-1 text-xs text-red-500">
             <Icon Style="Icon.IconStyle.Close" CssClass="mr-2" />@ErrorMessage
@@ -129,26 +117,31 @@
     [Parameter] public string? ErrorMessage { get; set; }
     [Parameter] public string? HelpText { get; set; }
 
-    private string value = "";
-
-
-
+    private string inputType = "text";
     private bool showPassword = false;
     private bool showError = false;
-    private string inputType = "text";
 
     protected override void OnParametersSet()
     {
         if (!string.IsNullOrEmpty(Type))
-            inputType = Type;
+            inputType = Type.Trim().ToLower();
 
         base.OnParametersSet();
     }
 
-    private void TogglePasswordField()
+    private void OnChange(ChangeEventArgs e)
+    {
+        CurrentValueAsString = e.Value?.ToString();
+    }
+
+    private void OnBlur(FocusEventArgs e)
+    {
+        EditContext?.NotifyFieldChanged(FieldIdentifier);
+    }
+
+    private void TogglePasswordType()
     {
         showPassword = !showPassword;
-
         inputType = showPassword ? "text" : "password";
     }
 
@@ -170,5 +163,4 @@
         validationErrorMessage = null;
         return true;
     }
-
 }
