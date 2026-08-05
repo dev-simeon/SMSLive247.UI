@@ -1,8 +1,12 @@
 ﻿@page "/";
+@using SMSLive247.Blazor2.Pages.Account
 @layout MainLayout
 
-<h3>Dashboard</h3>
+<h3 @onclick="() => editProfileModal.Show()">Dashboard</h3>
 
+    <EditProfileModal @ref="editProfileModal"></EditProfileModal>
 @code {
+
+    private EditProfileModal editProfileModal = new();
 
 }
