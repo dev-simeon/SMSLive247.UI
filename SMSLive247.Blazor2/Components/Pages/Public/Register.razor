@@ -1,0 +1,159 @@
+@page "/register"
+@layout PublicLayout
+@attribute [AllowAnonymous]
+@inject NavigationManager nav
+@inject AlertService alert
+@inject ApiClient apiClient
+
+<div class="w-full max-w-lg space-y-8 my-8">
+    <div class="text-center lg:text-left">
+        <div class="lg:hidden flex justify-center items-center mb-8">
+            <img src="smslive-logo-2.png" alt="SMSLive247" class="h-10 w-auto" />
+        </div>
+        <h2 class="text-3xl font-bold text-slate-900">Create Account</h2>
+        <p class="mt-2 text-slate-500">Join the SMSLive247 enterprise platform today.</p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(serverError))
+    {
+        <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 flex items-start gap-2 animate-in fade-in slide-in-from-top-2">
+            <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-4 h-4 mt-0.5 shrink-0" />
+            <span>@serverError</span>
+        </div>
+    }
+
+    <EditForm Model="Model" OnValidSubmit="RegisterAsync" class="space-y-5">
+        <DataAnnotationsValidator />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormInput @bind-Value="Model.FirstName" Label="First Name" PlaceHolder="John" IconStyle="Icon.IconStyle.User" />
+            <FormInput @bind-Value="Model.LastName" Label="Last Name" PlaceHolder="Doe" IconStyle="Icon.IconStyle.User" />
+        </div>
+
+        <FormInput @bind-Value="Model.Email" Type="email" Label="Email" PlaceHolder="john@company.com" IconStyle="Icon.IconStyle.Mail" />
+        <FormInput @bind-Value="Model.Phone" Type="tel" Label="Phone Number" PlaceHolder="+234 800 000 0000" IconStyle="Icon.IconStyle.Phone" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-700" for="country">Country</label>
+                <div class="mt-1 relative">
+                    <InputSelect @bind-Value="Model.CountryCode" id="country" class="appearance-none block w-full px-3 py-3 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300">
+                        <option value="234">Nigeria</option>
+                        <option value="233">Ghana</option>
+                        <option value="254">Kenya</option>
+                        <option value="27">South Africa</option>
+                        <option value="1">United States of America</option>
+                        <option value="44">United Kingdom</option>
+                    </InputSelect>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                        <Icon Style="Icon.IconStyle.Globe" />
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700" for="timezone">Time Zone</label>
+                <div class="mt-1 relative">
+                    <InputSelect @bind-Value="Model.TimeZone" id="timezone" class="appearance-none block w-full px-3 py-3 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300">
+                        <option value="1">West Africa Time (UTC+1)</option>
+                        <option value="0">Greenwich Mean Time (UTC+0)</option>
+                        <option value="3">East Africa Time (UTC+3)</option>
+                    </InputSelect>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                        <Icon Style="Icon.IconStyle.Clock" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <FormInput @bind-Value="Model.Password" Type="password" Label="Password" PlaceHolder="••••••••" />
+            <FormInput @bind-Value="confirmPassword" Type="password" Label="Confirm Password" PlaceHolder="••••••••" />
+        </div>
+        @if (Model.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
+        {
+            <p class="mt-1 text-xs text-red-500">Passwords do not match</p>
+        }
+
+        <div class="flex items-center mt-4">
+            <InputCheckbox @bind-Value="acceptTerms" id="terms" class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
+            <label class="ml-2 block text-sm text-slate-600" for="terms">
+                I have read and accepted the <a href="/legal/terms.txt" target="_blank" class="text-brand-500 hover:text-brand-600">Agreement</a> and <a href="/legal/privacy.txt" target="_blank" class="text-brand-500 hover:text-brand-600">Privacy Policy</a>
+            </label>
+        </div>
+
+        <button type="submit" disabled="@isSubmitting" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-500 hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
+            @if (isSubmitting)
+            {
+                <div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            }
+            else
+            {
+                <span>Create Account</span>
+            }
+        </button>
+    </EditForm>
+
+    <p class="text-sm text-center text-slate-500 mt-6">
+        Already have an account? <a href="/login" class="text-brand-500 font-semibold hover:text-brand-600">Sign In</a>
+    </p>
+
+    <p class="text-xs text-center text-slate-400 mt-6 prose-slate">
+        By clicking "Create Account", you agree to our
+        <a href="/legal/terms.txt" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-600">
+            Terms of Service
+        </a>
+        and
+        <a href="/legal/privacy.txt" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-600">
+            Privacy Policy
+        </a>.
+    </p>
+</div>
+
+@code {
+    private string? serverError;
+    private bool isSubmitting = false;
+    private bool acceptTerms = false;
+    private string confirmPassword = "";
+
+    public AccountCreateRequest Model { get; set; } = new() { TimeZone = 1, CountryCode = 234 };
+
+    private async Task RegisterAsync()
+    {
+        isSubmitting = true;
+
+        try
+        {
+            if (!acceptTerms)
+                throw new Exception("You must accept the agreement and privacy policy to register");
+
+            if (Model.Password != confirmPassword)
+                throw new Exception("Passwords do not match");
+
+            Model.AccountName = $"{Model.FirstName} {Model.LastName}";
+            var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", Model);
+
+            if (response.StatusCode == 200)
+            {
+                await alert.Success("Account created successfully!");
+                nav.NavigateTo("/login?email=" + Model.Email);
+            }
+            else
+            {
+                throw new Exception("Registration failed. Please try again.");
+            }
+        }
+        catch (SMSLive247.OpenApi.ApiException ex)
+        {
+            await alert.Error(ex.Message, "Api Error");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+}
