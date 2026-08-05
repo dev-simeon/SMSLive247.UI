@@ -15,7 +15,7 @@
     </div>
 
     <EditForm Model="@model" OnValidSubmit="RegisterAsync" FormName="R1">
-        <DataAnnotationsValidator />
+        @* <DataAnnotationsValidator /> *@
 
         <FormRow Cols="2">
             <FormInput @bind-Value="model.FirstName" Label="First Name" PlaceHolder="John" IconStyle="Icon.IconStyle.User" />
@@ -46,9 +46,14 @@
         }
 
         <div class="flex items-center mt-4">
-            <InputCheckbox @bind-Value="acceptTerms" id="terms" class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
+            <InputCheckbox @bind-Value="acceptTerms" id="terms" 
+            class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
             <label class="ml-2 block text-sm text-slate-600" for="terms">
-                I have read and accepted the <a href="/legal/terms.txt" target="_blank" class="text-brand-500 hover:text-brand-600">Agreement</a> and <a href="/legal/privacy.txt" target="_blank" class="text-brand-500 hover:text-brand-600">Privacy Policy</a>
+                I have read and accepted the 
+                <a href="/legal/terms.txt" target="_blank" 
+                class="text-brand-500 hover:text-brand-600">Agreement</a> and
+                <a href="/legal/privacy.txt" target="_blank" 
+                class="text-brand-500 hover:text-brand-600">Privacy Policy</a>
             </label>
         </div>
 
