@@ -2,9 +2,43 @@
 @using SMSLive247.Blazor2.Pages.Account
 @layout MainLayout
 
-<h3 @onclick="() => editProfileModal.Show()">Dashboard</h3>
+<PageTitle>Dashboard</PageTitle>
 
-    <EditProfileModal @ref="editProfileModal"></EditProfileModal>
+<PageHeader Title="Dashboard" SubTitle="Welcome back! Monitor your account activity and broadcast performance at a glance."></PageHeader>
+
+<PageBody>
+    <HeaderLeft>
+       <p>justtsvvwdd</p>
+    </HeaderLeft>
+    <HeaderRight>
+        <button class="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors"
+                @onclick="() => editProfileModal.Show()">
+            Edit Profile
+        </button>
+    </HeaderRight>
+    <ChildContent>
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Email</th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Role</th>
+                </tr>
+            </thead>
+        </table>
+
+    </ChildContent>
+    <FooterLeft>
+        <p class="text-sm text-slate-500">© 2024 SMSLive247. All rights reserved.</p>
+    </FooterLeft>
+    <FooterRight>
+        <button class="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors">
+            Add New User
+        </button>
+    </FooterRight>
+</PageBody>
+
+<EditProfileModal @ref="editProfileModal"></EditProfileModal>
 @code {
 
     private EditProfileModal editProfileModal = new();
