@@ -1,16 +1,16 @@
-﻿@inherits InputBase<int>
+﻿@inherits InputBase<string>
 <div>
     @if (!string.IsNullOrEmpty(Label))
     {
-        <label class="block text-sm font-medium text-slate-700">
+        <label class="block text-sm font-medium text-slate-700 mb-1">
             @Label
         </label>
     }
-    <div class="mt-1 relative">
+    <div class="relative">
         <select 
             value="@CurrentValueAsString"
             @onchange="OnChange"
-            class="appearance-none block w-full px-3 py-2.5 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300">
+            class="@getCss">
             @if (Type == SelectType.Country)
             {
                 <option value="0">- select country -</option>
@@ -28,6 +28,7 @@
                     <option value="@offset">@timeZone.DisplayName</option>
                 }
             }
+            @ChildContent
         </select>
         @if (IconStyle != null)
         {
@@ -51,12 +52,14 @@
 </div>
 
 @code {
-    public enum SelectType {Country, TimeZone }
+    public enum SelectType {None, Country, TimeZone}
 
     [Parameter] public string? Label { get; set; }
-    [Parameter] public SelectType Type { get; set; } = SelectType.Country;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public SelectType Type { get; set; } = SelectType.None;
     [Parameter] public Icon.IconStyle? IconStyle { get; set; }
     [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public bool IsEmbedded { get; set; } = false;
     [Parameter] public string? HelpText { get; set; }
 
     private string inputType = "text";
@@ -74,26 +77,21 @@
         { 44, "United Kingdom" }
     };
 
+    private string getCss => IsEmbedded 
+            ? "h-full px-3 border-l border-slate-200 text-sm text-slate-700 focus:outline-none cursor-pointer"
+            : "appearance-none block w-full px-3 py-2.5 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300";
+
     private void OnChange(ChangeEventArgs e)
     {
         CurrentValueAsString = e.Value?.ToString();
     }
 
     protected override bool TryParseValueFromString(string? value, 
-        [MaybeNullWhen(false)] out int result, 
+        [MaybeNullWhen(false)] out string result, 
         [NotNullWhen(false)] out string validationErrorMessage)
     {
-        result = int.Parse(value ?? "0");
+        result = value ?? string.Empty;
         validationErrorMessage = null;
         return true;
     }
-
-    // protected override bool TryParseValueFromString(int? value,
-    //     [MaybeNullWhen(false)] out string result,
-    //     [NotNullWhen(false)] out string? validationErrorMessage)
-    // {
-    //     result = value ?? string.Empty;
-    //     validationErrorMessage = null;
-    //     return true;
-    // }
 }

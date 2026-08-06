@@ -58,11 +58,19 @@
 
     <FormRow Cols="2">
         <FormInput @bind-Value="model.Phone" Type="tel" Label="Phone Number" PlaceHolder="+234 800 000 0000" IconStyle="Icon.IconStyle.Phone" />
-        <FormSelect @bind-Value="model.CountryCode" Label="Country" Type="FormSelect.SelectType.Country" IconStyle="Icon.IconStyle.Phone"></FormSelect>
+        <FormSelect @bind-Value="countryCode" 
+                    Label="Country" Type="FormSelect.SelectType.Country" 
+                    IconStyle="Icon.IconStyle.Phone"></FormSelect>
     </FormRow>
 
     <FormRow Cols="1" Visible="false">
-        <FormSelect @bind-Value="model.TimeZone" Label="Time Zone" Type="FormSelect.SelectType.TimeZone" IconStyle="Icon.IconStyle.Phone"></FormSelect>
+       @*  <FormSelect Value="@model.TimeZone.ToString()" 
+                    ValueChanged="(e) => model.TimeZone = int.Parse(e)" 
+                    Label="Time Zone" Type="FormSelect.SelectType.TimeZone" 
+                    IconStyle="Icon.IconStyle.Phone"></FormSelect> *@
+        <FormSelect @bind-Value="timezone"
+                    Label="Time Zone" Type="FormSelect.SelectType.TimeZone"
+                    IconStyle="Icon.IconStyle.Phone"></FormSelect>
     </FormRow>
 
     <FormRow Cols="2">
@@ -90,7 +98,7 @@
     <Button IsSubmit="true"
             IsBusy="@isBusy"
             IsDisabled="@(!termsAccepted)"
-            CssClass="w-full"
+            CssClass="w-full py-3"
             Text="Create Account" />
 </EditForm>
 
@@ -105,6 +113,7 @@
     private bool isBusy = false;
     private bool termsAccepted = false;
     private string confirmPassword = "";
+    private string countryCode, timezone;
 
     private AccountCreateRequest model = new() { TimeZone = 99, CountryCode = 0 };
 

@@ -22,7 +22,14 @@ public partial class Program
         builder.Services.AddAuthentication("Cookies")
             .AddCookie(options => { options.LoginPath = "/"; });
 
-        builder.Services.AddHttpClient<ApiClient>(ConfigureUrl);
+        builder.Services.AddTransient<AuthDelegateHandler>();
+        //builder.Services.AddTransient<CacheDelegateHandler>();
+        //builder.Services.AddTransient<SpinnerDelegateHandler>();
+
+        builder.Services.AddHttpClient<ApiClient>(ConfigureUrl)
+                        .AddHttpMessageHandler<AuthDelegateHandler>();
+                        //.AddHttpMessageHandler<CacheDelegateHandler>();
+
         builder.Services.AddSingleton<AlertService>();
         builder.Services.AddScoped<AuthenticationStateProvider, SmsAuthProvider>();
         //builder.Services.AddScoped<BackOfficeClient.Client>();

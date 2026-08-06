@@ -1,0 +1,50 @@
+﻿@typeparam TValue where TValue : struct
+
+@if (!TimeOnly.Equals(default(TValue)))
+{
+    <span>@FormatValueAsString(TimeOnly, "hh:mm")</span>
+}
+@if (!DateOnly.Equals(default(TValue)))
+{
+    <span class="text-nowrap">@FormatValueAsString(DateOnly, "MMM dd yyyy")</span>
+}
+@if (!DateTime.Equals(default(TValue)))
+{
+    <span class="text-nowrap">@FormatValueAsString(DateTime, "MMM dd yyyy")</span>
+    <small class="text-muted">@FormatValueAsString(DateTime, "hh:mm")</small>
+}
+
+@code {
+    [Parameter] public TValue TimeOnly { get; set; }
+    [Parameter] public TValue DateOnly { get; set; }
+    [Parameter] public TValue DateTime { get; set; }
+
+    protected override Task OnParametersSetAsync()
+    {
+        return base.OnParametersSetAsync();
+    }
+
+    private static string? FormatValueAsString(TValue? value, string? format)
+    {
+        switch (value)
+        {
+            case null:
+                return null;
+
+            case TimeOnly timeOnly:
+                return timeOnly.ToString(format);
+
+            case DateOnly dateOnly:
+                return dateOnly.ToString(format);
+
+            case DateTime dateTime:
+                return dateTime.ToString(format);
+
+            case DateTimeOffset dateTimeOffset:
+                return dateTimeOffset.ToString(format);
+
+            default:
+                throw new InvalidOperationException($"Unsupported type {value.GetType()}");
+        }
+    }
+}

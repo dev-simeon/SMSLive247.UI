@@ -1,0 +1,119 @@
+﻿@page "/messaging/sender-ids"
+@layout MainLayout
+
+<PageTitle>Sender IDs</PageTitle>
+
+<PageHeader Title="Sender IDs" SubTitle="Manage your sender IDs for messaging campaigns."></PageHeader>
+
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="Search Sender IDs..." @bind-SearchTerm="searchQuery">
+            <FormSelect @bind-Value="searchStatus" IsEmbedded="true">
+                <option value="">All Statuses</option>
+                <option value="Approved">Approved</option>
+                <option value="Pending">Pending</option>
+                <option value="Rejected">Rejected</option>
+            </FormSelect>
+        </SearchBox>
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Icon="Icon.IconStyle.PlusCircle" Text="Request Sender ID" />
+    </HeaderRight>
+    <ChildContent>
+        <Table Items="filteredItems">
+            <Columns>
+                <Column Header="Sender ID">@context.SenderID</Column>
+                <Column Header="Purpose / Sample Message" Width="40%">
+                   @*  @context.Purpose 
+                    <small class="text-muted">@context.SampleText</small> *@
+                    <div class="min-w-[300px] max-w-lg">
+                        <div class="font-semibold text-slate-800 text-sm whitespace-normal">@context.Purpose</div>
+                        <div class="text-slate-600 text-sm whitespace-normal mt-0.5">@context.SampleText</div>
+                    </div>
+                </Column>
+                <Column Header="Date Requested">
+                    <FormatDate DateTime="@context.DateRequested"></FormatDate>
+                </Column>
+                <Column Header="Date Approved">
+                    @if (context.DateDecided.HasValue)
+                    {
+                        <FormatDate DateTime="context.DateDecided.Value.DateTime"></FormatDate>
+                    }
+                    else
+                    {
+                        <span>Pending Approval</span>
+                    }
+                </Column>
+                <Column Header="Status">
+                    @if (context.Status == "APPROVED")
+                    {
+                        <span class="badge text-bg-success">APPROVED</span>
+                    }
+                    else if (context.Status == "REJECTED")
+                    {
+                        <span class="badge text-bg-error">REJECTED</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-danger">REJECTED</span>
+                    }
+                </Column>
+                <Column>
+                    @* <Actions OnDelete="e => senderIdModal.Delete(context)">
+                    </Actions> *@
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+    <FooterLeft>
+          <Paging @bind-PageNumber="pageNumber"
+                @bind-PageSize="pageSize"
+                TotalRecords="totalRecords">
+        </Paging>
+    </FooterLeft>
+
+    </PageBody>
+
+
+@code {
+    private int pageNumber = 1;
+    private int pageSize = 25;
+    private int? totalRecords = null;
+
+    private string? searchStatus;
+    private string? searchQuery;
+    private List<SenderIdResponse>? items;
+    private List<SenderIdResponse>? filteredItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        var response = await apiClient.SenderIdListAsync(1, 500, null);
+
+        if (response.StatusCode == 200)
+        {
+            items = response.Result.ToList();
+            filteredItems = items;
+        }
+    }
+
+    private void OnSearch()
+    {
+        filteredItems = items;
+
+        if (!string.IsNullOrWhiteSpace(searchStatus))
+        {
+            filteredItems = filteredItems?.Where(x => x.Status == searchStatus).ToList();
+        }
+
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+        {
+            filteredItems = filteredItems?.Where(x => x.SenderID.Contains(
+                searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+    }
+}
