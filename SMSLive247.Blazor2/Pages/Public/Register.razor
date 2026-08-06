@@ -5,94 +5,115 @@
 @inject AlertService alert
 @inject ApiClient apiClient
 
-<div class="w-full max-w-lg space-y-8 my-8">
-    <div class="text-center lg:text-left">
-        <div class="lg:hidden flex justify-center items-center mb-8">
-            <img src="smslive-logo-2.png" alt="SMSLive247" class="h-10 w-auto" />
+<SectionContent SectionName="page-branding">
+    <div class="relative z-10 max-w-lg">
+        <h1 class="text-4xl font-bold leading-tight mb-6">Everything you need to reach your customers.</h1>
+        <p class="text-blue-100 text-lg leading-relaxed mb-8">
+            Join thousands of businesses sending millions of messages daily with
+            the most reliable bulk SMS platform in Nigeria.
+        </p>
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big text-white shrink-0" aria-hidden="true">
+                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
+                    <path d="m9 11 3 3L22 4"></path>
+                </svg>
+                <div>
+                    <p class="font-semibold">Robust API Integration</p>
+                    <p class="text-xs text-blue-100 mt-0.5">Connect your enterprise workflows in minutes.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield text-white shrink-0" aria-hidden="true">
+                    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
+                </svg>
+                <div>
+                    <p class="font-semibold">Scalable Infrastructure</p>
+                    <p class="text-xs text-blue-100 mt-0.5">High throughput for time-critical notifications.</p>
+                </div>
+            </div>
         </div>
-        <h2 class="text-3xl font-bold text-slate-900">Create Account</h2>
-        <p class="mt-2 text-slate-500">Join the SMSLive247 enterprise platform today.</p>
     </div>
+</SectionContent>
 
-    <EditForm Model="@model" OnValidSubmit="RegisterAsync" FormName="R1">
-        @* <DataAnnotationsValidator /> *@
-
-        <FormRow Cols="2">
-            <FormInput @bind-Value="model.FirstName" Label="First Name" PlaceHolder="John" IconStyle="Icon.IconStyle.User" />
-            <FormInput @bind-Value="model.LastName" Label="Last Name" PlaceHolder="Doe" IconStyle="Icon.IconStyle.User" />
-        </FormRow>
-
-        <FormRow Cols="1">
-            <FormInput @bind-Value="model.Email" Type="email" Label="Email" PlaceHolder="john@company.com" IconStyle="Icon.IconStyle.Mail" />
-        </FormRow>
-
-        <FormRow Cols="1">
-            <FormInput @bind-Value="model.Phone" Type="tel" Label="Phone Number" PlaceHolder="+234 800 000 0000" IconStyle="Icon.IconStyle.Phone" />
-        </FormRow>
-
-        <FormRow Cols="2">
-            <FormSelect @bind-Value="model.CountryCode" Label="Country" Type="FormSelect.SelectType.Country"></FormSelect>
-            <FormSelect @bind-Value="model.TimeZone" Label="Time Zone" Type="FormSelect.SelectType.TimeZone"></FormSelect>
-        </FormRow>
-
-        <FormRow Cols="2">
-            <FormInput @bind-Value="model.Password" Type="password" Label="Password" PlaceHolder="••••••••" />
-            <FormInput @bind-Value="confirmPassword" Type="password" Label="Confirm Password" PlaceHolder="••••••••" />
-        </FormRow>
-
-        @if (model.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
-        {
-            <p class="mt-1 text-xs text-red-500">Passwords do not match</p>
-        }
-
-        <div class="flex items-center mt-4">
-            <InputCheckbox @bind-Value="acceptTerms" id="terms" 
-            class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
-            <label class="ml-2 block text-sm text-slate-600" for="terms">
-                I have read and accepted the 
-                <a href="/legal/terms.txt" target="_blank" 
-                class="text-brand-500 hover:text-brand-600">Agreement</a> and
-                <a href="/legal/privacy.txt" target="_blank" 
-                class="text-brand-500 hover:text-brand-600">Privacy Policy</a>
-            </label>
-        </div>
-
-        <Button IsSubmit="true"
-                CssClass="w-full"
-                IsBusy="@isSubmitting"
-                Text="Create Account" />
-    </EditForm>
-
-    <p class="text-sm text-center text-slate-500 mt-6">
-        Already have an account? <a href="/login" class="text-brand-500 font-semibold hover:text-brand-600">Sign In</a>
-    </p>
-
-    <p class="text-xs text-center text-slate-400 mt-6 prose-slate">
-        By clicking "Create Account", you agree to our
-        <a href="/legal/terms.txt" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-600">
-            Terms of Service
-        </a>
-        and
-        <a href="/legal/privacy.txt" target="_blank" rel="noopener noreferrer" class="underline hover:text-slate-600">
-            Privacy Policy
-        </a>.
-    </p>
+<div class="text-center lg:text-left">
+    <div class="lg:hidden flex justify-center items-center mb-8">
+        <img src="smslive-logo-2.png" alt="SMSLive247" class="h-10 w-auto" />
+    </div>
+    <h2 class="text-3xl font-bold text-slate-900">Create Account</h2>
+    <p class="mt-2 text-slate-500">Join the SMSLive247 enterprise platform today.</p>
 </div>
 
+<EditForm Model="@model" OnValidSubmit="RegisterAsync" FormName="R1" class="space-y-5">
+    @* <DataAnnotationsValidator /> *@
+
+    <FormRow Cols="2">
+        <FormInput @bind-Value="model.FirstName" Label="First Name" PlaceHolder="John" IconStyle="Icon.IconStyle.User" />
+        <FormInput @bind-Value="model.LastName" Label="Last Name" PlaceHolder="Doe" IconStyle="Icon.IconStyle.User" />
+    </FormRow>
+
+    <FormRow Cols="1">
+        <FormInput @bind-Value="model.Email" Type="email" Label="Email" PlaceHolder="john@company.com" IconStyle="Icon.IconStyle.Mail" />
+    </FormRow>
+
+    <FormRow Cols="2">
+        <FormInput @bind-Value="model.Phone" Type="tel" Label="Phone Number" PlaceHolder="+234 800 000 0000" IconStyle="Icon.IconStyle.Phone" />
+        <FormSelect @bind-Value="model.CountryCode" Label="Country" Type="FormSelect.SelectType.Country" IconStyle="Icon.IconStyle.Phone"></FormSelect>
+    </FormRow>
+
+    <FormRow Cols="1" Visible="false">
+        <FormSelect @bind-Value="model.TimeZone" Label="Time Zone" Type="FormSelect.SelectType.TimeZone" IconStyle="Icon.IconStyle.Phone"></FormSelect>
+    </FormRow>
+
+    <FormRow Cols="2">
+        <FormInput @bind-Value="model.Password" Type="password" Label="Password" />
+        <FormInput @bind-Value="confirmPassword" Type="password" Label="Confirm Password" />
+    </FormRow>
+
+    @if (model.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
+    {
+        <p class="mt-1 text-xs text-red-500">Passwords do not match.</p>
+    }
+
+    <div class="flex items-center">
+        <InputCheckbox @bind-Value="termsAccepted" id="terms"
+                       class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
+        <label class="ml-2 block text-sm text-slate-600" for="terms">
+            I have read and accepted the
+            <a href="/legal/terms.txt" target="_blank"
+               class="text-brand-500 hover:text-brand-600">Agreement</a> and
+            <a href="/legal/privacy.txt" target="_blank"
+               class="text-brand-500 hover:text-brand-600">Privacy Policy</a>
+        </label>
+    </div>
+
+    <Button IsSubmit="true"
+            IsBusy="@isBusy"
+            IsDisabled="@(!termsAccepted)"
+            CssClass="w-full"
+            Text="Create Account" />
+</EditForm>
+
+<p class="text-sm text-center text-slate-500">
+    Already have an account?
+    <a href="/login" class="text-brand-500 font-semibold hover:text-brand-600">
+        Sign In
+    </a>
+</p>
+
 @code {
-    private bool isSubmitting = false;
-    private bool acceptTerms = false;
+    private bool isBusy = false;
+    private bool termsAccepted = false;
     private string confirmPassword = "";
 
-    private AccountCreateRequest model = new() { TimeZone = 1, CountryCode = 234 };
+    private AccountCreateRequest model = new() { TimeZone = 99, CountryCode = 0 };
 
     private async Task RegisterAsync()
     {
-        isSubmitting = true;
-
+        isBusy = true;
         try
         {
-            if (!acceptTerms)
+            if (!termsAccepted)
                 throw new Exception("You must accept the agreement and privacy policy to register");
 
             if (model.Password != confirmPassword)
@@ -121,7 +142,7 @@
         }
         finally
         {
-            isSubmitting = false;
+            isBusy = false;
         }
     }
 }

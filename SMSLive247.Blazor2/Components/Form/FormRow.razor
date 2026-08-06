@@ -1,9 +1,13 @@
-﻿ <div class="@GetGridClass() mb-4">
-     @ChildContent
- </div>
+﻿@if (Visible)
+{
+    <div class="@GetGridClass()">
+        @ChildContent
+    </div>
+}
 
 @code {
     [Parameter] public int Cols { get; set; } = 1;
+    [Parameter] public bool Visible { get; set; } = true;
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
     private string GetGridClass()

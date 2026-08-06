@@ -20,14 +20,14 @@
             <span class="text-slate-400 hover:text-slate-600 cursor-pointer">
                 @crumb1
             </span>
-            <Icon Style="Icon.IconStyle.ChevronRight" CssClass="w-4 h-4 text-slate-300" />
+            <Icon Style="Icon.IconStyle.ChevronRight" />
 
             @if (!string.IsNullOrEmpty(crumb2))
             {
                 <span class="text-slate-400 hover:text-slate-600 cursor-pointer">
                     @crumb2
                 </span>
-                <Icon Style="Icon.IconStyle.ChevronRight" CssClass="w-4 h-4 text-slate-300" />
+                <Icon Style="Icon.IconStyle.ChevronRight" />
             }
 
             <span class="text-brand-600 font-medium">@crumb3</span>
@@ -40,7 +40,7 @@
             <div class="flex items-center gap-2">
                 <span class="flex items-center text-blue-500 p-0.5"
                       title="Available Credits">
-                    <Icon Style="Icon.IconStyle.Coins" CssClass="w-5 h-5" />
+                    <Icon Style="Icon.IconStyle.Bell" />
                 </span>
                 <span class="text-sm font-bold text-slate-800">
                     5,000.00
@@ -51,12 +51,12 @@
         @* Actions *@
         <button @onclick="NavigateToTopup"
                 class="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm shadow-brand-500/30 flex items-center gap-2">
-            <Icon Style="Icon.IconStyle.PlusCircle" CssClass="w-4 h-4" />
+            <Icon Style="Icon.IconStyle.PlusCircle" />
             <span>Top Up</span>
         </button>
 
         <button class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
-            <Icon Style="Icon.IconStyle.Bell" CssClass="w-5 h-5" />
+            <Icon Style="Icon.IconStyle.Bell" />
             <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
         </button>
     </div>

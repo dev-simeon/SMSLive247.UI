@@ -1,0 +1,106 @@
+﻿@page "/forgot";
+@layout PublicLayout
+@attribute [AllowAnonymous]
+
+@inject Settings settings;
+@inject HttpClient httpClient
+@inject NavigationManager nav
+@inject AuthenticationStateProvider auth;
+
+<SectionContent SectionName="page-branding">
+    <div class="relative z-10 max-w-lg">
+        <h1 class="text-4xl font-bold leading-tight mb-6">
+            Security is our Priority.
+        </h1>
+        <p class="text-blue-100 text-lg leading-relaxed">
+            Follow our secure process to recover your account and get back to managing your communications.
+        </p>
+    </div>
+</SectionContent>
+
+<div class="text-center lg:text-left">
+    <div class="lg:hidden flex justify-center items-center mb-8">
+        <img src="smslive-logo-2.png"
+             alt="SMSLive247"
+             class="h-10 w-auto" />
+    </div>
+    <h2 class="text-3xl font-bold text-slate-900 transition-colors">
+        Forgot Password?
+    </h2>
+    <p class="mt-2 text-slate-500">
+        Enter your account email address and we'll send you a reset code.
+    </p>
+</div>
+
+<EditForm Model="@model" OnValidSubmit="ForgotAsync" FormName="f1" class="space-y-6">
+    <FormRow>
+        <FormInput @bind-Value="model.Username"
+                   Type="email" Label="Email Address"
+                   IconStyle="Icon.IconStyle.Mail"
+                   PlaceHolder="Enter your email"
+                   ErrorMessage="Please enter a valid email address." />
+    </FormRow>
+ 
+    <div>
+        <Button IsSubmit="true"
+                CssClass="w-full"
+                IsBusy="@isBusy"
+                Text="Send Reset Code >" />
+    </div>
+</EditForm>
+
+<p class="text-center text-sm text-slate-500">
+    Wait, I remember my password! 
+    <a href="/login" class="text-brand-500 font-semibold decoration-brand-500/30
+        hover:text-brand-600 hover:decoration-brand-500 transition-all" data-discover="true">
+        Sign In
+     </a>
+</p>
+
+@code {
+    private bool isBusy = false;
+    private LoginRequest model = new();
+
+    private async Task ForgotAsync()
+    {
+        isBusy = true;
+        try
+        {
+            model.ParentID = settings.ParentID;
+            var response = await apiClient.LoginAsync(model);
+
+            if (response.StatusCode == 200)
+            {
+                httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", response.Result.AccessToken.ToString());
+
+                var apiKey = response.Result.AccessToken.ToString();
+                var member = new Authentication.SmsAuthProvider.UserClaims(model.Username, apiKey);
+
+                await ((Authentication.SmsAuthProvider)auth)
+                .SaveAuthenticationState(member);
+
+                nav.NavigateTo("/");
+                return;
+            }
+
+            if (response.StatusCode == 401) //unauthorized
+            {
+                await alert.Error("Access denied!", "Error");
+            }
+        }
+        catch (SMSLive247.OpenApi.ApiException ex)
+        {
+            await alert.Error(ex.Message, "Api Error");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+}

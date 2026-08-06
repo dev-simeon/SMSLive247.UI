@@ -7,117 +7,120 @@
 @inject NavigationManager nav
 @inject AuthenticationStateProvider auth;
 
-<div class="w-full max-w-md space-y-8">
-    <div class="text-center lg:text-left">
-        <div class="lg:hidden flex justify-center items-center mb-8">
-            <img src="smslive-logo-2.png"
-                 alt="SMSLive247"
-                 class="h-10 w-auto" />
-        </div>
-        <h2 class="text-3xl font-bold text-slate-900 transition-colors">
-            Welcome back
-        </h2>
-        <p class="mt-2 text-slate-500">
-            Please enter your details to access your dashboard.
+<SectionContent SectionName="page-branding">
+    <div class="relative z-10 max-w-lg">
+        <h1 class="text-4xl font-bold leading-tight mb-6">
+            Reliable Bulk SMS for Every Business.
+        </h1>
+        <p class="text-blue-100 text-lg leading-relaxed mb-8">
+            Scale your communication with high-volume workflows, sub-account
+            management, and real-time delivery analytics tailored for large
+            organizations.
         </p>
+        <div class="flex gap-4">
+            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+                <Icon Style="Icon.IconStyle.CheckCircle" />
+                <span class="text-sm font-medium">99.9% Uptime</span>
+            </div>
+            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+                <Icon Style="Icon.IconStyle.Shield" />
+                <span class="text-sm font-medium">Bank-grade Security</span>
+            </div>
+        </div>
     </div>
+</SectionContent>
 
-    <EditForm Model="@model" OnValidSubmit="LoginAsync" FormName="f1">
-        <FormRow Cols="1">
-            <FormInput @bind-Value="model.Username"
-                       Type="email"
-                       IconStyle="Icon.IconStyle.Mail"
-                       PlaceHolder="Enter your email"
-                       ErrorMessage="Please enter a valid email address." />
-        </FormRow>
+<div class="text-center lg:text-left">
+    <div class="lg:hidden flex justify-center items-center mb-8">
+        <img src="smslive-logo-2.png"
+             alt="SMSLive247"
+             class="h-10 w-auto" />
+    </div>
+    <h2 class="text-3xl font-bold text-slate-900 transition-colors">
+        Welcome Back
+    </h2>
+    <p class="mt-2 text-slate-500">
+        Please enter your details to access your dashboard.
+    </p>
+</div>
 
-        <FormRow Cols="1">
-            <FormInput @bind-Value="model.Password" Type="password"
-                       PlaceHolder="Enter your password"
-                       ErrorMessage="Password is required" />
-        </FormRow>
+<EditForm Model="@model" OnValidSubmit="LoginAsync" FormName="f1" class="space-y-6">
+    <FormRow>
+        <FormInput @bind-Value="model.Username"
+                   Type="email" Label="Email"
+                   IconStyle="Icon.IconStyle.Mail"
+                   PlaceHolder="Enter your email"
+                   ErrorMessage="Please enter a valid email address." />
+    </FormRow>
 
+    <FormRow>
+        <FormInput @bind-Value="model.Password" 
+                   Type="password" Label="Password"
+                   PlaceHolder="Enter your password"
+                   ErrorMessage="Password is required" />
+    </FormRow>
  
-        <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center">
-                <input id="remember-me"
-                       name="remember-me"
-                       type="checkbox"
-                       class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
-                <label class="ml-2 block text-sm text-slate-600"
-                       htmlFor="remember-me">
-                    Remember me for 30 days
-                </label>
-            </div>
-            <div class="text-sm">
-                <a href="/forgot" class="font-medium text-brand-500 hover:text-brand-600">
-                    Forgot password?
-                </a>
-            </div>
+    <div class="flex items-center justify-between">
+        <div class="flex items-center">
+            <input id="remember-me"
+                   name="remember-me"
+                   type="checkbox"
+                   class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-300 rounded" />
+            <label class="ml-2 block text-sm text-slate-600"
+                   htmlFor="remember-me">
+                Remember me for 30 days
+            </label>
         </div>
-
-        <div>
-            <Button IsSubmit="true"
-                    CssClass="w-full"
-                    IsBusy="@isSubmitting"
-                    Text="Sign in to Dashboard" />
-        </div>
-    </EditForm>
-
-    <div class="relative">
-        <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-slate-200"></div>
-        </div>
-        <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-slate-500 transition-colors">
-                Or continue with
-            </span>
+        <div class="text-sm">
+            <a href="/forgot" class="font-medium text-brand-500 hover:text-brand-600">
+                Forgot password?
+            </a>
         </div>
     </div>
 
     <div>
-        <button type="button"
-                class="w-full inline-flex justify-center items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg shadow-sm bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors">
-            <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                      fill="#4285F4"></path>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      fill="#34A853"></path>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      fill="#FBBC05"></path>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      fill="#EA4335"></path>
-            </svg>
-            <span>Sign in with Google</span>
-        </button>
+        <Button IsSubmit="true"
+                CssClass="w-full"
+                IsBusy="@isBusy"
+                Text="Sign in to Dashboard" />
     </div>
+</EditForm>
 
-    <p class="text-sm text-center text-slate-500 mt-8">
-        Don't have an account?
-        <a href="/register"
-           class="text-brand-500 font-semibold hover:text-brand-600">
-            Sign up now
-        </a>
-    </p>
-
-    <p class="text-xs text-center text-slate-400 mt-6 prose-slate">
-        By clicking "Sign in", you agree to our
-        <a href="/legal/terms.txt"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="underline hover:text-slate-600 dark:hover:text-slate-300">
-            Terms of Service
-        </a>
-        and
-        <a href="/legal/privacy.txt"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="underline hover:text-slate-600 dark:hover:text-slate-300">
-            Privacy Policy
-        </a>
-        .
-    </p>
+<div class="relative">
+    <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-slate-200"></div>
+    </div>
+    <div class="relative flex justify-center text-sm">
+        <span class="px-2 bg-white text-slate-500 transition-colors">
+            Or continue with
+        </span>
+    </div>
 </div>
+
+<div>
+    <button type="button"
+            class="w-full inline-flex justify-center items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg shadow-sm bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors">
+        <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"></path>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"></path>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"></path>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"></path>
+        </svg>
+        <span>Sign in with Google</span>
+    </button>
+</div>
+
+<p class="text-sm text-center text-slate-500 mt-8">
+    Don't have an account?
+    <a href="/register"
+           class="text-brand-500 font-semibold hover:text-brand-600">
+        Sign up now
+    </a>
+</p>
 
 @code {
     private bool isBusy = false;

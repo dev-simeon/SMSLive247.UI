@@ -1,80 +1,59 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="w-full min-h-screen flex font-sans">
-      @* Left Side - Branding *@
-      <div class="hidden lg:flex w-1/2 bg-brand-500 relative overflow-hidden flex-col justify-between p-12 text-white">
+    @* Left Side - Branding *@
+    <div class="hidden lg:flex w-1/2 bg-brand-500 relative overflow-hidden flex-col justify-between p-12 text-white">
         <div class="absolute inset-0 opacity-10">
-          <svg
-            class="h-full w-full"
-            preserveAspectRatio="none"
-            viewBox="0 0 100 100"
-          >
-            <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path>
-            <path
-              d="M0 0 C 50 100 80 100 100 0 Z"
-              fill="white"
-              opacity="0.5"
-            ></path>
-          </svg>
+            <svg class="h-full w-full"
+                 preserveAspectRatio="none"
+                 viewBox="0 0 100 100">
+                <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path>
+                <path d="M0 0 C 50 100 80 100 100 0 Z"
+                      fill="white"
+                      opacity="0.5"></path>
+            </svg>
         </div>
 
         <div class="relative z-10 flex items-center">
-          <img
-            src="smslive-logo-2.png"
-            alt="SMSLive247"
-            class="h-12 w-auto rounded-[5px]"
-          />
+            <img src="smslive-logo-2.png"
+                 alt="SMSLive247"
+                 class="h-12 w-auto rounded-[5px]" />
         </div>
 
-        <div class="relative z-10 max-w-lg">
-          <h1 class="text-4xl font-bold leading-tight mb-6">
-            Reliable Bulk SMS for Every Business.
-          </h1>
-          <p class="text-blue-100 text-lg leading-relaxed mb-8">
-            Scale your communication with high-volume workflows, sub-account
-            management, and real-time delivery analytics tailored for large
-            organizations.
-          </p>
-          <div class="flex gap-4">
-            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
-              <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-white" />
-              <span class="text-sm font-medium">99.9% Uptime</span>
-            </div>
-            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
-              <Icon Style="Icon.IconStyle.Shield" CssClass="text-white" />
-              <span class="text-sm font-medium">Bank-grade Security</span>
-            </div>
-          </div>
-        </div>
+        <SectionOutlet SectionName="page-branding" />
 
         <div class="relative z-10 text-sm text-blue-200 flex justify-between items-center">
-          <p>© @DateTime.Now.Year SMSLive247 by iDevWorks Technologies Ltd.</p>
-          <div class="flex gap-4">
-            <a
-              href="/legal/privacy.txt"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hover:text-white transition-colors"
-            >
-              Privacy
-            </a>
-            <a
-              href="/legal/terms.txt"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hover:text-white transition-colors"
-            >
-              Terms
-            </a>
-          </div>
+            <p>© @DateTime.Now.Year SMSLive247 by iDevWorks Technologies Ltd.</p>
+            <div class="flex gap-4">
+                <a href="/legal/privacy.txt"
+                       target="_blank"
+                       class="hover:text-white transition-colors">
+                    Privacy
+                </a>
+                <a href="/legal/terms.txt"
+                       target="_blank"
+                       class="hover:text-white transition-colors">
+                    Terms
+                </a>
+            </div>
         </div>
-      </div>
-
-      @* Right Side - Form  *@
-      <div class="w-full lg:w-1/2 bg-white flex items-center justify-center p-8 lg:p-16 relative">
-          <Alert />
-        <div class="w-full max-w-md space-y-8">
-            @Body
-        </div>
-      </div>
     </div>
+
+    @* Right Side *@
+    <div class="w-full lg:w-1/2 bg-white flex items-center justify-center p-8 lg:p-16 relative overflow-y-auto">
+        <Alert />
+        <div class="w-full max-w-md space-y-8 my-8">
+            @Body
+
+            <p class="text-xs text-center text-slate-400 mt-6 prose-slate">
+                By submitting the form, you agree to our
+                <a href="/legal/terms.txt" target="_blank"
+                       class="underline hover:text-slate-600 dark:hover:text-slate-300">Terms of Service</a>
+                and
+                <a href="/legal/privacy.txt" target="_blank"
+                       class="underline hover:text-slate-600 dark:hover:text-slate-300">Privacy Policy</a>
+                .
+            </p>
+        </div>
+    </div>
+</div>

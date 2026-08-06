@@ -10,9 +10,10 @@
         <select 
             value="@CurrentValueAsString"
             @onchange="OnChange"
-            class="appearance-none block w-full px-3 py-3 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300">
+            class="appearance-none block w-full px-3 py-2.5 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-300">
             @if (Type == SelectType.Country)
             {
+                <option value="0">- select country -</option>
                 @foreach (var country in countries)
                 {
                     <option value="@country.Key">@country.Value</option>
@@ -20,6 +21,7 @@
             }
             else if (Type == SelectType.TimeZone)
             {
+                <option value="99">- select time zone -</option>
                 @foreach (var timeZone in timeZones)
                 {
                     var offset = timeZone.BaseUtcOffset.Hours;
@@ -48,14 +50,8 @@
     }
 </div>
 
-
 @code {
-    public enum SelectType
-    {
-        Country,
-        TimeZone
-    }
-
+    public enum SelectType {Country, TimeZone }
 
     [Parameter] public string? Label { get; set; }
     [Parameter] public SelectType Type { get; set; } = SelectType.Country;
