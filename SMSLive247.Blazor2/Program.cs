@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
-using SMSLive247.UI;
 using SMSLive247.UI.Services;
+using SMSLive247.UI.Shared;
 using SMSLive247.OpenApi;
 using SMSLive247.Authentication;
 using SMSLive247.Blazor2.Components;
@@ -22,19 +22,15 @@ public partial class Program
         builder.Services.AddAuthentication("Cookies")
             .AddCookie(options => { options.LoginPath = "/"; });
 
+        builder.Services.AddSingleton<AlertService>();
         builder.Services.AddTransient<AuthDelegateHandler>();
         //builder.Services.AddTransient<CacheDelegateHandler>();
-        //builder.Services.AddTransient<SpinnerDelegateHandler>();
 
         builder.Services.AddHttpClient<ApiClient>(ConfigureUrl)
                         .AddHttpMessageHandler<AuthDelegateHandler>();
-                        //.AddHttpMessageHandler<CacheDelegateHandler>();
 
-        builder.Services.AddSingleton<AlertService>();
         builder.Services.AddScoped<AuthenticationStateProvider, SmsAuthProvider>();
-        //builder.Services.AddScoped<BackOfficeClient.Client>();
-        //builder.Services.AddScoped<NotificationService>();
-        builder.Services.AddLocalStorageServices();
+        builder.Services.AddMemoryCache();
 
         // ── Middleware ───────────────────────────────────────────────────────
         var app = builder.Build();

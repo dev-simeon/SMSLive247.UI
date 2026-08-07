@@ -1,7 +1,7 @@
 ﻿using SMSLive247.OpenApi;
 using SMSLive247.UI.Services;
 
-namespace SMSLive247.UI
+namespace SMSLive247.UI.Shared
 {
     public class ApiDataSource<T>()
     {

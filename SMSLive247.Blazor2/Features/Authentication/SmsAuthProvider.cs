@@ -1,11 +1,10 @@
-﻿//using Blazored.LocalStorage;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.JSInterop;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SMSLive247.Authentication
 {
-    public class SmsAuthProvider(ILocalStorageService storage) : AuthenticationStateProvider
+    public class SmsAuthProvider(IMemoryCache storage) : AuthenticationStateProvider
     {
         private readonly string storageKey = "UserSession";
         private readonly AuthenticationState anonymousState = new(new(new ClaimsIdentity()));
@@ -26,7 +25,7 @@ namespace SMSLive247.Authentication
         {
             try
             {
-                var response = await storage.GetItemAsync<UserClaims>(storageKey);
+                var response = storage.Get<UserClaims>(storageKey);
 
                 if (response == null)
                     return anonymousState;
@@ -42,20 +41,20 @@ namespace SMSLive247.Authentication
 
         public async Task SaveAuthenticationState(UserClaims member)
         {
-            await storage.SetItemAsync(storageKey, member);
+            storage.Set(storageKey, member);
 
             var authenticatedState = CreateAuthenticationState(member);
             NotifyAuthenticationStateChanged(Task.FromResult(authenticatedState));
         }
 
-        public ValueTask<UserClaims?> GetMember()
+        public UserClaims? GetMember()
         {
-            return storage.GetItemAsync<UserClaims>(storageKey);
+            return storage.Get<UserClaims>(storageKey);
         }
 
         public async Task ClearAuthenticationState()
         {
-            await storage.RemoveItemAsync(storageKey);
+            storage.Remove(storageKey);
             NotifyAuthenticationStateChanged(Task.FromResult(anonymousState));
         }
 

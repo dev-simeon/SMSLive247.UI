@@ -1,0 +1,48 @@
+﻿@implements IDisposable
+@inject NavigationManager nav
+
+<div class="hidden md:flex items-center gap-2 text-sm text-slate-500">
+    @if (match.Child != null)
+    {
+        @if (@match.Parent.Title != null)
+        {
+            <span class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                @match.Parent.Title
+            </span>
+
+            <Icon Style="Icon.IconStyle.ChevronRight" />  
+        }
+
+        <span class="text-brand-600 font-medium">@match.Child.Title</span>
+    }
+</div>
+
+@code {
+    private (Const.NavItem Parent, Const.NavItem Child) match;
+
+    protected override void OnInitialized()
+    {
+        nav.LocationChanged += OnLocationChanged;
+        UpdateCrumbs(nav.Uri);
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        UpdateCrumbs(e.Location);
+        StateHasChanged();
+    }
+
+    private void UpdateCrumbs(string uri)
+    {
+        var path = "/" + nav.ToBaseRelativePath(uri);
+
+        match = Const.NavItems
+            .SelectMany(c => c.Items.Select(i => (Parent: c, Child: i)))
+            .FirstOrDefault(x => path.StartsWith(x.Child.Url ?? "--"));
+    }
+
+    public void Dispose()
+    {
+        nav.LocationChanged -= OnLocationChanged;
+    }
+}

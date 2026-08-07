@@ -16,7 +16,7 @@
                @onblur="OnBlur" 
                class="appearance-none block w-full px-3 py-2.5 border rounded-lg placeholder-slate-400 
                       focus:outline-none focus:ring-brand-500 focus:border-brand-500 
-                      sm:text-sm bg-white text-slate-900 transition-all border-slate-300 
+                      sm:text-sm bg-white text-slate-900 transition-all border-slate-200 
                       @GetErrorClass()" />
 
         @if (IconStyle != null)
@@ -152,7 +152,7 @@
 
     private string GetErrorClass()
     {
-        return showError ? "border-red-300 ring-1 ring-red-300" : "border-slate-300";
+        return showError ? "border-red-300 ring-1 ring-red-300" : "border-slate-200";
     }
 
     private void ValidateInput(FocusEventArgs args)

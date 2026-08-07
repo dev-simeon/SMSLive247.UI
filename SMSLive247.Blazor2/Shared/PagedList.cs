@@ -1,6 +1,6 @@
 ﻿using SMSLive247.OpenApi;
 
-namespace SMSLive247.UI
+namespace SMSLive247.UI.Shared
 {
     public class PagedList<T> : List<T>
     {

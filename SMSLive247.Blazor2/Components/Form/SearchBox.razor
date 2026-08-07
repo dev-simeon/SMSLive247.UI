@@ -1,5 +1,6 @@
 ﻿<div class="flex flex-col sm:flex-row sm:items-center gap-4 w-full sm:w-auto">
-    <div class="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 w-fit">
+    <div class="flex items-center rounded-lg border border-slate-200 bg-white overflow-hidden
+                shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 w-fit">
 
         <input type="text"
                placeholder="@Placeholder"
@@ -9,9 +10,12 @@
 
         @ChildContent
 
-        <button type="button" @onclick="TriggerSearch" class="h-9 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border-l border-slate-200 transition-colors flex items-center justify-center cursor-pointer">
+        <button type="button" @onclick="TriggerSearch" 
+            class="h-full px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border-l border-slate-200
+                    transition-colors flex items-center justify-center cursor-pointer">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
         </button>
     </div>
