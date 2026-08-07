@@ -1,7 +1,7 @@
-@implements IDisposable
-@inject NavigationManager NavigationManager
+@inject NavigationManager nav
 
-<header class="h-16 bg-white/90 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-10">
+<header class="h-16 bg-white/90 backdrop-blur-md border-b border-slate-200 flex items-center 
+                justify-between px-4 sm:px-6 sticky top-0 z-10">
     <div class="flex items-center gap-3">
         <button @onclick="OnMenuClick"
                 class="lg:hidden p-2 -ml-2 text-slate-600 hover:text-brand-600 rounded-md">
@@ -10,28 +10,11 @@
 
         @* Mobile Logo *@
         <div class="lg:hidden flex items-center">
-            <img src="/smslive-logo-2.png"
-                 alt="SMSLive247"
-                 class="h-8 w-auto" />
+            <img src="/smslive-logo-2.png" alt="SMSLive247" class="h-8 w-auto" />
         </div>
 
         @* Breadcrumb *@
-        <div class="hidden md:flex items-center gap-2 text-sm text-slate-500">
-            <span class="text-slate-400 hover:text-slate-600 cursor-pointer">
-                @crumb1
-            </span>
-            <Icon Style="Icon.IconStyle.ChevronRight" />
-
-            @if (!string.IsNullOrEmpty(crumb2))
-            {
-                <span class="text-slate-400 hover:text-slate-600 cursor-pointer">
-                    @crumb2
-                </span>
-                <Icon Style="Icon.IconStyle.ChevronRight" />
-            }
-
-            <span class="text-brand-600 font-medium">@crumb3</span>
-        </div>
+        <Breadcrumbs></Breadcrumbs>
     </div>
 
     <div class="flex items-center gap-4 ml-auto">
@@ -49,7 +32,7 @@
         </div>
 
         @* Actions *@
-        <Button Icon="Icon.IconStyle.PlusCircle" Text="Top Up" OnClick="NavigateToTopup" />
+        <Button Icon="Icon.IconStyle.CreditCard" Text="Top Up" OnClick="NavigateToTopup" />
 
         <button class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
             <Icon Style="Icon.IconStyle.Bell" />
@@ -61,71 +44,8 @@
 @code {
     [Parameter] public EventCallback OnMenuClick { get; set; }
 
-    // private ViewDetails details = new ViewDetails("App", "Page");
-    private string? crumb1, crumb2, crumb3;
-
-    protected override void OnInitialized()
-    {
-        NavigationManager.LocationChanged += OnLocationChanged;
-        UpdateDetails(NavigationManager.Uri);
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        UpdateDetails(e.Location);
-        InvokeAsync(StateHasChanged);
-    }
-
-    private void UpdateDetails(string uri)
-    {
-        var path = "/" + NavigationManager.ToBaseRelativePath(uri);
-        var details = GetViewDetails(path);
-        crumb1 = details.Category;
-        crumb2 = details.SubCategory;
-        crumb3 = details.Title;
-
-        //Sidebar.Categories.Where(x => x.)
-    }
-
-    private ViewDetails GetViewDetails(string path)
-    {
-        if (path.StartsWith("/messaging/compose")) return new ViewDetails("Messaging", "Compose Message");
-        if (path.StartsWith("/messaging/messages")) return new ViewDetails("Messaging", "Messages Log");
-        if (path.StartsWith("/messaging/contacts/edit-group")) return new ViewDetails("Messaging", "Edit Group", "Contacts");
-        if (path.StartsWith("/messaging/contacts")) return new ViewDetails("Messaging", "Contacts");
-        if (path.StartsWith("/messaging/sender-ids")) return new ViewDetails("Messaging", "Sender IDs");
-        if (path.StartsWith("/messaging/")) return new ViewDetails("Messaging", "Delivery Report", "Messages");
-
-        if (path.StartsWith("/account/dashboard")) return new ViewDetails("Accounts", "Dashboard");
-        if (path.StartsWith("/account/sub-accounts/")) return new ViewDetails("Accounts", "Details", "Sub-Accounts");
-        if (path.StartsWith("/account/sub-accounts")) return new ViewDetails("Accounts", "Sub-Accounts");
-        if (path.StartsWith("/account/profile")) return new ViewDetails("Account", "My Profile");
-
-        if (path.StartsWith("/wallet/buy-credits")) return new ViewDetails("Wallet", "Buy SMS Credits");
-        if (path.StartsWith("/wallet/deposits")) return new ViewDetails("Wallet", "Deposits");
-        if (path.StartsWith("/wallet/transfers")) return new ViewDetails("Wallet", "Transfers");
-        if (path.StartsWith("/wallet/pricing")) return new ViewDetails("Wallet", "Pricing");
-        if (path.StartsWith("/wallet/purchase/complete")) return new ViewDetails("Wallet", "Purchase Successful");
-
-        if (path.StartsWith("/support/coverage")) return new ViewDetails("Support", "Network Coverage");
-        if (path.StartsWith("/support/contact-us")) return new ViewDetails("Support", "Contact Us");
-        if (path.StartsWith("/support/tickets")) return new ViewDetails("Support", "Tickets");
-
-        if (path.StartsWith("/developer/api-docs")) return new ViewDetails("Developer", "API Documentation");
-        if (path.StartsWith("/developer/api-keys")) return new ViewDetails("Developer", "API Keys");
-
-        return new ViewDetails("Not", "Found");
-    }
-
     private void NavigateToTopup()
     {
-        NavigationManager.NavigateTo("/wallet/buy-credits");
+        nav.NavigateTo("/wallet/buy-credits");
     }
-
-    public void Dispose()
-    {
-        NavigationManager.LocationChanged -= OnLocationChanged;
-    }
-
-    private record ViewDetails(string Category, string Title, string? SubCategory = null);
 }

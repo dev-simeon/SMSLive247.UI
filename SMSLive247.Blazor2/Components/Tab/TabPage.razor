@@ -1,6 +1,6 @@
 @if (Parent != null && Parent.LoadedTabs.Contains(Id))
 {
-    <div hidden="@(!IsActive)">
+    <div hidden="@(!isActive)">
         @ChildContent
     </div>
 }
@@ -13,12 +13,12 @@
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public Icon.IconStyle? Icon { get; set; }
 
-    private bool IsActive => Parent?.IsActive(this) ?? false;
+    private bool isActive => Parent?.IsActive(this) ?? false;
 
     protected override void OnInitialized()
     {
         if (Parent == null)
-            throw new ArgumentNullException(nameof(Parent), "TabPage must exist within a Tabs component");
+            throw new ArgumentNullException("TabPage must exist within a Tabs component");
 
         Parent.AddPage(this);
         base.OnInitialized();

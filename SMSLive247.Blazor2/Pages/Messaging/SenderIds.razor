@@ -1,13 +1,17 @@
-﻿@page "/messaging/sender-ids"
+﻿@attribute [Route(Const.Routes.Messaging.SenderIds)]
 @layout MainLayout
 
 <PageTitle>Sender IDs</PageTitle>
 
-<PageHeader Title="Sender IDs" SubTitle="Manage your sender IDs for messaging campaigns."></PageHeader>
+<PageHeader 
+    Title="Sender IDs" 
+    SubTitle="Manage your sender IDs for messaging campaigns.">
+</PageHeader>
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search Sender IDs..." @bind-SearchTerm="searchQuery">
+        <SearchBox Placeholder="Search Sender IDs..." 
+                   @bind-SearchTerm="searchQuery" OnSearch="OnSearch">
             <FormSelect @bind-Value="searchStatus" IsEmbedded="true">
                 <option value="">All Statuses</option>
                 <option value="Approved">Approved</option>
@@ -66,20 +70,14 @@
         </Table>
     </ChildContent>
     <FooterLeft>
-          <Paging @bind-PageNumber="pageNumber"
-                @bind-PageSize="pageSize"
-                TotalRecords="totalRecords">
+          <Paging PageNumber="1" PageSize="25"
+                TotalRecords="filteredItems?.Count"
+                OnPageSizeChange="FetchData">
         </Paging>
     </FooterLeft>
-
-    </PageBody>
-
+</PageBody>
 
 @code {
-    private int pageNumber = 1;
-    private int pageSize = 25;
-    private int? totalRecords = null;
-
     private string? searchStatus;
     private string? searchQuery;
     private List<SenderIdResponse>? items;

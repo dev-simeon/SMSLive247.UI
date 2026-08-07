@@ -78,11 +78,11 @@
                 cursor: pointer;
             }
     </style>
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
 </head>
 
 <body>
-    <Routes @rendermode="InteractiveServer"></Routes>
+    <Routes @rendermode="new InteractiveServerRenderMode(prerender: false)"></Routes>
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>

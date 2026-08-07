@@ -1,4 +1,4 @@
-﻿namespace SMSLive247.UI
+﻿namespace SMSLive247.UI.Shared
 {
     public class Settings
     {
