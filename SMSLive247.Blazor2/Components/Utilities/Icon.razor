@@ -42,6 +42,8 @@
         Download,
         Save,
         MoreVertical,
+        FileSpreadsheet,
+        FileText,
     }
 
     // public string GetBootstrapClass()
@@ -154,6 +156,8 @@
             IconStyle.Download       => "bi bi-download",
             IconStyle.Save           => "bi bi-save",
             IconStyle.MoreVertical   => "bi bi-three-dots-vertical",
+            IconStyle.FileSpreadsheet=> "bi bi-file-earmark-spreadsheet",
+            IconStyle.FileText       => "bi bi-file-earmark-text",
             _ => throw new ArgumentOutOfRangeException("Unmapped IconStyle value.")
         };
     }
@@ -197,6 +201,8 @@
             IconStyle.Download       => "download",
             IconStyle.Save           => "save",
             IconStyle.MoreVertical   => "more_vert",
+            IconStyle.FileSpreadsheet=> "table_chart",
+            IconStyle.FileText       => "description",
             _ => throw new ArgumentOutOfRangeException("Unmapped IconStyle value.")
         };
     }
