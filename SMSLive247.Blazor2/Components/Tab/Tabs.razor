@@ -1,14 +1,14 @@
 <CascadingValue Value="this">
-    <div class="border-b border-slate-00">
+    <div class="border-b border-slate-300">
         <nav class="-mb-px flex space-x-8 overflow-x-auto">
             @foreach (TabPage p in pages)
             {
                 <button type="button" @onclick="() => SetActivePage(p)"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm 
+                        class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm 
                                flex items-center gap-2 transition-colors cursor-pointer
                         @(IsActive(p) 
                             ? "border-brand-500 text-brand-600" 
-                            : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-200")">
+                            : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300")">
 
                     @if (p.Icon.HasValue)
                     {
