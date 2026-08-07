@@ -51,10 +51,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Pages\Messaging\Contacts\BulkFilesTab.razor" />
-    <None Include="Pages\Messaging\Contacts\CsvExcelTab.razor" />
-    <None Include="Pages\Messaging\Contacts\Index.razor" />
-    <None Include="Pages\Messaging\Contacts\PhonebookTab.razor" />
+    <Content Include="Pages\Messaging\Contacts\BulkFilesTab.razor" />
+    <Content Include="Pages\Messaging\Contacts\CsvExcelTab.razor" />
+    <Content Include="Pages\Messaging\Contacts\Index.razor" />
+    <Content Include="Pages\Messaging\Contacts\PhonebookTab.razor" />
   </ItemGroup>
 
   <ItemGroup>

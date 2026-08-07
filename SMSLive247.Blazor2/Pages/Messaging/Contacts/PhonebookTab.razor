@@ -1,12 +1,289 @@
-@* Phonebook Tab *@
-@* Matches React: Contacts/Index.tsx — activeTab === "phonebook" *@
-@* Shows contacts and groups with a sub-toggle (Contacts / Groups) *@
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="@(viewMode == "groups" ? "Search groups..." : "Search contacts...")"
+                   @bind-SearchTerm="searchQuery">
+            <div class="bg-slate-100 p-1 rounded-lg flex items-center h-10 shrink-0">
+                <button type="button"
+                        @onclick='() => SetViewMode("contacts")'
+                        class="@(viewMode == "contacts" ? "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer bg-white text-brand-600 shadow-sm" : "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer text-slate-500 hover:text-slate-900")">
+                    All Contacts
+                </button>
+                <button type="button"
+                        @onclick='() => SetViewMode("groups")'
+                        class="@(viewMode == "groups" ? "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer bg-white text-brand-600 shadow-sm" : "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer text-slate-500 hover:text-slate-900")">
+                    Groups
+                </button>
+            </div>
+        </SearchBox>
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="New Group" Icon="Icon.IconStyle.PlusCircle" Style="Button.ButtonStyle.Secondary" @onclick="HandleNewGroup" />
+        <Button Text="Add Contact" Icon="Icon.IconStyle.PlusCircle" @onclick="HandleAddContact" />
+    </HeaderRight>
 
-<div class="bg-white rounded-xl border border-slate-100 shadow-sm p-6">
-    <p class="text-slate-500 text-sm">Phonebook — contacts and groups table — coming soon.</p>
-</div>
+    <ChildContent>
+        @if (viewMode == "contacts")
+        {
+            <Table Items="PaginatedContacts" EmptyMessage="No contacts found.">
+                <Columns>
+                    <Column Header="Name">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold bg-blue-100 text-blue-600 shrink-0">
+                                @GetInitials(context.ContactName)
+                            </div>
+                            <div>
+                                <p class="font-medium text-slate-900 text-sm">@(string.IsNullOrEmpty(context.ContactName) ? "—" : context.ContactName)</p>
+                            </div>
+                        </div>
+                    </Column>
+                    <Column Header="Phone Number">
+                        <span class="text-sm text-slate-600 font-mono">@(string.IsNullOrEmpty(context.PhoneNumber) ? "—" : context.PhoneNumber)</span>
+                    </Column>
+                    <Column Header="Groups">
+                        <div class="flex flex-wrap gap-1">
+                            @if (context.Groups != null && context.Groups.Any())
+                            {
+                                @foreach (var g in context.Groups)
+                                {
+                                    <span class="px-2 py-0.5 bg-brand-50 text-brand-700 border border-brand-100 rounded text-[10px] font-bold uppercase">
+                                        @g
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-xs text-slate-400 italic">None</span>
+                            }
+                        </div>
+                    </Column>
+                    <Column Header="Date Added">
+                        <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                    </Column>
+                    <Column>
+                        <Actions OnEdit="() => HandleEditContact(context)"
+                                 OnDelete="() => HandleDeleteContact(context.PhoneNumber)">
+                        </Actions>
+                    </Column>
+                </Columns>
+            </Table>
+        }
+        else
+        {
+            <Table Items="PaginatedGroups" EmptyMessage="No groups found.">
+                <Columns>
+                    <Column Header="Group Name">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-indigo-100 text-indigo-600 shrink-0">
+                                <Icon Style="Icon.IconStyle.Users" CssClass="w-5 h-5" />
+                            </div>
+                            <span class="font-semibold text-slate-900 text-sm">@(string.IsNullOrEmpty(context.GroupName) ? "—" : context.GroupName)</span>
+                        </div>
+                    </Column>
+                    <Column Header="Members">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-sm font-semibold text-slate-900">@(context.Members?.Count ?? 0)</span>
+                            <span class="text-xs text-slate-500">contacts</span>
+                        </div>
+                    </Column>
+                    <Column>
+                        <Actions OnEdit="() => HandleEditGroup(context)"
+                                 OnDelete="() => HandleDeleteGroup(context.GroupName)">
+                        </Actions>
+                    </Column>
+                </Columns>
+            </Table>
+        }
+    </ChildContent>
+
+    <FooterLeft>
+        @if (viewMode == "contacts")
+        {
+            <Paging @bind-PageNumber="contactsPage"
+                    @bind-PageSize="pageSize"
+                    TotalRecords="FilteredContacts.Count">
+            </Paging>
+        }
+        else
+        {
+            <Paging @bind-PageNumber="groupsPage"
+                    @bind-PageSize="pageSize"
+                    TotalRecords="FilteredGroups.Count">
+            </Paging>
+        }
+    </FooterLeft>
+</PageBody>
 
 @code {
-    // TODO: Implement contacts/groups sub-toggle table
-    // React reference: viewMode === "contacts" | "groups"
+    private string viewMode = "contacts"; // "contacts" | "groups"
+    private string? searchQuery;
+
+    private int contactsPage = 1;
+    private int groupsPage = 1;
+    private int pageSize = 20;
+
+    private List<ContactResponse> contacts = new();
+    private List<GroupResponse> groups = new();
+    private bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        isLoading = true;
+        try
+        {
+            var contactsTask = apiClient.ContactListAsync();
+            var groupsTask = apiClient.GroupListAsync();
+
+            await Task.WhenAll(contactsTask, groupsTask);
+
+            var contactsRes = await contactsTask;
+            var groupsRes = await groupsTask;
+
+            contacts = contactsRes.Result?.ToList() ?? new();
+            groups = groupsRes.Result?.ToList() ?? new();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error("Failed to load contacts data.");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void SetViewMode(string mode)
+    {
+        viewMode = mode;
+        searchQuery = null;
+        contactsPage = 1;
+        groupsPage = 1;
+    }
+
+    private List<ContactResponse> FilteredContacts
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(searchQuery))
+                return contacts;
+
+            var q = searchQuery.Trim().ToLowerInvariant();
+            return contacts.Where(c =>
+                (c.ContactName != null && c.ContactName.ToLowerInvariant().Contains(q)) ||
+                (c.PhoneNumber != null && c.PhoneNumber.ToLowerInvariant().Contains(q))
+            ).ToList();
+        }
+    }
+
+    private List<ContactResponse> PaginatedContacts
+    {
+        get
+        {
+            return FilteredContacts
+                .Skip((contactsPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+    }
+
+    private List<GroupResponse> FilteredGroups
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(searchQuery))
+                return groups;
+
+            var q = searchQuery.Trim().ToLowerInvariant();
+            return groups.Where(g =>
+                g.GroupName != null && g.GroupName.ToLowerInvariant().Contains(q)
+            ).ToList();
+        }
+    }
+
+    private List<GroupResponse> PaginatedGroups
+    {
+        get
+        {
+            return FilteredGroups
+                .Skip((groupsPage - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+        }
+    }
+
+    private string GetInitials(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return "?";
+
+        var trimmed = name.Trim();
+        if (trimmed.Length == 1)
+            return trimmed.ToUpperInvariant();
+
+        return trimmed.Substring(0, 2).ToUpperInvariant();
+    }
+
+    private void HandleNewGroup()
+    {
+        // Modal placeholder
+    }
+
+    private void HandleAddContact()
+    {
+        // Modal placeholder
+    }
+
+    private void HandleEditContact(ContactResponse contact)
+    {
+        // Modal placeholder
+    }
+
+    private async Task HandleDeleteContact(string? phoneNo)
+    {
+        if (string.IsNullOrEmpty(phoneNo)) return;
+
+        bool confirmed = await alert.Confirm($"Are you sure you want to delete contact {phoneNo}?", "Confirm Delete");
+        if (confirmed)
+        {
+            try
+            {
+                await apiClient.ContactDeleteAsync(phoneNo);
+                await alert.Success("Contact deleted successfully.");
+                await FetchData();
+            }
+            catch (Exception ex)
+            {
+                await alert.Error("Failed to delete contact.");
+            }
+        }
+    }
+
+    private void HandleEditGroup(GroupResponse group)
+    {
+        // Modal placeholder
+    }
+
+    private async Task HandleDeleteGroup(string? groupId)
+    {
+        if (string.IsNullOrEmpty(groupId)) return;
+
+        bool confirmed = await alert.Confirm($"Are you sure you want to delete group '{groupId}'?", "Confirm Delete");
+        if (confirmed)
+        {
+            try
+            {
+                await apiClient.GroupDeleteAsync(groupId);
+                await alert.Success("Group deleted successfully.");
+                await FetchData();
+            }
+            catch (Exception ex)
+            {
+                await alert.Error("Failed to delete group.");
+            }
+        }
+    }
 }
