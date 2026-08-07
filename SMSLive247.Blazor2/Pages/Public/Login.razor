@@ -1,6 +1,6 @@
-﻿@page "/login";
-@layout PublicLayout
+﻿@attribute [Route(Const.Routes.Login)]
 @attribute [AllowAnonymous]
+@layout PublicLayout
 
 @inject Settings settings;
 @inject HttpClient httpClient
@@ -72,7 +72,7 @@
             </label>
         </div>
         <div class="text-sm">
-            <a href="/forgot" class="font-medium text-brand-500 hover:text-brand-600">
+            <a href="@Const.Routes.ForgotPassword" class="font-medium text-brand-500 hover:text-brand-600">
                 Forgot password?
             </a>
         </div>
@@ -116,7 +116,7 @@
 
 <p class="text-sm text-center text-slate-500 mt-8">
     Don't have an account?
-    <a href="/register"
+    <a href="@Const.Routes.Register"
            class="text-brand-500 font-semibold hover:text-brand-600">
         Sign up now
     </a>
@@ -145,7 +145,7 @@
                 await ((Authentication.SmsAuthProvider)auth)
                 .SaveAuthenticationState(member);
 
-                nav.NavigateTo("/");
+                nav.NavigateTo(Const.Routes.Home);
                 return;
             }
 

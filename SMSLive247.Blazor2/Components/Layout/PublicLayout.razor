@@ -25,13 +25,11 @@
         <div class="relative z-10 text-sm text-blue-200 flex justify-between items-center">
             <p>© @DateTime.Now.Year SMSLive247 by iDevWorks Technologies Ltd.</p>
             <div class="flex gap-4">
-                <a href="/legal/privacy.txt"
-                       target="_blank"
+                <a href="@Const.Routes.Legal.Privacy" target="_blank"
                        class="hover:text-white transition-colors">
                     Privacy
                 </a>
-                <a href="/legal/terms.txt"
-                       target="_blank"
+                <a href="@Const.Routes.Legal.Terms" target="_blank"
                        class="hover:text-white transition-colors">
                     Terms
                 </a>
@@ -47,10 +45,10 @@
 
             <p class="text-xs text-center text-slate-400 mt-6 prose-slate">
                 By submitting the form, you agree to our
-                <a href="/legal/terms.txt" target="_blank"
+                <a href="@Const.Routes.Legal.Terms" target="_blank"
                        class="underline hover:text-slate-600 dark:hover:text-slate-300">Terms of Service</a>
                 and
-                <a href="/legal/privacy.txt" target="_blank"
+                <a href="@Const.Routes.Legal.Privacy" target="_blank"
                        class="underline hover:text-slate-600 dark:hover:text-slate-300">Privacy Policy</a>
                 .
             </p>

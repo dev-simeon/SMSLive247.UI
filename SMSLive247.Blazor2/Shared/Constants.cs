@@ -9,8 +9,16 @@ namespace SMSLive247.UI.Shared
             // Auth
             public const string Home = "/";
             public const string Login = "/login";
+            public const string Logoff = "/logout";
             public const string Register = "/register";
             public const string ForgotPassword = "/forgot";
+            public const string NotFound = "/not-found";
+
+            public static class Legal
+            {
+                public const string Terms = "/legal/terms.txt";
+                public const string Privacy = "/legal/privacy.txt";
+            }
 
             public static class Messaging
             {

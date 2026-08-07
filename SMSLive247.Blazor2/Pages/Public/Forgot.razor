@@ -1,6 +1,6 @@
-﻿@page "/forgot";
-@layout PublicLayout
+﻿@attribute [Route(Const.Routes.ForgotPassword)]
 @attribute [AllowAnonymous]
+@layout PublicLayout
 
 @inject Settings settings;
 @inject HttpClient httpClient
@@ -51,7 +51,7 @@
 
 <p class="text-center text-sm text-slate-500">
     Wait, I remember my password! 
-    <a href="/login" class="text-brand-500 font-semibold decoration-brand-500/30
+    <a href="@Const.Routes.Login" class="text-brand-500 font-semibold decoration-brand-500/30
         hover:text-brand-600 hover:decoration-brand-500 transition-all" data-discover="true">
         Sign In
      </a>
@@ -80,7 +80,7 @@
                 await ((Authentication.SmsAuthProvider)auth)
                 .SaveAuthenticationState(member);
 
-                nav.NavigateTo("/");
+                nav.NavigateTo(Const.Routes.Home);
                 return;
             }
 

@@ -1,5 +1,6 @@
-@page "/logout"
-@page "/logoff"
+@attribute [Route(Const.Routes.Logoff)]
+@attribute [AllowAnonymous]
+
 @inject NavigationManager nav
 @inject AuthenticationStateProvider auth;
 
@@ -7,7 +8,7 @@
     protected override async Task OnInitializedAsync()
     {
         await ((Authentication.SmsAuthProvider)auth).ClearAuthenticationState();
-        var shouldForceReload = !nav.Uri.EndsWith("/login", StringComparison.OrdinalIgnoreCase);
-        nav.NavigateTo("/login", shouldForceReload);
+        var shouldForceReload = !nav.Uri.EndsWith(Const.Routes.Login, StringComparison.OrdinalIgnoreCase);
+        nav.NavigateTo(Const.Routes.Login, shouldForceReload);
     }
 }
