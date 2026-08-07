@@ -1,0 +1,90 @@
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="Search scheduled messages..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+    </HeaderLeft>
+    <HeaderRight>
+    </HeaderRight>
+
+    <ChildContent>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Scheduled Time" Width="180px">
+                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
+                </Column>
+                <Column Header="Status">
+                    <StatusBadge Status="@StatusBadge.MapBatchStatus(context.Status)" />
+                </Column>
+                <Column Header="Sender" Width="100px">
+                    <span class="font-medium text-slate-900 text-sm">@context.SenderID?.ToUpper()</span>
+                </Column>
+                <Column Header="Message">
+                    <p class="text-sm text-slate-600 truncate max-w-md" title="@context.MessageText">@context.MessageText</p>
+                </Column>
+                <Column>
+                    <Actions>
+                        <button class="flex items-center gap-3 px-4 py-2 text-sm text-brand-700 hover:bg-brand-50 w-full text-left transition-colors"
+                                @onclick="e => ResumeBatch(context.BatchID)"
+                                @onclick:stopPropagation="true" title="Resume Batch">
+                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-brand-500 w-4 h-4 text-center" />
+                            Send Immediately
+                        </button>
+                        <button class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors"
+                                @onclick="e => AbortBatch(context.BatchID)"
+                                @onclick:stopPropagation="true" title="Abort Batch">
+                            <Icon Style="Icon.IconStyle.Close" CssClass="text-red-500 w-4 h-4 text-center" />
+                            Abort
+                        </button>
+                    </Actions>
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+    <FooterLeft>
+        <Paging @bind-PageNumber="pageNumber" @bind-PageSize="pageSize" TotalRecords="totalRecords">
+        </Paging>
+    </FooterLeft>
+</PageBody>
+
+@code {
+
+    private string? searchQuery;
+    private int pageNumber = 1;
+    private int pageSize = 25;
+    private int? totalRecords = null;
+
+    private ApiDataSource<SmsBatchResponse> ds = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.SmsBatchPendingListAsync();
+        });
+        await ds.LoadData(alert);
+    }
+
+    private async Task ReloadData()
+    {
+        await ds.LoadData(alert);
+    }
+
+    private async Task AbortBatch(long batchId)
+    {
+        bool confirmed = await alert.Confirm("Are you sure you want to cancel this batch?", "Confirm");
+        if (confirmed)
+        {
+            await apiClient.SmsBatchPendingAbortAsync(batchId);
+            await ReloadData();
+        }
+    }
+
+    private async Task ResumeBatch(long batchId)
+    {
+        bool confirmed = await alert.Confirm("Are you sure you want to resume this batch now?", "Confirm");
+        if (confirmed)
+        {
+            await apiClient.SmsBatchPendingResumeAsync(batchId);
+            await ReloadData();
+        }
+    }
+}

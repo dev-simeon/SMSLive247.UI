@@ -1,0 +1,15 @@
+@page "/Messaging/Messages"
+@attribute [Authorize]
+
+<PageTitle>SMSLive247 - Messages</PageTitle>
+
+<PageHeader Title="Message History" SubTitle="View and manage your sent messages" />
+
+<Tabs>
+    <TabPage Title="Sent Messages" Icon="Icon.IconStyle.Mail">
+        <SentMessages />
+    </TabPage>
+    <TabPage Title="Scheduled Messages" Icon="Icon.IconStyle.Clock">
+        <ScheduledMessages />
+    </TabPage>
+</Tabs>

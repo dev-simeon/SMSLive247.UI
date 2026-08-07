@@ -1,12 +1,13 @@
-﻿@typeparam TItem
+
+@typeparam TItem
 
 @if (Item == null)
 {
-    <th style="width: @Width; text-align: @Align">@Header</th>
+    <th class="px-4 py-4 text-xs font-bold text-brand-900 uppercase tracking-wider text-left" style="width: @Width; @GetTextAlign()">@Header</th>
 }
 else 
 {
-    <td>@ChildContent</td>
+    <td class="px-4 py-4" style="@GetTextAlign()">@ChildContent</td>
 }
 
 @code {
@@ -15,4 +16,12 @@ else
     [Parameter] public string? Width { get; set; }
     [Parameter] public string? Align { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string GetTextAlign()
+    {
+        if (string.IsNullOrWhiteSpace(Align))
+            return "text-align: left;";
+        
+        return $"text-align: {Align};";
+    }
 }

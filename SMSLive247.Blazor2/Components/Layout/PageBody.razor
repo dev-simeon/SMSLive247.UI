@@ -1,6 +1,7 @@
-﻿<div class="w-full bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+<div class="w-full bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col">
     @* Table Toolbar *@
-    <div class="p-4 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
+    <div
+        class="p-4 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
         <div class="flex gap-3">
             @HeaderLeft
         </div>
@@ -26,9 +27,18 @@
 </div>
 
 <style>
+    .unified-table-wrapper table {
+        width: 100%;
+        min-width: 100%;
+        text-align: left;
+        border-collapse: collapse;
+    }
+
     .unified-table-wrapper table thead tr {
         background-color: #eff6ff;
-        border-bottom: 2px solid #dbeafe;
+        /* bg-blue-50/brand-50 */
+        border-bottom: 1px solid #dbeafe;
+        /* border-blue-100 */
     }
 
     .unified-table-wrapper table thead th {
@@ -41,8 +51,25 @@
         padding-bottom: 1.25rem;
     }
 
+    .unified-table-wrapper table tbody {
+        background-color: #ffffff;
+        /* bg-white */
+    }
+
+    .unified-table-wrapper table tbody tr {
+        transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
+    }
+
+    .unified-table-wrapper table tbody tr:not(:first-child) {
+        border-top: 1px solid #f1f5f9;
+        /* divide-y divide-slate-100 */
+    }
+
     .unified-table-wrapper table tbody tr:hover {
         background-color: rgba(241, 245, 249, 0.5);
+        /* hover:bg-slate-50/50 */
     }
 
     .unified-table-wrapper table tbody td {
@@ -51,6 +78,10 @@
         padding-top: 1rem;
         padding-bottom: 1rem;
         vertical-align: middle;
+    }
+
+    .table-select-row td {
+        background-color: #f1f5f9 !important;
     }
 </style>
 

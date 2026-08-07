@@ -39,6 +39,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Pages\Messaging\Messages\Index.razor" />
+    <Content Include="Pages\Messaging\Messages\ScheduledMessages.razor" />
+    <Content Include="Pages\Messaging\Messages\SentMessages.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\Messaging\Compose\CustomizedMessage.razor" />
+    <Content Include="Pages\Messaging\Compose\Index.razor" />
+    <Content Include="Pages\Messaging\Compose\SimpleMessage.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Pages\Messaging\Contacts\BulkFilesTab.razor" />
+    <None Include="Pages\Messaging\Contacts\CsvExcelTab.razor" />
+    <None Include="Pages\Messaging\Contacts\Index.razor" />
+    <None Include="Pages\Messaging\Contacts\PhonebookTab.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SMSLive247.ApiClient\SMSLive247.ApiClient.csproj" />
   </ItemGroup>
 

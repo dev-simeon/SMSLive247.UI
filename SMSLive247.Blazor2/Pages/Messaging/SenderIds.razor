@@ -1,4 +1,4 @@
-﻿@page "/messaging/sender-ids"
+@page "/messaging/sender-ids"
 @layout MainLayout
 
 <PageTitle>Sender IDs</PageTitle>
@@ -22,13 +22,13 @@
     <ChildContent>
         <Table Items="filteredItems">
             <Columns>
-                <Column Header="Sender ID">@context.SenderID</Column>
+                <Column Header="Sender ID">
+                    <span class="font-medium text-slate-900">@(string.IsNullOrEmpty(context.SenderID) ? "—" : context.SenderID)</span>
+                </Column>
                 <Column Header="Purpose / Sample Message" Width="40%">
-                   @*  @context.Purpose 
-                    <small class="text-muted">@context.SampleText</small> *@
-                    <div class="min-w-[300px] max-w-lg">
-                        <div class="font-semibold text-slate-800 text-sm whitespace-normal">@context.Purpose</div>
-                        <div class="text-slate-600 text-sm whitespace-normal mt-0.5">@context.SampleText</div>
+                    <div class="flex flex-col">
+                        <div class="text-sm font-medium text-slate-900 mb-0.5">@(string.IsNullOrEmpty(context.Purpose) ? "—" : context.Purpose)</div>
+                        <div class="text-xs text-slate-500 truncate max-w-md">@(string.IsNullOrEmpty(context.SampleText) ? "—" : context.SampleText)</div>
                     </div>
                 </Column>
                 <Column Header="Date Requested">
@@ -41,26 +41,15 @@
                     }
                     else
                     {
-                        <span>Pending Approval</span>
+                        <span class="text-slate-400">Pending Approval</span>
                     }
                 </Column>
                 <Column Header="Status">
-                    @if (context.Status == "APPROVED")
-                    {
-                        <span class="badge text-bg-success">APPROVED</span>
-                    }
-                    else if (context.Status == "REJECTED")
-                    {
-                        <span class="badge text-bg-error">REJECTED</span>
-                    }
-                    else
-                    {
-                        <span class="badge text-bg-danger">REJECTED</span>
-                    }
+                    <StatusBadge Status="@(context.Status?.ToUpper() ?? "REJECTED")" />
                 </Column>
                 <Column>
-                    @* <Actions OnDelete="e => senderIdModal.Delete(context)">
-                    </Actions> *@
+                    <Actions OnDelete="() => HandleDelete(context)">
+                    </Actions>
                 </Column>
             </Columns>
         </Table>
@@ -88,6 +77,11 @@
     protected override async Task OnInitializedAsync()
     {
         await FetchData();
+    }
+
+    private void HandleDelete(SenderIdResponse item)
+    {
+        // TODO: Implement delete logic
     }
 
     private async Task FetchData()

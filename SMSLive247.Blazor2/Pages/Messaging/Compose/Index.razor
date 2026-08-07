@@ -1,0 +1,44 @@
+@page "/messaging/compose"
+@layout MainLayout
+
+<PageTitle>Compose Message</PageTitle>
+
+<PageHeader Title="Compose Message" SubTitle="Send simple or personalized bulk messages to your contacts."></PageHeader>
+
+@* Tab Bar *@
+<div class="border-b border-slate-200 mb-6">
+    <nav class="-mb-px flex space-x-8">
+        <button @onclick='() => SetTab("simple")'
+                class="@GetTabClass("simple")">
+            <Icon Style="Icon.IconStyle.Mail" CssClass="w-5 h-5" />
+            Simple Message
+        </button>
+        <button @onclick='() => SetTab("customized")'
+                class="@GetTabClass("customized")">
+            <Icon Style="Icon.IconStyle.BookOpen" CssClass="w-5 h-5" />
+            Customized Message
+        </button>
+    </nav>
+</div>
+
+@* Tab Content *@
+@if (activeTab == "simple")
+{
+    <SimpleMessage />
+}
+else
+{
+    <CustomizedMessage />
+}
+
+@code {
+    private string activeTab = "simple";
+
+    private void SetTab(string tab) => activeTab = tab;
+
+    private string GetTabClass(string tab) =>
+        "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors " +
+        (activeTab == tab
+            ? "border-brand-500 text-brand-600"
+            : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300");
+}

@@ -1,0 +1,75 @@
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border @GetStyles()">
+    @if (ShowDot)
+    {
+        <span class="w-1.5 h-1.5 rounded-full @GetDotColor()"></span>
+    }
+    @Status
+</span>
+
+@code {
+    public enum StatusVariant
+    {
+        Success,
+        Pending,
+        Danger,
+        Info,
+        Neutral
+    }
+
+    [Parameter] public string Status { get; set; } = string.Empty;
+    [Parameter] public StatusVariant? Variant { get; set; }
+    [Parameter] public bool ShowDot { get; set; } = true;
+
+    private StatusVariant ResolvedVariant => Variant ?? GetStatusVariant(Status);
+
+    private StatusVariant GetStatusVariant(string status)
+    {
+        var s = status?.ToLowerInvariant() ?? "";
+        if (s is "approved" or "resolved" or "completed" or "success" or "active" or "deposit" or "delivered" or "processed")
+            return StatusVariant.Success;
+        if (s is "pending" or "in progress" or "warning" or "refund" or "processing" or "running" or "paused")
+            return StatusVariant.Pending;
+        if (s is "rejected" or "cancelled" or "failed" or "error" or "transfer" or "inactive" or "aborted")
+            return StatusVariant.Danger;
+        if (s is "open" or "info" or "new")
+            return StatusVariant.Info;
+        
+        return StatusVariant.Neutral;
+    }
+
+    /// <summary>
+    /// Maps raw API batch status strings to user-friendly labels — mirrors React's mapBatchStatus.
+    /// </summary>
+    public static string MapBatchStatus(string? status) => status?.ToUpperInvariant() switch
+    {
+        "COMPLETED" => "Delivered",
+        "RUNNING"   => "Pending",
+        "PAUSED"    => "Pending",
+        "ABORTED"   => "Failed",
+        _           => status ?? "Unknown"
+    };
+
+    private string GetStyles()
+    {
+        return ResolvedVariant switch
+        {
+            StatusVariant.Success => "bg-emerald-50 text-emerald-700 border-emerald-100",
+            StatusVariant.Pending => "bg-amber-50 text-amber-700 border-amber-100",
+            StatusVariant.Danger => "bg-red-50 text-red-700 border-red-100",
+            StatusVariant.Info => "bg-blue-50 text-blue-700 border-blue-100",
+            _ => "bg-slate-50 text-slate-700 border-slate-100"
+        };
+    }
+
+    private string GetDotColor()
+    {
+        return ResolvedVariant switch
+        {
+            StatusVariant.Success => "bg-emerald-500",
+            StatusVariant.Pending => "bg-amber-500",
+            StatusVariant.Danger => "bg-red-500",
+            StatusVariant.Info => "bg-blue-500",
+            _ => "bg-slate-500"
+        };
+    }
+}

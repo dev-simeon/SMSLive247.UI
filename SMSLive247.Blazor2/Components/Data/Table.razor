@@ -1,4 +1,4 @@
-﻿@attribute [CascadingTypeParameter(nameof(TItem))]
+@attribute [CascadingTypeParameter(nameof(TItem))]
 @typeparam TItem
 
 @if (Columns == null)
@@ -18,7 +18,7 @@ else
                 @if (IsLoading())
                 {
                     <tr>
-                        <td colspan="20">
+                        <td colspan="20" class="px-4 py-12 text-center text-slate-500">
                             <Loading BoolCheck="false"></Loading>
                         </td>
                     </tr>
@@ -26,16 +26,15 @@ else
                 else if (items == null)
                 {
                     <tr>
-                        <td colspan="20">
+                        <td colspan="20" class="px-4 py-12 text-center text-slate-500">
                             <span class="badge text-bg-info">NULL items </span>
                         </td>
                     </tr>
                 }
-
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="20">
+                        <td colspan="20" class="px-4 py-12 text-center text-slate-500">
                             <span class="badge text-bg-info">@EmptyMessage</span>
                         </td>
                     </tr>
@@ -55,27 +54,6 @@ else
         </table>
     </div>
 }
-
-<style>
-    .table {
-        cursor: default !important;
-        width: 100%;
-    }
-
-    .table th {
-        text-transform: uppercase;
-        font-weight: 500;
-    }
-
-    .table td {
-        padding: 0.75rem
-    }
-
-    .table-select-row td {
-        background-color: navy !important;
-        color: white !important;
-    }
-</style>
 
 @code {
     [Parameter] public IList<TItem>? Items { get; set; }

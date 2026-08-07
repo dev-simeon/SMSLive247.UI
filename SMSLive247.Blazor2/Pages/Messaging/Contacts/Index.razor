@@ -1,0 +1,53 @@
+@page "/messaging/contacts"
+@layout MainLayout
+
+<PageTitle>Contact Lists</PageTitle>
+
+<PageHeader Title="Contact Lists" SubTitle="Manage your recipient groups and individual contacts."></PageHeader>
+
+@* Tab Bar *@
+<div class="border-b border-slate-200 mb-6">
+    <nav aria-label="Tabs" class="-mb-px flex gap-6">
+        <button @onclick='() => SetTab("phonebook")'
+                class="@GetTabClass("phonebook")">
+            <Icon Style="Icon.IconStyle.Users" CssClass="w-4 h-4" />
+            Phonebook
+        </button>
+        <button @onclick='() => SetTab("bulk")'
+                class="@GetTabClass("bulk")">
+            <Icon Style="Icon.IconStyle.BookOpen" CssClass="w-4 h-4" />
+            Bulk Files
+        </button>
+        <button @onclick='() => SetTab("excel")'
+                class="@GetTabClass("excel")">
+            <Icon Style="Icon.IconStyle.Terminal" CssClass="w-4 h-4" />
+            CSV / Excel
+        </button>
+    </nav>
+</div>
+
+@* Tab Content *@
+@if (activeTab == "phonebook")
+{
+    <PhonebookTab />
+}
+else if (activeTab == "bulk")
+{
+    <BulkFilesTab />
+}
+else
+{
+    <CsvExcelTab />
+}
+
+@code {
+    private string activeTab = "phonebook";
+
+    private void SetTab(string tab) => activeTab = tab;
+
+    private string GetTabClass(string tab) =>
+        "whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors cursor-pointer " +
+        (activeTab == tab
+            ? "border-brand-500 text-brand-600"
+            : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300");
+}

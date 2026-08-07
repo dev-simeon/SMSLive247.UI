@@ -1,0 +1,105 @@
+<FormSelect Value="@_optionStr" ValueChanged="HandleOptionChanged" ValueExpression="@(() => _optionStr)"
+            IsEmbedded="true">
+    <option value="@DateRangeFilter.NONE">None</option>
+    <option value="@DateRangeFilter.TODAY">Today</option>
+    <option value="@DateRangeFilter.YESTERDAY">Yesterday</option>
+    <option value="@DateRangeFilter.LAST_3_DAYS">Last 3 Days</option>
+    <option value="@DateRangeFilter.LAST_7_DAYS">Last 7 Days</option>
+    <option value="@DateRangeFilter.LAST_14_DAYS">Last 14 Days</option>
+    <option value="@DateRangeFilter.LAST_30_DAYS">Last 30 Days</option>
+    <option value="@DateRangeFilter.LAST_90_DAYS">Last 90 Days</option>
+    <option value="@DateRangeFilter.THIS_MONTH">This Month</option>
+    <option value="@DateRangeFilter.LAST_MONTH">Last Month</option>
+    <option value="@DateRangeFilter.CUSTOM">Custom Date</option>
+</FormSelect>
+
+@if (Option == DateRangeFilter.CUSTOM)
+{
+    <div class="flex items-center border-l border-slate-200 h-full">
+        <input type="date" class="h-9 px-2 text-sm text-slate-700 focus:outline-none cursor-pointer bg-transparent w-32"
+               @bind="customStartDate" @bind:after="OnCustomDateChanged" />
+        <span class="text-slate-400 px-0.5">–</span>
+        <input type="date" class="h-9 px-2 text-sm text-slate-700 focus:outline-none cursor-pointer bg-transparent w-32"
+               @bind="customEndDate" @bind:after="OnCustomDateChanged" />
+    </div>
+}
+
+@code {
+    public enum DateRangeFilter
+    {
+        NONE,
+        TODAY,
+        YESTERDAY,
+        LAST_3_DAYS,
+        LAST_7_DAYS,
+        LAST_14_DAYS,
+        LAST_30_DAYS,
+        LAST_90_DAYS,
+        THIS_MONTH,
+        LAST_MONTH,
+        CUSTOM,
+    }
+
+    [Parameter] public DateRangeFilter Option { get; set; } = DateRangeFilter.TODAY;
+
+    private string _optionStr => Option.ToString();
+
+    [Parameter] public EventCallback<(DateTime? From, DateTime? To)> DateRangeChanged { get; set; }
+
+    private DateTime? customStartDate;
+    private DateTime? customEndDate;
+
+    private async Task HandleOptionChanged(string newValue)
+    {
+        if (!Enum.TryParse<DateRangeFilter>(newValue, out var filter))
+            return;
+
+        Option = filter;
+
+        if (filter == DateRangeFilter.NONE)
+        {
+            // No date filter — let the API return all records.
+            await DateRangeChanged.InvokeAsync((null, null));
+        }
+        else if (filter != DateRangeFilter.CUSTOM)
+        {
+            // Preset option — fire the computed range immediately.
+            var (from, to) = GetDateRange(filter);
+            await DateRangeChanged.InvokeAsync((from, to));
+        }
+        // CUSTOM: wait until both date inputs are filled via OnCustomDateChanged.
+    }
+
+    // Fires automatically when either custom date input loses focus (no Apply button needed).
+    private async Task OnCustomDateChanged()
+    {
+        if (customStartDate.HasValue && customEndDate.HasValue)
+        {
+            var (from, to) = GetDateRange(DateRangeFilter.CUSTOM);
+            await DateRangeChanged.InvokeAsync(((DateTime?)from, (DateTime?)to));
+        }
+    }
+
+    public (DateTime From, DateTime To) GetDateRange(DateRangeFilter option)
+    {
+        var now = DateTime.UtcNow;
+
+        return option switch
+        {
+            DateRangeFilter.TODAY => (now.Date, now.Date.AddDays(1).AddTicks(-1)),
+            DateRangeFilter.YESTERDAY => (now.Date.AddDays(-1), now.Date.AddTicks(-1)),
+            DateRangeFilter.LAST_3_DAYS => (now.Date.AddDays(-3), now.Date.AddDays(1).AddTicks(-1)),
+            DateRangeFilter.LAST_7_DAYS => (now.Date.AddDays(-7), now.Date.AddDays(1).AddTicks(-1)),
+            DateRangeFilter.LAST_14_DAYS => (now.Date.AddDays(-14), now.Date.AddDays(1).AddTicks(-1)),
+            DateRangeFilter.LAST_30_DAYS => (now.Date.AddDays(-30), now.Date.AddDays(1).AddTicks(-1)),
+            DateRangeFilter.LAST_90_DAYS => (now.Date.AddDays(-90), now.Date.AddDays(1).AddTicks(-1)),
+            DateRangeFilter.THIS_MONTH => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc),
+                                             new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(1).AddTicks(-1)),
+            DateRangeFilter.LAST_MONTH => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddMonths(-1),
+                                             new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc).AddTicks(-1)),
+            DateRangeFilter.CUSTOM => (customStartDate ?? now.Date,
+                                             customEndDate?.AddDays(1).AddTicks(-1) ?? now.Date.AddDays(1).AddTicks(-1)),
+            _ => (now.Date, now.Date.AddDays(1).AddTicks(-1)),
+        };
+    }
+}

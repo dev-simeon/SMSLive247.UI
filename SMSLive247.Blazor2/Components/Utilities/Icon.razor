@@ -38,6 +38,10 @@
         Phone,
         Clock,
         AlertCircle,
+        Trash,
+        Download,
+        Save,
+        MoreVertical,
     }
 
     // public string GetBootstrapClass()
@@ -146,6 +150,10 @@
             IconStyle.Phone          => "bi bi-telephone",
             IconStyle.Clock          => "bi bi-clock",
             IconStyle.AlertCircle    => "bi bi-exclamation-circle",
+            IconStyle.Trash          => "bi bi-trash",
+            IconStyle.Download       => "bi bi-download",
+            IconStyle.Save           => "bi bi-save",
+            IconStyle.MoreVertical   => "bi bi-three-dots-vertical",
             _ => throw new ArgumentOutOfRangeException("Unmapped IconStyle value.")
         };
     }
@@ -185,6 +193,10 @@
             IconStyle.Phone          => "call",
             IconStyle.Clock          => "schedule",
             IconStyle.AlertCircle    => "error",
+            IconStyle.Trash          => "delete",
+            IconStyle.Download       => "download",
+            IconStyle.Save           => "save",
+            IconStyle.MoreVertical   => "more_vert",
             _ => throw new ArgumentOutOfRangeException("Unmapped IconStyle value.")
         };
     }
