@@ -16,7 +16,11 @@
 </button>
 
 @code {
-    public enum ButtonStyle { Primary, Secondary }
+    public enum ButtonStyle
+    {
+        Primary,
+        Secondary,
+    }
 
     [Parameter] public ButtonStyle Style { get; set; } = ButtonStyle.Primary;
     [Parameter] public Icon.IconStyle? Icon { get; set; }
