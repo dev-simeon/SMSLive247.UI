@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Content Include="Pages\Accounts\EditProfileModal.razor" />
+    <Content Include="Pages\Messaging\Messages\Drafts.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,22 +40,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Messaging\Messages\Index.razor" />
-    <Content Include="Pages\Messaging\Messages\ScheduledMessages.razor" />
-    <Content Include="Pages\Messaging\Messages\SentMessages.razor" />
+    <Content Include="Pages\Messaging\Messages\_Index.razor" />
+    <Content Include="Pages\Messaging\Messages\Scheduled.razor" />
+    <Content Include="Pages\Messaging\Messages\Sent.razor" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Messaging\Compose\CustomizedMessage.razor" />
-    <Content Include="Pages\Messaging\Compose\Index.razor" />
-    <Content Include="Pages\Messaging\Compose\SimpleMessage.razor" />
+    <Content Include="Pages\Messaging\Compose\Customized.razor" />
+    <Content Include="Pages\Messaging\Compose\_Index.razor" />
+    <Content Include="Pages\Messaging\Compose\Simple.razor" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Messaging\Contacts\BulkFilesTab.razor" />
-    <Content Include="Pages\Messaging\Contacts\CsvExcelTab.razor" />
-    <Content Include="Pages\Messaging\Contacts\Index.razor" />
-    <Content Include="Pages\Messaging\Contacts\PhonebookTab.razor" />
+    <Content Include="Pages\Messaging\Contacts\BulkFiles.razor" />
+    <Content Include="Pages\Messaging\Contacts\CsvFiles.razor" />
+    <Content Include="Pages\Messaging\Contacts\_Index.razor" />
+    <Content Include="Pages\Messaging\Contacts\Phonebook.razor" />
   </ItemGroup>
 
   <ItemGroup>

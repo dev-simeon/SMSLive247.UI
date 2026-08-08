@@ -1,0 +1,108 @@
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="Search messages..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
+            <DateRangePicker DateRangeChanged="OnDateRangeChanged" />
+        </SearchBox>
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Export CSV" Icon="Icon.IconStyle.Download" />
+    </HeaderRight>
+
+    <ChildContent>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date / Time" Width="180px">
+                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
+                </Column>
+                <Column Header="Status">
+                    <StatusBadge Status="@StatusBadge.MapBatchStatus(context.Status)" />
+                </Column>
+                <Column Header="Sender" Width="100px">
+                    <span class="font-medium text-slate-900 text-sm">@context.SenderID?.ToUpper()</span>
+                </Column>
+                <Column Header="Message">
+                    <p class="text-sm text-slate-600 truncate max-w-md" title="@context.MessageText">@context.MessageText</p>
+                </Column>
+                <Column Header="Delivery">
+                    <div class="flex flex-col gap-0.5 text-sm">
+                        <div class="font-semibold text-slate-900">
+                            @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
+                        </div>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1" title="Credits Charged">
+                            <Icon Style="Icon.IconStyle.Coins" CssClass="w-3.5 h-3.5 text-blue-500" />
+                            <span>@context.CreditsCharged.ToString("#,##0.00")</span>
+                        </div>
+                    </div>
+                </Column>
+                <Column>
+                    <Actions ViewLink="@($"/messaging/{context.BatchID}")"
+                             OnDelete="e => DeleteBatch(context.BatchID)">
+                    </Actions>
+                </Column>
+                </Columns>
+            </Table>
+        </ChildContent>
+        <FooterLeft>
+            <Paging PageNumber="ds.PageState.PageNumber"
+                    PageSize="ds.PageState.PageSize"
+                    TotalRecords="ds.PageState.TotalCount"
+                    PageNumberChanged="OnPageChange"
+                    PageSizeChanged="OnPageSizeChange">
+            </Paging>
+        </FooterLeft>
+    </PageBody>
+
+
+@code {
+    private string? searchQuery;
+    private DateTime? filterFrom;
+    private DateTime? filterTo;
+
+    private void OnDateRangeChanged((DateTime? From, DateTime? To) range)
+    {
+        filterFrom = range.From;
+        filterTo = range.To;
+    }
+
+    private ApiDataSource<SmsBatchResponse> ds = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, filterFrom, filterTo, searchQuery);
+        });
+        ds.SetPage(new PageState(100, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task ReloadData()
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageChange(int page)
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, page));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageSizeChange(int size)
+    {
+        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
+        await ds.LoadData(alert);
+    }
+
+    private async Task DeleteBatch(long? batchId)
+    {
+        if (batchId == null) return;
+        
+        bool confirmed = await alert.Confirm("Are you sure you want to delete this batch?", "Confirm");
+        if (confirmed)
+        {
+            // await apiClient.SmsBatchDeleteAsync(batchId.Value);
+            await ReloadData();
+        }
+    }
+}
