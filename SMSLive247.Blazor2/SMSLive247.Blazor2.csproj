@@ -47,6 +47,9 @@
     <Content Include="Pages\Messaging\Contacts\CsvFiles.razor" />
     <Content Include="Pages\Messaging\Contacts\_Index.razor" />
     <Content Include="Pages\Messaging\Contacts\Phonebook.razor" />
+    <Content Include="Pages\Messaging\Contacts\Modals\ContactModal.razor" />
+    <Content Include="Pages\Messaging\Contacts\Modals\GroupModal.razor" />
+    <Content Include="Pages\Messaging\Contacts\Modals\BulkFileModal.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,6 +71,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Pages\Credits\Modals\TransferModal.razor" />
+    <Content Include="Pages\Credits\Modals\PurchaseModal.razor" />
     <ProjectReference Include="..\SMSLive247.ApiClient\SMSLive247.ApiClient.csproj" />
   </ItemGroup>
 

@@ -1,21 +1,19 @@
 <Modal Title="Update Profile" @bind-IsVisible="isVisible">
 
     <Body>
-        <EditForm id="BasicInfo" Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit">
+        <EditForm FormName="BasicInfo" Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit" class="space-y-4">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
-            <div class="space-y-4">
-                <FormInput Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required="true" />
-                <FormInput Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required="true" />
-                <FormInput Label="Email Address" @bind-Value="accountUpdateRequest.Email" disabled="true" />
-                <FormInput Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true" />
+            <FormInput Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required="true" />
+            <FormInput Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required="true" />
+            <FormInput Label="Email Address" @bind-Value="accountUpdateRequest.Email" disabled="true" />
+            <FormInput Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true" />
 
-                <FormSelect Label="Country" Type="FormSelect.SelectType.Country" @bind-Value="CountryCodeString"
-                            IsEmbedded="false" />
-                <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone" @bind-Value="TimeZoneString"
-                            IsEmbedded="false" />
-            </div>
+            <FormSelect Label="Country" Type="FormSelect.SelectType.Country" @bind-Value="CountryCodeString"
+                        IsEmbedded="false" />
+            <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone" @bind-Value="TimeZoneString"
+                        IsEmbedded="false" />
         </EditForm>
     </Body>
 

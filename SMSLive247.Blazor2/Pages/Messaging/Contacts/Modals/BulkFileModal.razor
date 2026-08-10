@@ -1,102 +1,174 @@
-﻿@inject IJSRuntime js
+<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
+    <Body>
+        <div class="space-y-6">
+            @if (!ForCSV)
+            {
+                <FormSelect Label="Country Code"
+                            Type="FormSelect.SelectType.Country"
+                            @bind-Value="CountryCodeString" />
+            }
 
-<EditModal TItem="BatchFileResponse" @ref="editor" LabelText="Bulk File" OnCreate="OnCreate" OnDelete="OnDelete"
-    OnDownload="OnDownload" OnCompleted="OnCompleted">
-    @if (editor.EditMode == 0) //create=0, edit=1
-    {
-        <div class="overflow-x-hidden overflow-y-auto flex-grow-1 pe-2">
-            <FormInputFile Label="Select File" OnChange="FileSelected" Accept="@fileTypes"></FormInputFile>
-            @if (ForCSV == false)
-            {
-                <FormField Label="Organize File">
-                    <InputRadioGroup @bind-Value="groupMode">
-                        <div class="form-check form-check-inline">
-                            <InputRadio class="form-check-input" id="r1" Value="@("NEW")" />
-                            <label class="form-check-label" for="r1">Save as new file</label>
+            <div class="space-y-4">
+                <label class="block text-sm font-medium text-slate-700">
+                    Upload File
+                </label>
+
+                @if (selectedFile == null)
+                {
+                    <label class="relative group cursor-pointer flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-brand-500 transition-all duration-200">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <div class="p-3 mb-3 rounded-full bg-blue-50 text-brand-600 group-hover:bg-white group-hover:shadow-md transition-all duration-200">
+                                <Icon Style="Icon.IconStyle.Download" CssClass="w-8 h-8" />
+                            </div>
+                            <p class="mb-2 text-sm text-slate-700 font-medium">
+                                <span class="text-brand-600 hover:underline">Click to upload</span>
+                                or drag and drop
+                            </p>
+                            <p class="text-xs text-slate-500 uppercase">
+                                @SupportedFormatsText
+                            </p>
                         </div>
-                        <div class="form-check form-check-inline">
-                            <InputRadio class="form-check-input" id="r2" Value="@("MERGE")" />
-                            <label class="form-check-label" for="r2">Merge into existing file</label>
+                        <InputFile class="hidden" OnChange="FileSelected" accept="@AcceptedFileTypes" />
+                    </label>
+                }
+                else
+                {
+                    <div class="bg-slate-50 rounded-lg border border-slate-200 p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+                                    <Icon Style="@(ForCSV ? Icon.IconStyle.FileSpreadsheet : Icon.IconStyle.FileText)" CssClass="w-6 h-6" />
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="text-sm font-semibold text-slate-900 truncate">
+                                        @selectedFile.Name
+                                    </span>
+                                    <span class="text-xs text-slate-500">
+                                        @FormatFileSize(selectedFile.Size) - Ready
+                                    </span>
+                                </div>
+                            </div>
+                            <button type="button"
+                                    @onclick="ClearFile"
+                                    class="text-slate-400 hover:text-red-500 transition-colors p-1"
+                                    title="Remove file">
+                                <Icon Style="Icon.IconStyle.Trash" CssClass="w-5 h-5" />
+                            </button>
                         </div>
-                    </InputRadioGroup>
-                </FormField>
-            }
-            @if (groupMode == "NEW")
-            {
-                <FormInputText Label="Group Name" @bind-Value="fileName"></FormInputText>
-            }
-            else if (groupMode == "MERGE")
-            {
-                <FormField Label="Select Group">
-                    <select class="form-select" @bind="fileName">
-                        <option value="group1">Group 1</option>
-                        <option value="group2">Group 2</option>
-                        <option value="group3">Another Group</option>
-                    </select>
-                </FormField>
-            }
+                        <div class="w-full bg-slate-200 rounded-full h-1.5 mt-2 overflow-hidden">
+                            <div class="bg-emerald-500 h-1.5 rounded-full w-full"></div>
+                        </div>
+                    </div>
+                }
+
+                <p class="text-xs text-slate-400 px-1">
+                    Supported formats: @SupportedFormatsText
+                </p>
+            </div>
+
+            <p class="text-xs text-slate-500 flex items-center gap-1.5">
+                <Icon Style="Icon.IconStyle.Info" CssClass="w-3.5 h-3.5 shrink-0" />
+                Duplicate numbers will be automatically removed during processing.
+            </p>
         </div>
-        <p class="mt-auto pt-3">Note: Duplicate numbers will be removed.</p>
-    }
-    else if ((int)editor.EditMode >= 2) //delete=2, download=3
-    {
-        <div class="overflow-y-auto overflow-x-hidden flex-grow-1 pe-2">
-            <FormInputText Label="Description" @bind-Value="editor.Model.Description" Disabled="true"></FormInputText>
-            <FormInputNumber Label="Total In File" @bind-Value="editor.Model.TotalNumbers" Disabled="true">
-            </FormInputNumber>
-            <FormInputText Label="File Type" @bind-Value="editor.Model.FileType" Disabled="true"></FormInputText>
-            <FormInputDate Label="Date Added" @bind-Value="editor.Model.DateCreated" Disabled="true"></FormInputDate>
-        </div>
-    }
-</EditModal>
+    </Body>
+    <Footer>
+        <Button Text="Upload & Process"
+                Icon="Icon.IconStyle.Download"
+                IsBusy="@isSubmitting"
+                IsDisabled="@(selectedFile == null)"
+                OnClick="HandleUpload" />
+        <Button Text="Cancel"
+                Style="Button.ButtonStyle.Secondary"
+                IsDisabled="@isSubmitting"
+                OnClick="Close" />
+    </Footer>
+</Modal>
 
 @code {
-    [Parameter] public bool ForCSV { get; set; } = false;
+    private const long MaxFileBytes = 20 * 1024 * 1024;
+
+    [Parameter] public bool ForCSV { get; set; }
     [Parameter] public EventCallback OnCompleted { get; set; }
 
-    private EditModal<BatchFileResponse> editor = new();
-    private IBrowserFile? browserFile;
+    private bool isVisible;
+    private bool isSubmitting;
+    private IBrowserFile? selectedFile;
+    private string? CountryCodeString { get; set; }
 
-    private string groupMode = "NEW";
-    private string fileName = string.Empty;
-    private string fileTypes => ForCSV ? ".csv" : ".txt, .text";
+    private string ModalTitle => ForCSV ? "Upload CSV / Excel File" : "Upload Bulk File";
+    private string AcceptedFileTypes => ForCSV ? ".csv,.xls,.xlsx,.xlx" : ".txt,.text";
+    private string SupportedFormatsText => AcceptedFileTypes.Replace(".", "").Replace(",", ", ");
 
-    public void Show(BatchFileResponse? batchFile = null) => editor.Show(batchFile);
-    public void Delete(BatchFileResponse batchFile) => editor.Delete(batchFile);
-    public void Download(BatchFileResponse batchFile) => editor.Download(batchFile);
-
-    private async Task OnCreate()
+    public void Show()
     {
-        if (browserFile != null)
-        {
-            var file = new FileParameter(browserFile.OpenReadStream(browserFile.Size), browserFile.Name, browserFile.ContentType);
-            await apiClient.BatchFileCreateAsync(234, file);
-        }
-    }
-
-    private async Task OnDelete()
-    {
-        var question = "Are you sure you want to delete this bulk file?";
-        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
-
-        if (confirmed)
-            await apiClient.BatchFileDeleteAsync(editor.Model.BatchFileID);
-    }
-
-    private async Task OnDownload()
-    {
-        var question = "Are you sure you want to download this bulk file?";
-        bool confirmed = await alert.Confirm(question, "Confirm Download");
-
-        if (confirmed)
-        {
-            var response = await apiClient.BatchFileDownloadAsync(editor.Model.BatchFileID);
-            await js.DownloadFromStream(response.Stream, "example.txt");
-        }
+        selectedFile = null;
+        CountryCodeString = null;
+        isVisible = true;
+        StateHasChanged();
     }
 
     private void FileSelected(InputFileChangeEventArgs e)
     {
-        browserFile = e.File;
+        selectedFile = e.File;
+    }
+
+    private void ClearFile()
+    {
+        selectedFile = null;
+    }
+
+    private async Task HandleUpload()
+    {
+        if (selectedFile == null)
+            return;
+
+        if (!ForCSV && !int.TryParse(CountryCodeString, out _))
+        {
+            await alert.Error("Please select a country code.", "Validation Error");
+            return;
+        }
+
+        isSubmitting = true;
+        try
+        {
+            int? countryCode = null;
+            if (int.TryParse(CountryCodeString, out var parsedCountryCode))
+                countryCode = parsedCountryCode;
+
+            await using var stream = selectedFile.OpenReadStream(MaxFileBytes);
+            var file = new FileParameter(stream, selectedFile.Name, selectedFile.ContentType);
+            await apiClient.BatchFileCreateAsync(countryCode, file);
+
+            await alert.Success("File uploaded successfully.", "Success");
+            isVisible = false;
+            await OnCompleted.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Upload Failed");
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private Task Close()
+    {
+        isVisible = false;
+        return Task.CompletedTask;
+    }
+
+    private static string FormatFileSize(long bytes)
+    {
+        if (bytes <= 0)
+            return "0 Bytes";
+
+        string[] sizes = ["Bytes", "KB", "MB", "GB"];
+        var order = Math.Min(sizes.Length - 1, (int)Math.Floor(Math.Log(bytes, 1024)));
+        var size = bytes / Math.Pow(1024, order);
+        return $"{size:0.##} {sizes[order]}";
     }
 }

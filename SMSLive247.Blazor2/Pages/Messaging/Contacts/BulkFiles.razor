@@ -1,5 +1,7 @@
 
 
+@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
+
 <PageBody>
     <HeaderLeft>
         <SearchBox Placeholder="Search files..." @bind-SearchTerm="searchQuery" />
@@ -45,6 +47,8 @@
     </FooterLeft>
 </PageBody>
 
+<BulkFileModal @ref="uploadModal" OnCompleted="FetchFiles" />
+
 @code {
     private string? searchQuery;
     private int pageNumber = 1;
@@ -52,6 +56,7 @@
 
     private List<BatchFileResponse> files = new();
     private bool isLoading = false;
+    private BulkFileModal uploadModal = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,7 +107,7 @@
 
     private void HandleUpload()
     {
-        // Upload modal placeholder
+        uploadModal.Show();
     }
 
     private async Task HandleDownload(string? fileId)

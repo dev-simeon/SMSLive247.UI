@@ -1,5 +1,6 @@
 @attribute [Route(Const.Routes.Wallet.BuyCredits)]
 @layout MainLayout
+@using SMSLive247.Blazor2.Pages.Credits.Modals
 
 <PageTitle>SMSLive247 - Buy Credits</PageTitle>
 
@@ -10,6 +11,9 @@
     <HeaderLeft>
         <SearchBox Placeholder="Search purchases..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Buy Credits" Icon="Icon.IconStyle.CreditCard" OnClick="() => purchaseModal.Show()" />
+    </HeaderRight>
 
     <ChildContent>
         <Table DataSource="ds">
@@ -59,9 +63,12 @@
     </FooterLeft>
 </PageBody>
 
+<PurchaseModal @ref="purchaseModal" OnCompleted="ReloadData" />
+
 @code {
     private string? searchQuery;
     private ApiDataSource<PurchaseResponse> ds = new();
+    private PurchaseModal purchaseModal = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,4 +98,3 @@
         await ds.LoadData(alert);
     }
 }
-

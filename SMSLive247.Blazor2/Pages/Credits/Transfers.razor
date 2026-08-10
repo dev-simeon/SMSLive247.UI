@@ -1,14 +1,20 @@
 @attribute [Route(Const.Routes.Wallet.Transfers)]
 @layout MainLayout
+@using SMSLive247.Blazor2.Pages.Credits.Modals
 
 <PageTitle>SMSLive247 - Transfers</PageTitle>
 
-<PageHeader Title="Transfers" SubTitle="View the history of all credit transfers to and from your account." />
+<PageHeader Title="Transfers" SubTitle="The list below shows all your successful transfers to / from your account." />
 
 <PageBody>
     <HeaderLeft>
         <SearchBox Placeholder="Search transfers..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Transfer Credit"
+                Icon="Icon.IconStyle.PlusCircle"
+                OnClick="async () => await transferModal.Show()" />
+    </HeaderRight>
 
     <ChildContent>
         <Table DataSource="ds">
@@ -39,9 +45,12 @@
     </FooterLeft>
 </PageBody>
 
+<TransferModal @ref="transferModal" OnCompleted="ReloadData" />
+
 @code {
     private string? searchQuery;
     private ApiDataSource<TransferResponse> ds = new();
+    private TransferModal transferModal = new();
 
     protected override async Task OnInitializedAsync()
     {

@@ -119,20 +119,11 @@
 <div class="h-12"></div>
 
 @code {
-    private const string OpenChatScript = """
-        if (window.Tawk_API && typeof window.Tawk_API.showWidget === 'function') {
-            window.Tawk_API.showWidget();
-            window.Tawk_API.maximize();
-        } else {
-            alert('Live chat is still initializing. Please wait a moment and try again.');
-        }
-        """;
-
     private async Task OpenChat()
     {
         try
         {
-            await JSRuntime.InvokeVoidAsync("eval", OpenChatScript);
+            await JSRuntime.InvokeVoidAsync("smsliveOpenTawkChat");
         }
         catch (Exception ex)
         {

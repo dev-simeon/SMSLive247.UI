@@ -1,218 +1,208 @@
-﻿@inject AuthenticationStateProvider auth
-@inject Settings settings;
-@inject IJSRuntime js
+@inject NavigationManager nav
 
-<Modal Title="Buy SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
+<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
     <Body>
-        @if (price != null)
-        {
-            <StaticText Label="SMS Quantity" Text="@price.Quantity.ToString("#,##0")" />
-            <StaticText Label="Unit Price" Text="@(price.Price.ToString("₦ #,##0.00"))" />
-            <StaticText Label="Purchase Amount" Text="@(price.Amount.ToString("₦ #,##0.00"))" />
-            <StaticText Label="Transaction Fee" Text="@(price.Fee.ToString("₦ #,##0.00"))" />
-            <StaticText Label="Total Amount" Text="@((price.Amount + price.Fee).ToString("₦ #,##0.00"))" />
-        }
-        else
-        {
-            <div class="alert alert-info" role="alert">
-                Minimum SMS credit quantity to purchase is 500 sms credit.
-            </div>
-            <EditForm id="Purchase" Model="quantity" OnValidSubmit="ConfirmPrice">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <FormField Label="Sms Quantity">
-                    <InputNumber class="form-control" min="500" @bind-Value="quantity" required></InputNumber>
-                </FormField>
-            </EditForm>
-        }
+        <div class="space-y-6">
+            @if (price == null)
+            {
+                <EditForm id="PurchaseCalculateForm" Model="@model" OnValidSubmit="ConfirmPrice">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">
+                                Quantity/Credits
+                            </label>
+                            <div class="relative">
+                                <InputNumber @bind-Value="model.Quantity"
+                                             min="500"
+                                             class="block w-full rounded-lg border-0 py-3 pl-4 pr-20 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-brand-500 sm:text-sm font-mono outline-none"
+                                             placeholder="e.g. 10000" />
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                    <span class="text-slate-500 text-[10px] font-bold">
+                                        CREDITS
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-[11px] text-blue-700 flex gap-2">
+                            <Icon Style="Icon.IconStyle.Info" CssClass="w-4 h-4 mt-0.5 shrink-0" />
+                            <p>Minimum SMS credit quantity to purchase is 500. Transaction charges are added at checkout.</p>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+            else
+            {
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center pb-3 border-b border-slate-200/60">
+                            <span class="text-sm text-slate-500 font-medium">SMS Quantity</span>
+                            <span class="text-base font-bold text-slate-900">
+                                @price.Quantity.ToString("#,##0") Credits
+                            </span>
+                        </div>
+
+                        <div class="space-y-3 pt-1">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500">Credit Price</span>
+                                <span class="text-slate-700 font-medium whitespace-nowrap">@FormatCurrency(price.Price)</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500">Purchase Amount</span>
+                                <span class="text-slate-700 font-medium">@FormatCurrency(price.Amount)</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500">Transaction Fee</span>
+                                <span class="text-slate-700 font-medium">@FormatCurrency(price.Fee)</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-200">
+                            <div class="flex justify-between items-center">
+                                <span class="text-base font-bold text-slate-900">Total Amount</span>
+                                <span class="text-xl font-black text-brand-600">@FormatCurrency(price.Amount + price.Fee)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-4 bg-blue-50/50 rounded-lg border border-blue-100/50">
+                    <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                        <span class="text-blue-600 text-xs font-bold font-mono">i</span>
+                    </div>
+                    <p class="text-xs text-blue-700 leading-relaxed">
+                        You will be redirected to Paystack to complete your payment securely.
+                        Once successful, your credits will be added to your account instantly.
+                    </p>
+                </div>
+            }
+        </div>
     </Body>
     <Footer>
-        @if (price != null)
+        @if (price == null)
         {
-            <Button Type="Button.Style.DEFAULT" @onclick="ConfirmPurchase">Pay with Paystack</Button>
-            <Button Type="Button.Style.CANCEL" @onclick="CancelConfirmation">Cancel</Button>
+            <Button IsSubmit="true"
+                    form="PurchaseCalculateForm"
+                    Text="Confirm Price"
+                    Icon="Icon.IconStyle.ChevronRight"
+                    IsBusy="@isCalculating" />
         }
         else
         {
-            <button form="Purchase" type="submit" class="btn btn-primary">Confirm Price</button>
+            <Button Text="Pay with Paystack"
+                    Icon="Icon.IconStyle.CreditCard"
+                    IsBusy="@isProcessingPayment"
+                    OnClick="BeginPayment" />
+            <Button Text="Back"
+                    Style="Button.ButtonStyle.Secondary"
+                    IsDisabled="@isProcessingPayment"
+                    OnClick="CancelConfirmation" />
         }
+        <Button Text="Cancel"
+                Style="Button.ButtonStyle.Secondary"
+                IsDisabled="@(isCalculating || isProcessingPayment)"
+                OnClick="Close" />
     </Footer>
 </Modal>
 
 @code {
-    private bool hideModal = true;
-    private PriceCalcResponse? price;
-    private long quantity = 1000;
-
-    // keep a reference so JS can call back into this instance
-    private DotNetObjectReference<PurchaseModal>? dotNetRef;
-
-    protected override async Task OnInitializedAsync()
+    private sealed class PurchaseFormModel
     {
-        var member = await ((Authentication.SmsAuthProvider)auth).GetMember();
-
-        if (member == null)
-            await alert.Error("Please re-login", "Error");
+        public long Quantity { get; set; } = 10000;
     }
+
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private bool isVisible;
+    private bool isCalculating;
+    private bool isProcessingPayment;
+    private PurchaseFormModel model = new();
+    private PriceCalcResponse? price;
+
+    private string ModalTitle => price == null ? "Buy SMS Credits" : "Confirm Purchase";
 
     public void Show()
     {
-        hideModal = false;
-        StateHasChanged();
-    }
-
-    private void CancelConfirmation()
-    {
+        model = new PurchaseFormModel();
         price = null;
+        isVisible = true;
+        StateHasChanged();
     }
 
     private async Task ConfirmPrice()
     {
+        if (model.Quantity < 500)
+        {
+            await alert.Error("Minimum SMS credit quantity to purchase is 500.", "Validation Error");
+            return;
+        }
+
+        isCalculating = true;
         try
         {
-            var response = await apiClient.PriceCalculateAsync(null, quantity, "N");
-
+            var response = await apiClient.PriceCalculateAsync(null, model.Quantity, "N");
             if (response.StatusCode == 200)
-            {
                 price = response.Result;
-                return;
-            }
-            throw new Exception("apiClient.PurchaseBeginAsync() Failed");
+            else
+                await alert.Error("Failed to calculate cost.", "Error");
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
         }
+        finally
+        {
+            isCalculating = false;
+            StateHasChanged();
+        }
     }
 
-    private async Task ConfirmPurchase()
+    private async Task BeginPayment()
     {
+        if (price == null)
+            return;
+
+        isProcessingPayment = true;
         try
         {
-            if (price == null)
-                throw new Exception("Confirm the price first");
+            var request = new PurchaseRequest
+            {
+                ProviderID = "PAYSTACK",
+                Quantity = model.Quantity
+            };
 
-            // Get the total amount including the transaction fee
-            var totalAmount = (decimal)price.Amount + (decimal)price.Amount * 0.015M;
-
-            // Paystack expects amount in Kobo, so multiply by 100 and cast to int/long.
-            // Use Math.Round to handle potential floating point issues before casting.
-            var totalAmountKobo = (long)Math.Round(totalAmount * 100M);
-
-            var request = new PurchaseRequest { ProviderID = "PAYSTACK", Quantity = quantity };
             var response = await apiClient.PurchaseBeginAsync(request);
+            var authorizationUrl = response.Result?.AuthorizationUrl;
 
-            if (response.StatusCode != 200)
-                throw new Exception("apiClient.PurchaseBeginAsync() Failed");
+            if (string.IsNullOrWhiteSpace(authorizationUrl))
+                throw new Exception("No authorization URL received from server.");
 
-            // Create a DotNetObjectReference to allow JS to call back into this component
-            dotNetRef = DotNetObjectReference.Create(this);
-            
-            // Ensure access code is a string
-            var accessCode = response.Result?.AccessCode?.ToString() ?? "";
-            if (string.IsNullOrEmpty(accessCode))
-                throw new Exception("No access code received from server");
-                
-            await js.InvokeVoidAsync("paystackPopup", accessCode, dotNetRef);
+            isVisible = false;
+            await OnCompleted.InvokeAsync();
+            nav.NavigateTo(authorizationUrl, forceLoad: true);
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
-        }
-        finally
-        {
-            // keep modal open until callback completes; only hide if you want
-            hideModal = true;
+            isProcessingPayment = false;
+            StateHasChanged();
         }
     }
 
-
-
-    [JSInvokable("OnLoad")]
-    public void OnLoad(string? info)
+    private Task CancelConfirmation()
     {
-        Console.WriteLine(info);
+        price = null;
+        return Task.CompletedTask;
     }
 
-    [JSInvokable("OnSuccess")]
-    public async Task OnSuccess(string transactionReference)
+    private Task Close()
     {
-        try
-        {
-            await apiClient.PurchaseCompleteAsync(transactionReference);
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-        finally
-        {
-            // dispose the DotNet reference after completion
-            dotNetRef?.Dispose();
-            dotNetRef = null;
-        }
+        isVisible = false;
+        return Task.CompletedTask;
     }
 
-    [JSInvokable("OnCancel")]
-    public void OnCancel()
-    {
-        Console.WriteLine("canceled");
-        dotNetRef?.Dispose();
-        dotNetRef = null;
-    }
-
-    [JSInvokable("OnError")]
-    public Task OnError(string errorMessage)
-    {
-        dotNetRef?.Dispose();
-        dotNetRef = null;
-        return alert.Error(errorMessage, "Error");
-    }
+    private static string FormatCurrency(double amount) => $"N {amount:#,##0.00}";
 }
-
-<script src="https://js.paystack.co/v2/inline.js"></script>
-<script>
-    function paystackPopup(accessCode, dotNetRef) {
-        const popup = new PaystackPop();
-
-        function messageHandler(e) {
-            try {
-                if (!e.data) return;
-
-                // Ensure it's from Paystack
-                if (e.origin && !e.origin.includes('paystack')) return;
-
-                const data = e.data;
-                let safePayload = {};
-
-                // Extract only safe serializable fields
-                if (typeof data === 'object') {
-                    safePayload = {
-                        reference: data.reference || data.transaction || null,
-                        message: data.message || null,
-                        event: data.event || null,
-                        status: data.status || null
-                    };
-                }
-
-                // Route events properly
-                if (safePayload.reference) {
-                    dotNetRef?.invokeMethodAsync('OnSuccess', safePayload.reference);
-                } else if (safePayload.message && safePayload.message.toLowerCase().includes('cancel')) {
-                    dotNetRef?.invokeMethodAsync('OnCancel');
-                } else if (safePayload.message) {
-                    dotNetRef?.invokeMethodAsync('OnError', safePayload.message);
-                } else {
-                    dotNetRef?.invokeMethodAsync('OnLoad', JSON.stringify(safePayload));
-                }
-            } catch (err) {
-                console.error('Handler error:', err);
-            }
-        }
-
-        window.addEventListener('message', messageHandler);
-
-        popup.resumeTransaction(accessCode);
-    }
-
-</script>
