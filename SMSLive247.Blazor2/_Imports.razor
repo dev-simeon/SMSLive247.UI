@@ -26,9 +26,10 @@
 @using SMSLive247.UI.Services
 @using SMSLive247.OpenApi
 
-@inject SubAccountClient subClient
+@inject IJSRuntime js
 @inject ApiClient apiClient
 @inject AlertService alert
-@* @inject IJSRuntime JS *@
+@inject NavigationManager nav
+@inject SubAccountClient subClient
 @* @attribute [Authorize] *@
 

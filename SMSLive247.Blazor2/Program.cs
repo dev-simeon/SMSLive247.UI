@@ -26,6 +26,7 @@ public partial class Program
         builder.Services.AddTransient<AuthDelegateHandler>();
         //builder.Services.AddTransient<CacheDelegateHandler>();
 
+        builder.Services.AddHttpClient<SubAccountClient>(ConfigureUrl);
         builder.Services.AddHttpClient<ApiClient>(ConfigureUrl)
                         .AddHttpMessageHandler<AuthDelegateHandler>();
 

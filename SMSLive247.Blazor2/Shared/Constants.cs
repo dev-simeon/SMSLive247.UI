@@ -34,6 +34,8 @@ namespace SMSLive247.UI.Shared
                 public const string SubAccounts = "/account/sub-accounts";
                 public const string SubAccountDetails = "/account/sub-accounts/{id}";
                 public const string Profile = "/account/profile";
+
+                public static string Details(string id) => SubAccountDetails.Replace("{id}", id);
             }
 
             public static class Wallet
