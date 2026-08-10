@@ -1,45 +1,64 @@
-﻿<EditModal TItem="AccountResponse" @ref="editor" LabelText="Sub User"
-           OnCreate="OnCreate"
-           OnUpdate="OnUpdate"
-           OnDelete="OnDelete"
-           OnCompleted="OnCompleted">
-    @if (editor.EditMode == EditModal<AccountResponse>.EditModeEnum.CREATE)
-    {
-        <FormInputText Label="UserName" @bind-Value="model.AccountName"></FormInputText>
-        <FormInputText Label="First Name" @bind-Value="model.FirstName" required></FormInputText>
-        <FormInputText Label="Last Name" @bind-Value="model.LastName" required></FormInputText>
-        <FormInputText Label="Phone Number" @bind-Value="model.Phone" required></FormInputText>
-        <FormInputText Label="Delivery Email" @bind-Value="model.Email" required></FormInputText>
-    }
-    else if (editor.EditMode == EditModal<AccountResponse>.EditModeEnum.EDIT)
-    {
-        <FormInputText Label="UserName" @bind-Value="model.AccountName" readonly></FormInputText>
-        <FormInputText Label="First Name" @bind-Value="model.FirstName" required></FormInputText>
-        <FormInputText Label="Last Name" @bind-Value="model.LastName" required></FormInputText>
-        <FormInputText Label="Phone Number" @bind-Value="model.Phone" readonly></FormInputText>
-        <FormInputText Label="Delivery Email" @bind-Value="model.Email" readonly></FormInputText>
+<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
+    <Body>
+        <EditForm id="SubUserForm" Model="@model" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-        var stringApiKey = subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A";
-        <FormInputText Label="API Key" @bind-Value="@stringApiKey" readonly></FormInputText>
-    }
-    else
-    {
-        <FormInputText Label="First Name" @bind-Value="model.FirstName" readonly></FormInputText>
-        <FormInputText Label="Last Name" @bind-Value="model.LastName" readonly></FormInputText>
-        <FormInputText Label="Phone Number" @bind-Value="model.Phone" readonly></FormInputText>
-        <FormInputText Label="Delivery Email" @bind-Value="model.Email" readonly></FormInputText>
-    }
-</EditModal>
+            <div class="space-y-4">
+                @if (editMode == EditModeEnum.CREATE)
+                {
+                    <FormInput Label="UserName" @bind-Value="model.AccountName" />
+                    <FormInput Label="First Name" @bind-Value="model.FirstName" />
+                    <FormInput Label="Last Name" @bind-Value="model.LastName" />
+                    <FormInput Label="Phone Number" @bind-Value="model.Phone" />
+                    <FormInput Label="Delivery Email" @bind-Value="model.Email" />
+                }
+                else if (editMode == EditModeEnum.EDIT)
+                {
+                    <FormInput Label="UserName" @bind-Value="model.AccountName" ReadOnly="true" />
+                    <FormInput Label="First Name" @bind-Value="model.FirstName" />
+                    <FormInput Label="Last Name" @bind-Value="model.LastName" />
+                    <FormInput Label="Phone Number" @bind-Value="model.Phone" ReadOnly="true" />
+                    <FormInput Label="Delivery Email" @bind-Value="model.Email" ReadOnly="true" />
 
-
+                    <FormInput Label="API Key" Value="@(subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")" ReadOnly="true" />
+                }
+                else if (editMode == EditModeEnum.VIEW)
+                {
+                    <FormInput Label="First Name" @bind-Value="model.FirstName" ReadOnly="true" />
+                    <FormInput Label="Last Name" @bind-Value="model.LastName" ReadOnly="true" />
+                    <FormInput Label="Phone Number" @bind-Value="model.Phone" ReadOnly="true" />
+                    <FormInput Label="Delivery Email" @bind-Value="model.Email" ReadOnly="true" />
+                }
+            </div>
+        </EditForm>
+    </Body>
+    <Footer>
+        @if (editMode == EditModeEnum.CREATE)
+        {
+            <Button IsSubmit="true" Text="Create Sub User" form="SubUserForm" />
+        }
+        else if (editMode == EditModeEnum.EDIT)
+        {
+            <Button IsSubmit="true" Text="Update Sub User" form="SubUserForm" />
+        }
+        else
+        {
+            <Button Text="Close" OnClick="() => isVisible = false" Type="Button.Style.SECONDARY" />
+        }
+    </Footer>
+</Modal>
 
 @code {
     [Parameter] public EventCallback OnCompleted { get; set; }
-    [Parameter] public string SubAccountId { get; set; }
+    [Parameter] public string SubAccountId { get; set; } = string.Empty;
 
-    private EditModal<AccountResponse> editor = new();
-    private AccountResponse model => editor.Model;
-
+    public enum EditModeEnum { CREATE, EDIT, VIEW }
+    private EditModeEnum editMode = EditModeEnum.CREATE;
+    
+    private bool isVisible = false;
+    private string modalTitle = "Sub User";
+    private AccountResponse model = new();
     private AccountResponse subAccount = new();
 
     protected override async Task OnInitializedAsync()
@@ -48,8 +67,8 @@
         {
             var response = await apiClient.AccountGetAsync(SubAccountId);
 
-            if (response.StatusCode == 200)
-                subAccount =  response.Result;
+            if (response.StatusCode == 200 && response.Result != null)
+                subAccount = response.Result;
         }
         catch (Exception ex)
         {
@@ -57,44 +76,72 @@
         }
     }
 
-    public void Show(AccountResponse? item = null) => editor.Show(item);
-    public void Delete(AccountResponse account) => editor.Delete(account);
-
-    private async Task OnCreate()
+    public void Show(AccountResponse? item = null)
     {
-        var request = new AccountCreateRequest
+        if (item == null)
         {
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            Phone = model.Phone,
-            Email = model.Email,
-            AccountName = model.AccountName,
-            Password = GeneratePassword(12)
-        };
-
-        await subClient.Impersonate(subAccount).AccountCreateAsync(request);
+            editMode = EditModeEnum.CREATE;
+            modalTitle = "Add Sub User";
+            model = new();
+        }
+        else
+        {
+            editMode = EditModeEnum.EDIT;
+            modalTitle = "Edit Sub User";
+            model = new()
+            {
+                AccountID = item.AccountID,
+                AccountName = item.AccountName,
+                FirstName = item.FirstName,
+                LastName = item.LastName,
+                Phone = item.Phone,
+                Email = item.Email
+            };
+        }
+        isVisible = true;
+        StateHasChanged();
     }
 
-    private async Task OnUpdate()
+    private async Task HandleSubmit()
     {
-        var updateRequest = new AccountUpdateRequest
+        try
         {
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            Phone = model.Phone,
-            Email = model.Email,
-        };
+            if (editMode == EditModeEnum.CREATE)
+            {
+                var request = new AccountCreateRequest
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Phone = model.Phone,
+                    Email = model.Email,
+                    AccountName = model.AccountName,
+                    Password = GeneratePassword(12)
+                };
 
-        await subClient.Impersonate(subAccount).AccountUpdateAsync(model.AccountID, updateRequest);
-    }
+                await subClient.Impersonate(subAccount).AccountCreateAsync(request);
+                await alert.Success("Sub User created.", "Success");
+            }
+            else if (editMode == EditModeEnum.EDIT)
+            {
+                var updateRequest = new AccountUpdateRequest
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Phone = model.Phone,
+                    Email = model.Email,
+                };
 
-    private async Task OnDelete()
-    {
-        var question = "Are you sure you want to delete this account?";
-        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
-
-        if (confirmed)
-            await subClient.Impersonate(subAccount).AccountDeleteAsync(model.AccountID);
+                await subClient.Impersonate(subAccount).AccountUpdateAsync(model.AccountID, updateRequest);
+                await alert.Success("Sub User updated.", "Success");
+            }
+            
+            isVisible = false;
+            await OnCompleted.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
     }
 
     public static string GeneratePassword(int length)
@@ -108,5 +155,4 @@
 
         return new string(passwordChars);
     }
-
 }

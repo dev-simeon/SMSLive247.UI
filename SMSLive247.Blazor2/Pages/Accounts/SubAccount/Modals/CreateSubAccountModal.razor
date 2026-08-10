@@ -1,0 +1,87 @@
+<Modal Title="Add Sub-Account" @bind-IsVisible="isVisible">
+    <Body>
+        <EditForm id="CreateSubAccount" Model="@request" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <FormInput Label="First Name" @bind-Value="request.FirstName" />
+                    <FormInput Label="Last Name" @bind-Value="request.LastName" />
+                </div>
+                <FormInput Label="Account Name (Username / Email)" @bind-Value="request.AccountName" />
+                <FormInput Label="Email Address" @bind-Value="request.Email" Type="email" />
+                <FormInput Label="Phone Number" @bind-Value="request.Phone" />
+                <FormInput Label="Password" @bind-Value="password" Type="password" />
+                <FormSelect Label="Country" Type="FormSelect.SelectType.Country"
+                            @bind-Value="CountryCodeString" IsEmbedded="false" />
+                <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone"
+                            @bind-Value="TimeZoneString" IsEmbedded="false" />
+            </div>
+        </EditForm>
+    </Body>
+    <Footer>
+        <Button IsSubmit="true" Text="Create Sub-Account" form="CreateSubAccount" />
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private bool isVisible = false;
+    private AccountCreateRequest request = new();
+    private string password = string.Empty;
+    private string? CountryCodeString { get; set; }
+    private string? TimeZoneString { get; set; }
+
+    public void Show()
+    {
+        request = new();
+        password = string.Empty;
+        CountryCodeString = null;
+        TimeZoneString = null;
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(CountryCodeString)
+                && int.TryParse(CountryCodeString, out int countryCode))
+            {
+                request.CountryCode = countryCode;
+            }
+
+            if (!string.IsNullOrEmpty(TimeZoneString)
+                && int.TryParse(TimeZoneString, out int tz))
+            {
+                request.TimeZone = tz;
+            }
+
+            request.Password = password;
+
+            var response = await apiClient.AccountCreateAsync(request);
+
+            if (response.StatusCode == 200 || response.StatusCode == 201)
+            {
+                await alert.Success("Sub-account created successfully.", "Success");
+                await OnCompleted.InvokeAsync();
+            }
+            else
+            {
+                await alert.Error("Failed to create sub-account.", "Error");
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        finally
+        {
+            isVisible = false;
+            StateHasChanged();
+        }
+    }
+}

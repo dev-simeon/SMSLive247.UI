@@ -1,26 +1,176 @@
-﻿@attribute [Route(Const.Routes.Account.SubAccounts)]
+@attribute [Route(Const.Routes.Account.SubAccounts)]
 @layout MainLayout
 @inject NavigationManager nav
+@inject IJSRuntime JSRuntime
+@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
 
+<PageTitle>Sub-Accounts</PageTitle>
 
-<PageTitle>Sub Accounts</PageTitle>
+<PageHeader Title="Sub-Accounts"
+            SubTitle="Manage all your sub-accounts and monitor their usage." />
+
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="Search by name or ID..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Add Sub-Account" Icon="Icon.IconStyle.PlusCircle" OnClick="() => createModal.Show()" />
+    </HeaderRight>
+
+    <ChildContent>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Sub-Account Name">
+                    <button @onclick="() => nav.NavigateTo(SubAccountUrl(context.AccountID))"
+                            class="font-medium text-brand-600 hover:text-brand-700 hover:underline text-left transition-colors">
+                        @(context.AccountName ?? "—")
+                    </button>
+                </Column>
+                <Column Header="Balance">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-slate-700">
+                            @context.Credits.ToString("#,##0.##")
+                        </span>
+                        <button @onclick="() => transferModal.Show(context)"
+                                class="p-1 text-brand-600 hover:bg-brand-50 rounded-md transition-all"
+                                title="Transfer credits">
+                            <Icon Style="Icon.IconStyle.PlusCircle" CssClass="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                </Column>
+                <Column Header="Status">
+                    @if (context.Active == true)
+                    {
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                            Active
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">
+                            Inactive
+                        </span>
+                    }
+                </Column>
+                <Column Header="Date Created" Width="150px">
+                    <FormatDate DateTime="@context.DateCreated" />
+                </Column>
+                <Column Header="Account ID">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-slate-600">@(context.AccountID ?? "—")</span>
+                        @if (!string.IsNullOrEmpty(context.AccountID))
+                        {
+                            <button @onclick="() => CopyToClipboard(context.AccountID!)"
+                                    class="text-slate-400 hover:text-brand-600 transition-colors"
+                                    title="Copy ID">
+                                <Icon Style="Icon.IconStyle.FileText" CssClass="w-3.5 h-3.5" />
+                            </button>
+                        }
+                    </div>
+                </Column>
+                <Column>
+                    <Actions ViewLink="@SubAccountUrl(context.AccountID)"
+                             OnDelete="e => DeleteSubAccount(context)" />
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+
+    <FooterLeft>
+        <Paging PageNumber="ds.PageState.PageNumber"
+                PageSize="ds.PageState.PageSize"
+                TotalRecords="ds.PageState.TotalCount"
+                PageNumberChanged="OnPageChange"
+                PageSizeChanged="OnPageSizeChange" />
+    </FooterLeft>
+</PageBody>
+
+<CreateSubAccountModal @ref="createModal" OnCompleted="ReloadData" />
+<TransferModal @ref="transferModal" ParentId="@parentAccountId" />
 
 @code {
-    // private SearchBox searchBox = new();
-    // private SubAccountModal subAccountModal = new();
-    // private ApiDataSource<AccountResponse> ds = new();
+    private string? searchQuery;
+    private string parentAccountId = "";
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     ds.Callback = new((PageState p, FilterState? f) =>
-    //     {
-    //         return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchBox.Text);
-    //     });
-    //     await ds.LoadData(alert);
-    // }
+    private ApiDataSource<AccountResponse> ds = new();
+    private CreateSubAccountModal createModal = new();
+    private TransferModal transferModal = new();
 
-    // private void NavigateToSubAccountDetails(AccountResponse account)
-    // {
-    //     nav.NavigateTo($"/Accounts/{account.AccountID}");
-    // }
+    private string SubAccountUrl(string? id) =>
+        Const.Routes.Account.SubAccountDetails.Replace("{id}", id ?? "");
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var me = await apiClient.AccountGetAsync("me");
+            if (me?.StatusCode == 200 && me.Result?.AccountID != null)
+                parentAccountId = me.Result.AccountID;
+        }
+        catch { }
+
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchQuery);
+        });
+        ds.SetPage(new PageState(25, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task ReloadData()
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageChange(int page)
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, page));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageSizeChange(int size)
+    {
+        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
+        await ds.LoadData(alert);
+    }
+
+    private async Task DeleteSubAccount(AccountResponse account)
+    {
+        if (account.AccountID == null) return;
+
+        bool confirmed = await alert.Confirm(
+            $"Are you sure you want to delete \"{account.AccountName}\"? This action cannot be undone.",
+            "Delete Sub-Account");
+
+        if (!confirmed) return;
+
+        try
+        {
+            var response = await apiClient.AccountDeleteAsync(account.AccountID);
+            if (response.StatusCode == 200)
+            {
+                await alert.Success("Sub-account deleted successfully.", "Deleted");
+                await ReloadData();
+            }
+            else
+            {
+                await alert.Error("Failed to delete sub-account.", "Error");
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private async Task CopyToClipboard(string text)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            await alert.Success("Account ID copied to clipboard.", "Copied");
+        }
+        catch { }
+    }
 }

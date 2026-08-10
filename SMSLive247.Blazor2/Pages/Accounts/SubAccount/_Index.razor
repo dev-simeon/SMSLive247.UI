@@ -1,26 +1,36 @@
-﻿@page "/Accounts/{subAccountId}"
-
+@attribute [Route(Const.Routes.Account.SubAccountDetails)]
+@layout MainLayout
 
 <PageTitle>Sub-Account Details</PageTitle>
 
-<Title>Sub-Account Details</Title>
-
-<Tabs>
-    <TabPage Title="Details" Icon="fa fa-info">
-        <Details SubAccountId="@subAccountId"></Details>
-    </TabPage>
-    <TabPage Title="Sent Messages" Icon="fa fa-envelope">
-        <Messages SubAccountId="@subAccountId"></Messages>
-    </TabPage>
-    <TabPage Title="Sub-Users" Icon="fa fa-layer-group">
-        <SubUsers SubAccountId="@subAccountId"></SubUsers>
-    </TabPage>
-    <TabPage Title="Transfers" Icon="fa fa-gift">
-        <Transfers SubAccountId="@subAccountId"></Transfers>
-    </TabPage>
-</Tabs>
+<PageBody>
+    <HeaderLeft>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Sub-Account Details</h1>
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Back" Icon="Icon.IconStyle.ChevronRight" OnClick='() => nav.NavigateTo(Const.Routes.Account.SubAccounts)' />
+    </HeaderRight>
+    
+    <ChildContent>
+        <Tabs>
+            <TabPage Title="Details" Icon="Icon.IconStyle.Info">
+                <Details SubAccountId="@subAccountId"></Details>
+            </TabPage>
+            <TabPage Title="Sent Messages" Icon="Icon.IconStyle.Mail">
+                <Messages SubAccountId="@subAccountId"></Messages>
+            </TabPage>
+            <TabPage Title="Sub-Users" Icon="Icon.IconStyle.Users">
+                <SubUsers SubAccountId="@subAccountId"></SubUsers>
+            </TabPage>
+            <TabPage Title="Transfers" Icon="Icon.IconStyle.ArrowRightLeft">
+                <Transfers SubAccountId="@subAccountId"></Transfers>
+            </TabPage>
+        </Tabs>
+    </ChildContent>
+</PageBody>
 
 @code {
     [Parameter] public string? subAccountId { get; set; }
-
+    
+    [Inject] private NavigationManager nav { get; set; } = default!;
 }

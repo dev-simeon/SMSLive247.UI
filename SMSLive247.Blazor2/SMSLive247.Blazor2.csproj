@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Accounts\EditProfileModal.razor" />
     <Content Include="Pages\Messaging\Messages\Drafts.razor" />
   </ItemGroup>
 
@@ -52,10 +51,19 @@
 
   <ItemGroup>
     <Content Include="Pages\Accounts\Profile.razor" />
+    <Content Include="Pages\Accounts\Modals\EditProfileModal.razor" />
+    <Content Include="Pages\Accounts\Modals\ChangePasswordModal.razor" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Pages\Accounts\SubAccounts.razor" />
+    <Content Include="Pages\Accounts\SubAccount\_Index.razor" />
+    <Content Include="Pages\Accounts\SubAccount\Details.razor" />
+    <Content Include="Pages\Accounts\SubAccount\Messages.razor" />
+    <Content Include="Pages\Accounts\SubAccount\SubUsers.razor" />
+    <Content Include="Pages\Accounts\SubAccount\Modals\CreateSubAccountModal.razor" />
+    <Content Include="Pages\Accounts\SubAccount\Modals\SubUserModal.razor" />
+    <Content Include="Pages\Accounts\SubAccount\Modals\TransferModal.razor" />
   </ItemGroup>
 
   <ItemGroup>

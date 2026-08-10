@@ -1,35 +1,199 @@
-﻿@layout MainLayout
+@layout MainLayout
 @attribute [Route(Const.Routes.Account.Profile)]
+@using SMSLive247.Blazor2.Pages.Accounts.Modals
 
 <PageTitle>SMSLive247 - Profile</PageTitle>
 
+<PageHeader Title="My Profile"
+            SubTitle="Manage your personal information and account security.">
+</PageHeader>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- ── Left: Personal Information ──────────────────────────────────── -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
+        <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <Icon Style="Icon.IconStyle.User" CssClass="text-slate-400 w-5 h-5" />
+                Personal Information
+            </h3>
+            <button @onclick="() => profileModal.show()"
+                    class="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
+                Edit
+            </button>
+        </div>
+
+        <div class="p-6 space-y-8 flex-1">
+            <!-- Avatar -->
+            <div class="flex flex-col sm:flex-row items-center gap-6">
+                <div class="relative">
+                    <div class="w-24 h-24 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 font-bold text-3xl border-4 border-white shadow-sm">
+                        @(account?.FirstName?.FirstOrDefault() ?? account?.AccountName?.FirstOrDefault() ?? '?')
+                    </div>
+                    @* <button class="absolute bottom-0 right-0 bg-white p-1.5 rounded-full border border-slate-200 text-slate-500 hover:text-brand-600 shadow-sm transition-colors">
+                            <Icon Style="Icon.IconStyle.Camera" CssClass="w-4 h-4" />
+                        </button> *@
+                </div>
+                <div class="text-center sm:text-left">
+                    <h2 class="text-base font-bold text-slate-900">
+                        @(string.IsNullOrWhiteSpace(account?.FirstName + account?.LastName) ? account?.AccountName ?? "—" : $"{account?.FirstName} {account?.LastName}")
+                    </h2>
+                    <p class="text-slate-500 text-sm">
+                        @(account?.Active == true ? "Active Account" : "Inactive Account")
+                    </p>
+                    <div class="flex gap-2 mt-3 justify-center sm:justify-start">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 italic font-mono">
+                            ID: @account?.AccountID
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info rows -->
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Email Address</label>
+                    <div class="flex items-center p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <span class="text-slate-400 mr-3"><Icon Style="Icon.IconStyle.Mail" CssClass="w-5 h-5" /></span>
+                        <span class="text-slate-700 font-medium">@(account?.AccountName ?? "—")</span>
+                        <span class="ml-auto text-emerald-700 bg-emerald-50 border border-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded-full">ACTIVE</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Phone Number</label>
+                    <div class="flex items-center p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <span class="text-slate-400 mr-3"><Icon Style="Icon.IconStyle.Phone" CssClass="w-5 h-5" /></span>
+                        <span class="text-slate-700 font-medium">@(account?.Phone ?? "—")</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Country Code</label>
+                    <div class="flex items-center p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <span class="text-slate-400 mr-3"><Icon Style="Icon.IconStyle.Globe" CssClass="w-5 h-5" /></span>
+                        <span class="text-slate-700 font-medium">+@account?.CountryCode</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Time Zone</label>
+                    <div class="flex items-center p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <span class="text-slate-400 mr-3"><Icon Style="Icon.IconStyle.Clock" CssClass="w-5 h-5" /></span>
+                        <span class="text-slate-700 font-medium">GMT @((account?.TimeZone >= 0 ? "+" : "") + account?.TimeZone)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Right: Security ───────────────────────────────────────── -->
+    <div class="space-y-8">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-200 bg-slate-50/50">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <Icon Style="Icon.IconStyle.Shield" CssClass="text-slate-400 w-5 h-5" />
+                    Security Settings
+                </h3>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-semibold text-slate-800">Password</h4>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Manage your account password here.
+                        </p>
+                    </div>
+                    <button @onclick="() => passwordModal.Show()"
+                            class="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm">
+                        Change Password
+                    </button>
+                </div>
+
+                <hr class="border-slate-100" />
+
+                <div class="flex items-start justify-between opacity-50 cursor-not-allowed">
+                    <div class="pr-8">
+                        <h4 class="font-semibold text-slate-800 flex items-center gap-2">
+                            Two-Factor Authentication
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 uppercase">
+                                Coming Soon
+                            </span>
+                        </h4>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Secure your account with 2FA using SMS or an authenticator
+                            app.
+                        </p>
+                    </div>
+                    <label class="relative inline-flex items-center pointer-events-none">
+                        <input type="checkbox"
+                               disabled
+                               checked="false"
+                               class="sr-only peer" />
+                        <div class="w-11 h-6 bg-slate-200 rounded-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- KYC Verification -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-200 bg-slate-50/50">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-slate-400 w-5 h-5" />
+                    KYC Verification
+                </h3>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100">
+                        <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-slate-900">
+                            Not Verified
+                        </h4>
+                        <p class="text-sm text-slate-500">
+                            Your account identity has not been verified yet.
+                        </p>
+                    </div>
+                </div>
+                <button disabled="true"
+                        class="w-full mt-6 px-4 py-2 bg-slate-200 text-white rounded-lg text-sm font-semibold transition-colors shadow-md">
+                    Start Verification
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 
+@if (account != null)
+{
+    <EditProfileModal @ref="profileModal" account="account" OnCompleted="FetchData"></EditProfileModal>
+    <ChangePasswordModal @ref="passwordModal" account="account"></ChangePasswordModal>    
+}
 
 
 @code {
-    // private ProfileInfoModal profileModal = new();
-    // private ChangePasswordModal passwordModal = new();
+    private EditProfileModal profileModal = new();
+    private ChangePasswordModal passwordModal = new();
 
-    // private AccountResponse? account;
+    private AccountResponse? account;
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     await FetchData();
-    // }
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
 
-    // private async Task FetchData()
-    // {
-    //     try
-    //     {
-    //         var response = await apiClient.AccountGetAsync("self");
+    private async Task FetchData()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync("self");
 
-    //         if (response.StatusCode == 200)
-    //             account = response.Result;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         await alert.Error(ex.Message, "Error");
-    //     }
-    // }
+            if (response.StatusCode == 200)
+                account = response.Result;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
 }

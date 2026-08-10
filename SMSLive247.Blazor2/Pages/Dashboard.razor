@@ -13,8 +13,7 @@
        <p>justtsvvwdd</p>
     </HeaderLeft>
     <HeaderRight>
-        <button class="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors"
-                @onclick="() => editProfileModal.Show()">
+        <button class="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors">
             Edit Profile
         </button>
     </HeaderRight>
@@ -39,10 +38,3 @@
         </button>
     </FooterRight>
 </PageBody>
-
-<EditProfileModal @ref="editProfileModal"></EditProfileModal>
-@code {
-
-    private EditProfileModal editProfileModal = new();
-
-}

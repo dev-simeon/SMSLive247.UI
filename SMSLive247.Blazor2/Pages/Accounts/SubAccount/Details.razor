@@ -1,99 +1,71 @@
-﻿@page "/Accounts/ABC"
-
-@using SMSLive247.UI.Pages.Accounts.SubAccount.Modals;
-
-<style>
-    .card.account-details-container {
-        max-width: 800px;
-        background-color: #f9f9f9;
-        border: 0;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .account-info h2 {
-        margin: 0;
-        font-size: 24px;
-    }
-
-    .account-details-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    .detail-item{
-        display: flex;
-        flex-direction: column;
-    }
-</style>
+@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals;
 
 @if (subAccount != null)
 {
-    <div class="card account-details-container">
-        <div class="card-header border-bottom py-3">
-            <LeftRight>
-                <Left>
-                    <div class="account-info">
-                        <h2>@subAccount.AccountName</h2>
-                        <span>ID: @subAccount.AccountID</span>
-                    </div>
-                </Left>
-                <Right>
-                    <Button Type="Button.Style.DEFAULT" @onclick="() => transferModal.Show(subAccount)">
-                        Add/Remove Credit
-                    </Button>
-                </Right>
-            </LeftRight>
+    <div class="bg-white shadow rounded-lg max-w-4xl border border-slate-200">
+        <div class="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900 m-0">@subAccount.AccountName</h2>
+                <p class="text-sm text-slate-500 mt-1">ID: <span class="font-mono text-slate-700">@subAccount.AccountID</span></p>
+            </div>
+            <div>
+                <Button Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(subAccount)">
+                    Add/Remove Credit
+                </Button>
+            </div>
         </div>
        
-        <div class="card-body">
-            <div class="account-details-grid">
-                <div class="detail-item">
-                    <label class="fw-semibold mb-1">Status</label>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Status</label>
                     @if (subAccount.Active)
                     {
                         <div>
-                            <span class="badge text-bg-success">ACTIVE</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                ACTIVE
+                            </span>
                         </div>
                     }
                     else
                     {
                         <div>
-                            <span class="badge text-bg-error">INACTIVE</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                                INACTIVE
+                            </span>
                         </div>
                     }
                 </div>
-                <div class="detail-item">
-                    <label class="fw-semibold mb-1">Phone</label>
-                    <span>@subAccount.Phone</span>
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Phone</label>
+                    <span class="text-slate-900">@subAccount.Phone</span>
                 </div>
-                <div class="detail-item">
-                    <label class="fw-semibold mb-1">Credit Balance</label>
-                    <span>₦ @subAccount.Credits.ToString("##0.00")</span>
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Credit Balance</label>
+                    <span class="text-slate-900 font-medium">₦ @subAccount.Credits.ToString("##0.00")</span>
                 </div>
-                <div class="detail-item">
-                    <label class="fw-semibold mb-1">Date Created</label>
-                    <span>@subAccount.DateCreated.ToString("MM/dd/yyyy")</span>
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Date Created</label>
+                    <span class="text-slate-900">@subAccount.DateCreated.ToString("MMM dd, yyyy")</span>
                 </div>
-                <div class="detail-item">
-                    <label class="fw-semibold mb-1">Time Zone</label>
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Time Zone</label>
                     @{
                         string sign = subAccount.TimeZone > 0 ? "+" : "-";
                     }
-                    <span>GMT @sign@subAccount.TimeZone</span>
+                    <span class="text-slate-900">GMT @sign@subAccount.TimeZone</span>
                 </div>
-                <div class="detail-item">
-                    <label class="fw-semibold mb-1">Country Code</label>
-                    <span>+@subAccount.CountryCode</span>
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Country Code</label>
+                    <span class="text-slate-900">+@subAccount.CountryCode</span>
                 </div>
-                <div class="detail-item">
-                    <label class="fw-semibold mb-1">Traffic</label>
-                    <span>@subAccount.Traffic</span>
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Traffic</label>
+                    <span class="text-slate-900">@subAccount.Traffic</span>
                 </div>
-                <div class="detail-item">
-                    <label class="fw-semibold mb-1">API Key</label>
-                    <span>@(subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")</span>
+                <div class="flex flex-col">
+                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">API Key</label>
+                    <span class="text-slate-900 font-mono text-sm">@(subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")</span>
                 </div>
             </div>
         </div>
@@ -101,13 +73,15 @@
 }
 else
 {
-    <p>Loading...</p>
+    <div class="flex justify-center p-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600"></div>
+    </div>
 }
 
 <TransferModal @ref="transferModal" ParentId="self"></TransferModal>
 
 @code {
-    [Parameter] public string SubAccountId { get; set; }
+    [Parameter] public string SubAccountId { get; set; } = string.Empty;
 
     private AccountResponse subAccount = new();
     private TransferModal transferModal = new();
@@ -118,7 +92,7 @@ else
         {
             var response = await apiClient.AccountGetAsync(SubAccountId);
 
-            if (response.StatusCode == 200)
+            if (response.StatusCode == 200 && response.Result != null)
                 subAccount = response.Result;
         }
         catch (Exception ex)

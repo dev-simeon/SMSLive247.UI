@@ -1,97 +1,98 @@
-﻿ @using SMSLive247.UI.Pages.Accounts.SubAccount.Modals
+<div class="bg-white shadow rounded-lg border border-slate-200">
+    <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
+        <SearchBox Placeholder="Search sub users..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
+        </SearchBox>
+        <Button Text="Add Sub User" Icon="Icon.IconStyle.PlusCircle" OnClick="() => subUserModal.Show()" />
+    </div>
 
-<Card HeaderTitle="Sub Account">
-    <Body>
-        <SearchArea>
-            <LeftRight>
-                <Left>
-                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
-                    </SearchBox>
-                </Left>
-                <Right>
-                    <Button Type="Button.Style.ADD" @onclick="() => subUserModal.Show()">Add Sub User</Button>
-                </Right>
-            </LeftRight>
-        </SearchArea>
-        <Table DataSource="ds">
-            <Columns>
-                <Column Header="Date Created">
-                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
-                </Column>
-                <Column Header="Username">
-                    @context.AccountName
-                </Column>
-                <Column Header="First Name">
-                    @context.FirstName
-                </Column>
-                <Column Header="Last Name">
-                    @context.LastName
-                </Column>
-                <Column Header="Balance">
-                    <div class="d-flex">
+    <Table DataSource="ds">
+        <Columns>
+            <Column Header="Date Created" Width="180px">
+                <FormatDate DateTime="@context.DateCreated"></FormatDate>
+            </Column>
+            <Column Header="Username">
+                <span class="font-medium text-slate-900">@context.AccountName</span>
+            </Column>
+            <Column Header="First Name">
+                @context.FirstName
+            </Column>
+            <Column Header="Last Name">
+                @context.LastName
+            </Column>
+            <Column Header="Balance">
+                <div class="flex items-center justify-between">
+                    <span class="font-medium text-slate-900">
                         <FormatNumber Number="@context.Credits"></FormatNumber>
-                        <button class="btn btn-outline-primary" @onclick="() => transferModal.Show(context)">
-                            Add/Remove Credit
-                        </button>
-                    </div>
-                </Column>
-                <Column Header="Status">
-                    @if (context.Active)
-                    {
-                        <span class="badge text-bg-success">ACTIVE</span>
-                    }
-                    else
-                    {
-                        <span class="badge text-bg-error">INACTIVE</span>
-                    }
-                </Column>
-                <Column>
-                    <Actions 
-                        OnEdit="() => subUserModal.Show(context)"
-                        OnDelete="() => subUserModal.Delete(context)">
-                    </Actions>
-                </Column>
-            </Columns>
-        </Table>
-    </Body>
-    <Footer>
-        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
-    </Footer>
-</Card>
+                    </span>
+                    <Button Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(context)" CssClass="text-xs px-2 py-1">
+                        Add/Remove Credit
+                    </Button>
+                </div>
+            </Column>
+            <Column Header="Status">
+                @if (context.Active)
+                {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        ACTIVE
+                    </span>
+                }
+                else
+                {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                        INACTIVE
+                    </span>
+                }
+            </Column>
+            <Column>
+                <Actions 
+                    OnEdit="() => subUserModal.Show(context)"
+                    OnDelete="() => DeleteSubUser(context)">
+                </Actions>
+            </Column>
+        </Columns>
+    </Table>
+    <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-lg">
+        <Paging PageNumber="ds.PageState.PageNumber"
+                PageSize="ds.PageState.PageSize"
+                TotalRecords="ds.PageState.TotalCount"
+                PageNumberChanged="OnPageChange"
+                PageSizeChanged="OnPageSizeChange">
+        </Paging>
+    </div>
+</div>
 
-<SubUserModal @ref="subUserModal" SubAccountId="@SubAccountId" OnCompleted="FetchData"></SubUserModal>
+<SubUserModal @ref="subUserModal" SubAccountId="@SubAccountId" OnCompleted="ReloadData"></SubUserModal>
 <TransferModal @ref="transferModal" ParentId="@SubAccountId"></TransferModal>
 
 @code {
-    [Parameter] public string SubAccountId { get; set; }
-    private SearchBox searchBox = new();
+    [Parameter] public string SubAccountId { get; set; } = string.Empty;
+    
+    private string? searchQuery;
     private SubUserModal subUserModal = new();
     private TransferModal transferModal = new();
 
     private ApiDataSource<AccountResponse> ds = new();
+    private AccountResponse? currentAccount;
 
     protected override async Task OnInitializedAsync()
     {
-        await FetchData();
-    }
-
-    private async Task FetchData()
-    {
-        var account = await GetSubAccount(SubAccountId);
+        currentAccount = await GetSubAccount(SubAccountId);
 
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            if (account != null)
+            if (currentAccount != null)
             {
-                return await subClient.Impersonate(account).AccountsListAsync(
-                    p.PageNumber, p.PageSize, null, searchBox.Text);
+                return await subClient.Impersonate(currentAccount).AccountsListAsync(
+                    p.PageNumber, p.PageSize, null, searchQuery);
             }
             return ds.EmptyResponse;
         });
+        
+        ds.SetPage(new PageState(10, 1));
         await ds.LoadData(alert);
     }
 
-    private async Task<AccountResponse> GetSubAccount(string subAccountId)
+    private async Task<AccountResponse?> GetSubAccount(string subAccountId)
     {
         try
         {
@@ -104,6 +105,44 @@
         {
             await alert.Error(ex.Message, "Error");
         }
-        return new AccountResponse();
+        return null;
+    }
+    
+    private async Task ReloadData()
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageChange(int page)
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, page));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageSizeChange(int size)
+    {
+        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
+        await ds.LoadData(alert);
+    }
+    
+    private async Task DeleteSubUser(AccountResponse account)
+    {
+        var question = $"Are you sure you want to delete the sub user '{account.AccountName}'?";
+        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+
+        if (confirmed && currentAccount != null)
+        {
+            try
+            {
+                await subClient.Impersonate(currentAccount).AccountDeleteAsync(account.AccountID);
+                await alert.Success("Sub User deleted.", "Success");
+                await ReloadData();
+            }
+            catch (Exception ex)
+            {
+                await alert.Error(ex.Message, "Error");
+            }
+        }
     }
 }

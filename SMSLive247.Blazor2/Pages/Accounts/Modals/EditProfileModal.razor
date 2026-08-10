@@ -1,43 +1,26 @@
-﻿<Modal Title="Update Profile" @bind-Hidden="hideModal">
+<Modal Title="Update Profile" @bind-IsVisible="isVisible">
 
     <Body>
         <EditForm id="BasicInfo" Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
+            <div class="space-y-4">
+                <FormInput Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required="true" />
+                <FormInput Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required="true" />
+                <FormInput Label="Email Address" @bind-Value="accountUpdateRequest.Email" disabled="true" />
+                <FormInput Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true" />
 
-            <FormInputText Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required>
-            </FormInputText>
-            <FormInputText Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required>
-            </FormInputText>
-            <FormInputText Label="Email Address" @bind-Value="accountUpdateRequest.Email" disabled="true">
-            </FormInputText>
-            <FormInputText Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true">
-            </FormInputText>
-            <FormField Label="Country">
-                <InputSelect class="form-select" @bind-Value:after="() => { }" @bind-Value="CountryCodeString">
-                    <option value="">Select Country</option>
-                    @foreach (var country in CountryList)
-                    {
-                        <option value="@country.Code">@country.Name (@country.Code)</option>
-                    }
-                </InputSelect>
-            </FormField>
-            <FormField Label="Time Zone">
-                <InputSelect class="form-select" @bind-Value="accountUpdateRequest.TimeZone">
-                    @foreach (var tz in TimeZones)
-                    {
-                        <option value="@tz.Value">@tz.Label</option>
-                    }
-                </InputSelect>
-            </FormField>
+                <FormSelect Label="Country" Type="FormSelect.SelectType.Country" @bind-Value="CountryCodeString"
+                            IsEmbedded="false" />
+                <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone" @bind-Value="TimeZoneString"
+                            IsEmbedded="false" />
+            </div>
         </EditForm>
     </Body>
 
     <Footer>
-        <button type="submit" class="btn btn-primary w-100 py-2" form="BasicInfo">
-            Save Changes
-        </button>
+        <Button IsSubmit="true" Text="Save Changes" />
     </Footer>
 </Modal>
 
@@ -45,9 +28,10 @@
     [Parameter] public AccountResponse account { get; set; } = new();
     [Parameter] public EventCallback OnCompleted { get; set; }
 
-    private bool hideModal = true;
+    private bool isVisible = false;
     private AccountUpdateRequest accountUpdateRequest = new();
     private string? CountryCodeString { get; set; }
+    private string? TimeZoneString { get; set; }
 
     // ✅ Country list with code & label
     private List<(string Name, string Code)> CountryList = new()
@@ -77,13 +61,15 @@
         var country = CountryList.FirstOrDefault(c => c.Code.TrimStart('+') == account.CountryCode.ToString());
         if (country.Code != null)
         {
-            CountryCodeString = country.Code;
+            CountryCodeString = account.CountryCode.ToString();
         }
+
+        TimeZoneString = account.TimeZone.ToString();
     }
 
     public void show()
     {
-        hideModal = false;
+        isVisible = true;
         StateHasChanged();
     }
 
@@ -94,6 +80,11 @@
             if (!string.IsNullOrEmpty(CountryCodeString))
             {
                 accountUpdateRequest.CountryCode = int.Parse(CountryCodeString.TrimStart('+'));
+            }
+
+            if (!string.IsNullOrEmpty(TimeZoneString) && int.TryParse(TimeZoneString, out int tz))
+            {
+                accountUpdateRequest.TimeZone = tz;
             }
 
             var response = await apiClient.AccountUpdateAsync(account.AccountID, accountUpdateRequest);
@@ -114,7 +105,7 @@
         }
         finally
         {
-            hideModal = true;
+            isVisible = false;
             StateHasChanged();
         }
     }
