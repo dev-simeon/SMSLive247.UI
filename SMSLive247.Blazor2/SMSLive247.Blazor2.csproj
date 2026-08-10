@@ -61,6 +61,7 @@
     <Content Include="Pages\Accounts\SubAccount\Details.razor" />
     <Content Include="Pages\Accounts\SubAccount\Messages.razor" />
     <Content Include="Pages\Accounts\SubAccount\SubUsers.razor" />
+    <Content Include="Pages\Accounts\SubAccount\Transfers.razor" />
     <Content Include="Pages\Accounts\SubAccount\Modals\CreateSubAccountModal.razor" />
     <Content Include="Pages\Accounts\SubAccount\Modals\SubUserModal.razor" />
     <Content Include="Pages\Accounts\SubAccount\Modals\TransferModal.razor" />
