@@ -15,17 +15,17 @@
                     <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
                 </Column>
                 <Column Header="Status">
-                    <StatusBadge Status="@StatusBadge.MapBatchStatus(context.Status)" />
+                    <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@context.Status" />
                 </Column>
                 <Column Header="Sender" Width="100px">
-                    <span class="font-medium text-slate-900 text-sm">@context.SenderID?.ToUpper()</span>
+                    <span class="">@context.SenderID?.ToUpper()</span>
                 </Column>
                 <Column Header="Message">
-                    <p class="text-sm text-slate-600 truncate max-w-md" title="@context.MessageText">@context.MessageText</p>
+                    <p class="truncate max-w-md" title="@context.MessageText">@context.MessageText</p>
                 </Column>
                 <Column Header="Delivery">
                     <div class="flex flex-col gap-0.5 text-sm">
-                        <div class="font-semibold text-slate-900">
+                        <div class="">
                             @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
                         </div>
                         <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1" title="Credits Charged">

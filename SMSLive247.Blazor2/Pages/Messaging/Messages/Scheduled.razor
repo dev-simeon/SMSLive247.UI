@@ -1,10 +1,7 @@
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search scheduled messages..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
-    <HeaderRight>
-    </HeaderRight>
-
     <ChildContent>
         <Table DataSource="ds">
             <Columns>
@@ -12,7 +9,7 @@
                     <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
                 </Column>
                 <Column Header="Status">
-                    <StatusBadge Status="@StatusBadge.MapBatchStatus(context.Status)" />
+                    <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@context.Status" />
                 </Column>
                 <Column Header="Sender" Width="100px">
                     <span class="font-medium text-slate-900 text-sm">@context.SenderID?.ToUpper()</span>
@@ -52,7 +49,6 @@
 @code {
 
     private string? searchQuery;
-
     private ApiDataSource<SmsBatchResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
@@ -85,7 +81,7 @@
 
     private async Task AbortBatch(long batchId)
     {
-        bool confirmed = await alert.Confirm("Are you sure you want to cancel this batch?", "Confirm");
+        bool confirmed = await alert.Confirm("Are you sure you want to cancel this batch?");
         if (confirmed)
         {
             await apiClient.SmsBatchPendingAbortAsync(batchId);
@@ -95,7 +91,7 @@
 
     private async Task ResumeBatch(long batchId)
     {
-        bool confirmed = await alert.Confirm("Are you sure you want to resume this batch now?", "Confirm");
+        bool confirmed = await alert.Confirm("Are you sure you want to resume this batch now?");
         if (confirmed)
         {
             await apiClient.SmsBatchPendingResumeAsync(batchId);

@@ -1,0 +1,89 @@
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border @GetBadgeCss()">
+    @if (ShowDot)
+    {
+        <span class="w-1.5 h-1.5 rounded-full @GetDotCss()"></span>
+    }
+    @Value
+</span>
+
+@code {
+    public enum BadgeStyle { Success, Pending, Danger, Info, Neutral, }
+    public enum StatusVariant { SenderIdRequest, BatchMessage, DeliveryReport, UseBadgeStyle }
+
+    [Parameter] public StatusVariant Variant { get; set; } = StatusVariant.UseBadgeStyle;
+    [Parameter] public BadgeStyle Style { get; set; } = BadgeStyle.Neutral;
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public bool ShowDot { get; set; } = true;
+
+    private string GetBadgeCss()
+    {
+        return GetBadgeStyleFromVariant() switch
+        {
+            BadgeStyle.Success => "bg-emerald-50 text-emerald-700 border-emerald-100",
+            BadgeStyle.Pending => "bg-amber-50 text-amber-700 border-amber-100",
+            BadgeStyle.Danger => "bg-red-50 text-red-700 border-red-100",
+            BadgeStyle.Info => "bg-blue-50 text-blue-700 border-blue-100",
+            _ => "bg-slate-50 text-slate-700 border-slate-100"
+        };
+    }
+
+    private string GetDotCss()
+    {
+        return GetBadgeStyleFromVariant() switch
+        {
+            BadgeStyle.Success => "bg-emerald-500",
+            BadgeStyle.Pending => "bg-amber-500",
+            BadgeStyle.Danger => "bg-red-500",
+            BadgeStyle.Info => "bg-blue-500",
+            _ => "bg-slate-500"
+        };
+    }
+
+    private BadgeStyle GetBadgeStyleFromVariant()
+    {
+        return Variant switch
+        {
+            StatusVariant.BatchMessage      => MapBatchMessageStatus(Value),
+            StatusVariant.SenderIdRequest   => MapSenderIdRequestStatus(Value),
+            StatusVariant.DeliveryReport    => MapDeliveryReportStatus(Value),
+            _                               => Style,
+        };
+    }
+
+    private static BadgeStyle MapBatchMessageStatus(string value)
+    {
+        return value.ToUpperInvariant() switch
+        {
+            "COMPLETED"     => BadgeStyle.Success,
+            "RUNNING"       => BadgeStyle.Pending,
+            "PAUSED"        => BadgeStyle.Info,
+            "ABORTED"       => BadgeStyle.Danger,
+            _               => BadgeStyle.Neutral
+        };
+    }
+
+    private static BadgeStyle MapSenderIdRequestStatus(string value)
+    {
+        return value.ToUpperInvariant() switch
+        {
+            "COMPLETED" => BadgeStyle.Success,
+            "RUNNING" => BadgeStyle.Pending,
+            "PAUSED" => BadgeStyle.Info,
+            "ABORTED" => BadgeStyle.Danger,
+            _ => BadgeStyle.Neutral
+        };
+    }
+
+    private static BadgeStyle MapDeliveryReportStatus(string value)
+    {
+        return value.ToUpperInvariant() switch
+        {
+            "COMPLETED" => BadgeStyle.Success,
+            "RUNNING" => BadgeStyle.Pending,
+            "PAUSED" => BadgeStyle.Info,
+            "ABORTED" => BadgeStyle.Danger,
+            _ => BadgeStyle.Neutral
+        };
+    }
+
+}

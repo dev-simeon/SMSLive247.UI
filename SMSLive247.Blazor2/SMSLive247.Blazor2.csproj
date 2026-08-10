@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Messaging\SenderIds.razor" />
+    <Content Include="Pages\Messaging\SenderIDs\SenderIds.razor" />
   </ItemGroup>
 
   <ItemGroup>

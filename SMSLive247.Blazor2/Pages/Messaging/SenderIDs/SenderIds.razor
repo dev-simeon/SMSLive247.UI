@@ -10,8 +10,7 @@
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search Sender IDs..." 
-                   @bind-SearchTerm="searchQuery" OnSearch="OnSearch">
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="OnSearch">
             <FormSelect @bind-Value="searchStatus" IsEmbedded="true">
                 <option value="">All Statuses</option>
                 <option value="Approved">Approved</option>
@@ -49,8 +48,8 @@
                     }
                 </Column>
                 <Column Header="Status">
-                    <StatusBadge Status="@(context.Status?.ToUpper() ?? "REJECTED")" />
-                </Column>
+                    <Badge Variant="Badge.StatusVariant.SenderIdRequest" Value="@(context.Status ?? "rejected")" />
+                 </Column>
                 <Column>
                     <Actions OnDelete="() => HandleDelete(context)">
                     </Actions>
