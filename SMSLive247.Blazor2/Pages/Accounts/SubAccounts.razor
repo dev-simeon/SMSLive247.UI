@@ -39,18 +39,8 @@
                     </div>
                 </Column>
                 <Column Header="Status">
-                    @if (context.Active == true)
-                    {
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                            Active
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">
-                            Inactive
-                        </span>
-                    }
+                    <Badge Style="@(context.Active == true ? Badge.BadgeStyle.Success : Badge.BadgeStyle.Neutral)"
+                           Value="@(context.Active == true ? "Active" : "Inactive")" />
                 </Column>
                 <Column Header="Date Created" Width="150px">
                     <FormatDate DateTime="@context.DateCreated" />

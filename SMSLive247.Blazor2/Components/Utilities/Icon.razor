@@ -44,6 +44,7 @@
         MoreVertical,
         FileSpreadsheet,
         FileText,
+        RefreshCcw,
     }
 
     // public string GetBootstrapClass()
@@ -158,6 +159,7 @@
             IconStyle.MoreVertical => "bi bi-three-dots-vertical",
             IconStyle.FileSpreadsheet => "bi bi-file-earmark-spreadsheet",
             IconStyle.FileText => "bi bi-file-earmark-text",
+            IconStyle.RefreshCcw => "bi bi-arrow-counterclockwise",
             _ => throw new ArgumentOutOfRangeException("Unmapped IconStyle value.")
         };
     }
@@ -203,6 +205,7 @@
             IconStyle.MoreVertical => "more_vert",
             IconStyle.FileSpreadsheet => "table_chart",
             IconStyle.FileText => "description",
+            IconStyle.RefreshCcw => "refresh",
             _ => throw new ArgumentOutOfRangeException("Unmapped IconStyle value.")
         };
     }

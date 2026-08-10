@@ -29,6 +29,9 @@ public partial class Program
         builder.Services.AddHttpClient<ApiClient>(ConfigureUrl)
                         .AddHttpMessageHandler<AuthDelegateHandler>();
 
+        builder.Services.AddHttpClient<SubAccountClient>(ConfigureUrl);
+
+
         builder.Services.AddScoped<AuthenticationStateProvider, SmsAuthProvider>();
         builder.Services.AddMemoryCache();
 

@@ -1,43 +1,135 @@
-﻿@attribute [Route(Const.Routes.Developer.ApiKeys)]
+@attribute [Route(Const.Routes.Developer.ApiKeys)]
 @layout MainLayout
 
-<PageTitle>SMSLive247 - Api Keys</PageTitle>
+<PageTitle>SMSLive247 - API Keys</PageTitle>
 
+<PageHeader Title="API Keys" SubTitle="Manage your API keys for programmatic access to the platform." />
+
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="Search sub-accounts..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+    </HeaderLeft>
+
+    <ChildContent>
+        @if (mainAccount != null)
+        {
+            @* Main account row *@
+            <div class="mb-6 bg-white border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Main Account</span>
+                </div>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-100 bg-slate-50/50 text-xs text-slate-500 uppercase tracking-wide">
+                            <th class="px-5 py-3 text-left font-medium w-[38%]">Account ID</th>
+                            <th class="px-5 py-3 text-left font-medium">API Key</th>
+                            <th class="px-5 py-3 text-left font-medium w-12"></th>
+                            <th class="px-5 py-3 text-left font-medium">Date Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-5 py-3 font-mono text-slate-700">@mainAccount.AccountID</td>
+                            <td class="px-5 py-3 font-mono text-slate-700 truncate max-w-xs">
+                                @GetKeyString(mainAccount.Key)
+                            </td>
+                            <td class="px-5 py-3">
+                                <button @onclick="() => ResetApiKey(mainAccount)"
+                                        class="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-all"
+                                        title="Reset API Key">
+                                    <Icon Style="Icon.IconStyle.RefreshCcw" CssClass="w-4 h-4" />
+                                </button>
+                            </td>
+                            <td class="px-5 py-3 text-slate-600">
+                                <FormatDate DateTime="@mainAccount.DateCreated" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @* Sub-accounts table *@
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Sub-Account" Width="38%">
+                    <span class="font-medium text-slate-900">@context.AccountName</span>
+                    <div class="text-xs text-slate-400 font-mono mt-0.5">@context.AccountID</div>
+                </Column>
+                <Column Header="API Key">
+                    <span class="font-mono text-slate-700 text-xs">@GetKeyString(context.Key)</span>
+                </Column>
+                <Column Header="" Width="56px">
+                    <button @onclick="() => ResetApiKey(context)"
+                            class="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-all"
+                            title="Reset API Key">
+                        <Icon Style="Icon.IconStyle.RefreshCcw" CssClass="w-4 h-4" />
+                    </button>
+                </Column>
+                <Column Header="Date Created" Width="160px">
+                    <FormatDate DateTime="@context.DateCreated" />
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+
+    <FooterLeft>
+        <Paging PageNumber="ds.PageState.PageNumber" PageSize="ds.PageState.PageSize"
+                TotalRecords="ds.PageState.TotalCount" PageNumberChanged="OnPageChange" PageSizeChanged="OnPageSizeChange">
+        </Paging>
+    </FooterLeft>
+</PageBody>
 
 @code {
-    // private SearchBox searchBox = new();
-    // private AccountResponse? mainAccount;
-    // private ApiDataSource<AccountResponse> ds = new();
+    private string? searchQuery;
+    private AccountResponse? mainAccount;
+    private ApiDataSource<AccountResponse> ds = new();
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     var res = await apiClient.AccountGetAsync("self");
+    protected override async Task OnInitializedAsync()
+    {
+        var res = await apiClient.AccountGetAsync("self");
+        if (res.StatusCode == 200)
+            mainAccount = res.Result;
 
-    //     if (res.StatusCode == 200)
-    //         mainAccount = res.Result;
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchQuery);
+        });
+        ds.SetPage(new PageState(20, 1));
+        await ds.LoadData(alert);
+    }
 
-    //     ds.Callback = new((PageState p, FilterState? f) =>
-    //     {
-    //         return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchBox.Text);
-    //     });
-    //     mainAccount.Key = Guid.NewGuid().ToByteArray();
-    //     await ds.LoadData(alert);
-    // }
+    private static string GetKeyString(byte[]? key)
+    {
+        if (key == null || key.Length == 0) return "—";
+        try { return new Guid(key).ToString().ToUpperInvariant(); }
+        catch { return "—"; }
+    }
+
+    private async Task ReloadData()
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageChange(int page)
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, page));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageSizeChange(int size)
+    {
+        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
+        await ds.LoadData(alert);
+    }
 
     private async Task ResetApiKey(AccountResponse account)
     {
         try
         {
-            // var response = await apiClient.AccountUpdateProviderKeyAsync(account-request);
-            //if (response.StatusCode == 200)
-            // {
-            //     await alert.Success("API key reset successfully.", "Success");
-            //     await ds.LoadData(alert); // Reload data to reflect the reset API key
-            // }
-            // else
-            // {
+            // TODO: wire up to apiClient.AccountUpdateProviderKeyAsync() when available
             await alert.Error("Failed to reset API key", "Error");
-            // }
         }
         catch (Exception ex)
         {
@@ -45,3 +137,4 @@
         }
     }
 }
+
