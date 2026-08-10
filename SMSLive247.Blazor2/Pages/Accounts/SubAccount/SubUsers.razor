@@ -1,0 +1,109 @@
+﻿ @using SMSLive247.UI.Pages.Accounts.SubAccount.Modals
+
+<Card HeaderTitle="Sub Account">
+    <Body>
+        <SearchArea>
+            <LeftRight>
+                <Left>
+                    <SearchBox @ref="searchBox" @onclick="e => ds.LoadData(alert)">
+                    </SearchBox>
+                </Left>
+                <Right>
+                    <Button Type="Button.Style.ADD" @onclick="() => subUserModal.Show()">Add Sub User</Button>
+                </Right>
+            </LeftRight>
+        </SearchArea>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Username">
+                    @context.AccountName
+                </Column>
+                <Column Header="First Name">
+                    @context.FirstName
+                </Column>
+                <Column Header="Last Name">
+                    @context.LastName
+                </Column>
+                <Column Header="Balance">
+                    <div class="d-flex">
+                        <FormatNumber Number="@context.Credits"></FormatNumber>
+                        <button class="btn btn-outline-primary" @onclick="() => transferModal.Show(context)">
+                            Add/Remove Credit
+                        </button>
+                    </div>
+                </Column>
+                <Column Header="Status">
+                    @if (context.Active)
+                    {
+                        <span class="badge text-bg-success">ACTIVE</span>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-error">INACTIVE</span>
+                    }
+                </Column>
+                <Column>
+                    <Actions 
+                        OnEdit="() => subUserModal.Show(context)"
+                        OnDelete="() => subUserModal.Delete(context)">
+                    </Actions>
+                </Column>
+            </Columns>
+        </Table>
+    </Body>
+    <Footer>
+        <Pager PageState="ds.PageState" OnPageChange="e => ds.SetPage(e).LoadData(alert)" />
+    </Footer>
+</Card>
+
+<SubUserModal @ref="subUserModal" SubAccountId="@SubAccountId" OnCompleted="FetchData"></SubUserModal>
+<TransferModal @ref="transferModal" ParentId="@SubAccountId"></TransferModal>
+
+@code {
+    [Parameter] public string SubAccountId { get; set; }
+    private SearchBox searchBox = new();
+    private SubUserModal subUserModal = new();
+    private TransferModal transferModal = new();
+
+    private ApiDataSource<AccountResponse> ds = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        var account = await GetSubAccount(SubAccountId);
+
+        ds.Callback = new(async (PageState p, FilterState? f) =>
+        {
+            if (account != null)
+            {
+                return await subClient.Impersonate(account).AccountsListAsync(
+                    p.PageNumber, p.PageSize, null, searchBox.Text);
+            }
+            return ds.EmptyResponse;
+        });
+        await ds.LoadData(alert);
+    }
+
+    private async Task<AccountResponse> GetSubAccount(string subAccountId)
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync(subAccountId);
+
+            if (response.StatusCode == 200)
+                return response.Result;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        return new AccountResponse();
+    }
+}

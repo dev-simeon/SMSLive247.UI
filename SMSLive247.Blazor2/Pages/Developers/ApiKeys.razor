@@ -1,0 +1,47 @@
+﻿@attribute [Route(Const.Routes.Developer.ApiKeys)]
+@layout MainLayout
+
+<PageTitle>SMSLive247 - Api Keys</PageTitle>
+
+
+@code {
+    // private SearchBox searchBox = new();
+    // private AccountResponse? mainAccount;
+    // private ApiDataSource<AccountResponse> ds = new();
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var res = await apiClient.AccountGetAsync("self");
+
+    //     if (res.StatusCode == 200)
+    //         mainAccount = res.Result;
+
+    //     ds.Callback = new((PageState p, FilterState? f) =>
+    //     {
+    //         return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchBox.Text);
+    //     });
+    //     mainAccount.Key = Guid.NewGuid().ToByteArray();
+    //     await ds.LoadData(alert);
+    // }
+
+    private async Task ResetApiKey(AccountResponse account)
+    {
+        try
+        {
+            // var response = await apiClient.AccountUpdateProviderKeyAsync(account-request);
+            //if (response.StatusCode == 200)
+            // {
+            //     await alert.Success("API key reset successfully.", "Success");
+            //     await ds.LoadData(alert); // Reload data to reflect the reset API key
+            // }
+            // else
+            // {
+            await alert.Error("Failed to reset API key", "Error");
+            // }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+}

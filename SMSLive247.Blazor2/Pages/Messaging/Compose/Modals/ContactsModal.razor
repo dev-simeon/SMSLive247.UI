@@ -1,0 +1,30 @@
+﻿<Modal Title="Select Contacts" @bind-Hidden="hideModal" Size="Modal.ModalSize.LARGE">
+    <Body>
+        <ContactSelector Contacts="Model.Contacts" OnSelected="OnSelected" />
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.CANCEL"
+                @onclick="Hide">
+            Close
+        </Button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public ComposeSimpleModel? Model { get; set; }
+    [Parameter] public EventCallback OnSelected { get; set; }
+
+    private bool hideModal = true;
+
+    public void Show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        hideModal = true;
+        StateHasChanged();
+    }
+}

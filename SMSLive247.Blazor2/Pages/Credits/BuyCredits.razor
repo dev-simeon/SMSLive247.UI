@@ -1,0 +1,25 @@
+@attribute [Route(Const.Routes.Wallet.BuyCredits)]
+@layout MainLayout
+
+<PageTitle>SMSLive247 - Buy Credits</PageTitle>
+
+<PageHeader Title="Buy Credits"
+            SubTitle="Top up your account with SMS credits to keep your campaigns running." />
+
+
+
+@code {
+    private int selectedPackage = 2;
+
+    private List<CreditPackage> packages = new()
+    {
+        new(1, 1_000,    500,    false),
+        new(2, 5_000,   2_200,  true),
+        new(3, 10_000,  4_000,  false),
+        new(4, 25_000,  9_500,  false),
+        new(5, 50_000, 18_000,  false),
+        new(6, 100_000, 33_000, false),
+    };
+
+    private record CreditPackage(int Id, int Credits, decimal Price, bool IsBestValue);
+}

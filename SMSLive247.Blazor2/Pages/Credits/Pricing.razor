@@ -1,0 +1,49 @@
+﻿@attribute [Route(Const.Routes.Wallet.Pricing)]
+@layout MainLayout
+
+
+
+
+@code {
+    // private long quantity = 1000;
+    // private string currencySymbol = "₦";
+
+    // private PriceCalcResponse? priceCalc;
+    // private List<PriceSlotResponse>? priceSlots;
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     try
+    //     {
+    //         var t1 = apiClient.PriceCalculateAsync(null, quantity, "N");
+    //         var t2 = apiClient.PriceListAsync();
+
+    //         await Task.WhenAll(t1, t2);
+
+    //         priceSlots = t2.Result.Result.ToList();
+    //         priceCalc = t1.Result.Result;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         await alert.Error(ex.Message, "Error");
+    //     }
+    // }
+
+    // private async Task CalculatePrice()
+    // {
+    //     try
+    //     {
+    //         priceCalc = null;
+    //         StateHasChanged();
+
+    //         var result = await apiClient.PriceCalculateAsync(null, quantity, "N");
+
+    //         if (result.StatusCode == 200)
+    //             priceCalc = result.Result;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         await alert.Error(ex.Message, "Error");
+    //     }
+    // }
+}

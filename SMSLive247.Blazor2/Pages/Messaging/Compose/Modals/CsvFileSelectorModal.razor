@@ -1,0 +1,130 @@
+﻿@using SMSLive247.OpenApi
+@using SMSLive247.UI.Pages.ViewModels
+
+<Modal Title="Select CSV File" @bind-Hidden="hideModal" Size="Modal.ModalSize.LARGE">
+
+    <Body>
+        <div class="d-flex flex-column flex-fill">
+            <!-- Header: search -->
+            <div class="d-flex gap-2 mb-3">
+                <div class="flex-grow-1">
+                    <input class="form-control w-100" type="search" placeholder="Search..." @bind="SearchText" @bind:event="oninput" />
+                </div>
+                <div>
+                    <Button Type="Button.Style.ADD" ButtonType="button" @onclick="OnUploadClicked">
+                        Upload CSV File...
+                    </Button>
+                </div>
+            </div>
+
+            <!-- Results: scrollable area -->
+            <div class="overflow-x-hidden overflow-y-auto" style="flex: 1 1 auto;">
+                @if (!VisibleFiles.Any())
+                {
+                    <p>No CSV files found. Please upload a new file.</p>
+                }
+                else
+                {
+                    <div class="row gy-3">
+                        @foreach (var item in VisibleFiles.OrderByDescending(x => x.DateCreated))
+                        {
+                            <div class="col-md-4">
+                                <div class="form-check mb-1">
+                                    <input class="form-check-input" type="radio" name="csvFileRadio"
+                                        checked="@(item.BatchFileID == tempSelectedFile?.BatchFileID)" id="csv-@item.BatchFileID"
+                                        @onchange="() => tempSelectedFile = item">
+                                    <label class="form-check-label" for="csv-@item.BatchFileID">
+                                        <strong>@item.Description</strong>
+                                        <small class="d-block text-muted">
+                                            Uploaded: <FormatDate DateTime="@item.DateCreated"></FormatDate>
+                                        </small>
+                                    </label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <div class="ms-auto">
+            <Button Type="Button.Style.CANCEL" ButtonType="button" @onclick="Hide">
+                Close
+            </Button>
+            <Button Type="Button.Style.PRIMARY" ButtonType="button" @onclick="HandleSelection"
+                    Disabled="@(tempSelectedFile == null)">
+                Select
+            </Button>
+        </div>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public List<BatchFileResponse> AllFiles { get; set; } = [];
+    [Parameter] public BatchFileResponse? SelectedFile { get; set; }
+    [Parameter] public EventCallback<BatchFileResponse> OnFileSelected { get; set; }
+    [Parameter] public EventCallback OnUploadRequested { get; set; }
+
+    private List<BatchFileResponse> VisibleFiles { get; set; } = [];
+    private BatchFileResponse? tempSelectedFile;
+    private string? _searchText;
+    private string? SearchText
+    {
+        get => _searchText;
+        set {
+            _searchText = value;
+            OnSearchChanged();
+        }
+    }
+    private bool _isInitialized = false;
+    private bool hideModal = true;
+
+    protected override void OnParametersSet()
+                    {
+        // Initialize visible files only once when the component first receives them.
+        if (!_isInitialized && AllFiles.Count > 0)
+        {
+            _isInitialized = true;
+            VisibleFiles = new List<BatchFileResponse>(AllFiles);
+        }
+    }
+
+    public void Show()
+    {
+        SearchText = string.Empty; // Clear search text on show
+        tempSelectedFile = SelectedFile; // Pre-select the currently active file
+        VisibleFiles = new List<BatchFileResponse>(AllFiles); // Refresh the list on show
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    private void Hide()
+    {
+        hideModal = true;
+        SearchText = string.Empty; // Clear search text on close
+    }
+
+    private async Task HandleSelection()
+    {
+        if (tempSelectedFile != null)
+        {
+            await OnFileSelected.InvokeAsync(tempSelectedFile);
+        }
+        Hide();
+    }
+
+    private async Task OnUploadClicked()
+    {
+        Hide(); // First, close this modal.
+        await OnUploadRequested.InvokeAsync(); // Then, ask the parent to open the upload modal.
+    }
+
+    private void OnSearchChanged()
+    {
+        VisibleFiles = string.IsNullOrWhiteSpace(_searchText)
+        ? AllFiles
+        : AllFiles.Where(x => x.Description.Contains(_searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+        StateHasChanged(); // Notify Blazor to re-render the UI
+    }
+}

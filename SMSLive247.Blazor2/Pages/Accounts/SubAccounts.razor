@@ -1,0 +1,26 @@
+﻿@attribute [Route(Const.Routes.Account.SubAccounts)]
+@layout MainLayout
+@inject NavigationManager nav
+
+
+<PageTitle>Sub Accounts</PageTitle>
+
+@code {
+    // private SearchBox searchBox = new();
+    // private SubAccountModal subAccountModal = new();
+    // private ApiDataSource<AccountResponse> ds = new();
+
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     ds.Callback = new((PageState p, FilterState? f) =>
+    //     {
+    //         return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchBox.Text);
+    //     });
+    //     await ds.LoadData(alert);
+    // }
+
+    // private void NavigateToSubAccountDetails(AccountResponse account)
+    // {
+    //     nav.NavigateTo($"/Accounts/{account.AccountID}");
+    // }
+}

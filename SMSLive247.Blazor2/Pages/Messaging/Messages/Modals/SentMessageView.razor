@@ -1,0 +1,56 @@
+﻿<Modal Title="@($"View Message - {@batchId}")"
+        Hidden="@(!showModal)" VAlign="Modal.ModalVAlign.CENTER">
+    <Body>
+        <Loading NullCheckObject="message"> 
+            <AltView>
+                <p>Loading...</p>
+            </AltView>
+            <ChildContent>
+                <FormInputNumber Label="Batch ID" @bind-Value="message.BatchID" disabled></FormInputNumber>
+                <FormInputText Label="Sender ID" @bind-Value="message.SenderID" disabled></FormInputText>
+                <FormField Label="Message">
+                    <InputTextArea class="form-control" @bind-Value="message.MessageText" rows="5" disabled></InputTextArea>
+                </FormField>
+                <FormInputNumber Label="Total Processed" @bind-Value="message.TotalProcessed" disabled></FormInputNumber>
+                <FormInputNumber Label="Total Failed" @bind-Value="message.TotalFailed" disabled></FormInputNumber>
+                <FormInputNumber Label="Unit Charged" @bind-Value="message.CreditsCharged" disabled></FormInputNumber>
+            </ChildContent>
+        </Loading>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.CANCEL" @onclick="@(e => showModal = false)">Cancel</Button>
+    </Footer>
+</Modal>
+
+@code {
+    private long batchId;
+    private bool showModal = false;
+    private SmsBatchResponse? message;
+
+    public async Task Show(long id)
+    {
+        try
+        {
+            batchId = id;
+            message = null;
+            showModal = true;
+            StateHasChanged();
+
+            var response = await apiClient.SmsBatchGetAsync(batchId);
+
+            if (response.StatusCode > 299)
+                throw new Exception("No message was found");
+
+            message = response.Result;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+            showModal = false;
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+}

@@ -1,0 +1,108 @@
+﻿@inject IJSRuntime js
+
+<EditModal TItem="AccountResponse" @ref="editor" LabelText="Settings"
+           OnUpdate="OnUpdate"
+           OnCompleted="OnCompleted">
+    <FormField Label="Sender ID">
+        <InputSelect class="form-select" @bind-Value="senderId">
+            <option>-- select --</option>
+            @foreach (var item in senderIds)
+            {
+                <option value="@item.SenderID">@item.SenderID</option>
+            }
+        </InputSelect>
+    </FormField>
+    <FormInputText Label="Delivery Email" @bind-Value="model.AccountID"></FormInputText>
+    <FormInputText Label="Signature" @bind-Value="signature"></FormInputText>
+    <FormField Label="TimeZone">
+        <InputSelect class="form-select" @bind-Value="model.TimeZone">
+            <option value="-12">GMT -12</option>
+            <option value="-11">GMT -11</option>
+            <option value="-10">GMT -10</option>
+            <option value="-9">GMT -9</option>
+            <option value="-8">GMT -8</option>
+            <option value="-7">GMT -7</option>
+            <option value="-6">GMT -6</option>
+            <option value="-5">GMT -5</option>
+            <option value="-4">GMT -4</option>
+            <option value="-3">GMT -3</option>
+            <option value="-2">GMT -2</option>
+            <option value="-1">GMT -1</option>
+            <option value="0">GMT</option>
+            <option value="1">GMT +1</option>
+            <option value="2">GMT +2</option>
+            <option value="3">GMT +3</option>
+            <option value="4">GMT +4</option>
+            <option value="5">GMT +5</option>
+            <option value="6">GMT +6</option>
+            <option value="7">GMT +7</option>
+            <option value="8">GMT +8</option>
+            <option value="9">GMT +9</option>
+            <option value="10">GMT +10</option>
+            <option value="11">GMT +11</option>
+            <option value="12">GMT +12</option>
+        </InputSelect>
+    </FormField>
+</EditModal>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private EditModal<AccountResponse> editor = new();
+    private AccountResponse model => editor.Model;
+
+    private List<SenderIdResponse> senderIds = new();
+    private string signature = "";
+    private string senderId = "";
+
+    public void Show(AccountResponse? account = null) => editor.Show(account);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.SenderIdListAsync(1, 500, null);
+
+            if (response.StatusCode == 200)
+            {
+                senderIds = response.Result.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private async Task OnUpdate()
+    {
+        // if (signatureFile != null)
+        // {
+        //     // Upload the signature file
+        //     using var stream = new MemoryStream();
+        //     await signatureFile.OpenReadStream().CopyToAsync(stream);
+        //     var buffer = stream.ToArray();
+
+        //     // Assuming your API supports file upload
+        //     var fileContent = new MultipartFormDataContent
+        //     {
+        //         { new ByteArrayContent(buffer), "file", signatureFile.Name }
+        //     };
+
+        //     var uploadResponse = await apiClient.UploadSignatureAsync(fileContent);
+        //     if (uploadResponse.IsSuccessStatusCode)
+        //     {
+        //         signatureUrl = await uploadResponse.Content.ReadAsStringAsync();  // Get the file URL from response
+        //     }
+        // }
+
+        var updateRequest = new AccountUpdateRequest
+        {
+            TimeZone = model.TimeZone,
+            Active = model.Active,
+           // SignatureUrl = signatureUrl  Include the signature URL in the update request
+        };
+
+        await apiClient.AccountUpdateAsync(model.AccountID, updateRequest);
+    }
+}

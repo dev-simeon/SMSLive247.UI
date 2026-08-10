@@ -1,0 +1,26 @@
+﻿@page "/Accounts/{subAccountId}"
+
+
+<PageTitle>Sub-Account Details</PageTitle>
+
+<Title>Sub-Account Details</Title>
+
+<Tabs>
+    <TabPage Title="Details" Icon="fa fa-info">
+        <Details SubAccountId="@subAccountId"></Details>
+    </TabPage>
+    <TabPage Title="Sent Messages" Icon="fa fa-envelope">
+        <Messages SubAccountId="@subAccountId"></Messages>
+    </TabPage>
+    <TabPage Title="Sub-Users" Icon="fa fa-layer-group">
+        <SubUsers SubAccountId="@subAccountId"></SubUsers>
+    </TabPage>
+    <TabPage Title="Transfers" Icon="fa fa-gift">
+        <Transfers SubAccountId="@subAccountId"></Transfers>
+    </TabPage>
+</Tabs>
+
+@code {
+    [Parameter] public string? subAccountId { get; set; }
+
+}

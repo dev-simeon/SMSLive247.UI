@@ -1,0 +1,83 @@
+﻿<Modal Title="Transfer SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
+    <Body>
+        <div class="alert alert-info" role="alert">
+            Minimum SMS credit quantity to transfer is 50 sms credit.
+        </div>
+        <EditForm Model="transferRequest" id="Transfer" OnValidSubmit="BeginTransfer">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <FormInputText Label="Recipient Email" @bind-Value="transferRequest.Recipient" required></FormInputText>
+            <FormField Label="Credits">
+                <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required></InputNumber>
+            </FormField>
+            <FormInputText Label="Remarks" @bind-Value="transferRequest.Remarks"></FormInputText>
+            <FormInputNumber Label="Old Balance" @bind-Value="account.Credits" disabled="true"></FormInputNumber>
+            <FormField Label="New Balance">
+                <InputNumber @bind-Value="newBalance" class="form-control" disabled="true"></InputNumber>
+            </FormField>
+        </EditForm>
+    </Body>
+    <Footer>
+        <button type="submit" form="Transfer" class="btn btn-primary">Transfer Credits</button>
+    </Footer>
+</Modal>
+
+@code {
+    private int newBalance;
+    private bool hideModal = true;
+    private AccountResponse account = new();
+    private TransferRequest transferRequest = new TransferRequest();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync("self");
+
+            if (response.StatusCode == 200)
+                account = response.Result;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    public void Show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    private async Task BeginTransfer()
+    {
+        try
+        {
+            var task = await apiClient.TransferCreditAsync(transferRequest);
+
+            if (task.StatusCode == 200)
+                await alert.Success($@"Your transfer of {transferRequest.Credits} to: 
+                    {transferRequest.Recipient} was successful", "Success");
+            else
+                await alert.Error("Failed to initialize transfer.", "Error");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        finally
+        {
+            hideModal = true;
+            StateHasChanged();
+        }
+    }
+
+    private void UpdateNewBalance(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int credits))
+        {
+            newBalance = (int)account.Credits - credits;
+        }
+    }
+}

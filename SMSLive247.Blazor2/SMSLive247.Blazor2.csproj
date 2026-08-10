@@ -9,25 +9,17 @@
 
   <ItemGroup>
     <Compile Remove="Pages\Accounts\**" />
-    <Compile Remove="Pages\Credits\**" />
-    <Compile Remove="Pages\Developers\**" />
+    <Compile Remove="Pages\Credits\Modals\**" />
     <Compile Remove="Pages\Messaging\**" />
-    <Compile Remove="Pages\Support\**" />
     <Content Remove="Pages\Accounts\**" />
-    <Content Remove="Pages\Credits\**" />
-    <Content Remove="Pages\Developers\**" />
+    <Content Remove="Pages\Credits\Modals\**" />
     <Content Remove="Pages\Messaging\**" />
-    <Content Remove="Pages\Support\**" />
     <EmbeddedResource Remove="Pages\Accounts\**" />
-    <EmbeddedResource Remove="Pages\Credits\**" />
-    <EmbeddedResource Remove="Pages\Developers\**" />
+    <EmbeddedResource Remove="Pages\Credits\Modals\**" />
     <EmbeddedResource Remove="Pages\Messaging\**" />
-    <EmbeddedResource Remove="Pages\Support\**" />
     <None Remove="Pages\Accounts\**" />
-    <None Remove="Pages\Credits\**" />
-    <None Remove="Pages\Developers\**" />
+    <None Remove="Pages\Credits\Modals\**" />
     <None Remove="Pages\Messaging\**" />
-    <None Remove="Pages\Support\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +48,14 @@
     <Content Include="Pages\Messaging\Contacts\CsvFiles.razor" />
     <Content Include="Pages\Messaging\Contacts\_Index.razor" />
     <Content Include="Pages\Messaging\Contacts\Phonebook.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\Accounts\Profile.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\Accounts\SubAccounts.razor" />
   </ItemGroup>
 
   <ItemGroup>

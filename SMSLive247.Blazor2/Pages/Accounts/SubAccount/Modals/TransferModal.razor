@@ -1,0 +1,105 @@
+﻿<Modal Title="Transfer SMS Credits" @bind-Hidden="hideModal" VAlign="Modal.ModalVAlign.CENTER">
+    <Body>
+        <EditForm id="Transfer" Model="transferRequest" OnValidSubmit="BeginTransfer">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <FormField Label="Transfer From">
+                <InputRadioGroup @bind-Value="transferDirection">
+                    <div class="form-check-inline">
+                        <InputRadio id="toParent" Value='@("TO_PARENT")' />
+                        <label class="form-check-label" for="toParent">@subAccount.AccountName - @parentAccount.AccountName</label>
+                    </div>
+                    <div class="form-check-inline">
+                        <InputRadio id="fromParent" Value='@("FROM_PARENT")' />
+                        <label class="form-check-label" for="fromParent">@parentAccount.AccountName - @subAccount.AccountName</label>
+                    </div>
+                </InputRadioGroup>
+            </FormField>
+            <FormField Label="Credits">
+                <InputNumber class="form-control" @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required></InputNumber>
+            </FormField>
+            @{
+                int currentBalance = transferDirection == "TO_PARENT" ? (int)subAccount.Credits : (int)parentAccount.Credits;
+            }
+            <FormInputNumber Label="Old Balance" @bind-Value="@currentBalance" disabled="true"></FormInputNumber>
+            <FormField Label="New Balance">
+                <InputNumber @bind-Value="newBalance" class="form-control" disabled="true"></InputNumber>
+            </FormField>
+        </EditForm>
+    </Body>
+    <Footer>
+        <button type="submit" class="btn btn-primary" form="Transfer">Transfer Credits</button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public string ParentId { get; set; }
+
+    private bool hideModal = true;
+    private AccountResponse parentAccount = new();
+    private AccountResponse subAccount = new();
+    private int newBalance;
+    private TransferRequest transferRequest = new TransferRequest();
+    private string transferDirection = "TO_PARENT";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync(ParentId);
+
+            if (response.StatusCode == 200)
+                parentAccount = response.Result;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    public void Show(AccountResponse account)
+    {
+        hideModal = false;
+        subAccount = account;
+        StateHasChanged();
+    }
+
+    private async Task BeginTransfer()
+    {
+        try
+        {
+            if (transferDirection == "TO_PARENT")
+                transferRequest.Recipient = parentAccount.AccountID;
+            else
+                transferRequest.Recipient = subAccount.AccountID;
+
+            var task = await apiClient.TransferCreditAsync(transferRequest);
+
+            if (task.StatusCode == 200)
+                await alert.Success($"Your transfer of {transferRequest.Credits} was successful", "Success");
+            else
+                await alert.Error("Failed to initialize transfer.", "Error");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        finally
+        {
+            hideModal = true;
+            StateHasChanged();
+        }
+    }
+
+    private void UpdateNewBalance(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int credits))
+        {
+            if (transferDirection == "TO_PARENT")
+                newBalance = (int)subAccount.Credits - credits;
+            else
+                newBalance = (int)parentAccount.Credits - credits;
+        }
+    }
+}

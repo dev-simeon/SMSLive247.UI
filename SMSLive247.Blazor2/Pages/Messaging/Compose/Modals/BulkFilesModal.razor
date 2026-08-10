@@ -1,0 +1,87 @@
+﻿<Modal Title="Select Bulk Files" @bind-Hidden="hideModal">
+
+    <Body>
+        <div class="d-flex flex-column flex-fill">
+            <!-- Header: search + select all -->
+            <div class="mb-2">
+                <input class="form-control mb-2" type="text" placeholder="Search..." @oninput="OnSearchChanged" />
+
+                <div class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox" @onchange="OnSelectAll" id="bf-all">
+                    <label class="form-check-label" for="bf-all">Select All</label>
+                </div>
+            </div>
+
+            <!-- Results: scrollable area (prevents modal resizing) -->
+            <div class="bulk-results overflow-auto" style="flex: 1 1 auto; max-height: 50vh;">
+                @if (Model?.BatchFiles == null)
+                {
+                    <p><em>Loading...</em></p>
+                }
+                else if (Model.BatchFiles.Count == 0)
+                {
+                    <p>No bulk file found</p>
+                }
+                else
+                {
+                    @foreach (var item in Model.BatchFiles.Where(x => x.Visible).OrderBy(x => x.Name))
+                    {
+                        <div class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" value="@item.Key" checked="@item.Selected"
+                                id="bf-@item.Key" @onchange="e => OnSelect(item, e)">
+                            <label class="form-check-label" for="bf-@item.Key">@item.Name</label>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <Button Type="Button.Style.CANCEL" @onclick="Hide">
+            Close
+        </Button>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public ComposeSimpleModel? Model { get; set; }
+    [Parameter] public EventCallback OnSelected { get; set; }
+
+    private bool hideModal = true;
+
+    public void Show()
+    {
+        hideModal = false;
+        StateHasChanged();
+    }
+
+    public void Hide()
+    {
+        hideModal = true;
+        StateHasChanged();
+    }
+
+    private Task OnSelectAll(ChangeEventArgs e)
+    {
+        var selected = (bool?)e.Value ?? false;
+        Model?.BatchFiles?.ForEach(x => x.Selected = selected);
+        return OnSelected.InvokeAsync();
+    }
+
+    public Task OnSelect(ContactModel item, ChangeEventArgs e)
+    {
+        item.Selected = (bool?)e.Value ?? false;
+        return OnSelected.InvokeAsync();
+    }
+
+    private void OnSearchChanged(ChangeEventArgs e)
+    {
+        var search = e.Value?.ToString();
+        var noCase = StringComparison.OrdinalIgnoreCase;
+
+        if (string.IsNullOrWhiteSpace(search))
+            Model?.BatchFiles?.ForEach(x => x.Visible = true);
+        else
+            Model?.BatchFiles?.ForEach(x => x.Visible = x.Name.Contains(search, noCase));
+    }
+}
