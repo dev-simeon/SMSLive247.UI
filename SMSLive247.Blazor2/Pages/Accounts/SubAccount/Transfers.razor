@@ -19,14 +19,10 @@
                 <span class="font-medium text-slate-900">@context.RecipientName</span>
             </Column>
             <Column Header="Credits">
-                <span class="font-medium">
-                    <FormatNumber Number="@context.Credits"></FormatNumber>
-                </span>
+                <FormatNumber Number="@context.Credits"></FormatNumber>
             </Column>
             <Column Header="Status">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    TRANSFERRED
-                </span>
+                <Badge Style="Badge.BadgeStyle.Success" Value="TRANSFERRED" />
             </Column>
         </Columns>
     </Table>

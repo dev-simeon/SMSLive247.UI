@@ -1,25 +1,100 @@
 @attribute [Route(Const.Routes.Wallet.BuyCredits)]
 @layout MainLayout
+@using SMSLive247.Blazor2.Pages.Credits.Modals
 
 <PageTitle>SMSLive247 - Buy Credits</PageTitle>
 
 <PageHeader Title="Buy Credits"
             SubTitle="Top up your account with SMS credits to keep your campaigns running." />
 
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="Search purchases..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Buy Credits" Icon="Icon.IconStyle.CreditCard" OnClick="() => purchaseModal.Show()" />
+    </HeaderRight>
 
+    <ChildContent>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date Created" Width="180px">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Provider ID">
+                    @context.ProviderID
+                </Column>
+                <Column Header="Reference">
+                    @context.Reference
+                </Column>
+                <Column Header="Quantity">
+                    <FormatNumber Number="@context.Quantity"></FormatNumber>
+                </Column>
+                <Column Header="Price">
+                    <FormatNumber Currency="@context.Price"></FormatNumber>
+                </Column>
+                <Column Header="Amount">
+                    <FormatNumber Currency="@context.Amount"></FormatNumber>
+                </Column>
+                <Column Header="Status">
+                    @{
+                        var style = !string.IsNullOrEmpty(context.Error)
+                            ? Badge.BadgeStyle.Danger
+                            : context.IsPaid
+                                ? Badge.BadgeStyle.Success
+                                : Badge.BadgeStyle.Pending;
+                        var label = !string.IsNullOrEmpty(context.Error)
+                            ? "FAILED"
+                            : context.IsPaid ? "SUCCESS" : "PENDING";
+                    }
+                    <Badge Style="style" Value="@label" />
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+
+    <FooterLeft>
+        <Paging PageNumber="ds.PageState.PageNumber"
+                PageSize="ds.PageState.PageSize"
+                TotalRecords="ds.PageState.TotalCount"
+                PageNumberChanged="OnPageChange"
+                PageSizeChanged="OnPageSizeChange">
+        </Paging>
+    </FooterLeft>
+</PageBody>
+
+<PurchaseModal @ref="purchaseModal" OnCompleted="ReloadData" />
 
 @code {
-    private int selectedPackage = 2;
+    private string? searchQuery;
+    private ApiDataSource<PurchaseResponse> ds = new();
+    private PurchaseModal purchaseModal = new();
 
-    private List<CreditPackage> packages = new()
+    protected override async Task OnInitializedAsync()
     {
-        new(1, 1_000,    500,    false),
-        new(2, 5_000,   2_200,  true),
-        new(3, 10_000,  4_000,  false),
-        new(4, 25_000,  9_500,  false),
-        new(5, 50_000, 18_000,  false),
-        new(6, 100_000, 33_000, false),
-    };
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.PurchaseListAsync(p.PageNumber, p.PageSize, null, searchQuery);
+        });
+        ds.SetPage(new PageState(20, 1));
+        await ds.LoadData(alert);
+    }
 
-    private record CreditPackage(int Id, int Credits, decimal Price, bool IsBestValue);
+    private async Task ReloadData()
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageChange(int page)
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, page));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageSizeChange(int size)
+    {
+        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
+        await ds.LoadData(alert);
+    }
 }

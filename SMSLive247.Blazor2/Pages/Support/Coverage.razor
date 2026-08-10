@@ -1,11 +1,50 @@
-﻿@attribute [Route(Const.Routes.Support.Coverage)]
+@attribute [Route(Const.Routes.Support.Coverage)]
+@layout MainLayout
 
 <PageTitle>SMSLive247 - Coverage</PageTitle>
 
+<PageHeader Title="Global Network Coverage Lookup"
+            SubTitle="Search and view comprehensive network coverage and termination rates for supported countries." />
+
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="Search by country or operator..." @bind-SearchTerm="searchText" OnSearch="ApplySearch" />
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Export CSV" Icon="Icon.IconStyle.Download" Style="Button.ButtonStyle.Secondary" />
+    </HeaderRight>
+
+    <ChildContent>
+        <Table Items="pagedItems" AllowSelect="false">
+            <Columns>
+                <Column Header="Country">
+                    <span class="text-sm font-medium text-slate-900">@context.CountryName</span>
+                </Column>
+                <Column Header="Network Operator">
+                    <span class="text-sm font-medium text-slate-600">@context.NetworkName</span>
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+
+    <FooterLeft>
+        <Paging PageNumber="pageNumber"
+                PageSize="pageSize"
+                TotalRecords="filteredItems.Count"
+                PageNumberChanged="OnPageChange"
+                PageSizeChanged="OnPageSizeChange" />
+    </FooterLeft>
+</PageBody>
+
 @code {
+    private const int DefaultPageSize = 20;
+
     private string searchText = "";
     private List<CoverageResponse>? items;
     private List<CoverageResponse> filteredItems = [];
+    private List<CoverageResponse>? pagedItems;
+    private int pageNumber = 1;
+    private int pageSize = DefaultPageSize;
 
     protected override async Task OnInitializedAsync()
     {
@@ -17,22 +56,55 @@
             {
                 items = response.Result.ToList();
                 filteredItems = items;
+                SetPagedItems();
             }
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message, "Error");
+            pagedItems = [];
         }
     }
 
-    private void OnSearch(string input)
+    private void ApplySearch()
     {
-        searchText = input;
-
-        if (string.IsNullOrEmpty(searchText))
-            filteredItems = items ?? [] ;
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            filteredItems = items ?? [];
+        }
         else
-            filteredItems = items?.Where(x => x.CountryName.Contains(searchText, 
-                StringComparison.OrdinalIgnoreCase)).ToList() ?? [];
+        {
+            filteredItems = items?.Where(x =>
+                (x.CountryName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (x.NetworkName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList() ?? [];
+        }
+
+        pageNumber = 1;
+        SetPagedItems();
+    }
+
+    private void SetPagedItems()
+    {
+        pagedItems = filteredItems
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    private Task OnPageChange(int page)
+    {
+        var totalPages = Math.Max(1, (int)Math.Ceiling((decimal)filteredItems.Count / pageSize));
+        pageNumber = Math.Clamp(page, 1, totalPages);
+        SetPagedItems();
+        return Task.CompletedTask;
+    }
+
+    private Task OnPageSizeChange(int size)
+    {
+        pageSize = size;
+        pageNumber = 1;
+        SetPagedItems();
+        return Task.CompletedTask;
     }
 }

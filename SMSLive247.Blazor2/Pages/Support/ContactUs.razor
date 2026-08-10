@@ -1,93 +1,133 @@
 @attribute [Route(Const.Routes.Support.ContactUs)]
 @layout MainLayout
+@inject IJSRuntime JSRuntime
 
 <PageTitle>SMSLive247 - Contact Us</PageTitle>
 
-<PageHeader Title="Contact Us"
-            SubTitle="Have a question or need help? Reach out and our support team will get back to you." />
+<PageHeader Title="Contact Support"
+            SubTitle="Reach out to our team directly via our official channels below. For technical issues that require tracking, please use the ticket system." />
 
-<PageBody>
-    <ChildContent>
-        <div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-            @* Contact Form *@
-            <div class="space-y-4">
-                <h3 class="text-sm font-semibold text-slate-700">Send Us a Message</h3>
-
-                <div class="space-y-1">
-                    <label class="text-xs font-medium text-slate-600">Subject</label>
-                    <FormInput @bind-Value="subject" Placeholder="e.g. Issue with sender ID approval" />
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-medium text-slate-600">Priority</label>
-                    <FormSelect @bind-Value="priority">
-                        <option value="low">Low</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="high">High</option>
-                        <option value="critical">Critical</option>
-                    </FormSelect>
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-medium text-slate-600">Message</label>
-                    <textarea class="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400 min-h-32 resize-none"
-                              placeholder="Describe your issue in detail..."
-                              @bind="message" />
-                </div>
-                <Button Icon="Icon.IconStyle.Mail" Text="Submit Ticket" @onclick="SubmitTicket" />
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="space-y-6">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full">
+            <div class="p-6 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-brand-500 w-5 h-5" />
+                    Official Communication Channels
+                </h3>
             </div>
+            <div class="divide-y divide-slate-100">
+                <a href="mailto:info@smslive247.com"
+                   class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left">
+                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0">
+                        <Icon Style="Icon.IconStyle.Mail" CssClass="w-6 h-6" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">
+                            Email Support
+                        </p>
+                        <span class="text-base font-medium text-brand-600 group-hover:underline truncate block">
+                            info@smslive247.com
+                        </span>
+                        <p class="text-sm text-slate-500 mt-1">
+                            For general inquiries and partnership proposals.
+                        </p>
+                    </div>
+                </a>
 
-            @* Contact Info *@
-            <div class="space-y-4">
-                <h3 class="text-sm font-semibold text-slate-700">Other Ways to Reach Us</h3>
-                <div class="space-y-3">
-                    <div class="flex items-start gap-3 p-4 border border-slate-200 rounded-xl bg-white">
-                        <Icon Style="Icon.IconStyle.Mail" CssClass="w-5 h-5 text-brand-500 shrink-0 mt-0.5" />
-                        <div>
-                            <p class="text-sm font-semibold text-slate-800">Email Support</p>
-                            <p class="text-sm text-slate-500">support@smslive247.com</p>
-                            <p class="text-xs text-slate-400 mt-0.5">Response within 24 hours</p>
-                        </div>
+                <a href="tel:+2348099999247"
+                   class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left">
+                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0">
+                        <Icon Style="Icon.IconStyle.Phone" CssClass="w-6 h-6" />
                     </div>
-                    <div class="flex items-start gap-3 p-4 border border-slate-200 rounded-xl bg-white">
-                        <Icon Style="Icon.IconStyle.Globe" CssClass="w-5 h-5 text-brand-500 shrink-0 mt-0.5" />
-                        <div>
-                            <p class="text-sm font-semibold text-slate-800">Live Chat</p>
-                            <p class="text-sm text-slate-500">Available Mon–Fri, 9 AM–6 PM WAT</p>
-                            <p class="text-xs text-slate-400 mt-0.5">Fastest support channel</p>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">
+                            Call Center
+                        </p>
+                        <div class="space-y-1">
+                            <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block">
+                                +234-809-9999-247
+                            </span>
+                            <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block">
+                                +234-704-7332-240
+                            </span>
                         </div>
+                        <p class="text-sm text-slate-500 mt-1">
+                            Mondays - Fridays : 8AM - 5PM
+                        </p>
                     </div>
-                    <div class="flex items-start gap-3 p-4 border border-slate-200 rounded-xl bg-white">
-                        <Icon Style="Icon.IconStyle.HelpCircle" CssClass="w-5 h-5 text-brand-500 shrink-0 mt-0.5" />
-                        <div>
-                            <p class="text-sm font-semibold text-slate-800">Help Center</p>
-                            <p class="text-sm text-slate-500">Browse our knowledge base for common answers</p>
-                        </div>
+                </a>
+
+                <button type="button"
+                        @onclick="OpenChat"
+                        class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left">
+                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0">
+                        <Icon Style="Icon.IconStyle.HelpCircle" CssClass="w-6 h-6" />
                     </div>
-                </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">
+                            Live Chat
+                        </p>
+                        <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block">
+                            Start a conversation
+                        </span>
+                        <p class="text-sm text-slate-500 mt-1">
+                            Available 24/7 for quick questions.
+                        </p>
+                    </div>
+                </button>
             </div>
-
         </div>
-    </ChildContent>
-    <FooterLeft>
-        <p class="text-xs text-slate-400">Our support team operates Monday to Friday, 9 AM – 6 PM WAT.</p>
-    </FooterLeft>
-</PageBody>
+    </div>
+
+    <div class="space-y-6">
+        <div class="bg-blue-50 rounded-xl border border-blue-100 p-6 flex items-start gap-4">
+            <div class="bg-blue-100 p-2.5 rounded-lg shrink-0 text-brand-600">
+                <Icon Style="Icon.IconStyle.Clock" CssClass="w-5 h-5" />
+            </div>
+            <div>
+                <h3 class="text-base font-semibold text-slate-900">
+                    Estimated Response Time
+                </h3>
+                <p class="text-sm text-slate-600 mt-1">
+                    We typically respond to inquiries within
+                    <span class="font-bold text-brand-600">2 hours</span> during business days.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+            <div class="flex items-start gap-4">
+                <div class="bg-slate-100 p-3 rounded-xl text-slate-500">
+                    <Icon Style="Icon.IconStyle.Globe" CssClass="w-6 h-6" />
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">
+                        Visit Our Office
+                    </h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        6 Oremeta Street, Oregun,<br />
+                        Ikeja, Lagos State,<br />
+                        Nigeria.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="h-12"></div>
 
 @code {
-    private string? subject;
-    private string? priority = "medium";
-    private string? message;
-
-    private async Task SubmitTicket()
+    private async Task OpenChat()
     {
-        if (string.IsNullOrWhiteSpace(subject) || string.IsNullOrWhiteSpace(message))
+        try
         {
-            await alert.Error("Please fill in all required fields.", "Validation Error");
-            return;
+            await JSRuntime.InvokeVoidAsync("smsliveOpenTawkChat");
         }
-        // TODO: Call API to submit ticket
-        await alert.Success("Your ticket has been submitted. We'll get back to you shortly.", "Ticket Submitted");
-        subject = null;
-        message = null;
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Live Chat");
+        }
     }
 }

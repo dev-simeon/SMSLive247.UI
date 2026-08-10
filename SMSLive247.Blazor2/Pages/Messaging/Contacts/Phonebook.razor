@@ -1,3 +1,5 @@
+@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
+
 <PageBody>
     <HeaderLeft>
         <SearchBox Placeholder="@(viewMode == "groups" ? "Search groups..." : "Search contacts...")"
@@ -18,8 +20,8 @@
         </div>
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="New Group" Icon="Icon.IconStyle.PlusCircle" Style="Button.ButtonStyle.Secondary" @onclick="HandleNewGroup" />
-        <Button Text="Add Contact" Icon="Icon.IconStyle.PlusCircle" @onclick="HandleAddContact" />
+        <Button Text="New Group" Icon="Icon.IconStyle.PlusCircle" Style="Button.ButtonStyle.Secondary" OnClick="HandleNewGroup" />
+        <Button Text="Add Contact" Icon="Icon.IconStyle.PlusCircle" OnClick="HandleAddContact" />
     </HeaderRight>
 
     <ChildContent>
@@ -114,6 +116,9 @@
     </FooterLeft>
 </PageBody>
 
+<ContactModal @ref="contactModal" OnCompleted="FetchData" />
+<GroupModal @ref="groupModal" OnCompleted="OnGroupSaved" />
+
 @code {
     private string viewMode = "contacts"; // "contacts" | "groups"
     private string? searchQuery;
@@ -124,6 +129,8 @@
 
     private List<ContactResponse> contacts = new();
     private List<GroupResponse> groups = new();
+    private ContactModal contactModal = new();
+    private GroupModal groupModal = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -224,17 +231,17 @@
 
     private void HandleNewGroup()
     {
-        // Modal placeholder
+        groupModal.Show();
     }
 
     private void HandleAddContact()
     {
-        // Modal placeholder
+        contactModal.Show();
     }
 
     private void HandleEditContact(ContactResponse contact)
     {
-        // Modal placeholder
+        contactModal.Show(contact);
     }
 
     private async Task HandleDeleteContact(string? phoneNo)
@@ -259,7 +266,13 @@
 
     private void HandleEditGroup(GroupResponse group)
     {
-        // Modal placeholder
+        groupModal.Show(group);
+    }
+
+    private async Task OnGroupSaved()
+    {
+        viewMode = "groups";
+        await FetchData();
     }
 
     private async Task HandleDeleteGroup(string? groupId)

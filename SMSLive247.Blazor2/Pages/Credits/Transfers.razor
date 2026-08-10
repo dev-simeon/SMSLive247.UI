@@ -1,20 +1,83 @@
-﻿@attribute [Route(Const.Routes.Wallet.Transfers)]
+@attribute [Route(Const.Routes.Wallet.Transfers)]
 @layout MainLayout
+@using SMSLive247.Blazor2.Pages.Credits.Modals
 
 <PageTitle>SMSLive247 - Transfers</PageTitle>
 
+<PageHeader Title="Transfers" SubTitle="The list below shows all your successful transfers to / from your account." />
+
+<PageBody>
+    <HeaderLeft>
+        <SearchBox Placeholder="Search transfers..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Transfer Credit"
+                Icon="Icon.IconStyle.PlusCircle"
+                OnClick="async () => await transferModal.Show()" />
+    </HeaderRight>
+
+    <ChildContent>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Request Date" Width="180px">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Sender">
+                    <span class="font-medium text-slate-900">@context.SenderName</span>
+                </Column>
+                <Column Header="Recipient">
+                    <span class="font-medium text-slate-900">@context.RecipientName</span>
+                </Column>
+                <Column Header="Credits">
+                    <FormatNumber Number="@context.Credits"></FormatNumber>
+                </Column>
+                <Column Header="Status">
+                    <Badge Style="Badge.BadgeStyle.Success" Value="TRANSFERRED" />
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+
+    <FooterLeft>
+        <Paging PageNumber="ds.PageState.PageNumber" PageSize="ds.PageState.PageSize"
+                TotalRecords="ds.PageState.TotalCount" PageNumberChanged="OnPageChange" PageSizeChanged="OnPageSizeChange">
+        </Paging>
+    </FooterLeft>
+</PageBody>
+
+<TransferModal @ref="transferModal" OnCompleted="ReloadData" />
 
 @code {
-    // private SearchBox searchBox = new();
-    // private TransferModal transferModal = new();
-    // private ApiDataSource<TransferResponse> ds = new();
+    private string? searchQuery;
+    private ApiDataSource<TransferResponse> ds = new();
+    private TransferModal transferModal = new();
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     ds.Callback = new((PageState p, FilterState? f) =>
-    //     {
-    //         return apiClient.TransferListAsync(p.PageNumber, p.PageSize, null, searchBox.Text);
-    //     });
-    //     await ds.LoadData(alert);
-    // }
+    protected override async Task OnInitializedAsync()
+    {
+        ds.Callback = new((PageState p, FilterState? f) =>
+        {
+            return apiClient.TransferListAsync(p.PageNumber, p.PageSize, null, searchQuery);
+        });
+        ds.SetPage(new PageState(20, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task ReloadData()
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageChange(int page)
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, page));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageSizeChange(int size)
+    {
+        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
+        await ds.LoadData(alert);
+    }
 }
+
