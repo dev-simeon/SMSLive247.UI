@@ -140,5 +140,45 @@
         ds.SetPage(new PageState(size, ds.PageState.PageNumber));
         await ds.LoadData(alert);
     }
+
+    private async Task ResetApiKey(AccountResponse account)
+    {
+        bool confirmed = await alert.Confirm(
+            $"This will immediately invalidate the current API key for \"{account.AccountName}\". Any applications using it will stop authenticating. Continue?",
+            "Reset API Key");
+
+        if (!confirmed) return;
+
+        try
+        {
+            var response = await apiClient.AccountUpdateProviderKeyAsync(
+                account.AccountID, new AccountProviderKeyRequest());
+
+            if (response.StatusCode == 200)
+            {
+                await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
+
+                // Refresh main account if it was the one reset
+                if (account.AccountID == mainAccount?.AccountID)
+                {
+                    var res = await apiClient.AccountGetAsync("self");
+                    if (res.StatusCode == 200)
+                        mainAccount = res.Result;
+                }
+                else
+                {
+                    await ds.LoadData(alert);
+                }
+            }
+            else
+            {
+                await alert.Error("Failed to reset API key.", "Error");
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
 }
 

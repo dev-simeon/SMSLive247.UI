@@ -1,40 +1,40 @@
 <Modal Title="Transfer SMS Credits" @bind-IsVisible="isVisible">
+
     <Body>
-        <EditForm id="Transfer" Model="transferRequest" OnValidSubmit="BeginTransfer">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Transfer Direction</label>
-                    <InputRadioGroup @bind-Value="transferDirection" class="flex flex-col gap-2">
-                        <div class="flex items-center gap-2">
-                            <InputRadio id="toParent" Value="@("TO_PARENT")" />
-                            <label for="toParent" class="text-sm text-slate-700">
-                                @subAccount.AccountName → @parentAccount.AccountName
-                            </label>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <InputRadio id="fromParent" Value="@("FROM_PARENT")" />
-                            <label for="fromParent" class="text-sm text-slate-700">
-                                @parentAccount.AccountName → @subAccount.AccountName
-                            </label>
-                        </div>
-                    </InputRadioGroup>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-1">Credits</label>
-                    <InputNumber class="appearance-none block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                                 @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required />
-                </div>
-
-                @{
-                    int currentBalance = transferDirection == "TO_PARENT" ? (int)(subAccount.Credits) : (int)(parentAccount.Credits);
-                }
-                <FormInput Label="Current Balance" Value="@currentBalance.ToString()" disabled="true" />
-                <FormInput Label="New Balance" Value="@newBalance.ToString()" disabled="true" />
+        <EditForm id="Transfer" Model="transferRequest" OnValidSubmit="BeginTransfer" class="edit-form">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Transfer Direction</label>
+                <InputRadioGroup @bind-Value="transferDirection" class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2">
+                        <InputRadio id="toParent" Value="@("TO_PARENT")" />
+                        <label for="toParent" class="text-sm text-slate-700">
+                            @subAccount.AccountName → @parentAccount.AccountName
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <InputRadio id="fromParent" Value="@("FROM_PARENT")" />
+                        <label for="fromParent" class="text-sm text-slate-700">
+                            @parentAccount.AccountName → @subAccount.AccountName
+                        </label>
+                    </div>
+                </InputRadioGroup>
             </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Credits</label>
+                <InputNumber
+                class="appearance-none block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                @bind-Value="transferRequest.Credits" min="50" @oninput="UpdateNewBalance" required placeholder="Enter amount to transfer" />
+            </div>
+
+            @{
+                int currentBalance = transferDirection == "TO_PARENT" ? (int)(subAccount.Credits) :
+            (int)(parentAccount.Credits);
+            }
+            <FormRow Cols="2">
+                <FormInput Label="Current Balance" Value="@currentBalance.ToString()" disabled="true" PlaceHolder="Current balance" ErrorMessage="" />
+                <FormInput Label="New Balance" Value="@newBalance.ToString()" disabled="true" PlaceHolder="New balance" ErrorMessage="" />
+            </FormRow>
         </EditForm>
     </Body>
     <Footer>
