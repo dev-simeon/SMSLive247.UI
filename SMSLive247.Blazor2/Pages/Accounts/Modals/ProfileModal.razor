@@ -2,11 +2,14 @@
 
     <Body>
         <EditForm FormName="f1" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-4">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-
-            <FormInput Label="First Name" @bind-Value="model.FirstName" required="true" />
-            <FormInput Label="Last Name" @bind-Value="model.LastName" required="true" />
+            <FormInput @bind-Value="model.FirstName" 
+                       Label="First Name"
+                       ErrorMessage="First name is required."
+                       required="true" />
+            <FormInput @bind-Value="model.LastName" 
+                       Label="Last Name"
+                       ErrorMessage="Last name is required."
+                       required="true" />
             <FormInput Label="Email Address" @bind-Value="model.Email" disabled="true" />
             <FormInput Label="Phone Number" @bind-Value="model.Phone" disabled="true" />
 

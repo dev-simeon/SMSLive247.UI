@@ -8,8 +8,11 @@
                 <h2 class="text-xl font-bold text-slate-900 m-0">@subAccount.AccountName</h2>
                 <p class="text-sm text-slate-500 mt-1">ID: <span class="font-mono text-slate-700">@subAccount.AccountID</span></p>
             </div>
-            <div>
-                <Button Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(subAccount)">
+            <div class="flex items-center gap-2">
+                <Button Style="Button.ButtonStyle.Secondary" OnClick="() => subAccountModal.Show(subAccount)">
+                    Edit Profile
+                </Button>
+                <Button Style="Button.ButtonStyle.Secondary" OnClick="() => transferModal.Show(subAccount)">
                     Add/Remove Credit
                 </Button>
             </div>
@@ -79,14 +82,21 @@ else
 }
 
 <TransferModal @ref="transferModal" ParentId="self"></TransferModal>
+<SubAccountModal @ref="subAccountModal" OnCompleted="ReloadData"></SubAccountModal>
 
 @code {
     [Parameter] public string SubAccountId { get; set; } = string.Empty;
 
     private AccountResponse subAccount = new();
     private TransferModal transferModal = new();
+    private SubAccountModal subAccountModal = new();
 
     protected override async Task OnInitializedAsync()
+    {
+        await ReloadData();
+    }
+
+    private async Task ReloadData()
     {
         try
         {

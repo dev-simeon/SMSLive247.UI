@@ -1,27 +1,64 @@
 <Modal Title="Add Sub-Account" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm FormName="CreateSubAccount" Model="@request" OnValidSubmit="HandleSubmit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+        <EditForm id="CreateSubAccountForm" FormName="CreateSubAccount" Model="@request" OnValidSubmit="HandleSubmit" class="edit-form">
+            @* Account Name — full width *@
+            <FormInput Label="Account Name"
+                       PlaceHolder="e.g. Marketing Dept"
+                       @bind-Value="request.AccountName"
+                       required="true"
+                       ErrorMessage="" />
 
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <FormInput Label="First Name" @bind-Value="request.FirstName" />
-                    <FormInput Label="Last Name" @bind-Value="request.LastName" />
-                </div>
-                <FormInput Label="Account Name (Username / Email)" @bind-Value="request.AccountName" />
-                <FormInput Label="Email Address" @bind-Value="request.Email" Type="email" />
-                <FormInput Label="Phone Number" @bind-Value="request.Phone" />
-                <FormInput Label="Password" @bind-Value="password" Type="password" />
-                <FormSelect Label="Country" Type="FormSelect.SelectType.Country"
-                            @bind-Value="CountryCodeString" IsEmbedded="false" />
-                <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone"
-                            @bind-Value="TimeZoneString" IsEmbedded="false" />
-            </div>
+            @* First Name & Last Name — 2 columns *@
+            <FormRow Cols="2">
+                <FormInput Label="First Name"
+                           PlaceHolder="First Name"
+                           @bind-Value="request.FirstName"
+                           ErrorMessage="" />
+                <FormInput Label="Last Name"
+                           PlaceHolder="Last Name"
+                           @bind-Value="request.LastName"
+                           ErrorMessage="" />
+            </FormRow>
+
+            @* Email Address & Phone Number — 2 columns *@
+            <FormRow Cols="2">
+                <FormInput Label="Email Address"
+                           Type="email"
+                           PlaceHolder="email@example.com"
+                           @bind-Value="request.Email"
+                           ErrorMessage="" />
+                <FormInput Label="Phone Number"
+                           Type="tel"
+                           PlaceHolder="e.g. 08030000000"
+                           @bind-Value="request.Phone"
+                           ErrorMessage="" />
+            </FormRow>
+
+            @* Country Code & Time Zone — 2 columns *@
+            <FormRow Cols="2">
+                <FormSelect Label="Country Code"
+                            Type="FormSelect.SelectType.Country"
+                            @bind-Value="CountryCodeString"
+                            IsEmbedded="false" />
+                <FormSelect Label="Time Zone (GMT Offset)"
+                            Type="FormSelect.SelectType.TimeZone"
+                            @bind-Value="TimeZoneString"
+                            IsEmbedded="false" />
+            </FormRow>
+
+            @* Password — full width *@
+            <FormInput Label="Password"
+                       Type="password"
+                       PlaceHolder="••••••••"
+                       @bind-Value="password"
+                       required="true"
+                       HelpText="Must be at least 8 characters with numbers and symbols."
+                       ErrorMessage="" />
         </EditForm>
     </Body>
     <Footer>
-        <Button IsSubmit="true" Text="Create Sub-Account" />
+        <Button IsSubmit="true" Text="Create Sub-Account" form="CreateSubAccountForm" Icon="Icon.IconStyle.PlusCircle" IsBusy="@isSubmitting" />
+        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" IsDisabled="@isSubmitting" OnClick="() => isVisible = false" />
     </Footer>
 </Modal>
 
@@ -29,17 +66,18 @@
     [Parameter] public EventCallback OnCompleted { get; set; }
 
     private bool isVisible = false;
+    private bool isSubmitting = false;
     private AccountCreateRequest request = new();
     private string password = string.Empty;
-    private string? CountryCodeString { get; set; }
-    private string? TimeZoneString { get; set; }
+    private string? CountryCodeString { get; set; } = "234";
+    private string? TimeZoneString { get; set; } = "0";
 
     public void Show()
     {
         request = new();
         password = string.Empty;
-        CountryCodeString = null;
-        TimeZoneString = null;
+        CountryCodeString = "234";
+        TimeZoneString = "0";
         isVisible = true;
         StateHasChanged();
     }
@@ -48,8 +86,10 @@
     {
         try
         {
+            isSubmitting = true;
+
             if (!string.IsNullOrEmpty(CountryCodeString)
-                && int.TryParse(CountryCodeString, out int countryCode))
+                && int.TryParse(CountryCodeString.TrimStart('+'), out int countryCode))
             {
                 request.CountryCode = countryCode;
             }
@@ -62,17 +102,11 @@
 
             request.Password = password;
 
-            var response = await apiClient.AccountCreateAsync(request);
+            await apiClient.AccountCreateAsync(request);
 
-            if (response.StatusCode == 200 || response.StatusCode == 201)
-            {
-                await alert.Success("Sub-account created successfully.", "Success");
-                await OnCompleted.InvokeAsync();
-            }
-            else
-            {
-                await alert.Error("Failed to create sub-account.", "Error");
-            }
+            await alert.Success("Sub-account created successfully.", "Success");
+            await OnCompleted.InvokeAsync();
+            isVisible = false;
         }
         catch (Exception ex)
         {
@@ -80,7 +114,7 @@
         }
         finally
         {
-            isVisible = false;
+            isSubmitting = false;
             StateHasChanged();
         }
     }

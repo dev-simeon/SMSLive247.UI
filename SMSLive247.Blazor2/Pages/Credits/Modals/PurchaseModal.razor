@@ -1,31 +1,28 @@
 @inject NavigationManager nav
 
 <Modal Title="@modalTitle" @bind-IsVisible="isVisible">
+
     <Body>
         <div class="space-y-6">
             @if (price == null)
             {
-                <EditForm id="ew3" Model="@model" OnValidSubmit="ConfirmPrice">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
+                <EditForm id="ew3" Model="@model" OnValidSubmit="ConfirmPrice" class="space-y-6">
 
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">
-                                Quantity/Credits
-                            </label>
-                            <div class="relative">
-                                <InputNumber @bind-Value="model.Quantity"
-                                             min="500"
-                                             class="block w-full rounded-lg border-0 py-3 pl-4 pr-20 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-brand-500 sm:text-sm font-mono outline-none"
-                                             placeholder="e.g. 10000" />
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <span class="text-slate-500 text-[10px] font-bold">
-                                        CREDITS
-                                    </span>
-                                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                            Quantity/Credits
+                        </label>
+                        <div class="relative">
+                            <InputNumber @bind-Value="model.Quantity" min="500"
+                                         class="block w-full rounded-lg border-0 py-3 pl-4 pr-20 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-brand-500 sm:text-sm font-mono outline-none"
+                                         placeholder="e.g. 10000" />
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <span class="text-slate-500 text-[10px] font-bold">
+                                    CREDITS
+                                </span>
                             </div>
                         </div>
+                    </div>
 
                     <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-[11px] text-blue-700 flex gap-2">
                         <Icon Style="Icon.IconStyle.Info" CssClass="w-4 h-4 mt-0.5 shrink-0" />
@@ -47,7 +44,8 @@
                         <div class="space-y-3 pt-1">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-slate-500">Credit Price</span>
-                                <span class="text-slate-700 font-medium whitespace-nowrap">@formatCurrency(price.Price)</span>
+                                <span
+                                class="text-slate-700 font-medium whitespace-nowrap">@formatCurrency(price.Price)</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-slate-500">Purchase Amount</span>
@@ -62,49 +60,41 @@
                         <div class="pt-4 border-t border-slate-200">
                             <div class="flex justify-between items-center">
                                 <span class="text-base font-bold text-slate-900">Total Amount</span>
-                                <span class="text-xl font-black text-brand-600">@formatCurrency(price.Amount + price.Fee)</span>
+                                <span class="text-xl font-black text-brand-600">@formatCurrency(price.Amount +
+                                                                    price.Fee)</span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="flex items-start gap-3 p-4 bg-blue-50/50 rounded-lg border border-blue-100/50">
-                    <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-                        <span class="text-blue-600 text-xs font-bold font-mono">i</span>
+                    <div class="flex items-start gap-3 p-4 bg-blue-50/50 rounded-lg border border-blue-100/50">
+                        <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
+                            <span class="text-blue-600 text-xs font-bold font-mono">i</span>
+                        </div>
+                        <p class="text-xs text-blue-700 leading-relaxed">
+                            You will be redirected to Paystack to complete your payment securely.
+                            Once successful, your credits will be added to your account instantly.
+                        </p>
                     </div>
-                    <p class="text-xs text-blue-700 leading-relaxed">
-                        You will be redirected to Paystack to complete your payment securely.
-                        Once successful, your credits will be added to your account instantly.
-                    </p>
-                </div>
+                }
+            </div>
+        </Body>
+        <Footer>
+            @if (price == null)
+            {
+                <Button IsSubmit="true" Text="Confirm Price" Icon="Icon.IconStyle.ChevronRight" IsBusy="@isCalculating" />
             }
-        </div>
-    </Body>
-    <Footer>
-        @if (price == null)
-        {
-            <Button IsSubmit="true"
-                    Text="Confirm Price"
-                    Icon="Icon.IconStyle.ChevronRight"
-                    IsBusy="@isCalculating" />
-        }
-        else
-        {
-            <Button Text="Pay with Paystack"
-                    Icon="Icon.IconStyle.CreditCard"
-                    IsBusy="@isProcessingPayment"
-                    OnClick="BeginPayment" />
-            <Button Text="Back"
-                    Style="Button.ButtonStyle.Secondary"
-                    IsDisabled="@isProcessingPayment"
-                    OnClick="CancelConfirmation" />
-        }
-        <Button Text="Cancel"
-                Style="Button.ButtonStyle.Secondary"
-                IsDisabled="@(isCalculating || isProcessingPayment)"
-                OnClick="Close" />
-    </Footer>
-</Modal>
+            else
+            {
+                <Button Text="Pay with Paystack" Icon="Icon.IconStyle.CreditCard" IsBusy="@isProcessingPayment"
+                        OnClick="BeginPayment" />
+                <Button Text="Back" Style="Button.ButtonStyle.Secondary" IsDisabled="@isProcessingPayment"
+                        OnClick="CancelConfirmation" />
+            }
+            <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" IsDisabled="@(isCalculating || isProcessingPayment)"
+                    OnClick="Close" />
+        </Footer>
+    </Modal>
 
 @code {
     private sealed class PurchaseFormModel

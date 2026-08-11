@@ -14,7 +14,7 @@
         <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="Add Sub-Account" Icon="Icon.IconStyle.PlusCircle" OnClick="() => createModal.Show()" />
+        <Button Text="Add Sub-Account" Icon="Icon.IconStyle.PlusCircle" OnClick="() => subAccountModal.Show()" />
     </HeaderRight>
 
     <ChildContent>
@@ -72,7 +72,7 @@
     </FooterLeft>
 </PageBody>
 
-<CreateSubAccountModal @ref="createModal" OnCompleted="ReloadData" />
+<SubAccountModal @ref="subAccountModal" OnCompleted="ReloadData" />
 <TransferModal @ref="transferModal" ParentId="@parentAccountId" />
 
 @code {
@@ -80,7 +80,7 @@
     private string parentAccountId = "";
 
     private ApiDataSource<AccountResponse> ds = new();
-    private CreateSubAccountModal createModal = new();
+    private SubAccountModal subAccountModal = new();
     private TransferModal transferModal = new();
 
     private string SubAccountUrl(string? id) =>
@@ -93,9 +93,9 @@
             var me = await apiClient.AccountGetAsync("me");
             parentAccountId = me.Result.AccountID;
         }
-        catch
+        catch (Exception ex)
         {
-            
+            await alert.Error(ex.Message);
         }
 
         ds.Callback = new((PageState p, FilterState? f) =>

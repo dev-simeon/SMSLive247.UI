@@ -1,0 +1,221 @@
+@namespace SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
+
+<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
+    <Body>
+        <EditForm id="SubAccountForm" Model="@formModel" OnValidSubmit="HandleSubmit" class="space-y-6">
+            @if (isEditMode)
+            {
+                <div>
+                    <label class="block text-sm font-medium text-slate-700">Account Name</label>
+                    <div class="mt-1 w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-700">
+                        @editingAccount.AccountName
+                    </div>
+                </div>
+
+                <FormRow Cols="2">
+                    <FormInput Label="First Name"
+                               PlaceHolder="First Name"
+                               @bind-Value="updateRequest.FirstName"
+                               ErrorMessage="" />
+                    <FormInput Label="Last Name"
+                               PlaceHolder="Last Name"
+                               @bind-Value="updateRequest.LastName"
+                               ErrorMessage="" />
+                </FormRow>
+
+                <FormRow Cols="2">
+                    <FormInput Label="Email Address"
+                               Type="email"
+                               PlaceHolder="email@example.com"
+                               @bind-Value="updateRequest.Email"
+                               ErrorMessage="" />
+                    <FormInput Label="Phone Number"
+                               Type="tel"
+                               PlaceHolder="e.g. 08030000000"
+                               @bind-Value="updateRequest.Phone"
+                               ErrorMessage="" />
+                </FormRow>
+
+                <FormRow Cols="2">
+                    <FormSelect Label="Country Code"
+                                Type="FormSelect.SelectType.Country"
+                                @bind-Value="CountryCodeString"
+                                IsEmbedded="false" />
+                    <FormSelect Label="Time Zone (GMT Offset)"
+                                Type="FormSelect.SelectType.TimeZone"
+                                @bind-Value="TimeZoneString"
+                                IsEmbedded="false" />
+                </FormRow>
+            }
+            else
+            {
+                <FormInput Label="Account Name"
+                           PlaceHolder="e.g. Marketing Dept"
+                           @bind-Value="createRequest.AccountName"
+                           required="true"
+                           ErrorMessage="" />
+
+                <FormRow Cols="2">
+                    <FormInput Label="First Name"
+                               PlaceHolder="First Name"
+                               @bind-Value="createRequest.FirstName"
+                               ErrorMessage="" />
+                    <FormInput Label="Last Name"
+                               PlaceHolder="Last Name"
+                               @bind-Value="createRequest.LastName"
+                               ErrorMessage="" />
+                </FormRow>
+
+                <FormRow Cols="2">
+                    <FormInput Label="Email Address"
+                               Type="email"
+                               PlaceHolder="email@example.com"
+                               @bind-Value="createRequest.Email"
+                               ErrorMessage="" />
+                    <FormInput Label="Phone Number"
+                               Type="tel"
+                               PlaceHolder="e.g. 08030000000"
+                               @bind-Value="createRequest.Phone"
+                               ErrorMessage="" />
+                </FormRow>
+
+                <FormRow Cols="2">
+                    <FormSelect Label="Country Code"
+                                Type="FormSelect.SelectType.Country"
+                                @bind-Value="CountryCodeString"
+                                IsEmbedded="false" />
+                    <FormSelect Label="Time Zone (GMT Offset)"
+                                Type="FormSelect.SelectType.TimeZone"
+                                @bind-Value="TimeZoneString"
+                                IsEmbedded="false" />
+                </FormRow>
+
+                <FormInput Label="Password"
+                           Type="password"
+                           PlaceHolder="••••••••"
+                           @bind-Value="password"
+                           required="true"
+                           HelpText="Must be at least 8 characters with numbers and symbols."
+                           ErrorMessage="" />
+            }
+        </EditForm>
+    </Body>
+    <Footer>
+        <Button IsSubmit="true"
+                Text="@(isEditMode ? "Update Sub-Account" : "Create Sub-Account")"
+                form="SubAccountForm"
+                Icon="@(isEditMode ? Icon.IconStyle.Save : Icon.IconStyle.PlusCircle)"
+                IsBusy="@isSubmitting" />
+        <Button Text="Cancel"
+                Style="Button.ButtonStyle.Secondary"
+                IsDisabled="@isSubmitting"
+                OnClick="() => isVisible = false" />
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private bool isVisible = false;
+    private bool isSubmitting = false;
+    private bool isEditMode = false;
+    private string modalTitle = "Add Sub-Account";
+
+    private AccountCreateRequest createRequest = new();
+    private AccountUpdateRequest updateRequest = new();
+    private AccountResponse editingAccount = new();
+    private object formModel => isEditMode ? (object)updateRequest : createRequest;
+
+    private string password = string.Empty;
+    private string? CountryCodeString { get; set; } = "234";
+    private string? TimeZoneString { get; set; } = "0";
+
+    // Open for Create
+    public void Show()
+    {
+        isEditMode = false;
+        modalTitle = "Add Sub-Account";
+        createRequest = new();
+        password = string.Empty;
+        CountryCodeString = "234";
+        TimeZoneString = "0";
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    // Open for Edit
+    public void Show(AccountResponse account)
+    {
+        isEditMode = true;
+        modalTitle = "Edit Sub-Account";
+        editingAccount = account;
+
+        updateRequest = new AccountUpdateRequest
+        {
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            Email = account.Email,
+            Phone = account.Phone,
+            CountryCode = account.CountryCode,
+            TimeZone = account.TimeZone
+        };
+
+        CountryCodeString = account.CountryCode.ToString();
+        TimeZoneString = account.TimeZone.ToString();
+
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            isSubmitting = true;
+
+            int countryCode = 234;
+            if (!string.IsNullOrEmpty(CountryCodeString)
+                && int.TryParse(CountryCodeString.TrimStart('+'), out int cc))
+            {
+                countryCode = cc;
+            }
+
+            int tz = 0;
+            if (!string.IsNullOrEmpty(TimeZoneString)
+                && int.TryParse(TimeZoneString, out int t))
+            {
+                tz = t;
+            }
+
+            if (isEditMode)
+            {
+                updateRequest.CountryCode = countryCode;
+                updateRequest.TimeZone = tz;
+
+                await apiClient.AccountUpdateAsync(editingAccount.AccountID, updateRequest);
+                await alert.Success("Sub-account updated successfully.", "Success");
+            }
+            else
+            {
+                createRequest.CountryCode = countryCode;
+                createRequest.TimeZone = tz;
+                createRequest.Password = password;
+
+                await apiClient.AccountCreateAsync(createRequest);
+                await alert.Success("Sub-account created successfully.", "Success");
+            }
+
+            await OnCompleted.InvokeAsync();
+            isVisible = false;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+}
