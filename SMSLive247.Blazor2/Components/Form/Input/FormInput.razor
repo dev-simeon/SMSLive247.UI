@@ -1,36 +1,47 @@
-@inherits InputBase<string>
+@typeparam TValue
+@inherits InputBase<TValue>
 
 <div>
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="block text-sm font-medium text-slate-700">
             @Label
+            @if (Required)
+            {
+                <span class="ml-2 text-red-500">*</span>
+            }
+            @if (HasError)
+            {
+                <span class="ml-2 text-red-500">
+                    @* <Icon Style="Icon.IconStyle.Info" CssClass="mr-2 text-[2px] text-yellow-500" /> *@
+                    <o>@ErrorMessage</o>
+                </span>
+            }
         </label>
     }
-    <div class="mt-1 relative">
-        <input @attributes="AdditionalAttributes" 
-               type="@inputType"
+    <div class="relative mt-1">
+        <input type="@inputType"
                placeholder="@PlaceHolder"
                value="@CurrentValueAsString"
-               @onchange="OnChange"
-               @onblur="OnBlur" 
-               class="appearance-none block w-full px-3 py-2.5 border rounded-lg placeholder-slate-400 
-                      focus:outline-none focus:ring-brand-500 focus:border-brand-500 
-                      sm:text-sm bg-white text-slate-900 transition-all border-slate-200 
-                      @GetErrorClass()" />
+               min="@Min"
+               max="@Max"
+               @oninput="OnInput"
+               @onblur="OnBlur"
+               @attributes="AdditionalAttributes"
+               class="block w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:ring-brand-500 focus:border-brand-500 focus:outline-none sm:text-sm @GetErrorClass()" />
 
         @if (IconStyle != null)
         {
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 transition-colors">
+            <div class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-400 transition-colors hover:text-slate-600">
                 <Icon Style="@((Icon.IconStyle)IconStyle)" />
             </div>
         }
 
         @if (Type == "password")
         {
-            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 transition-colors"
+            <div class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-400 transition-colors hover:text-slate-600"
                  @onclick="TogglePasswordType">
-                @if (showPassword)
+                @if (inputType == "password")
                 {
                     <Icon Style="Icon.IconStyle.EyeOff" />                
                 }
@@ -38,93 +49,51 @@
                 {
                     <Icon Style="Icon.IconStyle.Eye" />
                 }
+
             </div>
         }
     </div>
 
-    @if (showError)
+    @if(!string.IsNullOrEmpty(HelpText))
     {
-        <p class="mt-1 text-xs text-red-500">
-            <Icon Style="Icon.IconStyle.Close" CssClass="mr-2" />@ErrorMessage
-        </p>
-    }
-    else if(!string.IsNullOrEmpty(HelpText))
-    {
-        <p class="mt-1 text-xs text-slate-500">
-            <Icon Style="Icon.IconStyle.Info" CssClass="mr-2" />@HelpText
+        <p class="text-s mt-1 text-slate-500">
+            <Icon Style="Icon.IconStyle.Info" CssClass="mr-2 text-xs leading-none" />
+            <span>@HelpText</span>
         </p>
     }
 </div>
 
-<script>
-    function validateField(event) {
-        const element = event.target;
-        const validity = element.validity;
-
-        // Find the companion error span inside the same parent container
-        const errorContainer = element.closest('.input-group');
-        const errorSpan = errorContainer ? errorContainer.querySelector('.error-msg') : null;
-
-        let errorMessage = "";
-
-        // 1. Check if the field is empty but marked as required
-        if (validity.valueMissing) {
-            if (element.type === 'checkbox') {
-                errorMessage = "You must accept this field to proceed.";
-            } else {
-                errorMessage = "This field cannot be left blank.";
-            }
-        }
-        // 2. Check type mismatches (e.g., invalid email format or broken URL)
-        else if (validity.typeMismatch) {
-            if (element.type === 'email') {
-                errorMessage = "Please enter a valid email address (e.g., name@example.com).";
-            } else {
-                errorMessage = "The format entered is incorrect.";
-            }
-        }
-        // 3. Check text length limits
-        else if (validity.tooShort) {
-            errorMessage = `Must be at least ${element.minLength} characters long.`;
-        }
-        // 4. Check numeric ranges
-        else if (validity.rangeUnderflow) {
-            errorMessage = `Value must be at least ${element.min}.`;
-        } else if (validity.rangeOverflow) {
-            errorMessage = `Value cannot be higher than ${element.max}.`;
-        }
-        // 5. Check custom regex pattern attributes
-        else if (validity.patternMismatch) {
-            errorMessage = "The format does not match requirements.";
-        }
-
-        // Render the error message to the UI
-        if (errorSpan) {
-            if (errorMessage) {
-                errorSpan.textContent = errorMessage;
-                errorSpan.style.display = "block";
-                element.classList.add('input-error'); // Optional: for CSS styling
-            } else {
-                errorSpan.textContent = "";
-                errorSpan.style.display = "none";
-                element.classList.remove('input-error');
-            }
-        }
-    }
-
-</script>
-
 @code {
     [Parameter] public string? Label { get; set; }
     [Parameter] public string? PlaceHolder { get; set; }
-    [Parameter] public string? Type { get; set; } = "text";
+    [Parameter] public string? Type { get; set; } = "text"; //text, password, email, number, etc.
     [Parameter] public Icon.IconStyle? IconStyle { get; set; }
-    [Parameter] public string? ErrorMessage { get; set; }
     [Parameter] public string? HelpText { get; set; }
 
+    // additional validation parameters
+    [Parameter] public bool Required { get; set; } = true;
+    [Parameter] public TValue? Min { get; set; }
+    [Parameter] public TValue? Max { get; set; }
+
+    [Parameter] public string InvalidMessage { get; set; } = "Please enter a valid {0}.";
+    [Parameter] public string RequiredMessage { get; set; } = "The {0} field is required.";
+    [Parameter] public string RangeMessageFormat { get; set; } = "Value must be between {0} and {1}.";
+
+    [Parameter] public EventCallback<bool> IsValidChanged { get; set; }
+
+    // public properties to expose validation state to parent components
+    public bool HasError { get; private set; }
+    public string? ErrorMessage { get; private set; }
+
+    private bool hasBlurredOnce = false;
     private string inputType = "text";
-    private bool showPassword = false;
-    private bool showError => !string.IsNullOrEmpty(ErrorMessage);
+    private ValidationMessageStore? messageStore;
+
+    protected override void OnInitialized()
+    {
+        if (EditContext is not null)
+            messageStore = new ValidationMessageStore(EditContext);
+    }
 
     protected override void OnParametersSet()
     {
@@ -134,38 +103,119 @@
         base.OnParametersSet();
     }
 
-    private void OnChange(ChangeEventArgs e)
-    {
-        CurrentValueAsString = e.Value?.ToString();
-    }
-
-    private void OnBlur(FocusEventArgs e)
-    {
-        EditContext?.NotifyFieldChanged(FieldIdentifier);
-    }
-
     private void TogglePasswordType()
     {
-        showPassword = !showPassword;
-        inputType = showPassword ? "text" : "password";
+        inputType = inputType == "password" ? "text" : "password";
     }
 
     private string GetErrorClass()
     {
-        return showError ? "border-red-300 ring-1 ring-red-300" : "border-slate-200";
-    }
-
-    private void ValidateInput(FocusEventArgs args)
-    {
-        ErrorMessage = args.Type;
+        return HasError ? "border-red-300 ring-1 ring-red-300" : "border-slate-200";
     }
 
     protected override bool TryParseValueFromString(string? value,
-        [MaybeNullWhen(false)] out string result,
-        [NotNullWhen(false)] out string? validationErrorMessage)
+            [MaybeNullWhen(false)] out TValue result,
+            [NotNullWhen(false)] out string? validationErrorMessage)
     {
-        result = value ?? string.Empty;
+        result = value is null ? default : (TValue)(object)value;
+
         validationErrorMessage = null;
         return true;
+    }
+      
+    private async Task OnBlur(FocusEventArgs e)
+    {
+        hasBlurredOnce = true;
+        await ValidateAsync();
+    }
+    
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        CurrentValueAsString = e.Value?.ToString();
+                
+        if (hasBlurredOnce)
+            await ValidateAsync();
+    }
+
+    private async Task ValidateAsync()
+    {
+        var (isValid, message) = Validate(CurrentValueAsString);
+
+        HasError = !isValid;
+        ErrorMessage = message;
+
+        if (messageStore is not null && EditContext is not null)
+        {
+            messageStore.Clear(FieldIdentifier);
+            if (!isValid && message is not null)
+            {
+                messageStore.Add(FieldIdentifier, message);
+            }
+            EditContext.NotifyValidationStateChanged();
+        }
+
+        await IsValidChanged.InvokeAsync(isValid);
+        StateHasChanged();
+    }
+
+    private (bool IsValid, string? Message) Validate(string? raw)
+    {
+        var isEmpty = string.IsNullOrWhiteSpace(raw);
+
+        if (Required && isEmpty)
+            return (false, string.Format(RequiredMessage, Label ?? Type));
+
+        if (isEmpty)
+            // Not required and empty — nothing further to check.
+            return (true, null);
+
+        if (Type == "email" && !System.Net.Mail.MailAddress.TryCreate(raw, out _))
+            return (false, string.Format(InvalidMessage, Label ?? Type));
+
+        // if (!TryParse(raw, out _))
+        //     return (false, "Please enter a valid number.");
+
+        // var numeric = Convert.ToDouble(raw, CultureInfo.InvariantCulture);
+
+        // if (Min.HasValue && numeric < Min.Value)
+        //     return (false, string.Format(RangeMessageFormat, Min, Max));
+
+        // if (Max.HasValue && numeric > Max.Value)
+        //     return (false, string.Format(RangeMessageFormat, Min, Max));
+
+        return (true, null);
+    }
+
+    // private static bool TryParse(string? raw, out TValue? value)
+    // {
+    //     value = default;
+
+    //     if (string.IsNullOrWhiteSpace(raw))
+    //     {
+    //         return false;
+    //     }
+
+    //     try
+    //     {
+    //         var underlyingType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
+    //         var converted = Convert.ChangeType(raw, underlyingType, CultureInfo.InvariantCulture);
+    //         value = (TValue)converted;
+    //         return true;
+    //     }
+    //     catch
+    //     {
+    //         return false;
+    //     }
+    // }
+
+    /// <summary>
+    /// Runs validation on demand (e.g. call this from a parent's submit
+    /// handler to force-validate fields the user never blurred).
+    /// </summary>
+    private async Task<bool> ValidateNowAsync()
+    {
+        hasBlurredOnce = true;
+        await ValidateAsync();
+        return !HasError;
     }
 }
