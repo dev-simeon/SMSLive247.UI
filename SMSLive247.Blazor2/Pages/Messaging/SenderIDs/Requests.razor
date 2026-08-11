@@ -1,3 +1,4 @@
+@using SMSLive247.Blazor2.Pages.Messaging.SenderIDs.Modals
 @attribute [Route(Const.Routes.Messaging.SenderIds)]
 @layout MainLayout
 
@@ -20,7 +21,7 @@
         </SearchBox>
     </HeaderLeft>
     <HeaderRight>
-        <Button Icon="Icon.IconStyle.PlusCircle" Text="Request Sender ID" />
+        <Button Icon="Icon.IconStyle.PlusCircle" Text="Request Sender ID" OnClick="() => requestModal.Show()" />
     </HeaderRight>
     <ChildContent>
         <Table Items="filteredItems">
@@ -65,20 +66,35 @@
     </FooterLeft>
 </PageBody>
 
+<RequestModal @ref="requestModal" OnCompleted="FetchData" />
+
 @code {
     private string? searchStatus;
     private string? searchQuery;
     private List<SenderIdResponse>? items;
     private List<SenderIdResponse>? filteredItems;
+    private RequestModal requestModal = new();
 
     protected override async Task OnInitializedAsync()
     {
         await FetchData();
     }
 
-    private void HandleDelete(SenderIdResponse item)
+    private async Task HandleDelete(SenderIdResponse item)
     {
-        // TODO: Implement delete logic
+        bool confirmed = await alert.Confirm($"Are you sure you want to delete Sender ID [{item.SenderID}]?", "Delete Sender ID");
+        if (!confirmed) return;
+
+        try
+        {
+            await apiClient.SenderIdDeleteAsync(item.SenderID);
+            await alert.Success("Sender ID deleted successfully.", "Deleted");
+            await FetchData();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
     }
 
     private async Task FetchData()

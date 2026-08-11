@@ -109,19 +109,6 @@
         try { return new Guid(key).ToString().ToUpperInvariant(); }
         catch { return "—"; }
     }
-    
-    private async Task ResetApiKey(AccountResponse account)
-    {
-        try
-        {
-            // TODO: wire up to apiClient.AccountUpdateProviderKeyAsync() when available
-            await alert.Error("Failed to reset API key");
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message);
-        }
-    }
 
     private async Task ReloadData()
     {
@@ -154,30 +141,22 @@
             var response = await apiClient.AccountUpdateProviderKeyAsync(
                 account.AccountID, new AccountProviderKeyRequest());
 
-            if (response.StatusCode == 200)
-            {
-                await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
+            await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
 
-                // Refresh main account if it was the one reset
-                if (account.AccountID == mainAccount?.AccountID)
-                {
-                    var res = await apiClient.AccountGetAsync("self");
-                    if (res.StatusCode == 200)
-                        mainAccount = res.Result;
-                }
-                else
-                {
-                    await ds.LoadData(alert);
-                }
+            // Refresh main account if it was the one reset
+            if (account.AccountID == mainAccount?.AccountID)
+            {
+                var res = await apiClient.AccountGetAsync("self");
+                mainAccount = res.Result;
             }
             else
             {
-                await alert.Error("Failed to reset API key.", "Error");
+                await ds.LoadData(alert);
             }
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
     }
 }
