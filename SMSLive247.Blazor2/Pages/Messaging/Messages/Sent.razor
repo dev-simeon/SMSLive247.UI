@@ -1,6 +1,6 @@
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search messages..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
             <DateRangePicker DateRangeChanged="OnDateRangeChanged" />
         </SearchBox>
     </HeaderLeft>
@@ -57,13 +57,6 @@
     private string? searchQuery;
     private DateTime? filterFrom;
     private DateTime? filterTo;
-
-    private void OnDateRangeChanged((DateTime? From, DateTime? To) range)
-    {
-        filterFrom = range.From;
-        filterTo = range.To;
-    }
-
     private ApiDataSource<SmsBatchResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
@@ -72,8 +65,27 @@
         {
             return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, filterFrom, filterTo, searchQuery);
         });
+
         ds.SetPage(new PageState(100, 1));
         await ds.LoadData(alert);
+    }
+
+    private void OnDateRangeChanged((DateTime? From, DateTime? To) range)
+    {
+        filterFrom = range.From;
+        filterTo = range.To;
+    }
+    
+    private async Task DeleteBatch(long? batchId)
+    {
+        if (batchId == null) return;
+        
+        bool confirmed = await alert.Confirm("Are you sure you want to delete this batch?");
+        if (confirmed)
+        {
+            // await apiClient.SmsBatchDeleteAsync(batchId.Value);
+            await ReloadData();
+        }
     }
 
     private async Task ReloadData()
@@ -92,17 +104,5 @@
     {
         ds.SetPage(new PageState(size, ds.PageState.PageNumber));
         await ds.LoadData(alert);
-    }
-
-    private async Task DeleteBatch(long? batchId)
-    {
-        if (batchId == null) return;
-        
-        bool confirmed = await alert.Confirm("Are you sure you want to delete this batch?", "Confirm");
-        if (confirmed)
-        {
-            // await apiClient.SmsBatchDeleteAsync(batchId.Value);
-            await ReloadData();
-        }
     }
 }

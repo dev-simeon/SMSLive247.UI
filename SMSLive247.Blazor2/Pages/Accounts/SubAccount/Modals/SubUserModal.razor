@@ -1,36 +1,31 @@
 <Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm id="SubUserForm" Model="@model" OnValidSubmit="HandleSubmit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-
-            <div class="space-y-4">
+        <EditForm id="SubUserForm" Model="@model" OnValidSubmit="HandleSubmit" class="edit-form">
                 @if (editMode == EditModeEnum.CREATE)
                 {
-                    <FormInput Label="UserName" @bind-Value="model.AccountName" />
-                    <FormInput Label="First Name" @bind-Value="model.FirstName" />
-                    <FormInput Label="Last Name" @bind-Value="model.LastName" />
-                    <FormInput Label="Phone Number" @bind-Value="model.Phone" />
-                    <FormInput Label="Delivery Email" @bind-Value="model.Email" />
+                    <FormInput Label="UserName" @bind-Value="model.AccountName" ErrorMessage="" />
+                    <FormInput Label="First Name" @bind-Value="model.FirstName" ErrorMessage="" />
+                    <FormInput Label="Last Name" @bind-Value="model.LastName" ErrorMessage="" />
+                    <FormInput Label="Phone Number" @bind-Value="model.Phone" ErrorMessage="" />
+                    <FormInput Label="Delivery Email" @bind-Value="model.Email" ErrorMessage="" />
                 }
                 else if (editMode == EditModeEnum.EDIT)
                 {
-                    <FormInput Label="UserName" @bind-Value="model.AccountName" ReadOnly="true" />
-                    <FormInput Label="First Name" @bind-Value="model.FirstName" />
-                    <FormInput Label="Last Name" @bind-Value="model.LastName" />
-                    <FormInput Label="Phone Number" @bind-Value="model.Phone" ReadOnly="true" />
-                    <FormInput Label="Delivery Email" @bind-Value="model.Email" ReadOnly="true" />
+                    <FormInput Label="UserName" @bind-Value="model.AccountName" ReadOnly="true" ErrorMessage="" />
+                    <FormInput Label="First Name" @bind-Value="model.FirstName" ErrorMessage="" />
+                    <FormInput Label="Last Name" @bind-Value="model.LastName" ErrorMessage="" />
+                    <FormInput Label="Phone Number" @bind-Value="model.Phone" ReadOnly="true" ErrorMessage="" />
+                    <FormInput Label="Delivery Email" @bind-Value="model.Email" ReadOnly="true" ErrorMessage="" />
 
-                    <FormInput Label="API Key" Value="@(subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")" ReadOnly="true" />
+                    <FormInput Label="API Key" Value="@(subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")" ReadOnly="true" ErrorMessage="" />
                 }
                 else if (editMode == EditModeEnum.VIEW)
                 {
-                    <FormInput Label="First Name" @bind-Value="model.FirstName" ReadOnly="true" />
-                    <FormInput Label="Last Name" @bind-Value="model.LastName" ReadOnly="true" />
-                    <FormInput Label="Phone Number" @bind-Value="model.Phone" ReadOnly="true" />
-                    <FormInput Label="Delivery Email" @bind-Value="model.Email" ReadOnly="true" />
+                    <FormInput Label="First Name" @bind-Value="model.FirstName" ReadOnly="true" ErrorMessage="" />
+                    <FormInput Label="Last Name" @bind-Value="model.LastName" ReadOnly="true" ErrorMessage="" />
+                    <FormInput Label="Phone Number" @bind-Value="model.Phone" ReadOnly="true" ErrorMessage="" />
+                    <FormInput Label="Delivery Email" @bind-Value="model.Email" ReadOnly="true" ErrorMessage="" />
                 }
-            </div>
         </EditForm>
     </Body>
     <Footer>

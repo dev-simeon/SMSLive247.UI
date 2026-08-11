@@ -57,28 +57,11 @@
         {
             return apiClient.SmsBatchPendingListAsync();
         });
+
         ds.SetPage(new PageState(100, 1));
         await ds.LoadData(alert);
     }
-
-    private async Task ReloadData()
-    {
-        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
-        await ds.LoadData(alert);
-    }
-
-    private async Task OnPageChange(int page)
-    {
-        ds.SetPage(new PageState(ds.PageState.PageSize, page));
-        await ds.LoadData(alert);
-    }
-
-    private async Task OnPageSizeChange(int size)
-    {
-        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
-        await ds.LoadData(alert);
-    }
-
+    
     private async Task AbortBatch(long batchId)
     {
         bool confirmed = await alert.Confirm("Are you sure you want to cancel this batch?");
@@ -97,5 +80,23 @@
             await apiClient.SmsBatchPendingResumeAsync(batchId);
             await ReloadData();
         }
+    }
+
+    private async Task ReloadData()
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageChange(int page)
+    {
+        ds.SetPage(new PageState(ds.PageState.PageSize, page));
+        await ds.LoadData(alert);
+    }
+
+    private async Task OnPageSizeChange(int size)
+    {
+        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
+        await ds.LoadData(alert);
     }
 }

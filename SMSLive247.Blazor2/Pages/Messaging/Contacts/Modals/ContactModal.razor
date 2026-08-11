@@ -4,14 +4,14 @@
             <FormInput Label="Full Name"
                        PlaceHolder="e.g. Sarah Smith"
                        IconStyle="Icon.IconStyle.User"
-                       @bind-Value="model.ContactName" required="true" />
+                       @bind-Value="model.ContactName" required="true" ErrorMessage="" />
 
             <div class="space-y-1">
                 <FormInput Label="Phone Number"
                            PlaceHolder="+234 800 000 0000"
                            Type="tel"
                            @bind-Value="model.PhoneNumber"
-                           disabled="@isEditMode" required="true" />
+                           disabled="@isEditMode" required="true" ErrorMessage="" />
                 <p class="text-xs text-slate-500 flex items-center gap-1">
                     <Icon Style="Icon.IconStyle.Info" CssClass="w-3.5 h-3.5" />
                     Please include country code.

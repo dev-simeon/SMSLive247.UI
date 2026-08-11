@@ -1,18 +1,23 @@
 <Modal Title="Transfer Credit" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm id="WalletTransferForm" Model="@request" OnValidSubmit="BeginTransfer" class="edit-form">
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex gap-3">
-                <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-5 h-5 text-amber-600 shrink-0" />
-                <p class="text-xs text-amber-800 leading-relaxed font-medium">
-                    Minimum SMS credit quantity to transfer is 50 sms credit.
-                </p>
-            </div>
+        <EditForm id="wf3" Model="@model" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-            <FormInput Label="Recipient Email"
-                       PlaceHolder="user@example.com"
-                       Type="email"
-                       IconStyle="Icon.IconStyle.Mail"
-                       @bind-Value="request.Recipient" required="true" />
+            <div class="space-y-6">
+                <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex gap-3">
+                    <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-5 h-5 text-amber-600 shrink-0" />
+                    <p class="text-xs text-amber-800 leading-relaxed font-medium">
+                        Minimum SMS credit quantity to transfer is 50 sms credit.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <FormInput Label="Recipient Email"
+                               PlaceHolder="user@example.com"
+                               Type="email"
+                               IconStyle="Icon.IconStyle.Mail"
+                               @bind-Value="model.Recipient" />
 
                     <div class="space-y-1.5">
                         <label class="block text-sm font-medium text-slate-700">
@@ -20,14 +25,14 @@
                         </label>
                         <InputNumber class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm sm:text-sm"
                                      min="50"
-                                     @bind-Value="request.Credits" />
-                        @if (request.Credits > 0 && request.Credits < 50)
+                                     @bind-Value="model.Credits" />
+                        @if (model.Credits > 0 && model.Credits < 50)
                         {
                             <p class="text-xs text-red-500 font-semibold mt-1">
                                 Amount must be at least 50 credits.
                             </p>
                         }
-                        @if (request.Credits > currentBalance)
+                        @if (model.Credits > currentBalance)
                         {
                             <p class="text-xs text-red-500 font-semibold mt-1">
                                 Insufficient balance to transfer this amount.
@@ -40,7 +45,7 @@
                             Remarks
                         </label>
                         <textarea rows="3"
-                                  @bind="request.Remarks"
+                                  @bind="model.Remarks"
                                   class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm sm:text-sm resize-none"
                                   placeholder="Optional note..."></textarea>
                     </div>
@@ -58,8 +63,8 @@
                         <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
                             New Balance
                         </span>
-                        <span class="block text-lg font-mono font-bold mt-1 @(NewBalance < 0 ? "text-red-600" : "text-brand-600")">
-                            @NewBalance.ToString("#,##0.##")
+                        <span class="block text-lg font-mono font-bold mt-1 @(newBalance < 0 ? "text-red-600" : "text-brand-600")">
+                            @newBalance.ToString("#,##0.##")
                         </span>
                     </div>
                 </div>
@@ -67,11 +72,10 @@
     </Body>
     <Footer>
         <Button IsSubmit="true"
-                form="WalletTransferForm"
                 Text="Transfer Credits"
                 Icon="Icon.IconStyle.ChevronRight"
                 IsBusy="@isSubmitting"
-                IsDisabled="@(!CanSubmit)" />
+                IsDisabled="@(!canSubmit)" />
         <Button Text="Cancel"
                 Style="Button.ButtonStyle.Secondary"
                 IsDisabled="@isSubmitting"
@@ -85,61 +89,52 @@
     private bool isVisible;
     private bool isSubmitting;
     private double currentBalance;
-    private TransferRequest request = new();
+    private TransferRequest model = new();
 
-    private double NewBalance => currentBalance - request.Credits;
-    private bool CanSubmit =>
-        !string.IsNullOrWhiteSpace(request.Recipient)
-        && request.Credits >= 50
-        && request.Credits <= currentBalance;
+    private double newBalance => currentBalance - model.Credits;
+    private bool canSubmit => !string.IsNullOrWhiteSpace(model.Recipient)
+        && model.Credits >= 50 && model.Credits <= currentBalance;
 
     public async Task Show()
     {
-        request = new TransferRequest();
-        await LoadBalance();
+        model = new TransferRequest();
+        await FetchData();
+
         isVisible = true;
         StateHasChanged();
     }
 
-    private async Task LoadBalance()
+    private void Close()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
+
+    private async Task FetchData()
     {
         try
         {
             var response = await apiClient.AccountGetAsync("self");
-            if (response.StatusCode == 200)
-                currentBalance = response.Result.Credits;
+            currentBalance = response.Result.Credits;
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
     }
 
-    private async Task BeginTransfer()
+    private async Task HandleSubmit()
     {
-        if (!CanSubmit)
-        {
-            await alert.Error("Please enter a valid recipient and credit amount.", "Validation Error");
-            return;
-        }
-
-        isSubmitting = true;
         try
         {
-            var response = await apiClient.TransferCreditAsync(request);
+            if (!canSubmit)
+                throw new Exception("Please enter a valid recipient and credit amount.");
 
-            if (response.StatusCode == 200)
-            {
-                await alert.Success(
-                    $"Your transfer of {request.Credits:#,##0} to {request.Recipient} was successful.",
-                    "Success");
-                isVisible = false;
-                await OnCompleted.InvokeAsync();
-            }
-            else
-            {
-                await alert.Error("Failed to initialize transfer.", "Error");
-            }
+            isSubmitting = true;
+            var response = await apiClient.TransferCreditAsync(model);
+
+            await alert.Success($"Your transfer of {model.Credits:#,##0} to {model.Recipient} was successful.");
+            await OnCompleted.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -147,14 +142,9 @@
         }
         finally
         {
+            isVisible = false;
             isSubmitting = false;
             StateHasChanged();
         }
-    }
-
-    private Task Close()
-    {
-        isVisible = false;
-        return Task.CompletedTask;
     }
 }

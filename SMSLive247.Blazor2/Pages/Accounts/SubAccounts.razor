@@ -1,17 +1,17 @@
+@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
 @attribute [Route(Const.Routes.Account.SubAccounts)]
 @layout MainLayout
 @inject NavigationManager nav
-@inject IJSRuntime JSRuntime
-@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
 
-<PageTitle>Sub-Accounts</PageTitle>
+<PageTitle>Sub Accounts</PageTitle>
 
 <PageHeader Title="Sub-Accounts"
-            SubTitle="Manage all your sub-accounts and monitor their usage." />
+            SubTitle="Manage all your sub-accounts and monitor their usage.">
+</PageHeader>
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search by name or ID..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
     <HeaderRight>
         <Button Text="Add Sub-Account" Icon="Icon.IconStyle.PlusCircle" OnClick="() => createModal.Show()" />
@@ -34,28 +34,25 @@
                         <button @onclick="() => transferModal.Show(context)"
                                 class="p-1 text-brand-600 hover:bg-brand-50 rounded-md transition-all"
                                 title="Transfer credits">
-                            <Icon Style="Icon.IconStyle.PlusCircle" CssClass="w-3.5 h-3.5" />
+                            <Icon Style="Icon.IconStyle.PlusCircle" />
                         </button>
                     </div>
                 </Column>
                 <Column Header="Status">
-                    <Badge Style="@(context.Active == true ? Badge.BadgeStyle.Success : Badge.BadgeStyle.Neutral)"
-                           Value="@(context.Active == true ? "Active" : "Inactive")" />
+                    <Badge Style="@(context.Active ? Badge.BadgeStyle.Success : Badge.BadgeStyle.Neutral)"
+                           Value="@(context.Active ? "Active" : "Inactive")" />
                 </Column>
                 <Column Header="Date Created" Width="150px">
                     <FormatDate DateTime="@context.DateCreated" />
                 </Column>
                 <Column Header="Account ID">
                     <div class="flex items-center gap-2">
-                        <span class="text-sm text-slate-600">@(context.AccountID ?? "—")</span>
-                        @if (!string.IsNullOrEmpty(context.AccountID))
-                        {
-                            <button @onclick="() => CopyToClipboard(context.AccountID!)"
-                                    class="text-slate-400 hover:text-brand-600 transition-colors"
-                                    title="Copy ID">
-                                <Icon Style="Icon.IconStyle.FileText" CssClass="w-3.5 h-3.5" />
-                            </button>
-                        }
+                        <span class="text-sm text-slate-600">@context.AccountID</span>
+                        <button @onclick="() => CopyToClipboard(context.AccountID)"
+                                class="text-slate-400 hover:text-brand-600 transition-colors"
+                                title="Copy ID">
+                            <Icon Style="Icon.IconStyle.FileText" />
+                        </button>
                     </div>
                 </Column>
                 <Column>
@@ -94,17 +91,52 @@
         try
         {
             var me = await apiClient.AccountGetAsync("me");
-            if (me?.StatusCode == 200 && me.Result?.AccountID != null)
-                parentAccountId = me.Result.AccountID;
+            parentAccountId = me.Result.AccountID;
         }
-        catch { }
+        catch
+        {
+            
+        }
 
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchQuery);
         });
+
         ds.SetPage(new PageState(25, 1));
         await ds.LoadData(alert);
+    }
+
+    private async Task DeleteSubAccount(AccountResponse account)
+    {
+        bool confirmed = await alert.Confirm(
+            $"Are you sure you want to delete [{account.AccountName}]? " +
+            "This action cannot be undone.",
+            "Delete Sub-Account");
+
+        if (!confirmed) 
+            return;
+
+        try
+        {
+            var response = await apiClient.AccountDeleteAsync(account.AccountID);
+            await alert.Success("Sub-account deleted successfully.", "Deleted");
+            await ReloadData();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message);
+        }
+    }
+
+    private async Task CopyToClipboard(string text)
+    {
+        try
+        {
+            await js.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            await alert.Success("Account ID copied to clipboard.", "Copied");
+        }
+        catch { }
     }
 
     private async Task ReloadData()
@@ -123,44 +155,5 @@
     {
         ds.SetPage(new PageState(size, ds.PageState.PageNumber));
         await ds.LoadData(alert);
-    }
-
-    private async Task DeleteSubAccount(AccountResponse account)
-    {
-        if (account.AccountID == null) return;
-
-        bool confirmed = await alert.Confirm(
-            $"Are you sure you want to delete \"{account.AccountName}\"? This action cannot be undone.",
-            "Delete Sub-Account");
-
-        if (!confirmed) return;
-
-        try
-        {
-            var response = await apiClient.AccountDeleteAsync(account.AccountID);
-            if (response.StatusCode == 200)
-            {
-                await alert.Success("Sub-account deleted successfully.", "Deleted");
-                await ReloadData();
-            }
-            else
-            {
-                await alert.Error("Failed to delete sub-account.", "Error");
-            }
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-    }
-
-    private async Task CopyToClipboard(string text)
-    {
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", text);
-            await alert.Success("Account ID copied to clipboard.", "Copied");
-        }
-        catch { }
     }
 }

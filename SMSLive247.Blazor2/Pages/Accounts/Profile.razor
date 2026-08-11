@@ -16,7 +16,7 @@
                 <Icon Style="Icon.IconStyle.User" CssClass="text-slate-400 w-5 h-5" />
                 Personal Information
             </h3>
-            <button @onclick="() => profileModal.show()"
+            <button @onclick="() => profileModal.Show()"
                     class="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
                 Edit
             </button>
@@ -163,18 +163,15 @@
     </div>
 </div>
 
-
 @if (account != null)
 {
-    <EditProfileModal @ref="profileModal" account="account" OnCompleted="FetchData"></EditProfileModal>
-    <ChangePasswordModal @ref="passwordModal" account="account"></ChangePasswordModal>    
+    <ProfileModal @ref="profileModal" Account="account" OnCompleted="FetchData"></ProfileModal>
+    <PasswordModal @ref="passwordModal" Account="account"></PasswordModal>    
 }
 
-
 @code {
-    private EditProfileModal profileModal = new();
-    private ChangePasswordModal passwordModal = new();
-
+    private ProfileModal profileModal = new();
+    private PasswordModal passwordModal = new();
     private AccountResponse? account;
 
     protected override async Task OnInitializedAsync()
@@ -187,13 +184,11 @@
         try
         {
             var response = await apiClient.AccountGetAsync("self");
-
-            if (response.StatusCode == 200)
-                account = response.Result;
+            account = response.Result;
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
     }
 }

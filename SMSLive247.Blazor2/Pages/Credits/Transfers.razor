@@ -1,14 +1,17 @@
+@using SMSLive247.Blazor2.Pages.Credits.Modals
 @attribute [Route(Const.Routes.Wallet.Transfers)]
 @layout MainLayout
-@using SMSLive247.Blazor2.Pages.Credits.Modals
 
 <PageTitle>SMSLive247 - Transfers</PageTitle>
 
-<PageHeader Title="Transfers" SubTitle="The list below shows all your successful transfers to / from your account." />
+<PageHeader 
+    Title="Transfers" 
+    SubTitle="The list below shows all your successful transfers to / from your account.">
+</PageHeader>
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search transfers..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
     <HeaderRight>
         <Button Text="Transfer Credit"
@@ -39,8 +42,12 @@
     </ChildContent>
 
     <FooterLeft>
-        <Paging PageNumber="ds.PageState.PageNumber" PageSize="ds.PageState.PageSize"
-                TotalRecords="ds.PageState.TotalCount" PageNumberChanged="OnPageChange" PageSizeChanged="OnPageSizeChange">
+        <Paging 
+            PageNumber="ds.PageState.PageNumber" 
+            PageSize="ds.PageState.PageSize"
+            TotalRecords="ds.PageState.TotalCount" 
+            PageNumberChanged="OnPageChange" 
+            PageSizeChanged="OnPageSizeChange">
         </Paging>
     </FooterLeft>
 </PageBody>
@@ -58,6 +65,7 @@
         {
             return apiClient.TransferListAsync(p.PageNumber, p.PageSize, null, searchQuery);
         });
+
         ds.SetPage(new PageState(20, 1));
         await ds.LoadData(alert);
     }

@@ -1,9 +1,22 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SMSLive247.Blazor2.Components.Form
+namespace SMSLive247.Blazor2.Components.Form.Input
 {
+    public enum DateRangeFilter
+    {
+        NONE,
+        TODAY,
+        YESTERDAY,
+        LAST_3_DAYS,
+        LAST_7_DAYS,
+        LAST_14_DAYS,
+        LAST_30_DAYS,
+        LAST_90_DAYS,
+        THIS_MONTH,
+        LAST_MONTH,
+        CUSTOM,
+    }
+
     public class DateRange : IValidatableObject
     {
         private DateRangeFilter _filter = DateRangeFilter.NONE;
@@ -105,9 +118,11 @@ namespace SMSLive247.Blazor2.Components.Form
             {
                 if (_startDate > _endDate)
                 {
-                    yield return new ValidationResult("End Date must be later than or equal to Start Date", new[] { nameof(StartDate), nameof(EndDate) });
+                    yield return new ValidationResult("End Date must be later than or equal to Start Date", 
+                        [nameof(StartDate), nameof(EndDate)]);
                 }
             }
         }
     }
+
 }
