@@ -16,11 +16,11 @@
                     <FormInput Label="First Name"
                                PlaceHolder="First Name"
                                @bind-Value="updateRequest.FirstName"
-                               ErrorMessage="" />
+                               Required="true" />
                     <FormInput Label="Last Name"
                                PlaceHolder="Last Name"
                                @bind-Value="updateRequest.LastName"
-                               ErrorMessage="" />
+                               Required="true" />
                 </FormRow>
 
                 <FormRow Cols="2">
@@ -28,12 +28,12 @@
                                Type="email"
                                PlaceHolder="email@example.com"
                                @bind-Value="updateRequest.Email"
-                               ErrorMessage="" />
+                               Required="true" />
                     <FormInput Label="Phone Number"
                                Type="tel"
                                PlaceHolder="e.g. 08030000000"
                                @bind-Value="updateRequest.Phone"
-                               ErrorMessage="" />
+                               Required="true" />
                 </FormRow>
 
                 <FormRow Cols="2">
@@ -52,18 +52,17 @@
                 <FormInput Label="Account Name"
                            PlaceHolder="e.g. Marketing Dept"
                            @bind-Value="createRequest.AccountName"
-                           required="true"
-                           ErrorMessage="" />
+                           Required="true" />
 
                 <FormRow Cols="2">
                     <FormInput Label="First Name"
                                PlaceHolder="First Name"
                                @bind-Value="createRequest.FirstName"
-                               ErrorMessage="" />
+                               Required="true" />
                     <FormInput Label="Last Name"
                                PlaceHolder="Last Name"
                                @bind-Value="createRequest.LastName"
-                               ErrorMessage="" />
+                               Required="true" />
                 </FormRow>
 
                 <FormRow Cols="2">
@@ -71,12 +70,12 @@
                                Type="email"
                                PlaceHolder="email@example.com"
                                @bind-Value="createRequest.Email"
-                               ErrorMessage="" />
+                               Required="true" />
                     <FormInput Label="Phone Number"
                                Type="tel"
                                PlaceHolder="e.g. 08030000000"
                                @bind-Value="createRequest.Phone"
-                               ErrorMessage="" />
+                               Required="true" />
                 </FormRow>
 
                 <FormRow Cols="2">
@@ -94,9 +93,9 @@
                            Type="password"
                            PlaceHolder="••••••••"
                            @bind-Value="password"
-                           required="true"
+                           Required="true"
                            HelpText="Must be at least 8 characters with numbers and symbols."
-                           ErrorMessage="" />
+                           />
             }
         </EditForm>
     </Body>

@@ -1,15 +1,13 @@
 <Modal Title="Update Profile" @bind-IsVisible="isVisible">
 
     <Body>
-        <EditForm FormName="f1" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-4">
+        <EditForm id="ProfileForm" FormName="f1" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-4">
             <FormInput @bind-Value="model.FirstName" 
                        Label="First Name"
-                       ErrorMessage="First name is required."
-                       required="true" />
+                       Required="true" />
             <FormInput @bind-Value="model.LastName" 
                        Label="Last Name"
-                       ErrorMessage="Last name is required."
-                       required="true" />
+                       Required="true" />
             <FormInput Label="Email Address" @bind-Value="model.Email" disabled="true" />
             <FormInput Label="Phone Number" @bind-Value="model.Phone" disabled="true" />
 
@@ -19,7 +17,7 @@
     </Body>
 
     <Footer>
-        <Button IsSubmit="true" Text="Save Changes" />
+        <Button IsSubmit="true" Text="Save Changes" form="ProfileForm" />
     </Footer>
 </Modal>
 

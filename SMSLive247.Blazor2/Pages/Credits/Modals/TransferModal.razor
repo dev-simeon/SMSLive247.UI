@@ -14,7 +14,8 @@
                             PlaceHolder="user@example.com"
                             Type="email"
                             IconStyle="Icon.IconStyle.Mail"
-                            @bind-Value="model.Recipient" />
+                            @bind-Value="model.Recipient"
+                            Required="true" />
 
                 <div class="space-y-1.5">
                     <label class="block text-sm font-medium text-slate-700">
@@ -73,7 +74,8 @@
                 Text="Transfer Credits"
                 Icon="Icon.IconStyle.ChevronRight"
                 IsBusy="@isSubmitting"
-                IsDisabled="@(!canSubmit)" />
+                IsDisabled="@(!canSubmit)"
+                form="wf3" />
         <Button Text="Cancel"
                 Style="Button.ButtonStyle.Secondary"
                 IsDisabled="@isSubmitting"

@@ -26,7 +26,7 @@
                     <span class="font-medium text-slate-900">
                         <FormatNumber Number="@context.Credits"></FormatNumber>
                     </span>
-                    <Button Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(context)" CssClass="text-xs px-2 py-1">
+                    <Button Type="Button.Style.SECONDARY" OnClick="async () => await transferModal.Show(context)" CssClass="text-xs px-2 py-1">
                         Add/Remove Credit
                     </Button>
                 </div>
@@ -64,7 +64,7 @@
 </div>
 
 <SubUserModal @ref="subUserModal" SubAccountId="@SubAccountId" OnCompleted="ReloadData"></SubUserModal>
-<TransferModal @ref="transferModal" ParentId="@SubAccountId"></TransferModal>
+<TransferModal @ref="transferModal" ParentId="@SubAccountId" OnCompleted="ReloadData"></TransferModal>
 
 @code {
     [Parameter] public string SubAccountId { get; set; } = string.Empty;

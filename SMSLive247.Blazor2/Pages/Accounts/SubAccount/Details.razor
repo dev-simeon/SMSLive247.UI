@@ -12,7 +12,7 @@
                 <Button Style="Button.ButtonStyle.Secondary" OnClick="() => subAccountModal.Show(subAccount)">
                     Edit Profile
                 </Button>
-                <Button Style="Button.ButtonStyle.Secondary" OnClick="() => transferModal.Show(subAccount)">
+                <Button Style="Button.ButtonStyle.Secondary" OnClick="async () => await transferModal.Show(subAccount)">
                     Add/Remove Credit
                 </Button>
             </div>
@@ -81,7 +81,7 @@ else
     </div>
 }
 
-<TransferModal @ref="transferModal" ParentId="self"></TransferModal>
+<TransferModal @ref="transferModal" ParentId="self" OnCompleted="ReloadData"></TransferModal>
 <SubAccountModal @ref="subAccountModal" OnCompleted="ReloadData"></SubAccountModal>
 
 @code {

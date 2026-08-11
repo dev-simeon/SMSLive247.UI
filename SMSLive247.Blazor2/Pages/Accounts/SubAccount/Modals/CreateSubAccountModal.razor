@@ -5,19 +5,18 @@
             <FormInput Label="Account Name"
                        PlaceHolder="e.g. Marketing Dept"
                        @bind-Value="request.AccountName"
-                       required="true"
-                       ErrorMessage="" />
+                       Required="true" />
 
             @* First Name & Last Name — 2 columns *@
             <FormRow Cols="2">
                 <FormInput Label="First Name"
                            PlaceHolder="First Name"
                            @bind-Value="request.FirstName"
-                           ErrorMessage="" />
+                           Required="true" />
                 <FormInput Label="Last Name"
                            PlaceHolder="Last Name"
                            @bind-Value="request.LastName"
-                           ErrorMessage="" />
+                           Required="true" />
             </FormRow>
 
             @* Email Address & Phone Number — 2 columns *@
@@ -26,12 +25,12 @@
                            Type="email"
                            PlaceHolder="email@example.com"
                            @bind-Value="request.Email"
-                           ErrorMessage="" />
+                           Required="true" />
                 <FormInput Label="Phone Number"
                            Type="tel"
                            PlaceHolder="e.g. 08030000000"
                            @bind-Value="request.Phone"
-                           ErrorMessage="" />
+                           Required="true" />
             </FormRow>
 
             @* Country Code & Time Zone — 2 columns *@
@@ -51,9 +50,9 @@
                        Type="password"
                        PlaceHolder="••••••••"
                        @bind-Value="password"
-                       required="true"
+                       Required="true"
                        HelpText="Must be at least 8 characters with numbers and symbols."
-                       ErrorMessage="" />
+                       />
         </EditForm>
     </Body>
     <Footer>

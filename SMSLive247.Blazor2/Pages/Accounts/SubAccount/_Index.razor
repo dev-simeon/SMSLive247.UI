@@ -30,7 +30,9 @@
 </PageBody>
 
 @code {
-    [Parameter] public string? subAccountId { get; set; }
+    [Parameter] public string? id { get; set; }
+
+    private string subAccountId => id ?? string.Empty;
     
     [Inject] private NavigationManager nav { get; set; } = default!;
 }

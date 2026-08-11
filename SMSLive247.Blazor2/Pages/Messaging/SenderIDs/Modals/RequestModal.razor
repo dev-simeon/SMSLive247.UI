@@ -13,14 +13,18 @@
             <FormInput Label="Sender ID"
                        PlaceHolder="Max 11 characters, no spaces"
                        @bind-Value="request.SenderID"
-                       required="true"
-                       ErrorMessage="@senderIdError" />
+                       Required="true" />
+            @if (!string.IsNullOrWhiteSpace(senderIdError))
+            {
+                <p class="text-xs text-red-500 font-semibold -mt-2">
+                    @senderIdError
+                </p>
+            }
 
             <FormInput Label="Purpose"
                        PlaceHolder="Briefly explain what this Sender ID will be used for..."
                        @bind-Value="request.Purpose"
-                       required="true"
-                       ErrorMessage="" />
+                       Required="true" />
 
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">

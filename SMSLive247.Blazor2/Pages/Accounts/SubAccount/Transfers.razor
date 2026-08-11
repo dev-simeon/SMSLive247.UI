@@ -4,7 +4,7 @@
     <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
         <SearchBox Placeholder="Search transfers..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
         </SearchBox>
-        <Button Text="Add/Remove Credit" Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(subAccount)" />
+        <Button Text="Add/Remove Credit" Type="Button.Style.SECONDARY" OnClick="async () => await transferModal.Show(subAccount)" />
     </div>
 
     <Table DataSource="ds">
@@ -36,7 +36,7 @@
     </div>
 </div>
 
-<TransferModal @ref="transferModal" ParentId="self"></TransferModal>
+<TransferModal @ref="transferModal" ParentId="self" OnCompleted="ReloadData"></TransferModal>
 
 @code {
     [Parameter] public string SubAccountId { get; set; } = string.Empty;

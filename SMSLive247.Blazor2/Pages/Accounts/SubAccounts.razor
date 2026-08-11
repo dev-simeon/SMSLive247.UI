@@ -31,7 +31,7 @@
                         <span class="text-sm font-medium text-slate-700">
                             @context.Credits.ToString("#,##0.##")
                         </span>
-                        <button @onclick="() => transferModal.Show(context)"
+                        <button @onclick="async () => await transferModal.Show(context)"
                                 class="p-1 text-brand-600 hover:bg-brand-50 rounded-md transition-all"
                                 title="Transfer credits">
                             <Icon Style="Icon.IconStyle.PlusCircle" />
@@ -73,31 +73,19 @@
 </PageBody>
 
 <SubAccountModal @ref="subAccountModal" OnCompleted="ReloadData" />
-<TransferModal @ref="transferModal" ParentId="@parentAccountId" />
+<TransferModal @ref="transferModal" ParentId="self" OnCompleted="ReloadData" />
 
 @code {
     private string? searchQuery;
-    private string parentAccountId = "";
-
     private ApiDataSource<AccountResponse> ds = new();
     private SubAccountModal subAccountModal = new();
     private TransferModal transferModal = new();
 
     private string SubAccountUrl(string? id) =>
-        Const.Routes.Account.SubAccountDetails.Replace("{id}", id ?? "");
+        Const.Routes.Account.Details(id ?? "");
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            var me = await apiClient.AccountGetAsync("me");
-            parentAccountId = me.Result.AccountID;
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message);
-        }
-
         ds.Callback = new((PageState p, FilterState? f) =>
         {
             return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchQuery);
