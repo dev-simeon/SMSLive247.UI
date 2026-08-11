@@ -45,7 +45,6 @@
 </div>
 
 <EditForm Model="@model" OnValidSubmit="LoginAsync" FormName="f1" class="space-y-6">
-    <ValidationSummary></ValidationSummary>
     <FormRow>
         <FormInput @bind-Value="model.Username"
                    Type="email" Label="Email"

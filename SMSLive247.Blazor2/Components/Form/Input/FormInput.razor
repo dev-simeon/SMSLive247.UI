@@ -1,4 +1,4 @@
-@typeparam TValue
+﻿@typeparam TValue
 @inherits InputBase<TValue>
 
 <div>
@@ -28,7 +28,7 @@
                @oninput="OnInput"
                @onblur="OnBlur"
                @attributes="AdditionalAttributes"
-               class="block w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:ring-brand-500 focus:border-brand-500 focus:outline-none sm:text-sm @GetErrorClass()" />
+               class="block w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 transition-all focus:ring-brand-500 focus:border-brand-500 focus:outline-none sm:text-sm @GetCssClass()" />
 
         @if (IconStyle != null)
         {
@@ -57,7 +57,7 @@
     @if(!string.IsNullOrEmpty(HelpText))
     {
         <p class="text-s mt-1 text-slate-500">
-            <Icon Style="Icon.IconStyle.Info" CssClass="mr-2 text-xs leading-none" />
+            <Icon Style="Icon.IconStyle.Info" CssClass="" />
             <span>@HelpText</span>
         </p>
     }
@@ -71,7 +71,7 @@
     [Parameter] public string? HelpText { get; set; }
 
     // additional validation parameters
-    [Parameter] public bool Required { get; set; } = true;
+    [Parameter] public bool Required { get; set; } = false;
     [Parameter] public TValue? Min { get; set; }
     [Parameter] public TValue? Max { get; set; }
 
@@ -108,7 +108,7 @@
         inputType = inputType == "password" ? "text" : "password";
     }
 
-    private string GetErrorClass()
+    private string GetCssClass()
     {
         return HasError ? "border-red-300 ring-1 ring-red-300" : "border-slate-200";
     }
@@ -186,36 +186,10 @@
         return (true, null);
     }
 
-    // private static bool TryParse(string? raw, out TValue? value)
+    // private async Task<bool> ValidateNowAsync()
     // {
-    //     value = default;
-
-    //     if (string.IsNullOrWhiteSpace(raw))
-    //     {
-    //         return false;
-    //     }
-
-    //     try
-    //     {
-    //         var underlyingType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
-    //         var converted = Convert.ChangeType(raw, underlyingType, CultureInfo.InvariantCulture);
-    //         value = (TValue)converted;
-    //         return true;
-    //     }
-    //     catch
-    //     {
-    //         return false;
-    //     }
+    //     hasBlurredOnce = true;
+    //     await ValidateAsync();
+    //     return !HasError;
     // }
-
-    /// <summary>
-    /// Runs validation on demand (e.g. call this from a parent's submit
-    /// handler to force-validate fields the user never blurred).
-    /// </summary>
-    private async Task<bool> ValidateNowAsync()
-    {
-        hasBlurredOnce = true;
-        await ValidateAsync();
-        return !HasError;
-    }
 }

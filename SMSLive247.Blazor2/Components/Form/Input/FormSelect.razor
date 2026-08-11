@@ -1,16 +1,40 @@
-@inherits InputBase<string>
+﻿@typeparam TValue
+@inherits InputBase<TValue>
+
 <div>
     @if (!string.IsNullOrEmpty(Label))
     {
-        <label class="block text-sm font-medium text-slate-700 mb-1">
+        @* <label class="mb-1 block text-sm font-medium text-slate-700">
             @Label
+        </label> *@
+    }
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="block text-sm font-medium text-slate-700">
+            @Label
+            @if (Required)
+            {
+                <span class="ml-2 text-red-500">*</span>
+            }
+            @if (HasError)
+            {
+                <span class="ml-2 text-red-500">
+                    @* <Icon Style="Icon.IconStyle.Info" CssClass="mr-2 text-[2px] text-yellow-500" /> *@
+                    <o>@ErrorMessage</o>
+                </span>
+            }
         </label>
     }
     <div class="relative">
-        <select value="@CurrentValueAsString" @onchange="OnChange" class="@getCss">
+        <select 
+                value="@CurrentValueAsString" 
+                @onchange="OnChange"
+                @attributes="AdditionalAttributes"
+                class="@GetCssClass()">
+
             @if (Type == SelectType.Country)
             {
-                <option value="0">- select country -</option>
+                <option value="">- select country -</option>
                 @foreach (var country in countries)
                 {
                     <option value="@country.Key">@country.Value</option>
@@ -18,7 +42,7 @@
             }
             else if (Type == SelectType.TimeZone)
             {
-                <option value="99">- select time zone -</option>
+                <option value="">- select time zone -</option>
                 @foreach (var timeZone in timeZones)
                 {
                     var offset = timeZone.BaseUtcOffset.Hours;
@@ -30,21 +54,17 @@
         @if (IconStyle != null)
         {
             <div
-                class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 transition-colors">
+                class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-400 transition-colors hover:text-slate-600">
                 <Icon Style="@((Icon.IconStyle)IconStyle)" />
             </div>
         }
     </div>
-    @if (showError)
+
+    @if (!string.IsNullOrEmpty(HelpText))
     {
-        <p class="mt-1 text-xs text-red-500">
-            <Icon Style="Icon.IconStyle.Close" CssClass="mr-2" />@ErrorMessage
-        </p>
-    }
-    else if (!string.IsNullOrEmpty(HelpText))
-    {
-        <p class="mt-1 text-xs text-slate-500">
-            <Icon Style="Icon.IconStyle.Info" CssClass="mr-2" />@HelpText
+        <p class="text-s mt-1 text-slate-500">
+            <Icon Style="Icon.IconStyle.Info" CssClass="" />
+            <span>@HelpText</span>
         </p>
     }
 </div>
@@ -56,13 +76,22 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public SelectType Type { get; set; } = SelectType.None;
     [Parameter] public Icon.IconStyle? IconStyle { get; set; }
-    [Parameter] public string? ErrorMessage { get; set; }
     [Parameter] public bool IsEmbedded { get; set; } = false;
     [Parameter] public string? HelpText { get; set; }
 
-    private string inputType = "text";
-    private bool showPassword = false;
-    private bool showError = false;
+    // additional validation parameters
+    [Parameter] public bool Required { get; set; } = true;
+
+    [Parameter] public string InvalidMessage { get; set; } = "Please enter a valid {0}.";
+    [Parameter] public string RequiredMessage { get; set; } = "The {0} field is required.";
+
+    [Parameter] public EventCallback<bool> IsValidChanged { get; set; }
+
+    // public properties to expose validation state to parent components
+    public bool HasError { get; private set; }
+    public string? ErrorMessage { get; private set; }
+
+    private ValidationMessageStore? messageStore;
     private TimeZoneInfo[] timeZones = TimeZoneInfo.GetSystemTimeZones().ToArray();
 
     private static readonly Dictionary<int, string> countries = new()
@@ -75,20 +104,77 @@
         { 44, "United Kingdom" }
     };
 
-    private string getCss => IsEmbedded
+    protected override void OnInitialized()
+    {
+        if (EditContext is not null)
+            messageStore = new ValidationMessageStore(EditContext);
+    }
+
+    private string GetCssClass()
+    {
+        return IsEmbedded
             ? "h-9 px-3 border-l border-slate-200 text-sm text-slate-700 focus:outline-none cursor-pointer"
             : "appearance-none block w-full px-3 py-2.5 border rounded-lg sm:text-sm bg-white text-slate-900 transition-all border-slate-200";
+    }
 
-    private void OnChange(ChangeEventArgs e)
+    private async Task OnChange(ChangeEventArgs e)
     {
         CurrentValueAsString = e.Value?.ToString();
+        await ValidateAsync();
+    }
+
+    private async Task ValidateAsync()
+    {
+        var (isValid, message) = Validate(CurrentValueAsString);
+
+        HasError = !isValid;
+        ErrorMessage = message;
+
+        if (messageStore is not null && EditContext is not null)
+        {
+            messageStore.Clear(FieldIdentifier);
+            if (!isValid && message is not null)
+            {
+                messageStore.Add(FieldIdentifier, message);
+            }
+            EditContext.NotifyValidationStateChanged();
+        }
+
+        await IsValidChanged.InvokeAsync(isValid);
+        StateHasChanged();
+    }
+
+    private (bool IsValid, string? Message) Validate(string? raw)
+    {
+        var isEmpty = string.IsNullOrWhiteSpace(raw);
+
+        if (Required && isEmpty)
+            return (false, string.Format(RequiredMessage, Label ?? Type.ToString()));
+
+        if (isEmpty)
+            // Not required and empty — nothing further to check.
+            return (true, null);
+
+        // if (!TryParse(raw, out _))
+        //     return (false, "Please enter a valid number.");
+
+        // var numeric = Convert.ToDouble(raw, CultureInfo.InvariantCulture);
+
+        // if (Min.HasValue && numeric < Min.Value)
+        //     return (false, string.Format(RangeMessageFormat, Min, Max));
+
+        // if (Max.HasValue && numeric > Max.Value)
+        //     return (false, string.Format(RangeMessageFormat, Min, Max));
+
+        return (true, null);
     }
 
     protected override bool TryParseValueFromString(string? value,
-        [MaybeNullWhen(false)] out string result,
-        [NotNullWhen(false)] out string validationErrorMessage)
+            [MaybeNullWhen(false)] out TValue result,
+            [NotNullWhen(false)] out string? validationErrorMessage)
     {
-        result = value ?? string.Empty;
+        result = value is null ? default : (TValue)(object)value;
+
         validationErrorMessage = null;
         return true;
     }
