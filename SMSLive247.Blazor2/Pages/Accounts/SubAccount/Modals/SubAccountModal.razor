@@ -15,11 +15,11 @@
                 <FormRow Cols="2">
                     <FormInput Label="First Name"
                                PlaceHolder="First Name"
-                               @bind-Value="updateRequest.FirstName"
+                               @bind-Value="updateModel.FirstName"
                                Required="true" />
                     <FormInput Label="Last Name"
                                PlaceHolder="Last Name"
-                               @bind-Value="updateRequest.LastName"
+                               @bind-Value="updateModel.LastName"
                                Required="true" />
                 </FormRow>
 
@@ -27,12 +27,12 @@
                     <FormInput Label="Email Address"
                                Type="email"
                                PlaceHolder="email@example.com"
-                               @bind-Value="updateRequest.Email"
+                               @bind-Value="updateModel.Email"
                                Required="true" />
                     <FormInput Label="Phone Number"
                                Type="tel"
                                PlaceHolder="e.g. 08030000000"
-                               @bind-Value="updateRequest.Phone"
+                               @bind-Value="updateModel.Phone"
                                Required="true" />
                 </FormRow>
 
@@ -49,17 +49,17 @@
             {
                 <FormInput Label="Account Name"
                            PlaceHolder="e.g. Marketing Dept"
-                           @bind-Value="createRequest.AccountName"
+                           @bind-Value="createModel.AccountName"
                            Required="true" />
 
                 <FormRow Cols="2">
                     <FormInput Label="First Name"
                                PlaceHolder="First Name"
-                               @bind-Value="createRequest.FirstName"
+                               @bind-Value="createModel.FirstName"
                                Required="true" />
                     <FormInput Label="Last Name"
                                PlaceHolder="Last Name"
-                               @bind-Value="createRequest.LastName"
+                               @bind-Value="createModel.LastName"
                                Required="true" />
                 </FormRow>
 
@@ -67,12 +67,12 @@
                     <FormInput Label="Email Address"
                                Type="email"
                                PlaceHolder="email@example.com"
-                               @bind-Value="createRequest.Email"
+                               @bind-Value="createModel.Email"
                                Required="true" />
                     <FormInput Label="Phone Number"
                                Type="tel"
                                PlaceHolder="e.g. 08030000000"
-                               @bind-Value="createRequest.Phone"
+                               @bind-Value="createModel.Phone"
                                Required="true" />
                 </FormRow>
 
@@ -88,7 +88,7 @@
                 <FormInput Label="Password"
                            Type="password"
                            PlaceHolder="••••••••"
-                           @bind-Value="password"
+                           @bind-Value="createModel.Password"
                            Required="true"
                            HelpText="Must be at least 8 characters with numbers and symbols."
                            />
