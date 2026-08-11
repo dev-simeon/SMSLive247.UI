@@ -1,6 +1,6 @@
 <Modal Title="Add Sub-Account" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm id="CreateSubAccount" Model="@request" OnValidSubmit="HandleSubmit">
+        <EditForm FormName="CreateSubAccount" Model="@request" OnValidSubmit="HandleSubmit">
             <DataAnnotationsValidator />
             <ValidationSummary />
 
@@ -21,7 +21,7 @@
         </EditForm>
     </Body>
     <Footer>
-        <Button IsSubmit="true" Text="Create Sub-Account" form="CreateSubAccount" />
+        <Button IsSubmit="true" Text="Create Sub-Account" />
     </Footer>
 </Modal>
 

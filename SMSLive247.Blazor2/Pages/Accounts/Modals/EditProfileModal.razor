@@ -1,19 +1,13 @@
 <Modal Title="Update Profile" @bind-IsVisible="isVisible">
 
     <Body>
-        <EditForm FormName="BasicInfo" Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit" class="space-y-4">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-
-            <FormInput Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required="true" />
-            <FormInput Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required="true" />
-            <FormInput Label="Email Address" @bind-Value="accountUpdateRequest.Email" disabled="true" />
-            <FormInput Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true" />
-
-            <FormSelect Label="Country" Type="FormSelect.SelectType.Country" @bind-Value="CountryCodeString"
-                        IsEmbedded="false" />
-            <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone" @bind-Value="TimeZoneString"
-                        IsEmbedded="false" />
+        <EditForm FormName="BasicInfo" Model="@accountUpdateRequest" OnValidSubmit="HandleValidSubmit" class="edit-form">
+            <FormInput Label="First Name" @bind-Value="accountUpdateRequest.FirstName" required="true" PlaceHolder="Enter first name" ErrorMessage="" />
+            <FormInput Label="Last Name" @bind-Value="accountUpdateRequest.LastName" required="true" PlaceHolder="Enter last name" ErrorMessage="" />
+            <FormInput Label="Email Address" @bind-Value="accountUpdateRequest.Email" disabled="true" PlaceHolder="name@example.com" ErrorMessage="" />
+            <FormInput Label="Phone Number" @bind-Value="accountUpdateRequest.Phone" disabled="true" PlaceHolder="+234..." ErrorMessage="" />
+            <FormSelect Label="Country" Type="FormSelect.SelectType.Country" @bind-Value="CountryCodeString" IsEmbedded="false" />
+            <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone" @bind-Value="TimeZoneString" IsEmbedded="false" />
         </EditForm>
     </Body>
 

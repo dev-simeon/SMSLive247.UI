@@ -1,26 +1,22 @@
 <Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm id="ContactForm" Model="@model" OnValidSubmit="HandleSubmit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+        <EditForm id="ContactForm" Model="@model" OnValidSubmit="HandleSubmit" class="edit-form">
+            <FormInput Label="Full Name"
+                       PlaceHolder="e.g. Sarah Smith"
+                       IconStyle="Icon.IconStyle.User"
+                       @bind-Value="model.ContactName" required="true" />
 
-            <div class="space-y-6">
-                <FormInput Label="Full Name"
-                           PlaceHolder="e.g. Sarah Smith"
-                           IconStyle="Icon.IconStyle.User"
-                           @bind-Value="model.ContactName" />
-
-                <div class="space-y-1">
-                    <FormInput Label="Phone Number"
-                               PlaceHolder="+234 800 000 0000"
-                               Type="tel"
-                               @bind-Value="model.PhoneNumber"
-                               disabled="@isEditMode" />
-                    <p class="text-xs text-slate-500 flex items-center gap-1">
-                        <Icon Style="Icon.IconStyle.Info" CssClass="w-3.5 h-3.5" />
-                        Please include country code.
-                    </p>
-                </div>
+            <div class="space-y-1">
+                <FormInput Label="Phone Number"
+                           PlaceHolder="+234 800 000 0000"
+                           Type="tel"
+                           @bind-Value="model.PhoneNumber"
+                           disabled="@isEditMode" required="true" />
+                <p class="text-xs text-slate-500 flex items-center gap-1">
+                    <Icon Style="Icon.IconStyle.Info" CssClass="w-3.5 h-3.5" />
+                    Please include country code.
+                </p>
+            </div>
 
                 <div class="space-y-2">
                     <div class="flex justify-between">
@@ -62,7 +58,6 @@
                         }
                     </div>
                 </div>
-            </div>
         </EditForm>
     </Body>
     <Footer>

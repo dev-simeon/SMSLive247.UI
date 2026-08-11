@@ -1,4 +1,4 @@
-﻿@inherits InputBase<string>
+@inherits InputBase<string>
 
 <div>
     @if (!string.IsNullOrEmpty(Label))
@@ -124,7 +124,7 @@
 
     private string inputType = "text";
     private bool showPassword = false;
-    private bool showError = false;
+    private bool showError => !string.IsNullOrEmpty(ErrorMessage);
 
     protected override void OnParametersSet()
     {
