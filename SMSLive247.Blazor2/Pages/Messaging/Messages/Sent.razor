@@ -1,7 +1,7 @@
-<PageBody>
+﻿<PageBody>
     <HeaderLeft>
         <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
-            <DateRangePicker DateRangeChanged="OnDateRangeChanged" />
+            <DateRange DateRangeChanged="OnDateRangeChanged" />
         </SearchBox>
     </HeaderLeft>
     <HeaderRight>
@@ -21,15 +21,15 @@
                     <span class="">@context.SenderID?.ToUpper()</span>
                 </Column>
                 <Column Header="Message">
-                    <p class="truncate max-w-md" title="@context.MessageText">@context.MessageText</p>
+                    <p class="max-w-md truncate" title="@context.MessageText">@context.MessageText</p>
                 </Column>
                 <Column Header="Delivery">
                     <div class="flex flex-col gap-0.5 text-sm">
                         <div class="">
                             @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
                         </div>
-                        <div class="flex items-center gap-1.5 text-xs text-slate-500 mt-1" title="Credits Charged">
-                            <Icon Style="Icon.IconStyle.Coins" CssClass="w-3.5 h-3.5 text-blue-500" />
+                        <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-500" title="Credits Charged">
+                            <Icon Style="Icon.IconStyle.Coins" CssClass="h-3.5 w-3.5 text-blue-500" />
                             <span>@context.CreditsCharged.ToString("#,##0.00")</span>
                         </div>
                     </div>

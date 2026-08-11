@@ -1,5 +1,5 @@
-@* <i class="@GetBootstrapClass() @CssClass" style="font-size: 1.2rem; -webkit-text-stroke-width: 0.7px;"></i> *@
-<i class="material-symbols-rounded">@GetMaterialSymbolName()</i>
+﻿@* <i class="@GetBootstrapClass() @CssClass" style="font-size: 1.2rem; -webkit-text-stroke-width: 0.7px;"></i> *@
+<span class="material-symbols-rounded @CssClass">@GetMaterialSymbolName()</span>
 
 @code {
     [Parameter] public IconStyle Style { get; set; } = IconStyle.Bell;

@@ -9,20 +9,20 @@
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
-        <h1 class="text-4xl font-bold leading-tight mb-6">
+        <h1 class="mb-6 text-4xl leading-tight font-bold">
             Reliable Bulk SMS for Every Business.
         </h1>
-        <p class="text-blue-100 text-lg leading-relaxed mb-8">
+        <p class="mb-8 text-lg leading-relaxed text-blue-100">
             Scale your communication with high-volume workflows, sub-account
             management, and real-time delivery analytics tailored for large
             organizations.
         </p>
         <div class="flex gap-4">
-            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+            <div class="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
                 <Icon Style="Icon.IconStyle.CheckCircle" />
                 <span class="text-sm font-medium">99.9% Uptime</span>
             </div>
-            <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white/20">
+            <div class="flex items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
                 <Icon Style="Icon.IconStyle.Shield" />
                 <span class="text-sm font-medium">Bank-grade Security</span>
             </div>
@@ -31,7 +31,7 @@
 </SectionContent>
 
 <div class="text-center lg:text-left">
-    <div class="lg:hidden flex justify-center items-center mb-8">
+    <div class="mb-8 flex items-center justify-center lg:hidden">
         <img src="smslive-logo-2.png"
              alt="SMSLive247"
              class="h-10 w-auto" />
@@ -45,19 +45,18 @@
 </div>
 
 <EditForm Model="@model" OnValidSubmit="LoginAsync" FormName="f1" class="space-y-6">
+    <ValidationSummary></ValidationSummary>
     <FormRow>
         <FormInput @bind-Value="model.Username"
                    Type="email" Label="Email"
                    IconStyle="Icon.IconStyle.Mail"
-                   PlaceHolder="Enter your email"
-                   ErrorMessage="Please enter a valid email address." />
+                   PlaceHolder="Enter your email" />
     </FormRow>
 
     <FormRow>
         <FormInput @bind-Value="model.Password" 
                    Type="password" Label="Password"
-                   PlaceHolder="Enter your password"
-                   ErrorMessage="Password is required" />
+                   PlaceHolder="Enter your password" />
     </FormRow>
  
     <div class="flex items-center justify-between">
@@ -65,14 +64,14 @@
             <input id="remember-me"
                    name="remember-me"
                    type="checkbox"
-                   class="h-4 w-4 text-brand-500 focus:ring-brand-500 border-slate-200 rounded" />
+                   class="text-brand-500 h-4 w-4 rounded border-slate-200 focus:ring-brand-500" />
             <label class="ml-2 block text-sm text-slate-600"
                    htmlFor="remember-me">
                 Remember me for 30 days
             </label>
         </div>
         <div class="text-sm">
-            <a href="@Const.Routes.ForgotPassword" class="font-medium text-brand-500 hover:text-brand-600">
+            <a href="@Const.Routes.ForgotPassword" class="text-brand-500 font-medium hover:text-brand-600">
                 Forgot password?
             </a>
         </div>
@@ -91,7 +90,7 @@
         <div class="w-full border-t border-slate-200"></div>
     </div>
     <div class="relative flex justify-center text-sm">
-        <span class="px-2 bg-white text-slate-500 transition-colors">
+        <span class="bg-white px-2 text-slate-500 transition-colors">
             Or continue with
         </span>
     </div>
@@ -99,7 +98,7 @@
 
 <div>
     <button type="button"
-            class="w-full inline-flex justify-center items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg shadow-sm bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors">
+            class="inline-flex w-full items-center justify-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:ring-2 focus:ring-slate-200 focus:ring-offset-2 focus:outline-none">
         <svg aria-hidden="true" class="h-5 w-5" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"></path>
@@ -114,7 +113,7 @@
     </button>
 </div>
 
-<p class="text-sm text-center text-slate-500 mt-8">
+<p class="mt-8 text-center text-sm text-slate-500">
     Don't have an account?
     <a href="@Const.Routes.Register"
            class="text-brand-500 font-semibold hover:text-brand-600">
