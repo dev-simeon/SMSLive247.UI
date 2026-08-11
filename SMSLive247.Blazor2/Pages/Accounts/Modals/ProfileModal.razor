@@ -2,19 +2,12 @@
 
     <Body>
         <EditForm FormName="f1" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-4">
-            <FormInput @bind-Value="model.FirstName" 
-                       Label="First Name"
-                       ErrorMessage="First name is required."
-                       required="true" />
-            <FormInput @bind-Value="model.LastName" 
-                       Label="Last Name"
-                       ErrorMessage="Last name is required."
-                       required="true" />
-            <FormInput Label="Email Address" @bind-Value="model.Email" disabled="true" />
-            <FormInput Label="Phone Number" @bind-Value="model.Phone" disabled="true" />
-
-            <FormSelect Label="Country" Type="FormSelect.SelectType.Country" @bind-Value="countryCodeString" />
-            <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone" @bind-Value="timeZoneString" />
+            <FormInput @bind-Value="model.FirstName" Label="First Name" Required="true" />   
+            <FormInput @bind-Value="model.LastName" Label="Last Name" Required="true" />
+            <FormInput @bind-Value="model.Email" Label="Email Address" Disabled="true" />
+            <FormInput @bind-Value="model.Phone" Label="Phone Number" Disabled="true" />
+            <FormSelect @bind-Value="model.CountryCode" Label="Country" Variant="FormSelect<int?>.SelectType.Country" />
+            <FormSelect @bind-Value="model.TimeZone" Label="Time Zone" Variant="FormSelect<int?>.SelectType.TimeZone" />
         </EditForm>
     </Body>
 
@@ -29,8 +22,6 @@
 
     private bool isVisible = false;
     private AccountUpdateRequest model = new();
-    private string? countryCodeString { get; set; }
-    private string? timeZoneString { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -40,9 +31,6 @@
         model.Phone = Account.Phone;
         model.TimeZone = Account.TimeZone;
         model.CountryCode = Account.CountryCode;
-
-        countryCodeString = Account.CountryCode.ToString();
-        timeZoneString = Account.TimeZone.ToString();
     }
 
     public void Show()
@@ -55,12 +43,6 @@
     {
         try
         {
-            if (int.TryParse(countryCodeString, out int cc))
-                model.CountryCode = cc;
-
-            if (int.TryParse(timeZoneString, out int tz))
-                model.TimeZone = tz;
-
             var response = await apiClient.AccountUpdateAsync(Account.AccountID, model);
             await alert.Success("Profile updated successfully.");
             await OnCompleted.InvokeAsync();

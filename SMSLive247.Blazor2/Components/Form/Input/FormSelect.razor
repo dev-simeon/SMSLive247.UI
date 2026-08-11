@@ -1,5 +1,5 @@
 ﻿@typeparam TValue
-@inherits InputBase<TValue>
+@inherits InputBase<TValue?>
 
 <div>
     @if (!string.IsNullOrEmpty(Label))
@@ -32,7 +32,7 @@
                 @attributes="AdditionalAttributes"
                 class="@GetCssClass()">
 
-            @if (Type == SelectType.Country)
+            @if (Variant == SelectType.Country)
             {
                 <option value="">- select country -</option>
                 @foreach (var country in countries)
@@ -40,7 +40,7 @@
                     <option value="@country.Key">@country.Value</option>
                 }
             }
-            else if (Type == SelectType.TimeZone)
+            else if (Variant == SelectType.TimeZone)
             {
                 <option value="">- select time zone -</option>
                 @foreach (var timeZone in timeZones)
@@ -74,7 +74,7 @@
 
     [Parameter] public string? Label { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public SelectType Type { get; set; } = SelectType.None;
+    [Parameter] public SelectType Variant { get; set; } = SelectType.None;
     [Parameter] public Icon.IconStyle? IconStyle { get; set; }
     [Parameter] public bool IsEmbedded { get; set; } = false;
     [Parameter] public string? HelpText { get; set; }
@@ -146,10 +146,11 @@
 
     private (bool IsValid, string? Message) Validate(string? raw)
     {
-        var isEmpty = string.IsNullOrWhiteSpace(raw);
+        var isEmpty = string.IsNullOrWhiteSpace(raw) 
+                    || default(TValue)?.ToString() == raw;
 
         if (Required && isEmpty)
-            return (false, string.Format(RequiredMessage, Label ?? Type.ToString()));
+            return (false, string.Format(RequiredMessage, Label ?? Variant.ToString()));
 
         if (isEmpty)
             // Not required and empty — nothing further to check.
@@ -170,12 +171,30 @@
     }
 
     protected override bool TryParseValueFromString(string? value,
-            [MaybeNullWhen(false)] out TValue result,
-            [NotNullWhen(false)] out string? validationErrorMessage)
+        [MaybeNullWhen(false)] out TValue? result,
+        [NotNullWhen(false)] out string? validationErrorMessage)
     {
-        result = value is null ? default : (TValue)(object)value;
+        try
+        {
+            result = string.IsNullOrWhiteSpace(value)
+                ? default : Parse(value);
+        }
+        catch (Exception)
+        {
+            throw new Exception($"Failed to cast value:'{value}' to type:'{typeof(TValue)}' in FormSelect");
+        }
 
         validationErrorMessage = null;
         return true;
+    }
+
+    private TValue? Parse(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+            return default;
+
+        var underlyingType = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
+        var converted = Convert.ChangeType(raw, underlyingType, System.Globalization.CultureInfo.InvariantCulture);
+        return (TValue)converted;
     }
 }

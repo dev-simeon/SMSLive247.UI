@@ -114,8 +114,8 @@
     }
 
     protected override bool TryParseValueFromString(string? value,
-            [MaybeNullWhen(false)] out TValue result,
-            [NotNullWhen(false)] out string? validationErrorMessage)
+        [MaybeNullWhen(false)] out TValue result,
+        [NotNullWhen(false)] out string? validationErrorMessage)
     {
         result = value is null ? default : (TValue)(object)value;
 

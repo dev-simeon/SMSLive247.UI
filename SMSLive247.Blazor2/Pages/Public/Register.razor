@@ -47,37 +47,59 @@
 </div>
 
 <EditForm Model="@model" OnValidSubmit="RegisterAsync" FormName="R1" class="space-y-5">
-    @* <DataAnnotationsValidator /> *@
-
     <FormRow Cols="2">
-        <FormInput @bind-Value="model.FirstName" Label="First Name" PlaceHolder="John" IconStyle="Icon.IconStyle.User" />
-        <FormInput @bind-Value="model.LastName" Label="Last Name" PlaceHolder="Doe" IconStyle="Icon.IconStyle.User" />
+        <FormInput 
+            @bind-Value="model.FirstName" 
+            Label="First Name" 
+            PlaceHolder="John"
+            IconStyle="Icon.IconStyle.User"
+            Required="true"/>
+        <FormInput 
+            @bind-Value="model.LastName" 
+            Label="Last Name" 
+            PlaceHolder="Doe" 
+            IconStyle="Icon.IconStyle.User" 
+            Required="true"/>
     </FormRow>
 
     <FormRow Cols="1">
-        <FormInput @bind-Value="model.Email" Type="email" Label="Email" PlaceHolder="john@company.com" IconStyle="Icon.IconStyle.Mail" />
+        <FormInput 
+            @bind-Value="model.Email" 
+            Type="email" 
+            Label="Email" 
+            PlaceHolder="john@company.com" 
+            IconStyle="Icon.IconStyle.Mail"
+            Required="true"/>
     </FormRow>
 
     <FormRow Cols="2">
-        <FormInput @bind-Value="model.Phone" Type="tel" Label="Phone Number" PlaceHolder="+234 800 000 0000" IconStyle="Icon.IconStyle.Phone" />
-        <FormSelect @bind-Value="model.CountryCode" TValue="int"
-                    Label="Country" Type="FormSelect.SelectType.Country" 
-                    IconStyle="Icon.IconStyle.Phone"></FormSelect>
+        <FormInput 
+            @bind-Value="model.Phone" 
+            Type="tel" 
+            Label="Phone Number" 
+            PlaceHolder="+234 800 000 0000" 
+            IconStyle="Icon.IconStyle.Phone" 
+            Required="true"/>
+        <FormSelect 
+            @bind-Value="model.CountryCode"  
+            Label="Country" 
+            Variant="FormSelect<int>.SelectType.Country" 
+            IconStyle="Icon.IconStyle.Phone"
+            Required="true" />
     </FormRow>
 
-    <FormRow Cols="1" Visible="false">
-       @*  <FormSelect Value="@model.TimeZone.ToString()" 
-                    ValueChanged="(e) => model.TimeZone = int.Parse(e)" 
-                    Label="Time Zone" Type="FormSelect.SelectType.TimeZone" 
-                    IconStyle="Icon.IconStyle.Phone"></FormSelect> *@
-        <FormSelect @bind-Value="model.TimeZone" TValue="int"
-                    Label="Time Zone" Type="FormSelect.SelectType.TimeZone"
-                    IconStyle="Icon.IconStyle.Phone"></FormSelect>
+    <FormRow Cols="1" Visible="true">
+        <FormSelect 
+            @bind-Value="model.TimeZone" 
+            Label="Time Zone" 
+            Variant="FormSelect<int>.SelectType.TimeZone"
+            IconStyle="Icon.IconStyle.Phone"
+            Required="true" />
     </FormRow>
 
     <FormRow Cols="2">
-        <FormInput @bind-Value="model.Password" Type="password" Label="Password" />
-        <FormInput @bind-Value="confirmPassword" Type="password" Label="Confirm Password" />
+        <FormInput @bind-Value="model.Password" Type="password" Label="Password" Required="true" />
+        <FormInput @bind-Value="confirmPassword" Type="password" Label="Confirm Password" Required="true" />
     </FormRow>
 
     @if (model.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
@@ -115,7 +137,6 @@
     private bool isBusy = false;
     private bool termsAccepted = false;
     private string confirmPassword = "";
-    private string? countryCode, timezone;
 
     private AccountCreateRequest model = new() { TimeZone = 99, CountryCode = 0 };
 
@@ -135,7 +156,7 @@
 
             if (response.StatusCode == 200)
             {
-                await alert.Success("Account created successfully!", "title");
+                await alert.Success("Account created successfully!");
                 nav.NavigateTo($"{Const.Routes.Login}?email=" + model.Email);
             }
             else
@@ -145,11 +166,11 @@
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
-            await alert.Error(ex.Message, "Api Error");
+            await alert.Error(ex.Message);
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
         finally
         {

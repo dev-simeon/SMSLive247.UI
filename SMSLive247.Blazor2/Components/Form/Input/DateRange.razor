@@ -1,5 +1,5 @@
 ﻿<FormSelect Value="@_optionStr"
-            ValueChanged="HandleOptionChanged" 
+            ValueChanged="(string e) => HandleOptionChanged(e)" 
             ValueExpression="@(() => _optionStr)"
             IsEmbedded="true">
     <option value="@DateRangeFilter.NONE">None</option>
