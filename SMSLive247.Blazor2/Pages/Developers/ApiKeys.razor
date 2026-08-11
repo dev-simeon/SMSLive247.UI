@@ -3,11 +3,14 @@
 
 <PageTitle>SMSLive247 - API Keys</PageTitle>
 
-<PageHeader Title="API Keys" SubTitle="Manage your API keys for programmatic access to the platform." />
+<PageHeader 
+    Title="API Keys" 
+    SubTitle="Manage your API keys for programmatic access to the platform.">
+</PageHeader>
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search sub-accounts..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
 
     <ChildContent>
@@ -74,9 +77,11 @@
     </ChildContent>
 
     <FooterLeft>
-        <Paging PageNumber="ds.PageState.PageNumber" PageSize="ds.PageState.PageSize"
-                TotalRecords="ds.PageState.TotalCount" PageNumberChanged="OnPageChange" PageSizeChanged="OnPageSizeChange">
-        </Paging>
+        <Paging PageNumber="ds.PageState.PageNumber"
+                PageSize="ds.PageState.PageSize"
+                TotalRecords="ds.PageState.TotalCount"
+                PageNumberChanged="OnPageChange"
+                PageSizeChanged="OnPageSizeChange" />
     </FooterLeft>
 </PageBody>
 
@@ -88,8 +93,7 @@
     protected override async Task OnInitializedAsync()
     {
         var res = await apiClient.AccountGetAsync("self");
-        if (res.StatusCode == 200)
-            mainAccount = res.Result;
+        mainAccount = res.Result;
 
         ds.Callback = new((PageState p, FilterState? f) =>
         {
@@ -104,6 +108,19 @@
         if (key == null || key.Length == 0) return "—";
         try { return new Guid(key).ToString().ToUpperInvariant(); }
         catch { return "—"; }
+    }
+    
+    private async Task ResetApiKey(AccountResponse account)
+    {
+        try
+        {
+            // TODO: wire up to apiClient.AccountUpdateProviderKeyAsync() when available
+            await alert.Error("Failed to reset API key");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message);
+        }
     }
 
     private async Task ReloadData()
@@ -122,19 +139,6 @@
     {
         ds.SetPage(new PageState(size, ds.PageState.PageNumber));
         await ds.LoadData(alert);
-    }
-
-    private async Task ResetApiKey(AccountResponse account)
-    {
-        try
-        {
-            // TODO: wire up to apiClient.AccountUpdateProviderKeyAsync() when available
-            await alert.Error("Failed to reset API key", "Error");
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
     }
 }
 

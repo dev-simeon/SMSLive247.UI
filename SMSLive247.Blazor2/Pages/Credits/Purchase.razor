@@ -4,12 +4,14 @@
 
 <PageTitle>SMSLive247 - Buy Credits</PageTitle>
 
-<PageHeader Title="Buy Credits"
-            SubTitle="Top up your account with SMS credits to keep your campaigns running." />
+<PageHeader 
+    Title="Buy Credits"
+    SubTitle="Top up your account with SMS credits to keep your campaigns running.">
+</PageHeader>
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search purchases..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
     <HeaderRight>
         <Button Text="Buy Credits" Icon="Icon.IconStyle.CreditCard" OnClick="() => purchaseModal.Show()" />
@@ -76,6 +78,7 @@
         {
             return apiClient.PurchaseListAsync(p.PageNumber, p.PageSize, null, searchQuery);
         });
+
         ds.SetPage(new PageState(20, 1));
         await ds.LoadData(alert);
     }

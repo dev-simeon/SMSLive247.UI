@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Pages\Messaging\SenderIDs\SenderIds.razor" />
+    <Content Include="Pages\Messaging\SenderIDs\Requests.razor" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,8 +54,8 @@
 
   <ItemGroup>
     <Content Include="Pages\Accounts\Profile.razor" />
-    <Content Include="Pages\Accounts\Modals\EditProfileModal.razor" />
-    <Content Include="Pages\Accounts\Modals\ChangePasswordModal.razor" />
+    <Content Include="Pages\Accounts\Modals\ProfileModal.razor" />
+    <Content Include="Pages\Accounts\Modals\PasswordModal.razor" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,75 @@
+<Modal Title="Update Profile" @bind-IsVisible="isVisible">
+
+    <Body>
+        <EditForm FormName="f1" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-4">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <FormInput Label="First Name" @bind-Value="model.FirstName" required="true" />
+            <FormInput Label="Last Name" @bind-Value="model.LastName" required="true" />
+            <FormInput Label="Email Address" @bind-Value="model.Email" disabled="true" />
+            <FormInput Label="Phone Number" @bind-Value="model.Phone" disabled="true" />
+
+            <FormSelect Label="Country" Type="FormSelect.SelectType.Country" @bind-Value="countryCodeString" />
+            <FormSelect Label="Time Zone" Type="FormSelect.SelectType.TimeZone" @bind-Value="timeZoneString" />
+        </EditForm>
+    </Body>
+
+    <Footer>
+        <Button IsSubmit="true" Text="Save Changes" />
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public AccountResponse Account { get; set; } = new();
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private bool isVisible = false;
+    private AccountUpdateRequest model = new();
+    private string? countryCodeString { get; set; }
+    private string? timeZoneString { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        model.FirstName = Account.FirstName;
+        model.LastName = Account.LastName;
+        model.Email = Account.AccountName;
+        model.Phone = Account.Phone;
+        model.TimeZone = Account.TimeZone;
+        model.CountryCode = Account.CountryCode;
+
+        countryCodeString = Account.CountryCode.ToString();
+        timeZoneString = Account.TimeZone.ToString();
+    }
+
+    public void Show()
+    {
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            if (int.TryParse(countryCodeString, out int cc))
+                model.CountryCode = cc;
+
+            if (int.TryParse(timeZoneString, out int tz))
+                model.TimeZone = tz;
+
+            var response = await apiClient.AccountUpdateAsync(Account.AccountID, model);
+            await alert.Success("Profile updated successfully.");
+            await OnCompleted.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message);
+        }
+        finally
+        {
+            isVisible = false;
+            StateHasChanged();
+        }
+    }
+}

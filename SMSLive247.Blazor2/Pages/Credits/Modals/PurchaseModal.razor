@@ -1,11 +1,11 @@
 @inject NavigationManager nav
 
-<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
+<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
         <div class="space-y-6">
             @if (price == null)
             {
-                <EditForm id="PurchaseCalculateForm" Model="@model" OnValidSubmit="ConfirmPrice">
+                <EditForm id="ew3" Model="@model" OnValidSubmit="ConfirmPrice">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
@@ -48,22 +48,22 @@
                         <div class="space-y-3 pt-1">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-slate-500">Credit Price</span>
-                                <span class="text-slate-700 font-medium whitespace-nowrap">@FormatCurrency(price.Price)</span>
+                                <span class="text-slate-700 font-medium whitespace-nowrap">@formatCurrency(price.Price)</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-slate-500">Purchase Amount</span>
-                                <span class="text-slate-700 font-medium">@FormatCurrency(price.Amount)</span>
+                                <span class="text-slate-700 font-medium">@formatCurrency(price.Amount)</span>
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-slate-500">Transaction Fee</span>
-                                <span class="text-slate-700 font-medium">@FormatCurrency(price.Fee)</span>
+                                <span class="text-slate-700 font-medium">@formatCurrency(price.Fee)</span>
                             </div>
                         </div>
 
                         <div class="pt-4 border-t border-slate-200">
                             <div class="flex justify-between items-center">
                                 <span class="text-base font-bold text-slate-900">Total Amount</span>
-                                <span class="text-xl font-black text-brand-600">@FormatCurrency(price.Amount + price.Fee)</span>
+                                <span class="text-xl font-black text-brand-600">@formatCurrency(price.Amount + price.Fee)</span>
                             </div>
                         </div>
                     </div>
@@ -85,7 +85,6 @@
         @if (price == null)
         {
             <Button IsSubmit="true"
-                    form="PurchaseCalculateForm"
                     Text="Confirm Price"
                     Icon="Icon.IconStyle.ChevronRight"
                     IsBusy="@isCalculating" />
@@ -122,36 +121,43 @@
     private PurchaseFormModel model = new();
     private PriceCalcResponse? price;
 
-    private string ModalTitle => price == null ? "Buy SMS Credits" : "Confirm Purchase";
+    private string modalTitle => price == null ? "Buy SMS Credits" : "Confirm Purchase";
+    private static string formatCurrency(double amount) => $"N {amount:#,##0.00}";
 
     public void Show()
     {
-        model = new PurchaseFormModel();
         price = null;
+        model = new PurchaseFormModel();
+
         isVisible = true;
         StateHasChanged();
     }
 
+    private void CancelConfirmation()
+    {
+        price = null;
+    }
+
+    private void Close()
+    {
+        isVisible = false;
+    }
+
     private async Task ConfirmPrice()
     {
-        if (model.Quantity < 500)
-        {
-            await alert.Error("Minimum SMS credit quantity to purchase is 500.", "Validation Error");
-            return;
-        }
-
-        isCalculating = true;
         try
         {
+            if (model.Quantity < 500)
+                throw new Exception("Minimum SMS credit quantity to purchase is 500.");
+
+            isCalculating = true;
+
             var response = await apiClient.PriceCalculateAsync(null, model.Quantity, "N");
-            if (response.StatusCode == 200)
-                price = response.Result;
-            else
-                await alert.Error("Failed to calculate cost.", "Error");
+            price = response.Result;
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
         finally
         {
@@ -162,12 +168,12 @@
 
     private async Task BeginPayment()
     {
-        if (price == null)
-            return;
-
-        isProcessingPayment = true;
         try
         {
+            if (price == null)
+                throw new Exception("DEBUG: Price{} should not be null");
+
+            isProcessingPayment = true;
             var request = new PurchaseRequest
             {
                 ProviderID = "PAYSTACK",
@@ -180,29 +186,19 @@
             if (string.IsNullOrWhiteSpace(authorizationUrl))
                 throw new Exception("No authorization URL received from server.");
 
-            isVisible = false;
             await OnCompleted.InvokeAsync();
             nav.NavigateTo(authorizationUrl, forceLoad: true);
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
+        }
+        finally
+        {
+            isVisible = false;
             isProcessingPayment = false;
             StateHasChanged();
         }
     }
 
-    private Task CancelConfirmation()
-    {
-        price = null;
-        return Task.CompletedTask;
-    }
-
-    private Task Close()
-    {
-        isVisible = false;
-        return Task.CompletedTask;
-    }
-
-    private static string FormatCurrency(double amount) => $"N {amount:#,##0.00}";
 }
