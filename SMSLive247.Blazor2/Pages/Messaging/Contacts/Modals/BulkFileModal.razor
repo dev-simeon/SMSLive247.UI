@@ -1,11 +1,11 @@
-<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
+﻿<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
     <Body>
         <div class="space-y-6">
             @if (!ForCSV)
             {
                 <FormSelect Label="Country Code"
-                            Type="FormSelect.SelectType.Country"
-                            @bind-Value="CountryCodeString" />
+                            Variant="FormSelect<int?>.SelectType.Country"
+                            @bind-Value="countryCode" />
             }
 
             <div class="space-y-4">
@@ -15,12 +15,12 @@
 
                 @if (selectedFile == null)
                 {
-                    <label class="relative group cursor-pointer flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-brand-500 transition-all duration-200">
+                    <label class="group relative flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 transition-all duration-200 hover:border-brand-500 hover:bg-slate-100">
                         <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <div class="p-3 mb-3 rounded-full bg-blue-50 text-brand-600 group-hover:bg-white group-hover:shadow-md transition-all duration-200">
-                                <Icon Style="Icon.IconStyle.Download" CssClass="w-8 h-8" />
+                            <div class="text-brand-600 mb-3 rounded-full bg-blue-50 p-3 transition-all duration-200 group-hover:bg-white group-hover:shadow-md">
+                                <Icon Style="Icon.IconStyle.Download" CssClass="h-8 w-8" />
                             </div>
-                            <p class="mb-2 text-sm text-slate-700 font-medium">
+                            <p class="mb-2 text-sm font-medium text-slate-700">
                                 <span class="text-brand-600 hover:underline">Click to upload</span>
                                 or drag and drop
                             </p>
@@ -33,14 +33,14 @@
                 }
                 else
                 {
-                    <div class="bg-slate-50 rounded-lg border border-slate-200 p-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
-                                    <Icon Style="@(ForCSV ? Icon.IconStyle.FileSpreadsheet : Icon.IconStyle.FileText)" CssClass="w-6 h-6" />
+                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                        <div class="mb-2 flex items-center justify-between">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                                    <Icon Style="@(ForCSV ? Icon.IconStyle.FileSpreadsheet : Icon.IconStyle.FileText)" CssClass="h-6 w-6" />
                                 </div>
-                                <div class="flex flex-col min-w-0">
-                                    <span class="text-sm font-semibold text-slate-900 truncate">
+                                <div class="flex min-w-0 flex-col">
+                                    <span class="truncate text-sm font-semibold text-slate-900">
                                         @selectedFile.Name
                                     </span>
                                     <span class="text-xs text-slate-500">
@@ -50,24 +50,24 @@
                             </div>
                             <button type="button"
                                     @onclick="ClearFile"
-                                    class="text-slate-400 hover:text-red-500 transition-colors p-1"
+                                    class="p-1 text-slate-400 transition-colors hover:text-red-500"
                                     title="Remove file">
-                                <Icon Style="Icon.IconStyle.Trash" CssClass="w-5 h-5" />
+                                <Icon Style="Icon.IconStyle.Trash" CssClass="h-5 w-5" />
                             </button>
                         </div>
-                        <div class="w-full bg-slate-200 rounded-full h-1.5 mt-2 overflow-hidden">
-                            <div class="bg-emerald-500 h-1.5 rounded-full w-full"></div>
+                        <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
+                            <div class="h-1.5 w-full rounded-full bg-emerald-500"></div>
                         </div>
                     </div>
                 }
 
-                <p class="text-xs text-slate-400 px-1">
+                <p class="px-1 text-xs text-slate-400">
                     Supported formats: @SupportedFormatsText
                 </p>
             </div>
 
-            <p class="text-xs text-slate-500 flex items-center gap-1.5">
-                <Icon Style="Icon.IconStyle.Info" CssClass="w-3.5 h-3.5 shrink-0" />
+            <p class="flex items-center gap-1.5 text-xs text-slate-500">
+                <Icon Style="Icon.IconStyle.Info" CssClass="h-3.5 w-3.5 shrink-0" />
                 Duplicate numbers will be automatically removed during processing.
             </p>
         </div>
@@ -94,7 +94,7 @@
     private bool isVisible;
     private bool isSubmitting;
     private IBrowserFile? selectedFile;
-    private string? CountryCodeString { get; set; }
+    private int? countryCode;
 
     private string ModalTitle => ForCSV ? "Upload CSV / Excel File" : "Upload Bulk File";
     private string AcceptedFileTypes => ForCSV ? ".csv,.xls,.xlsx,.xlx" : ".txt,.text";
@@ -103,7 +103,7 @@
     public void Show()
     {
         selectedFile = null;
-        CountryCodeString = null;
+        countryCode = null;
         isVisible = true;
         StateHasChanged();
     }
@@ -123,7 +123,7 @@
         if (selectedFile == null)
             return;
 
-        if (!ForCSV && !int.TryParse(CountryCodeString, out _))
+        if (!ForCSV && !countryCode.HasValue)
         {
             await alert.Error("Please select a country code.", "Validation Error");
             return;
@@ -132,10 +132,6 @@
         isSubmitting = true;
         try
         {
-            int? countryCode = null;
-            if (int.TryParse(CountryCodeString, out var parsedCountryCode))
-                countryCode = parsedCountryCode;
-
             await using var stream = selectedFile.OpenReadStream(MaxFileBytes);
             var file = new FileParameter(stream, selectedFile.Name, selectedFile.ContentType);
             await apiClient.BatchFileCreateAsync(countryCode, file);

@@ -1,4 +1,4 @@
-@namespace SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
+﻿@namespace SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
 
 <Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
@@ -7,8 +7,8 @@
             {
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Account Name</label>
-                    <div class="mt-1 w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-700">
-                        @editingAccount.AccountName
+                    <div class="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
+                        @account.AccountName
                     </div>
                 </div>
 
@@ -38,13 +38,11 @@
 
                 <FormRow Cols="2">
                     <FormSelect Label="Country Code"
-                                Type="FormSelect.SelectType.Country"
-                                @bind-Value="CountryCodeString"
-                                IsEmbedded="false" />
+                                Variant="FormSelect<int?>.SelectType.Country"
+                                @bind-Value="updateModel.CountryCode" />
                     <FormSelect Label="Time Zone (GMT Offset)"
-                                Type="FormSelect.SelectType.TimeZone"
-                                @bind-Value="TimeZoneString"
-                                IsEmbedded="false" />
+                                Variant="FormSelect<int?>.SelectType.TimeZone"
+                                @bind-Value="updateModel.TimeZone"  />
                 </FormRow>
             }
             else
@@ -80,13 +78,11 @@
 
                 <FormRow Cols="2">
                     <FormSelect Label="Country Code"
-                                Type="FormSelect.SelectType.Country"
-                                @bind-Value="CountryCodeString"
-                                IsEmbedded="false" />
+                                Variant="FormSelect<int>.SelectType.Country"
+                                @bind-Value="createModel.CountryCode" />
                     <FormSelect Label="Time Zone (GMT Offset)"
-                                Type="FormSelect.SelectType.TimeZone"
-                                @bind-Value="TimeZoneString"
-                                IsEmbedded="false" />
+                                Variant="FormSelect<int>.SelectType.TimeZone"
+                                @bind-Value="createModel.TimeZone" />
                 </FormRow>
 
                 <FormInput Label="Password"
@@ -120,24 +116,17 @@
     private bool isEditMode = false;
     private string modalTitle = "Add Sub-Account";
 
-    private AccountCreateRequest createRequest = new();
-    private AccountUpdateRequest updateRequest = new();
-    private AccountResponse editingAccount = new();
-    private object formModel => isEditMode ? (object)updateRequest : createRequest;
+    private AccountCreateRequest createModel = new();
+    private AccountUpdateRequest updateModel = new();
+    private AccountResponse account = new();
 
-    private string password = string.Empty;
-    private string? CountryCodeString { get; set; } = "234";
-    private string? TimeZoneString { get; set; } = "0";
+    private object formModel => isEditMode ? (object)updateModel : createModel;
 
-    // Open for Create
     public void Show()
     {
         isEditMode = false;
         modalTitle = "Add Sub-Account";
-        createRequest = new();
-        password = string.Empty;
-        CountryCodeString = "234";
-        TimeZoneString = "0";
+        createModel = new();
         isVisible = true;
         StateHasChanged();
     }
@@ -147,9 +136,9 @@
     {
         isEditMode = true;
         modalTitle = "Edit Sub-Account";
-        editingAccount = account;
+        this.account = account;
 
-        updateRequest = new AccountUpdateRequest
+        updateModel = new AccountUpdateRequest
         {
             FirstName = account.FirstName,
             LastName = account.LastName,
@@ -158,9 +147,6 @@
             CountryCode = account.CountryCode,
             TimeZone = account.TimeZone
         };
-
-        CountryCodeString = account.CountryCode.ToString();
-        TimeZoneString = account.TimeZone.ToString();
 
         isVisible = true;
         StateHasChanged();
@@ -172,35 +158,14 @@
         {
             isSubmitting = true;
 
-            int countryCode = 234;
-            if (!string.IsNullOrEmpty(CountryCodeString)
-                && int.TryParse(CountryCodeString.TrimStart('+'), out int cc))
-            {
-                countryCode = cc;
-            }
-
-            int tz = 0;
-            if (!string.IsNullOrEmpty(TimeZoneString)
-                && int.TryParse(TimeZoneString, out int t))
-            {
-                tz = t;
-            }
-
             if (isEditMode)
             {
-                updateRequest.CountryCode = countryCode;
-                updateRequest.TimeZone = tz;
-
-                await apiClient.AccountUpdateAsync(editingAccount.AccountID, updateRequest);
+                await apiClient.AccountUpdateAsync(account.AccountID, updateModel);
                 await alert.Success("Sub-account updated successfully.", "Success");
             }
             else
             {
-                createRequest.CountryCode = countryCode;
-                createRequest.TimeZone = tz;
-                createRequest.Password = password;
-
-                await apiClient.AccountCreateAsync(createRequest);
+                await apiClient.AccountCreateAsync(createModel);
                 await alert.Success("Sub-account created successfully.", "Success");
             }
 
