@@ -1,9 +1,11 @@
 ﻿@* <i class="@GetBootstrapClass() @CssClass" style="font-size: 1.2rem; -webkit-text-stroke-width: 0.7px;"></i> *@
-<span class="material-symbols-rounded @CssClass">@GetMaterialSymbolName()</span>
+<span class="@CssClass material-symbols-rounded"
+      style="@CssStyle">@GetMaterialSymbolName()</span>
 
 @code {
     [Parameter] public IconStyle Style { get; set; } = IconStyle.Bell;
-    [Parameter] public string CssClass { get; set; } = ""; //"w-5 h-5";
+    [Parameter] public string? CssStyle { get; set; }
+    [Parameter] public string? CssClass { get; set; }
 
     public enum IconStyle
     {
@@ -174,7 +176,7 @@
             IconStyle.Eye => "visibility",
             IconStyle.EyeOff => "visibility_off",
             IconStyle.Menu => "menu",
-            IconStyle.Coins => "wallet", //payments, savings, toll, currency_exchange
+            IconStyle.Coins => "poker_chip", //payments, savings, toll, currency_exchange
             IconStyle.PlusCircle => "add_circle",
             IconStyle.CheckCircle => "check_circle",
             IconStyle.Shield => "shield",

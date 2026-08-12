@@ -7,30 +7,28 @@
 
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full @GetMaxWidthClass(Size)">
+                <div class="relative w-full transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all sm:my-8 @GetMaxWidthClass()">
                     @* Header *@
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-                        <h3 class="text-lg font-semibold leading-6 text-slate-900"
-                            id="modal-title">
+                    <div class="flex items-center justify-between border-b border-slate-200 px-6 py-3">
+                        <h3 class="text-lg leading-6 font-semibold text-slate-900">
                             @Title
                         </h3>
                         <button type="button"
-                                class="rounded-full p-1 bg-transparent hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+                                class="grid size-7 place-content-center rounded-full bg-transparent text-slate-400 transition-colors hover:bg-red-100 hover:text-red-600"
                                 @onclick="OnClose">
-                            <span class="sr-only">Close</span>
                             <Icon Style="Icon.IconStyle.Close" />
                         </button>
                     </div>
 
                     @* Content *@
-                    <div class="px-6 py-4 max-h-[70vh] overflow-y-auto">
+                    <div class="max-h-[70vh] overflow-y-auto px-6 py-4">
                         @Body
                     </div>
 
                     @* Footer *@
                     @if (Footer != null)
                     {
-                        <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex flex-row-reverse gap-3">
+                        <div class="flex flex-row-reverse gap-3 border-t border-slate-200 bg-slate-50 px-6 py-3">
                             @Footer
                         </div>
                     }
@@ -56,14 +54,13 @@
     [Parameter] public bool IsVisible { get; set; } = false;
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
 
-
-    public string GetMaxWidthClass(ModalSize size) => size switch
+    public string GetMaxWidthClass() => Size switch
     {
-        ModalSize.Small => "max-w-md",
-        ModalSize.Medium => "max-w-lg",
-        ModalSize.Large => "max-w-2xl",
+        ModalSize.Small     => "max-w-md",
+        ModalSize.Medium    => "max-w-lg",
+        ModalSize.Large     => "max-w-2xl",
         ModalSize.ExtraLarge => "max-w-4xl",
-        _ => "max-w-lg"
+        _                   => "max-w-lg"
     };
 
     private async Task OnClose()
