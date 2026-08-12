@@ -1,0 +1,91 @@
+<Modal Title="Select Personalization File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+    <Body>
+        <div class="space-y-4">
+            <div class="flex items-end gap-3">
+                <div class="flex-1"><FormInput Label="Search files" @bind-Value="searchTerm" Required="false" Placeholder="Search files..." /></div>
+                <Button Text="Refresh" Icon="Icon.IconStyle.RefreshCcw" Style="Button.ButtonStyle.Secondary" IsBusy="isLoading" OnClick="Refresh" CssClass="min-w-0 px-3" />
+            </div>
+            <div class="max-h-96 overflow-y-auto rounded-lg border border-slate-200">
+                @if (isLoading)
+                {
+                    <p class="p-5 text-sm text-slate-500">Loading template files...</p>
+                }
+                else if (filteredFiles.Count == 0)
+                {
+                    <p class="p-8 text-center text-sm text-slate-500">No CSV or Excel files found.</p>
+                }
+                else
+                {
+                    <div class="divide-y divide-slate-100">
+                        @foreach (var file in filteredFiles)
+                        {
+                            <label class="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 hover:bg-slate-50">
+                                <span class="flex min-w-0 items-center gap-3"><input type="radio" name="templateFile" checked="@(selectedId == file.BatchFileID)" @onchange="_ => selectedId = file.BatchFileID" /><Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-brand-500" /><span class="min-w-0"><span class="block truncate text-sm font-medium text-slate-800">@file.Description</span><span class="block text-xs uppercase text-slate-400">@file.FileType</span></span></span>
+                                <span class="shrink-0 rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">@file.TotalNumbers.ToString("N0")</span>
+                            </label>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <Button Text="Use Selected File" Icon="Icon.IconStyle.CheckCircle" IsDisabled="@(string.IsNullOrWhiteSpace(selectedId))" OnClick="Confirm" />
+        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="Close" />
+    </Footer>
+</Modal>
+
+@code {
+    private readonly List<BatchFileResponse> files = [];
+    private bool isVisible;
+    private bool isLoading;
+    private string searchTerm = "";
+    private string? selectedId;
+
+    [Parameter] public EventCallback<BatchFileResponse> OnSelected { get; set; }
+    private List<BatchFileResponse> filteredFiles => files.Where(x => string.IsNullOrWhiteSpace(searchTerm) || x.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || x.BatchFileID.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    public async Task Show(string? currentFileId)
+    {
+        searchTerm = "";
+        selectedId = currentFileId;
+        isVisible = true;
+        await LoadFiles();
+    }
+
+    private async Task Refresh(MouseEventArgs _) => await LoadFiles();
+
+    private async Task LoadFiles()
+    {
+        isLoading = true;
+        try
+        {
+            var response = await apiClient.BatchFileListAsync();
+            files.Clear();
+            files.AddRange(response.Result.Where(IsTemplateFile));
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Template Files");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task Confirm(MouseEventArgs _)
+    {
+        var file = files.FirstOrDefault(x => x.BatchFileID == selectedId);
+        if (file is null) return;
+        isVisible = false;
+        await OnSelected.InvokeAsync(file);
+    }
+
+    private Task Close(MouseEventArgs _) { isVisible = false; return Task.CompletedTask; }
+    private static bool IsTemplateFile(BatchFileResponse file)
+    {
+        var type = file.FileType ?? "";
+        return type.Contains("csv", StringComparison.OrdinalIgnoreCase) || type.Contains("excel", StringComparison.OrdinalIgnoreCase) || type.Contains("spreadsheet", StringComparison.OrdinalIgnoreCase) || type.Contains("xls", StringComparison.OrdinalIgnoreCase);
+    }
+}

@@ -1,4 +1,5 @@
 ﻿<Modal Title="Transfer Credit" @bind-IsVisible="isVisible">
+
     <Body>
         <EditForm id="wf3" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
 
@@ -10,12 +11,8 @@
             </div>
 
             <div class="space-y-4">
-                <FormInput Label="Recipient Email"
-                            PlaceHolder="user@example.com"
-                            Type="email"
-                            IconStyle="Icon.IconStyle.Mail"
-                            @bind-Value="model.Recipient"
-                            Required="true" />
+                <FormInput Label="Recipient Email" PlaceHolder="user@example.com" Type="email"
+                           IconStyle="Icon.IconStyle.Mail" @bind-Value="model.Recipient" Required="true" />
 
                 <div class="space-y-1.5">
                     <label class="block text-sm font-medium text-slate-700">
@@ -70,16 +67,9 @@
         </EditForm>
     </Body>
     <Footer>
-        <Button IsSubmit="true"
-                Text="Transfer Credits"
-                Icon="Icon.IconStyle.ChevronRight"
-                IsBusy="@isSubmitting"
-                IsDisabled="@(!canSubmit)"
-                form="wf3" />
-        <Button Text="Cancel"
-                Style="Button.ButtonStyle.Secondary"
-                IsDisabled="@isSubmitting"
-                OnClick="Close" />
+        <Button IsSubmit="true" Text="Transfer Credits" Icon="Icon.IconStyle.ChevronRight" IsBusy="@isSubmitting"
+                IsDisabled="@(!canSubmit)" form="wf3" />
+        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" IsDisabled="@isSubmitting" OnClick="Close" />
     </Footer>
 </Modal>
 

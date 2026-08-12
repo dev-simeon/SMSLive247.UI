@@ -1,40 +1,328 @@
-﻿@attribute [Route(Const.Routes.Home)]
+@attribute [Route(Const.Routes.Home)]
 @attribute [Route(Const.Routes.Account.Dashboard)]
-
-@using SMSLive247.Blazor2.Pages.Accounts
 @layout MainLayout
+@inject NavigationManager nav
 
 <PageTitle>Dashboard</PageTitle>
 
-<PageHeader Title="Dashboard" SubTitle="Welcome back! Monitor your account activity and broadcast performance at a glance."></PageHeader>
+<div class="mx-auto max-w-7xl space-y-8 animate-in fade-in slide-in-from-top-2">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
+            <p class="mt-1 text-sm text-slate-500">
+                Welcome back! Monitor your account activity and broadcast performance at a glance.
+            </p>
+        </div>
+    </div>
 
-<PageBody>
-    <HeaderLeft>
-       <p>justtsvvwdd</p>
-    </HeaderLeft>
-    <HeaderRight>
-        <button class="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors">
-            Edit Profile
-        </button>
-    </HeaderRight>
-    <ChildContent>
-        <table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Email</th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Role</th>
-                </tr>
-            </thead>
-        </table>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex-row lg:col-span-2">
+            <div class="flex flex-1 flex-col justify-between border-b border-slate-100 p-6 sm:border-r sm:border-b-0 sm:p-8">
+                <div>
+                    <div class="mb-4 flex items-center gap-3">
+                        <div>
+                            <h3 class="text-xl leading-tight font-bold text-slate-900">
+                                @DisplayName
+                            </h3>
+                            <div class="mt-1 flex items-center gap-2">
+                                <span class="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold tracking-widest text-emerald-600 uppercase">
+                                    <Icon Style="Icon.IconStyle.Shield" CssClass="inline-flex items-center justify-center text-[12px] leading-none" />
+                                    Active
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                            Account ID
+                        </p>
+                        <p class="inline-block rounded-md bg-slate-50 px-2 py-1 font-mono text-sm text-slate-700">
+                            @CleanAccountId
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    </ChildContent>
-    <FooterLeft>
-        <p class="text-sm text-slate-500">© 2024 SMSLive247. All rights reserved.</p>
-    </FooterLeft>
-    <FooterRight>
-        <button class="bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-600 transition-colors">
-            Add New User
-        </button>
-    </FooterRight>
-</PageBody>
+            <button type="button"
+                    @onclick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)"
+                    class="group flex w-full flex-col items-center justify-center bg-slate-50/50 p-6 text-center transition-colors hover:bg-slate-100 sm:w-64 sm:p-8">
+                <p class="mb-2 text-xs font-bold tracking-widest text-slate-400 uppercase">
+                    Available Credits
+                </p>
+                <span class="text-4xl font-black text-slate-900 transition-colors group-hover:text-brand-600">
+                    @FormatNumber(account?.Credits ?? 0)
+                </span>
+                <span class="mt-4 flex items-center gap-2 text-sm font-bold tracking-wide text-brand-600 uppercase transition-colors group-hover:text-brand-700">
+                    Top Up Now
+                    <Icon Style="Icon.IconStyle.PlusCircle" CssClass="inline-flex items-center justify-center text-[16px] leading-none" />
+                </span>
+            </button>
+        </div>
+
+        <div class="group relative flex flex-col justify-center gap-6 overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-600 p-6 sm:p-8">
+            <div class="absolute top-0 right-0 -mt-16 -mr-16 h-32 w-32 rounded-full bg-white/5 transition-transform duration-700 group-hover:scale-150"></div>
+            <div class="relative z-10">
+                <h3 class="mb-1 text-lg font-bold text-white">Quick Action</h3>
+                <p class="text-sm text-brand-100 opacity-90">Start messaging instantly.</p>
+            </div>
+            <button type="button"
+                    @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Compose)"
+                    class="relative z-10 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-sm font-bold tracking-wide text-brand-600 uppercase shadow-sm transition-all hover:bg-brand-50 active:scale-95">
+                <Icon Style="Icon.IconStyle.PenSquare" CssClass="inline-flex items-center justify-center text-[20px] leading-none" />
+                Compose Message
+            </button>
+        </div>
+    </div>
+
+    @if (LowBalance)
+    {
+        <div class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <Icon Style="Icon.IconStyle.AlertCircle" CssClass="inline-flex items-center justify-center text-[20px] leading-none text-amber-600" />
+            <div>
+                <p class="text-sm font-bold text-amber-900">Critical Balance Alert!</p>
+                <p class="text-xs text-amber-700">
+                    Your credits are low. Top up soon to avoid interruption of planned broadcasts.
+                </p>
+            </div>
+        </div>
+    }
+
+    <div class="grid grid-cols-1 gap-8 xl:grid-cols-3">
+        <div class="space-y-4 xl:col-span-2">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <Icon Style="Icon.IconStyle.RefreshCcw" CssClass="inline-flex items-center justify-center text-[20px] leading-none text-brand-600" />
+                    <h3 class="text-lg font-bold tracking-tight text-slate-800">Recent Messages</h3>
+                </div>
+                <button type="button"
+                        @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)"
+                        class="text-xs font-bold tracking-wide text-brand-600 uppercase hover:underline">
+                    View More
+                </button>
+            </div>
+
+            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <table class="w-full text-left text-sm">
+                    <thead class="border-b border-slate-100 bg-slate-50/80">
+                        <tr>
+                            <th class="px-6 py-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase">ID</th>
+                            <th class="px-6 py-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase">Sender ID</th>
+                            <th class="px-6 py-4 text-center text-[10px] font-bold tracking-widest text-slate-400 uppercase">Status</th>
+                            <th class="px-6 py-4 text-right text-[10px] font-bold tracking-widest text-slate-400 uppercase">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @if (isLoading)
+                        {
+                            @for (var i = 0; i < 5; i++)
+                            {
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4">
+                                        <div class="h-4 w-full max-w-50 animate-pulse rounded bg-slate-100"></div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else if (batches.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" class="px-6 py-8 text-center text-xs text-slate-400 italic">
+                                    No recent messages
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var batch in batches.Take(5))
+                            {
+                                <tr class="group cursor-pointer transition-colors hover:bg-brand-50/40"
+                                    @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)">
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-1 font-mono text-xs font-bold text-brand-600 transition-colors group-hover:bg-brand-100">
+                                            <Icon Style="Icon.IconStyle.Mail" CssClass="inline-flex items-center justify-center text-[12px] leading-none" />
+                                            #@batch.BatchID
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 font-bold text-slate-700">
+                                        @(string.IsNullOrWhiteSpace(batch.SenderID) ? "-" : batch.SenderID)
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@batch.Status" ShowDot="true" />
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-xs font-medium whitespace-nowrap text-slate-500">
+                                        @FormatDate(batch.DateSubmitted)
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="h-full">
+            <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div class="mb-6 flex items-center justify-between text-slate-800">
+                    <h3 class="text-sm font-bold tracking-wide uppercase">Recent Transactions</h3>
+                </div>
+
+                <div class="flex-1 space-y-4">
+                    @if (isLoading)
+                    {
+                        @for (var i = 0; i < 3; i++)
+                        {
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 shrink-0 animate-pulse rounded-lg bg-slate-100"></div>
+                                <div class="min-w-0 flex-1 space-y-2">
+                                    <div class="h-3 w-24 animate-pulse rounded bg-slate-100"></div>
+                                    <div class="h-2 w-16 animate-pulse rounded bg-slate-50"></div>
+                                </div>
+                                <div class="h-4 w-12 animate-pulse rounded bg-emerald-50"></div>
+                            </div>
+                        }
+                    }
+                    else if (purchases.Count == 0)
+                    {
+                        <div class="py-4 text-center text-xs text-slate-400 italic">
+                            No recent transactions
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var purchase in purchases)
+                        {
+                            <div class="group/item flex items-center gap-3">
+                                <div class="@GetPurchaseIconClass(purchase)">
+                                    <Icon Style="@GetPurchaseIcon(purchase)" CssClass="inline-flex items-center justify-center text-[16px] leading-none" />
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="truncate text-xs leading-tight font-bold text-slate-800">Credits Purchase</p>
+                                    <p class="text-[10px] font-medium text-slate-400">
+                                        @FormatDate(purchase.DateCreated)
+                                    </p>
+                                </div>
+                                <p class="@GetPurchaseQuantityClass(purchase)">
+                                    @FormatPurchaseQuantity(purchase)
+                                </p>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <button type="button"
+                        @onclick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)"
+                        class="mt-6 flex w-full items-center justify-center gap-2 py-2 text-[10px] font-bold leading-none tracking-widest text-brand-500 uppercase hover:underline">
+                    Purchase History
+                    <Icon Style="Icon.IconStyle.ChevronRight" CssClass="inline-flex translate-y-px items-center justify-center text-[14px] leading-none" />
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private AccountResponse? account;
+    private List<SmsBatchResponse> batches = [];
+    private List<PurchaseResponse> purchases = [];
+    private bool isLoading = true;
+
+    private string DisplayName
+    {
+        get
+        {
+            if (account == null)
+                return "User Account";
+
+            var fullName = $"{account.FirstName} {account.LastName}".Trim();
+            return !string.IsNullOrWhiteSpace(fullName)
+                ? fullName
+                : (string.IsNullOrWhiteSpace(account.AccountName) ? "User Account" : account.AccountName);
+        }
+    }
+
+    private string CleanAccountId => string.IsNullOrWhiteSpace(account?.AccountID)
+        ? "0000"
+        : account.AccountID.Replace("MA-", "", StringComparison.OrdinalIgnoreCase);
+
+    private bool LowBalance => (account?.Credits ?? 0) < 500;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchDashboardData();
+    }
+
+    private async Task FetchDashboardData()
+    {
+        isLoading = true;
+
+        try
+        {
+            var accountTask = apiClient.AccountGetAsync("self");
+            var batchTask = apiClient.SmsBatchListAsync(1, 8, null, null, null, null);
+            var purchaseTask = apiClient.PurchaseListAsync(1, 5, null, null);
+
+            await Task.WhenAll(accountTask, batchTask, purchaseTask);
+
+            account = accountTask.Result.Result;
+            batches = batchTask.Result.Result?.ToList() ?? [];
+            purchases = purchaseTask.Result.Result?.ToList() ?? [];
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Dashboard");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string FormatNumber(double value) => value.ToString("#,##0.##");
+
+    private static string FormatDate(DateTimeOffset value) =>
+        value == default ? "-" : value.LocalDateTime.ToString("MMM dd, yyyy");
+
+    private static bool PurchaseHasFailed(PurchaseResponse purchase) =>
+        !string.IsNullOrWhiteSpace(purchase.Error);
+
+    private static bool PurchaseHasSucceeded(PurchaseResponse purchase) =>
+        !PurchaseHasFailed(purchase) && purchase.IsPaid;
+
+    private static Icon.IconStyle GetPurchaseIcon(PurchaseResponse purchase)
+    {
+        if (PurchaseHasFailed(purchase))
+            return Icon.IconStyle.Close;
+
+        return PurchaseHasSucceeded(purchase)
+            ? Icon.IconStyle.CreditCard
+            : Icon.IconStyle.Clock;
+    }
+
+    private static string GetPurchaseIconClass(PurchaseResponse purchase)
+    {
+        var color = PurchaseHasFailed(purchase)
+            ? "bg-red-50 text-red-600"
+            : PurchaseHasSucceeded(purchase)
+                ? "bg-emerald-50 text-emerald-600"
+                : "bg-amber-50 text-amber-600";
+
+        return $"flex h-8 w-8 shrink-0 items-center justify-center rounded-lg {color}";
+    }
+
+    private static string GetPurchaseQuantityClass(PurchaseResponse purchase)
+    {
+        var color = PurchaseHasFailed(purchase)
+            ? "text-red-600"
+            : PurchaseHasSucceeded(purchase)
+                ? "text-emerald-600"
+                : "text-amber-600";
+
+        return $"text-xs font-black {color}";
+    }
+
+    private static string FormatPurchaseQuantity(PurchaseResponse purchase)
+    {
+        var quantity = purchase.Quantity.ToString("#,##0");
+        return PurchaseHasSucceeded(purchase) ? $"+{quantity}" : quantity;
+    }
+}

@@ -1,0 +1,229 @@
+<Modal Title="Select Bulk File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+    <Body>
+        <div class="space-y-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <p class="text-sm text-slate-500">Choose from your previously uploaded TXT files.</p>
+                @if (selectedIds.Count > 0)
+                {
+                    <div class="flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+                        <span>Selected:</span>
+                        <span class="font-bold">@selectedIds.Count</span>
+                    </div>
+                }
+            </div>
+
+            <div class="flex gap-3">
+                <FormInput Label="" @bind-Value="searchTerm" Required="false" Placeholder="Search files..." />
+                <button type="button"
+                        title="Refresh"
+                        disabled="@isLoading"
+                        @onclick="Refresh"
+                        class="flex h-10 w-11 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 disabled:opacity-50">
+                    <Icon Style="Icon.IconStyle.RefreshCcw" CssClass="@RefreshIconClass" />
+                </button>
+            </div>
+
+            <div class="flex min-h-[360px] flex-col overflow-hidden rounded-lg border border-slate-200">
+                @if (isLoading)
+                {
+                    <div class="flex flex-1 items-center justify-center gap-3">
+                        <div class="h-6 w-6 animate-spin rounded-full border-2 border-brand-200 border-t-brand-500"></div>
+                        <span class="text-sm text-slate-500">Loading files...</span>
+                    </div>
+                }
+                else if (!string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    <div class="flex flex-1 flex-col items-center justify-center gap-2">
+                        <p class="text-sm text-red-500">@errorMessage</p>
+                        <button type="button" @onclick="Refresh" class="text-sm text-brand-500 hover:underline">Try again</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="flex-1 overflow-x-auto overflow-y-auto">
+                        <table class="w-full min-w-[420px] text-left text-sm">
+                            <thead class="border-b-2 border-blue-100 bg-brand-50">
+                                <tr>
+                                    <th class="w-10 px-4 py-3.5 text-center">
+                                        <input type="checkbox" checked="@AllPageSelected" @onchange="ToggleAll" class="h-4 w-4 rounded border-slate-300 accent-brand-500" />
+                                    </th>
+                                    <th class="px-4 py-3.5 text-xs font-bold tracking-wider text-brand-900 uppercase">File Name</th>
+                                    <th class="px-4 py-3.5 text-right text-xs font-bold tracking-wider text-brand-900 uppercase">Numbers</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                @if (FilteredFiles.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="3" class="py-10 text-center">
+                                            <Icon Style="Icon.IconStyle.FileText" CssClass="mx-auto mb-2 block text-4xl leading-none text-slate-200" />
+                                            <p class="text-sm text-slate-400">No TXT files found.</p>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var file in PagedFiles)
+                                    {
+                                        var id = file.BatchFileID ?? "";
+                                        var name = string.IsNullOrWhiteSpace(file.Description) ? id : file.Description;
+                                        var selected = selectedIds.Contains(id);
+                                        <tr class="cursor-pointer transition-colors hover:bg-slate-50/50 @(selected ? "bg-brand-50/50" : "")" @onclick="() => ToggleFile(id)">
+                                            <td class="px-4 py-3.5 text-center" @onclick:stopPropagation="true">
+                                                <input type="checkbox" checked="@selected" @onchange="_ => ToggleFile(id)" class="h-4 w-4 rounded border-slate-300 accent-brand-500" />
+                                            </td>
+                                            <td class="px-4 py-3.5 font-medium text-slate-900">
+                                                <div class="flex items-center gap-2.5">
+                                                    <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-50">
+                                                        <Icon Style="Icon.IconStyle.FileText" CssClass="text-base leading-none text-slate-500" />
+                                                    </div>
+                                                    <div class="flex min-w-0 flex-col">
+                                                        <span class="max-w-45 truncate text-sm font-medium">@name</span>
+                                                        <span class="font-mono text-[10px] leading-tight text-slate-400 uppercase">@(string.IsNullOrWhiteSpace(file.FileType) ? "Text" : file.FileType)</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3.5 text-right">
+                                                <span class="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">@file.TotalNumbers.ToString("N0")</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (FilteredFiles.Count > 0)
+                    {
+                        <div class="mt-1 flex shrink-0 items-center justify-between px-4 py-3">
+                            <span class="text-xs text-slate-500 sm:text-sm">
+                                Showing <span class="font-medium text-slate-900">@StartRecord</span> to <span class="font-medium text-slate-900">@EndRecord</span> of <span class="font-medium text-slate-900">@FilteredFiles.Count.ToString("N0")</span> results
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" @onclick="PreviousPage" disabled="@(safePage <= 1)" class="rounded-lg border border-slate-200 px-3 py-2 text-slate-400 transition-colors hover:border-brand-500 hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-50">‹</button>
+                                <button type="button" @onclick="NextPage" disabled="@(safePage >= totalPages)" class="rounded-lg border border-slate-200 px-3 py-2 text-slate-400 transition-colors hover:border-brand-500 hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-50">›</button>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <Button Text="@ConfirmText" Icon="Icon.IconStyle.PlusCircle" IsDisabled="@(selectedIds.Count == 0)" OnClick="Confirm" />
+        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="Close" />
+    </Footer>
+</Modal>
+
+@code {
+    private const int PageSize = 100;
+    private readonly List<BatchFileResponse> files = [];
+    private readonly HashSet<string> selectedIds = [];
+    private bool isVisible;
+    private bool isLoading;
+    private string searchTerm = "";
+    private string? errorMessage;
+    private int page = 1;
+
+    [Parameter] public EventCallback<List<SelectedFileRecipient>> OnSelected { get; set; }
+
+    private string RefreshIconClass => $"text-base leading-none {(isLoading ? "animate-spin" : "")}";
+    private string ConfirmText => selectedIds.Count > 0
+        ? $"Add {selectedIds.Count} File{(selectedIds.Count == 1 ? "" : "s")}"
+        : "Add Selected";
+
+    private List<BatchFileResponse> FilteredFiles => files.Where(x =>
+        string.IsNullOrWhiteSpace(searchTerm) ||
+        (x.Description ?? x.BatchFileID ?? "").Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    private int totalPages => Math.Max(1, (int)Math.Ceiling(FilteredFiles.Count / (double)PageSize));
+    private int safePage => Math.Min(page, totalPages);
+    private int pageStart => (safePage - 1) * PageSize;
+    private int StartRecord => FilteredFiles.Count == 0 ? 0 : pageStart + 1;
+    private int EndRecord => Math.Min(pageStart + PageSize, FilteredFiles.Count);
+    private List<BatchFileResponse> PagedFiles => FilteredFiles.Skip(pageStart).Take(PageSize).ToList();
+    private bool AllPageSelected => PagedFiles.Count > 0 && PagedFiles.All(x => !string.IsNullOrWhiteSpace(x.BatchFileID) && selectedIds.Contains(x.BatchFileID));
+
+    public async Task Show(IEnumerable<SelectedFileRecipient> selected)
+    {
+        selectedIds.Clear();
+        foreach (var file in selected) selectedIds.Add(file.FileId);
+
+        searchTerm = "";
+        page = 1;
+        isVisible = true;
+        await LoadFiles();
+    }
+
+    private async Task LoadFiles()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            var response = await apiClient.BatchFileListAsync();
+            files.Clear();
+            files.AddRange(response.Result.Where(IsSimpleMessageFile));
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            await alert.Error(ex.Message, "Bulk Files");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task Refresh(MouseEventArgs _) => await LoadFiles();
+
+    private static bool IsSimpleMessageFile(BatchFileResponse file)
+    {
+        var type = file.FileType ?? "";
+        var description = file.Description ?? "";
+
+        return type.Contains("txt", StringComparison.OrdinalIgnoreCase)
+            || type.Contains("text", StringComparison.OrdinalIgnoreCase)
+            || description.EndsWith(".txt", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void ToggleFile(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return;
+
+        if (!selectedIds.Add(id))
+            selectedIds.Remove(id);
+    }
+
+    private void ToggleAll(ChangeEventArgs _)
+    {
+        var ids = PagedFiles.Select(x => x.BatchFileID).Where(x => !string.IsNullOrWhiteSpace(x)).Cast<string>().ToList();
+
+        if (AllPageSelected)
+            foreach (var id in ids) selectedIds.Remove(id);
+        else
+            foreach (var id in ids) selectedIds.Add(id);
+    }
+
+    private void PreviousPage() => page = Math.Max(1, safePage - 1);
+    private void NextPage() => page = Math.Min(totalPages, safePage + 1);
+
+    private async Task Confirm(MouseEventArgs _)
+    {
+        var selectedFiles = files
+            .Where(x => !string.IsNullOrWhiteSpace(x.BatchFileID) && selectedIds.Contains(x.BatchFileID))
+            .Select(x => new SelectedFileRecipient(
+                x.BatchFileID,
+                string.IsNullOrWhiteSpace(x.Description) ? x.BatchFileID : x.Description,
+                x.TotalNumbers))
+            .ToList();
+
+        isVisible = false;
+        await OnSelected.InvokeAsync(selectedFiles);
+    }
+
+    private Task Close(MouseEventArgs _) { isVisible = false; return Task.CompletedTask; }
+}
