@@ -136,7 +136,7 @@
             var file = new FileParameter(stream, selectedFile.Name, selectedFile.ContentType);
             await apiClient.BatchFileCreateAsync(countryCode, file);
 
-            await alert.Success("File uploaded successfully.", "Success");
+            await alert.Success("File uploaded successfully.");
             isVisible = false;
             await OnCompleted.InvokeAsync();
         }

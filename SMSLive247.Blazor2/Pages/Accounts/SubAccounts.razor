@@ -72,13 +72,13 @@
     </FooterLeft>
 </PageBody>
 
-<SubAccountModal @ref="subAccountModal" OnCompleted="ReloadData" />
+<EditModal @ref="subAccountModal" OnCompleted="ReloadData" />
 <TransferModal @ref="transferModal" ParentId="self" OnCompleted="ReloadData" />
 
 @code {
     private string? searchQuery;
     private ApiDataSource<AccountResponse> ds = new();
-    private SubAccountModal subAccountModal = new();
+    private EditModal subAccountModal = new();
     private TransferModal transferModal = new();
 
     private string SubAccountUrl(string? id) =>

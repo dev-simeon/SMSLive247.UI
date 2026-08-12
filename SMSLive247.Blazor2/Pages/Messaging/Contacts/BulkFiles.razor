@@ -1,4 +1,4 @@
-
+﻿
 
 @using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
 
@@ -15,12 +15,12 @@
             <Columns>
                 <Column Header="File / Description">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 shrink-0">
-                            <Icon Style="Icon.IconStyle.FileText" CssClass="w-5 h-5" />
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                            <Icon Style="Icon.IconStyle.FileText" CssClass="h-5 w-5" />
                         </div>
                         <div>
-                            <p class="font-medium text-slate-900 text-sm">@(string.IsNullOrEmpty(context.Description) ? "—" : context.Description)</p>
-                            <p class="text-xs text-slate-400 font-mono uppercase">@context.FileType</p>
+                            <p class="text-sm font-medium text-slate-900">@(string.IsNullOrEmpty(context.Description) ? "—" : context.Description)</p>
+                            <p class="font-mono text-xs text-slate-400 uppercase">@context.FileType</p>
                         </div>
                     </div>
                 </Column>
@@ -74,7 +74,7 @@
         }
         catch (Exception)
         {
-            await alert.Error("Failed to load bulk text files.", "Error");
+            await alert.Error("Failed to load bulk text files.");
         }
         finally
         {
@@ -122,7 +122,7 @@
         }
         catch (Exception)
         {
-            await alert.Error("Failed to download file.", "Error");
+            await alert.Error("Failed to download file.");
         }
     }
 
@@ -137,12 +137,12 @@
             try
             {
                 await apiClient.BatchFileDeleteAsync(fileId);
-                await alert.Success("File deleted successfully.", "Success");
+                await alert.Success("File deleted successfully.");
                 await FetchFiles();
             }
             catch (Exception)
             {
-                await alert.Error("Failed to delete file.", "Error");
+                await alert.Error("Failed to delete file.");
             }
         }
     }

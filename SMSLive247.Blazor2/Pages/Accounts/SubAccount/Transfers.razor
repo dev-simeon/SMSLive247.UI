@@ -1,61 +1,62 @@
-@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
+﻿@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
 
-<div class="bg-white shadow rounded-lg border border-slate-200">
-    <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
-        <SearchBox Placeholder="Search transfers..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
+<PageBody>
+    <HeaderLeft>
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
         </SearchBox>
-        <Button Text="Add/Remove Credit" Type="Button.Style.SECONDARY" OnClick="async () => await transferModal.Show(subAccount)" />
-    </div>
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Add/Remove Credit" OnClick="() => transferModal.Show(Account)" />
+    </HeaderRight>
 
-    <Table DataSource="ds">
-        <Columns>
-            <Column Header="Request Date" Width="180px">
-                <FormatDate DateTime="@context.DateCreated"></FormatDate>
-            </Column>
-            <Column Header="Sender">
-                <span class="font-medium text-slate-900">@context.SenderName</span>
-            </Column>
-            <Column Header="Recipient">
-                <span class="font-medium text-slate-900">@context.RecipientName</span>
-            </Column>
-            <Column Header="Credits">
-                <FormatNumber Number="@context.Credits"></FormatNumber>
-            </Column>
-            <Column Header="Status">
-                <Badge Style="Badge.BadgeStyle.Success" Value="TRANSFERRED" />
-            </Column>
-        </Columns>
-    </Table>
-    <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-lg">
+    <ChildContent>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Request Date" Width="180px">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Sender">
+                    <span class="font-medium text-slate-900">@context.SenderName</span>
+                </Column>
+                <Column Header="Recipient">
+                    <span class="font-medium text-slate-900">@context.RecipientName</span>
+                </Column>
+                <Column Header="Credits">
+                    <FormatNumber Number="@context.Credits"></FormatNumber>
+                </Column>
+                <Column Header="Status">
+                    <Badge Style="Badge.BadgeStyle.Success" Value="TRANSFERRED" />
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+    <FooterLeft>
         <Paging PageNumber="ds.PageState.PageNumber"
                 PageSize="ds.PageState.PageSize"
                 TotalRecords="ds.PageState.TotalCount"
                 PageNumberChanged="OnPageChange"
                 PageSizeChanged="OnPageSizeChange">
         </Paging>
-    </div>
-</div>
+    </FooterLeft>
+</PageBody>
 
 <TransferModal @ref="transferModal" ParentId="self" OnCompleted="ReloadData"></TransferModal>
 
 @code {
-    [Parameter] public string SubAccountId { get; set; } = string.Empty;
-    
+    [CascadingParameter] public AccountResponse? Account { get; set; }
+
     private string? searchQuery;
     private TransferModal transferModal = new();
-    private AccountResponse? subAccount;
 
     private ApiDataSource<TransferResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
-        subAccount = await GetSubAccount(SubAccountId);
-
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            if (subAccount != null)
+            if (Account != null)
             {
-                return await subClient.Impersonate(subAccount).TransferListAsync(
+                return await subClient.Impersonate(Account).TransferListAsync(
                     p.PageNumber, p.PageSize, null, searchQuery);
             }
             return ds.EmptyResponse;
@@ -63,22 +64,6 @@
         
         ds.SetPage(new PageState(10, 1));
         await ds.LoadData(alert);
-    }
-
-    private async Task<AccountResponse?> GetSubAccount(string subAccountId)
-    {
-        try
-        {
-            var response = await apiClient.AccountGetAsync(subAccountId);
-
-            if (response.StatusCode == 200)
-                return response.Result;
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-        return null;
     }
     
     private async Task ReloadData()

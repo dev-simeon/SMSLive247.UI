@@ -1,55 +1,59 @@
-﻿<div class="rounded-lg border border-slate-200 bg-white shadow">
-    <div class="flex items-center justify-between rounded-t-lg border-b border-slate-200 bg-slate-50 px-6 py-4">
-        <SearchBox Placeholder="Search messages..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
+﻿<PageBody>
+    <HeaderLeft>
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
             <DateRange DateRangeChanged="OnDateRangeChanged" />
         </SearchBox>
+    </HeaderLeft>
+    <HeaderRight>
         <Button Text="Export CSV" Icon="Icon.IconStyle.Download" />
-    </div>
+    </HeaderRight>
 
-    <Table DataSource="ds">
-        <Columns>
-            <Column Header="Date / Time" Width="180px">
-                <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
-            </Column>
-            <Column Header="Status">
-                <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@context.Status" />
-            </Column>
-            <Column Header="Sender" Width="100px">
-                <span class="">@context.SenderID?.ToUpper()</span>
-            </Column>
-            <Column Header="Message">
-                <p class="max-w-md truncate" title="@context.MessageText">@context.MessageText</p>
-            </Column>
-            <Column Header="Delivery">
-                <div class="flex flex-col gap-0.5 text-sm">
-                    <div class="">
-                        @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
+    <ChildContent>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date / Time" Width="180px">
+                    <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
+                </Column>
+                <Column Header="Status">
+                    <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@context.Status" />
+                </Column>
+                <Column Header="Sender" Width="100px">
+                    <span class="">@context.SenderID?.ToUpper()</span>
+                </Column>
+                <Column Header="Message">
+                    <p class="max-w-md truncate" title="@context.MessageText">@context.MessageText</p>
+                </Column>
+                <Column Header="Delivery">
+                    <div class="flex flex-col gap-0.5 text-sm">
+                        <div class="">
+                            @context.TotalProcessed / @(context.TotalProcessed + context.TotalFailed)
+                        </div>
+                        <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-500" title="Credits Charged">
+                            <Icon Style="Icon.IconStyle.Coins" CssClass="h-3.5 w-3.5 text-blue-500" />
+                            <span>@context.CreditsCharged.ToString("#,##0.00")</span>
+                        </div>
                     </div>
-                    <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-500" title="Credits Charged">
-                        <Icon Style="Icon.IconStyle.Coins" CssClass="h-3.5 w-3.5 text-blue-500" />
-                        <span>@context.CreditsCharged.ToString("#,##0.00")</span>
-                    </div>
-                </div>
-            </Column>
-            <Column>
-                <Actions ViewLink="@($"/messaging/{context.BatchID}")"
-                         OnDelete="e => DeleteBatch(context.BatchID)">
-                </Actions>
-            </Column>
-        </Columns>
-    </Table>
-    <div class="rounded-b-lg border-t border-slate-200 bg-slate-50 px-6 py-4">
+                </Column>
+                <Column>
+                    <Actions ViewLink="@($"/messaging/{context.BatchID}")"
+                             OnDelete="e => DeleteBatch(context.BatchID)">
+                    </Actions>
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+    <FooterLeft>
         <Paging PageNumber="ds.PageState.PageNumber"
                 PageSize="ds.PageState.PageSize"
                 TotalRecords="ds.PageState.TotalCount"
                 PageNumberChanged="OnPageChange"
                 PageSizeChanged="OnPageSizeChange">
         </Paging>
-    </div>
-</div>
+    </FooterLeft>
+</PageBody>
 
 @code {
-    [Parameter] public string SubAccountId { get; set; } = string.Empty;
+    [CascadingParameter] public AccountResponse? Account { get; set; }
 
     private string? searchQuery;
     private DateTime? filterFrom;
@@ -65,35 +69,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var account = await GetSubAccount(SubAccountId);
-
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            if (account != null && account.AccountID != null)
+            if (Account != null)
             {
-                return await subClient.Impersonate(account).SmsBatchListAsync(
+                return await subClient.Impersonate(Account).SmsBatchListAsync(
                     p.PageNumber, p.PageSize, null, filterFrom, filterTo, searchQuery);
             }
             return ds.EmptyResponse;
         });
         ds.SetPage(new PageState(100, 1));
         await ds.LoadData(alert);
-    }
-
-    private async Task<AccountResponse?> GetSubAccount(string subAccountId)
-    {
-        try
-        {
-            var response = await apiClient.AccountGetAsync(subAccountId);
-
-            if (response.StatusCode == 200)
-                return response.Result;
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-        return null;
     }
 
     private async Task ReloadData()

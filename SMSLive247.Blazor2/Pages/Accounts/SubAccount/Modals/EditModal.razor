@@ -1,0 +1,201 @@
+﻿@namespace SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
+
+@if (accountId != null)
+{
+    <Modal Title="Edit Sub-Account" @bind-IsVisible="isVisible">
+        <Body>
+            <EditForm id="updateForm" Model="@updateModel" OnValidSubmit="HandleSubmit" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Account Name</label>
+                        <div class="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
+                            @accountName
+                        </div>
+                    </div>
+
+                    <FormRow Cols="2">
+                        <FormInput Label="First Name"
+                                   PlaceHolder="First Name"
+                                   @bind-Value="updateModel.FirstName"
+                                   Required="true" />
+
+                        <FormInput Label="Last Name"
+                                   PlaceHolder="Last Name"
+                                   @bind-Value="updateModel.LastName"
+                                   Required="true" />
+                    </FormRow>
+
+                    <FormRow Cols="2">
+                        <FormInput Label="Email Address"
+                                   Type="email"
+                                   PlaceHolder="email@example.com"
+                                   @bind-Value="updateModel.Email"
+                                   Required="true" />
+
+                        <FormInput Label="Phone Number"
+                                   Type="tel"
+                                   PlaceHolder="e.g. 08030000000"
+                                   @bind-Value="updateModel.Phone"
+                                   Required="true" />
+                    </FormRow>
+
+                    <FormRow Cols="2">
+                        <FormSelect Label="Country Code"
+                                    Variant="FormSelect<int?>.SelectType.Country"
+                                    @bind-Value="updateModel.CountryCode" />
+
+                        <FormSelect Label="Time Zone (GMT Offset)"
+                                    Variant="FormSelect<int?>.SelectType.TimeZone"
+                                    @bind-Value="updateModel.TimeZone" />
+                    </FormRow>
+            </EditForm>
+        </Body>
+        <Footer>
+            <Button IsSubmit="true" form="updateForm"
+                    Text="Update Sub-Account"
+                    Icon="@Icon.IconStyle.Save"
+                    IsBusy="@isSubmitting" />
+
+            <Button Text="Cancel"
+                    Style="Button.ButtonStyle.Secondary"
+                    IsDisabled="@isSubmitting"
+                    OnClick="() => isVisible = false" />
+        </Footer>
+    </Modal>
+}
+else
+{
+    <Modal Title="Add Sub-Account" @bind-IsVisible="isVisible">
+        <Body>
+            <EditForm id="createForm" Model="@createModel" OnValidSubmit="HandleSubmit" class="space-y-6">
+                    <FormInput Label="Account Name"
+                               PlaceHolder="e.g. Marketing Dept"
+                               @bind-Value="createModel.AccountName"
+                               Required="true" />
+
+                    <FormRow Cols="2">
+                        <FormInput Label="First Name"
+                                   PlaceHolder="First Name"
+                                   @bind-Value="createModel.FirstName"
+                                   Required="true" />
+                        <FormInput Label="Last Name"
+                                   PlaceHolder="Last Name"
+                                   @bind-Value="createModel.LastName"
+                                   Required="true" />
+                    </FormRow>
+
+                    <FormRow Cols="2">
+                        <FormInput Label="Email Address"
+                                   Type="email"
+                                   PlaceHolder="email@example.com"
+                                   @bind-Value="createModel.Email"
+                                   Required="true" />
+                        <FormInput Label="Phone Number"
+                                   Type="tel"
+                                   PlaceHolder="e.g. 08030000000"
+                                   @bind-Value="createModel.Phone"
+                                   Required="true" />
+                    </FormRow>
+
+                    <FormRow Cols="2">
+                        <FormSelect Label="Country Code"
+                                    Variant="FormSelect<int>.SelectType.Country"
+                                    @bind-Value="createModel.CountryCode" />
+                        <FormSelect Label="Time Zone (GMT Offset)"
+                                    Variant="FormSelect<int>.SelectType.TimeZone"
+                                    @bind-Value="createModel.TimeZone" />
+                    </FormRow>
+
+                    <FormInput Label="Password"
+                               Type="password"
+                               PlaceHolder="••••••••"
+                               @bind-Value="createModel.Password"
+                               Required="true"
+                               HelpText="Must be at least 8 characters with numbers and symbols." />
+            </EditForm>
+        </Body>
+        <Footer>
+            <Button IsSubmit="true" form="createForm"
+                    Text="Create Sub-Account"
+                    Icon="@Icon.IconStyle.PlusCircle"
+                    IsBusy="@isSubmitting" />
+
+            <Button Text="Cancel"
+                    Style="Button.ButtonStyle.Secondary"
+                    IsDisabled="@isSubmitting"
+                    OnClick="() => isVisible = false" />
+        </Footer>
+    </Modal>
+}
+
+
+@code {
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private bool isVisible = false;
+    private bool isSubmitting = false;
+
+    private AccountCreateRequest createModel = new();
+    private AccountUpdateRequest updateModel = new();
+
+    private string? accountId;
+    private string? accountName;
+
+    public void Show()
+    {
+        accountId = null;
+        createModel = new();
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    // Open for Edit
+    public void Show(AccountResponse account)
+    {
+        accountId = account.AccountID;
+        accountName = account.AccountName;
+
+        updateModel = new AccountUpdateRequest
+        {
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            Email = account.Email,
+            Phone = account.Phone,
+            CountryCode = account.CountryCode,
+            TimeZone = account.TimeZone, 
+        };
+
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            isSubmitting = true;
+
+            if (accountId != null)
+            {
+                await apiClient.AccountUpdateAsync(accountId, updateModel);
+                await alert.Success("Sub-account updated successfully.");
+            }
+            else
+            {
+                await apiClient.AccountCreateAsync(createModel);
+                await alert.Success("Sub-account created successfully.");
+            }
+
+            await OnCompleted.InvokeAsync();
+            isVisible = false;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message);
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+}

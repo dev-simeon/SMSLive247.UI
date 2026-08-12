@@ -1,43 +1,47 @@
-<Modal Title="Transfer SMS Credits" @bind-IsVisible="isVisible">
+﻿<Modal Title="Transfer SMS Credits" @bind-IsVisible="isVisible">
 
     <Body>
-        <EditForm id="Transfer" Model="transferRequest" OnValidSubmit="BeginTransfer" class="space-y-6">
+        <EditForm id="Transfer" Model="request" OnValidSubmit="BeginTransfer" class="space-y-6">
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-2">Transfer Direction</label>
-                <InputRadioGroup @bind-Value="TransferDirection" class="flex flex-col gap-2">
+                <label class="mb-2 block text-sm font-medium text-slate-700">Transfer Direction</label>
+                <InputRadioGroup @bind-Value="parentToChild" class="flex flex-col gap-2">
                     <div class="flex items-center gap-2">
-                        <InputRadio id="toParent" Value="@("TO_PARENT")" />
-                        <label for="toParent" class="text-sm text-slate-700">
-                            @subAccount.AccountName → @parentAccount.AccountName
+                        <InputRadio id="toChild" Value="@true" />
+                        <label for="toChild" class="text-sm text-slate-700">
+                            @ParentAccount?.AccountName → @subAccount.AccountName
                         </label>
                     </div>
                     <div class="flex items-center gap-2">
-                        <InputRadio id="fromParent" Value="@("FROM_PARENT")" />
-                        <label for="fromParent" class="text-sm text-slate-700">
-                            @parentAccount.AccountName → @subAccount.AccountName
+                        <InputRadio id="toParent" Value="@false" />
+                        <label for="toParent" class="text-sm text-slate-700">
+                            @subAccount.AccountName → @ParentAccount?.AccountName
                         </label>
                     </div>
                 </InputRadioGroup>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">Credits</label>
+                <label class="mb-1 block text-sm font-medium text-slate-700">Credits</label>
                 <InputNumber
-                class="appearance-none block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                @bind-Value="transferRequest.Credits" min="50" @oninput="OnCreditsInput" required placeholder="Enter amount to transfer" />
+                class="block w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:ring-brand-500 focus:ring-1 focus:outline-none"
+                @bind-Value="request.Credits" 
+                min="50"
+                @oninput="OnCreditChanged" 
+                required 
+                placeholder="Enter amount to transfer" />
             </div>
 
             <FormRow Cols="2">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700">Current Balance</label>
-                    <div class="mt-1 appearance-none block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-700">
-                        @CurrentBalance.ToString("#,##0.##")
+                    <label class="block text-sm font-medium text-slate-700">Sender Current Balance</label>
+                    <div class="mt-1 block w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
+                        @senderOldBalance.ToString("#,##0.##")
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700">New Balance</label>
-                    <div class="mt-1 appearance-none block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 @(NewBalance < 0 ? "text-red-600" : "text-slate-700")">
-                        @NewBalance.ToString("#,##0.##")
+                    <label class="block text-sm font-medium text-slate-700">Sender New Balance</label>
+                    <div class="mt-1 block w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm @(senderNewBalance < 0 ? "text-red-600" : "text-slate-700")">
+                        @senderNewBalance.ToString("#,##0.##")
                     </div>
                 </div>
             </FormRow>
@@ -49,58 +53,21 @@
 </Modal>
 
 @code {
-    [Parameter] public string ParentId { get; set; } = "self";
+    [CascadingParameter] public AccountResponse? ParentAccount { get; set; }
     [Parameter] public EventCallback OnCompleted { get; set; }
 
     private bool isVisible = false;
-    private AccountResponse parentAccount = new();
     private AccountResponse subAccount = new();
-    private TransferRequest transferRequest = new TransferRequest();
-    private string transferDirection = "TO_PARENT";
+    private TransferRequest request = new();
 
-    private string TransferDirection
+    private bool parentToChild = true;
+    private double senderOldBalance => parentToChild ? ParentAccount?.Credits ?? 0 : subAccount.Credits;
+    private double senderNewBalance => senderOldBalance - request.Credits;
+
+    public void Show(AccountResponse child)
     {
-        get => transferDirection;
-        set
-        {
-            transferDirection = value;
-            StateHasChanged();
-        }
-    }
-
-    private double CurrentBalance => transferDirection == "TO_PARENT"
-        ? subAccount.Credits
-        : parentAccount.Credits;
-
-    private double NewBalance => CurrentBalance - transferRequest.Credits;
-
-    private async Task LoadParentAccount()
-    {
-        try
-        {
-            var accountId = string.IsNullOrWhiteSpace(ParentId) ? "self" : ParentId;
-            var response = await apiClient.AccountGetAsync(accountId);
-            parentAccount = response.Result ?? new AccountResponse();
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-    }
-
-    public async Task Show(AccountResponse? account)
-    {
-        if (account == null)
-        {
-            await alert.Error("Unable to load the selected sub-account.", "Error");
-            return;
-        }
-
-        subAccount = account;
-        transferRequest = new TransferRequest();
-        transferDirection = "TO_PARENT";
-
-        await LoadParentAccount();
+        subAccount = child;
+        request = new TransferRequest();
 
         isVisible = true;
         StateHasChanged();
@@ -110,24 +77,22 @@
     {
         try
         {
-            if (transferRequest.Credits < 50)
+            if (request.Credits < 50)
                 throw new Exception("Minimum SMS credit quantity to transfer is 50.");
 
-            if (transferRequest.Credits > CurrentBalance)
+            if (request.Credits > senderOldBalance)
                 throw new Exception("Insufficient balance for this transfer.");
 
-            if (transferDirection == "TO_PARENT")
-                transferRequest.Recipient = parentAccount.AccountID;
-            else
-                transferRequest.Recipient = subAccount.AccountID;
+            if (!parentToChild)
+                request.Credits = -request.Credits;
 
-            await apiClient.TransferCreditAsync(transferRequest);
-            await alert.Success("Credits transferred successfully.", "Success");
+            await apiClient.TransferCreditAsync(request);
+            await alert.Success("Credits transferred successfully.");
             await OnCompleted.InvokeAsync();
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
         finally
         {
@@ -136,11 +101,11 @@
         }
     }
 
-    private void OnCreditsInput(ChangeEventArgs e)
+    private void OnCreditChanged(ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out int credits))
         {
-            transferRequest.Credits = credits;
+            request.Credits = credits;
         }
     }
 }

@@ -1,90 +1,89 @@
-@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
+﻿@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
 
-<div class="bg-white shadow rounded-lg border border-slate-200">
-    <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
-        <SearchBox Placeholder="Search sub users..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
+<PageBody>
+    <HeaderLeft>
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
         </SearchBox>
-        <Button Text="Add Sub User" Icon="Icon.IconStyle.PlusCircle" OnClick="() => subUserModal.Show()" />
-    </div>
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Text="Add Sub User" Icon="Icon.IconStyle.PlusCircle" OnClick="() => subUserModal.Show(null)" />
+    </HeaderRight>
 
-    <Table DataSource="ds">
-        <Columns>
-            <Column Header="Date Created" Width="180px">
-                <FormatDate DateTime="@context.DateCreated"></FormatDate>
-            </Column>
-            <Column Header="Username">
-                <span class="font-medium text-slate-900">@context.AccountName</span>
-            </Column>
-            <Column Header="First Name">
-                @context.FirstName
-            </Column>
-            <Column Header="Last Name">
-                @context.LastName
-            </Column>
-            <Column Header="Balance">
-                <div class="flex items-center justify-between">
-                    <span class="font-medium text-slate-900">
-                        <FormatNumber Number="@context.Credits"></FormatNumber>
-                    </span>
-                    <Button Type="Button.Style.SECONDARY" OnClick="async () => await transferModal.Show(context)" CssClass="text-xs px-2 py-1">
-                        Add/Remove Credit
-                    </Button>
-                </div>
-            </Column>
-            <Column Header="Status">
-                @if (context.Active)
-                {
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-                        ACTIVE
-                    </span>
-                }
-                else
-                {
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
-                        INACTIVE
-                    </span>
-                }
-            </Column>
-            <Column>
-                <Actions 
-                    OnEdit="() => subUserModal.Show(context)"
-                    OnDelete="() => DeleteSubUser(context)">
-                </Actions>
-            </Column>
-        </Columns>
-    </Table>
-    <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-lg">
+    <ChildContent>
+        <Table DataSource="ds">
+            <Columns>
+                <Column Header="Date Created" Width="180px">
+                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                </Column>
+                <Column Header="Username">
+                    <span class="font-medium text-slate-900">@context.AccountName</span>
+                </Column>
+                <Column Header="First Name">
+                    @context.FirstName
+                </Column>
+                <Column Header="Last Name">
+                    @context.LastName
+                </Column>
+                <Column Header="Balance">
+                    <div class="flex items-center justify-between">
+                        <span class="font-medium text-slate-900">
+                            <FormatNumber Number="@context.Credits"></FormatNumber>
+                        </span>
+                        <Button Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(context)" CssClass="text-xs px-2 py-1">
+                            Add/Remove Credit
+                        </Button>
+                    </div>
+                </Column>
+                <Column Header="Status">
+                    @if (context.Active)
+                    {
+                        <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+                            ACTIVE
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                            INACTIVE
+                        </span>
+                    }
+                </Column>
+                <Column>
+                    <Actions OnEdit="() => subUserModal.Show(context)"
+                             OnDelete="() => DeleteSubUser(context)">
+                    </Actions>
+                </Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+    <FooterLeft>
         <Paging PageNumber="ds.PageState.PageNumber"
                 PageSize="ds.PageState.PageSize"
                 TotalRecords="ds.PageState.TotalCount"
                 PageNumberChanged="OnPageChange"
                 PageSizeChanged="OnPageSizeChange">
         </Paging>
-    </div>
-</div>
+    </FooterLeft>
+</PageBody>
 
-<SubUserModal @ref="subUserModal" SubAccountId="@SubAccountId" OnCompleted="ReloadData"></SubUserModal>
-<TransferModal @ref="transferModal" ParentId="@SubAccountId" OnCompleted="ReloadData"></TransferModal>
+<SubUserModal @ref="subUserModal" OnCompleted="ReloadData"></SubUserModal>
+<TransferModal @ref="transferModal" OnCompleted="ReloadData"></TransferModal>
 
 @code {
-    [Parameter] public string SubAccountId { get; set; } = string.Empty;
-    
+    [CascadingParameter] public AccountResponse? Account { get; set; }
+
     private string? searchQuery;
     private SubUserModal subUserModal = new();
     private TransferModal transferModal = new();
-
     private ApiDataSource<AccountResponse> ds = new();
-    private AccountResponse? currentAccount;
 
     protected override async Task OnInitializedAsync()
     {
-        currentAccount = await GetSubAccount(SubAccountId);
-
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            if (currentAccount != null)
+            if (Account != null)
             {
-                return await subClient.Impersonate(currentAccount).AccountsListAsync(
+                return await subClient.Impersonate(Account).AccountsListAsync(
                     p.PageNumber, p.PageSize, null, searchQuery);
             }
             return ds.EmptyResponse;
@@ -92,22 +91,6 @@
         
         ds.SetPage(new PageState(10, 1));
         await ds.LoadData(alert);
-    }
-
-    private async Task<AccountResponse?> GetSubAccount(string subAccountId)
-    {
-        try
-        {
-            var response = await apiClient.AccountGetAsync(subAccountId);
-
-            if (response.StatusCode == 200)
-                return response.Result;
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-        return null;
     }
     
     private async Task ReloadData()
@@ -133,17 +116,17 @@
         var question = $"Are you sure you want to delete the sub user '{account.AccountName}'?";
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
 
-        if (confirmed && currentAccount != null)
+        if (confirmed && Account != null)
         {
             try
             {
-                await subClient.Impersonate(currentAccount).AccountDeleteAsync(account.AccountID);
-                await alert.Success("Sub User deleted.", "Success");
+                await subClient.Impersonate(Account).AccountDeleteAsync(account.AccountID);
+                await alert.Success("Sub User deleted.");
                 await ReloadData();
             }
             catch (Exception ex)
             {
-                await alert.Error(ex.Message, "Error");
+                await alert.Error(ex.Message);
             }
         }
     }

@@ -1,38 +1,78 @@
 @attribute [Route(Const.Routes.Account.SubAccountDetails)]
 @layout MainLayout
 
+@inject NavigationManager nav
+
 <PageTitle>Sub-Account Details</PageTitle>
 
-<PageBody>
-    <HeaderLeft>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Sub-Account Details</h1>
-    </HeaderLeft>
-    <HeaderRight>
-        <Button Text="Back" Icon="Icon.IconStyle.ChevronRight" OnClick='() => nav.NavigateTo(Const.Routes.Account.SubAccounts)' />
-    </HeaderRight>
-    
-    <ChildContent>
+@if (account is not null)
+{
+    <PageHeader Title="@account.AccountName">
+        <div class="mt-1 text-sm text-slate-500">
+            <strong>Sub-Account Details </strong>
+            <small>@account.AccountID</small>
+        </div>
+    </PageHeader>
+
+    <CascadingValue Value="@account">
         <Tabs>
             <TabPage Title="Details" Icon="Icon.IconStyle.Info">
-                <Details SubAccountId="@subAccountId"></Details>
+                <Details></Details>
             </TabPage>
             <TabPage Title="Sent Messages" Icon="Icon.IconStyle.Mail">
-                <Messages SubAccountId="@subAccountId"></Messages>
+                <Messages></Messages>
             </TabPage>
             <TabPage Title="Sub-Users" Icon="Icon.IconStyle.Users">
-                <SubUsers SubAccountId="@subAccountId"></SubUsers>
+                <SubUsers></SubUsers>
             </TabPage>
             <TabPage Title="Transfers" Icon="Icon.IconStyle.ArrowRightLeft">
-                <Transfers SubAccountId="@subAccountId"></Transfers>
+                <Transfers></Transfers>
             </TabPage>
         </Tabs>
-    </ChildContent>
-</PageBody>
+    </CascadingValue>
+}
+else if (errorMessage is null)
+{
+    <PageHeader Title="Sub-Account Details"
+                SubTitle="Wait while the account details is fetched...">
+    </PageHeader>
+
+    <p>Loading...</p>
+}
+else
+{
+
+    <PageHeader Title="Sub-Account Details"
+                SubTitle="The requested account was not found">
+    </PageHeader>
+
+    <p class="text-red-500">@errorMessage</p>
+    <br />
+    <a href="@Const.Routes.Account.SubAccounts"> &lt; Go back</a>
+}
 
 @code {
     [Parameter] public string? id { get; set; }
 
-    private string subAccountId => id ?? string.Empty;
-    
-    [Inject] private NavigationManager nav { get; set; } = default!;
+    private AccountResponse? account;
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                nav.NavigateTo(Const.Routes.Account.SubAccounts);
+                return;
+            }
+
+            var response = await apiClient.AccountGetAsync(id);
+            account = response.Result;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+    }
 }

@@ -1,6 +1,6 @@
-<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
+﻿<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm id="SubUserForm" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
+        <EditForm id="f3" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
             @if (editMode == EditModeEnum.CREATE)
             {
                 <FormInput Label="UserName" @bind-Value="model.AccountName" Required="true" />
@@ -19,8 +19,8 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700">API Key</label>
-                    <div class="mt-1 w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-700">
-                        @(subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")
+                    <div class="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
+                        @(Account?.Key != null ? BitConverter.ToString(Account.Key) : "N/A")
                     </div>
                 </div>
             }
@@ -36,11 +36,11 @@
     <Footer>
         @if (editMode == EditModeEnum.CREATE)
         {
-            <Button IsSubmit="true" Text="Create Sub User" form="SubUserForm" Icon="Icon.IconStyle.PlusCircle" />
+            <Button IsSubmit="true" Text="Create Sub User" form="f3" Icon="Icon.IconStyle.PlusCircle" />
         }
         else if (editMode == EditModeEnum.EDIT)
         {
-            <Button IsSubmit="true" Text="Update Sub User" form="SubUserForm" Icon="Icon.IconStyle.Save" />
+            <Button IsSubmit="true" Text="Update Sub User" form="f3" Icon="Icon.IconStyle.Save" />
         }
         else
         {
@@ -51,32 +51,18 @@
 
 @code {
     [Parameter] public EventCallback OnCompleted { get; set; }
-    [Parameter] public string SubAccountId { get; set; } = string.Empty;
+    [CascadingParameter] public AccountResponse? Account { get; set; }
 
-    public enum EditModeEnum { CREATE, EDIT, VIEW }
-    private EditModeEnum editMode = EditModeEnum.CREATE;
+    private enum EditModeEnum { CREATE, EDIT, VIEW }
 
     private bool isVisible = false;
     private string modalTitle = "Sub User";
     private AccountResponse model = new();
-    private AccountResponse subAccount = new();
+    private EditModeEnum editMode = EditModeEnum.CREATE;
 
-    protected override async Task OnInitializedAsync()
+    public void Show(AccountResponse? subUser, bool readOnly = false)
     {
-        try
-        {
-            var response = await apiClient.AccountGetAsync(SubAccountId);
-            subAccount = response.Result;
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Error");
-        }
-    }
-
-    public void Show(AccountResponse? item = null)
-    {
-        if (item == null)
+        if (subUser == null)
         {
             editMode = EditModeEnum.CREATE;
             modalTitle = "Add Sub User";
@@ -86,15 +72,10 @@
         {
             editMode = EditModeEnum.EDIT;
             modalTitle = "Edit Sub User";
-            model = new()
-            {
-                AccountID = item.AccountID,
-                AccountName = item.AccountName,
-                FirstName = item.FirstName,
-                LastName = item.LastName,
-                Phone = item.Phone,
-                Email = item.Email
-            };
+            model = subUser;
+
+            if (readOnly)
+                editMode = EditModeEnum.VIEW;
         }
         isVisible = true;
         StateHasChanged();
@@ -116,8 +97,8 @@
                     Password = GeneratePassword(12)
                 };
 
-                await subClient.Impersonate(subAccount).AccountCreateAsync(request);
-                await alert.Success("Sub User created.", "Success");
+                await subClient.Impersonate(Account).AccountCreateAsync(request);
+                await alert.Success("Sub User created.");
             }
             else if (editMode == EditModeEnum.EDIT)
             {
@@ -129,8 +110,8 @@
                     Email = model.Email,
                 };
 
-                await subClient.Impersonate(subAccount).AccountUpdateAsync(model.AccountID, updateRequest);
-                await alert.Success("Sub User updated.", "Success");
+                await subClient.Impersonate(Account).AccountUpdateAsync(model.AccountID, updateRequest);
+                await alert.Success("Sub User updated.");
             }
 
             isVisible = false;
@@ -138,7 +119,7 @@
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
     }
 

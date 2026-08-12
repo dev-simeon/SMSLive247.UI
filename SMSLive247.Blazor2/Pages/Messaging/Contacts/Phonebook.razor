@@ -1,4 +1,4 @@
-@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
+﻿@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
 
 <PageBody>
     <HeaderLeft>
@@ -6,7 +6,7 @@
                    @bind-SearchTerm="searchQuery">
             
         </SearchBox>
-        <div class="bg-slate-100 p-1 rounded-lg flex items-center h-10 shrink-0">
+        <div class="flex h-10 shrink-0 items-center rounded-lg bg-slate-100 p-1">
             <button type="button"
                     @onclick='() => SetViewMode("contacts")'
                     class="@(viewMode == "contacts" ? "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer bg-white text-brand-600 shadow-sm" : "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer text-slate-500 hover:text-slate-900")">
@@ -31,16 +31,16 @@
                 <Columns>
                     <Column Header="Name">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold bg-blue-100 text-blue-600 shrink-0">
+                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600">
                                 @GetInitials(context.ContactName)
                             </div>
                             <div>
-                                <p class="font-medium text-slate-900 text-sm">@(string.IsNullOrEmpty(context.ContactName) ? "—" : context.ContactName)</p>
+                                <p class="text-sm font-medium text-slate-900">@(string.IsNullOrEmpty(context.ContactName) ? "—" : context.ContactName)</p>
                             </div>
                         </div>
                     </Column>
                     <Column Header="Phone Number">
-                        <span class="text-sm text-slate-600 font-mono">@(string.IsNullOrEmpty(context.PhoneNumber) ? "—" : context.PhoneNumber)</span>
+                        <span class="font-mono text-sm text-slate-600">@(string.IsNullOrEmpty(context.PhoneNumber) ? "—" : context.PhoneNumber)</span>
                     </Column>
                     <Column Header="Groups">
                         <div class="flex flex-wrap gap-1">
@@ -48,7 +48,7 @@
                             {
                                 @foreach (var g in context.Groups)
                                 {
-                                    <span class="px-2 py-0.5 bg-brand-50 text-brand-700 border border-brand-100 rounded text-[10px] font-bold uppercase">
+                                    <span class="bg-brand-50 text-brand-700 border-brand-100 rounded border px-2 py-0.5 font-bold text-[10px] uppercase">
                                         @g
                                     </span>
                                 }
@@ -76,10 +76,10 @@
                 <Columns>
                     <Column Header="Group Name">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-indigo-100 text-indigo-600 shrink-0">
-                                <Icon Style="Icon.IconStyle.Users" CssClass="w-5 h-5" />
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+                                <Icon Style="Icon.IconStyle.Users" CssClass="h-5 w-5" />
                             </div>
-                            <span class="font-semibold text-slate-900 text-sm">@(string.IsNullOrEmpty(context.GroupName) ? "—" : context.GroupName)</span>
+                            <span class="text-sm font-semibold text-slate-900">@(string.IsNullOrEmpty(context.GroupName) ? "—" : context.GroupName)</span>
                         </div>
                     </Column>
                     <Column Header="Members">
@@ -154,7 +154,7 @@
         }
         catch (Exception)
         {
-            await alert.Error("Failed to load contacts data.", "Error");
+            await alert.Error("Failed to load contacts data.");
         }
     }
 
@@ -254,12 +254,12 @@
             try
             {
                 await apiClient.ContactDeleteAsync(phoneNo);
-                await alert.Success("Contact deleted successfully.", "Success");
+                await alert.Success("Contact deleted successfully.");
                 await FetchData();
             }
             catch (Exception)
             {
-                await alert.Error("Failed to delete contact.", "Error");
+                await alert.Error("Failed to delete contact.");
             }
         }
     }
@@ -285,12 +285,12 @@
             try
             {
                 await apiClient.GroupDeleteAsync(groupId);
-                await alert.Success("Group deleted successfully.", "Success");
+                await alert.Success("Group deleted successfully.");
                 await FetchData();
             }
             catch (Exception)
             {
-                await alert.Error("Failed to delete group.", "Error");
+                await alert.Error("Failed to delete group.");
             }
         }
     }

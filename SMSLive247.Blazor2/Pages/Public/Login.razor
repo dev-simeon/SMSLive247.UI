@@ -151,16 +151,16 @@
 
             if (response.StatusCode == 401) //unauthorized
             {
-                await alert.Error("Access denied!", "Error");
+                await alert.Error("Access denied!");
             }
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
-            await alert.Error(ex.Message, "Api Error");
+            await alert.Error(ex.Message);
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
         finally
         {

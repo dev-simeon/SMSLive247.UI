@@ -72,7 +72,7 @@
   <ItemGroup>
     <Content Include="Pages\Credits\Modals\TransferModal.razor" />
     <Content Include="Pages\Credits\Modals\PurchaseModal.razor" />
-    <Content Include="Pages\Accounts\SubAccount\Modals\SubAccountModal.razor" />
+    <Content Include="Pages\Accounts\SubAccount\Modals\EditModal.razor" />
     <Content Include="Pages\Messaging\SenderIDs\Modals\RequestModal.razor" />
     <ProjectReference Include="..\SMSLive247.ApiClient\SMSLive247.ApiClient.csproj" />
   </ItemGroup>

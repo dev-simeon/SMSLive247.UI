@@ -1,31 +1,31 @@
-@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals;
+﻿@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals;
 
-@if (subAccount != null)
+@if (Account != null)
 {
-    <div class="bg-white shadow rounded-lg max-w-4xl border border-slate-200">
-        <div class="px-6 py-5 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-lg">
+    <div class="max-w-4xl rounded-lg border border-slate-200 bg-white shadow">
+        <div class="flex items-center justify-between rounded-t-lg border-b border-slate-200 bg-slate-50 px-6 py-5">
             <div>
-                <h2 class="text-xl font-bold text-slate-900 m-0">@subAccount.AccountName</h2>
-                <p class="text-sm text-slate-500 mt-1">ID: <span class="font-mono text-slate-700">@subAccount.AccountID</span></p>
+                <h2 class="m-0 text-xl font-bold text-slate-900">@Account.AccountName</h2>
+                <p class="mt-1 text-sm text-slate-500">ID: <span class="font-mono text-slate-700">@Account.AccountID</span></p>
             </div>
             <div class="flex items-center gap-2">
-                <Button Style="Button.ButtonStyle.Secondary" OnClick="() => subAccountModal.Show(subAccount)">
+                <Button Style="Button.ButtonStyle.Secondary" OnClick="() => editModal.Show(Account)">
                     Edit Profile
                 </Button>
-                <Button Style="Button.ButtonStyle.Secondary" OnClick="async () => await transferModal.Show(subAccount)">
+                <Button Style="Button.ButtonStyle.Secondary" OnClick="() => transferModal.Show(Account)">
                     Add/Remove Credit
                 </Button>
             </div>
         </div>
        
         <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div class="flex flex-col">
-                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Status</label>
-                    @if (subAccount.Active)
+                    <label class="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Status</label>
+                    @if (Account.Active)
                     {
                         <div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+                            <span class="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
                                 ACTIVE
                             </span>
                         </div>
@@ -33,42 +33,42 @@
                     else
                     {
                         <div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                            <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
                                 INACTIVE
                             </span>
                         </div>
                     }
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Phone</label>
-                    <span class="text-slate-900">@subAccount.Phone</span>
+                    <label class="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Phone</label>
+                    <span class="text-slate-900">@Account.Phone</span>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Credit Balance</label>
-                    <span class="text-slate-900 font-medium">₦ @subAccount.Credits.ToString("##0.00")</span>
+                    <label class="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Credit Balance</label>
+                    <span class="font-medium text-slate-900">₦ @Account.Credits.ToString("##0.00")</span>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Date Created</label>
-                    <span class="text-slate-900">@subAccount.DateCreated.ToString("MMM dd, yyyy")</span>
+                    <label class="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Date Created</label>
+                    <span class="text-slate-900">@Account.DateCreated.ToString("MMM dd, yyyy")</span>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Time Zone</label>
+                    <label class="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Time Zone</label>
                     @{
-                        string sign = subAccount.TimeZone > 0 ? "+" : "-";
+                        string sign = Account.TimeZone > 0 ? "+" : "-";
                     }
-                    <span class="text-slate-900">GMT @sign@subAccount.TimeZone</span>
+                    <span class="text-slate-900">GMT @sign@Account.TimeZone</span>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Country Code</label>
-                    <span class="text-slate-900">+@subAccount.CountryCode</span>
+                    <label class="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Country Code</label>
+                    <span class="text-slate-900">+@Account.CountryCode</span>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Traffic</label>
-                    <span class="text-slate-900">@subAccount.Traffic</span>
+                    <label class="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">Traffic</label>
+                    <span class="text-slate-900">@Account.Traffic</span>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">API Key</label>
-                    <span class="text-slate-900 font-mono text-sm">@(subAccount.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")</span>
+                    <label class="mb-1 text-sm font-semibold tracking-wider text-slate-500 uppercase">API Key</label>
+                    <span class="font-mono text-sm text-slate-900">@(Account.Key != null ? BitConverter.ToString(Account.Key) : "N/A")</span>
                 </div>
             </div>
         </div>
@@ -77,37 +77,29 @@
 else
 {
     <div class="flex justify-center p-8">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600"></div>
+        <div class="border-brand-600 h-8 w-8 animate-spin rounded-full border-b-2"></div>
     </div>
 }
 
-<TransferModal @ref="transferModal" ParentId="self" OnCompleted="ReloadData"></TransferModal>
-<SubAccountModal @ref="subAccountModal" OnCompleted="ReloadData"></SubAccountModal>
+<TransferModal @ref="transferModal" OnCompleted="ReloadData"></TransferModal>
+<EditModal @ref="editModal" OnCompleted="ReloadData"></EditModal>
 
 @code {
-    [Parameter] public string SubAccountId { get; set; } = string.Empty;
+    [CascadingParameter] public AccountResponse? Account { get; set; }  
 
-    private AccountResponse subAccount = new();
     private TransferModal transferModal = new();
-    private SubAccountModal subAccountModal = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        await ReloadData();
-    }
+    private EditModal editModal = new();
 
     private async Task ReloadData()
     {
         try
         {
-            var response = await apiClient.AccountGetAsync(SubAccountId);
-
-            if (response.StatusCode == 200 && response.Result != null)
-                subAccount = response.Result;
+            var response = await apiClient.AccountGetAsync(Account?.AccountID);
+            Account = response.Result;
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
     }
 }

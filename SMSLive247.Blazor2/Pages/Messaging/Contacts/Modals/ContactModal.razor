@@ -1,4 +1,4 @@
-<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
+﻿<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
     <Body>
         <EditForm id="ContactForm" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
             <FormInput Label="Full Name"
@@ -14,8 +14,8 @@
                            @bind-Value="model.PhoneNumber"
                            disabled="@isEditMode"
                            Required="true" />
-                <p class="text-xs text-slate-500 flex items-center gap-1">
-                    <Icon Style="Icon.IconStyle.Info" CssClass="w-3.5 h-3.5" />
+                <p class="flex items-center gap-1 text-xs text-slate-500">
+                    <Icon Style="Icon.IconStyle.Info" CssClass="h-3.5 w-3.5" />
                     Please include country code.
                 </p>
             </div>
@@ -28,11 +28,11 @@
                         <span class="text-xs text-slate-500 italic">Optional</span>
                     </div>
 
-                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 max-h-48 overflow-y-auto">
+                    <div class="max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-3">
                         @if (isLoadingGroups)
                         {
                             <div class="flex items-center justify-center py-4">
-                                <div class="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin"></div>
+                                <div class="border-brand-500 h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"></div>
                             </div>
                         }
                         else if (groups.Count > 0)
@@ -46,7 +46,7 @@
                                         <span>@group.GroupName</span>
                                         @if (IsSelected(group.GroupName))
                                         {
-                                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="w-4 h-4" />
+                                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="h-4 w-4" />
                                         }
                                     </button>
                                 }
@@ -54,7 +54,7 @@
                         }
                         else
                         {
-                            <p class="text-xs text-slate-400 text-center py-4">
+                            <p class="py-4 text-center text-xs text-slate-400">
                                 No groups found. Create a group first to assign contacts.
                             </p>
                         }
@@ -160,7 +160,7 @@
             if (isEditMode)
             {
                 await apiClient.ContactUpdateAsync(originalPhoneNumber ?? model.PhoneNumber, model);
-                await alert.Success("Contact updated successfully.", "Success");
+                await alert.Success("Contact updated successfully.");
             }
             else
             {
@@ -171,7 +171,7 @@
                     Groups = model.Groups
                 };
                 await apiClient.ContactCreateAsync(request);
-                await alert.Success("Contact created successfully.", "Success");
+                await alert.Success("Contact created successfully.");
             }
 
             isVisible = false;
@@ -179,7 +179,7 @@
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
         finally
         {

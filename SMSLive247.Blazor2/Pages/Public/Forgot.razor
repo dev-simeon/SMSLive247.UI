@@ -9,17 +9,17 @@
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
-        <h1 class="text-4xl font-bold leading-tight mb-6">
+        <h1 class="mb-6 text-4xl leading-tight font-bold">
             Security is our Priority.
         </h1>
-        <p class="text-blue-100 text-lg leading-relaxed">
+        <p class="text-lg leading-relaxed text-blue-100">
             Follow our secure process to recover your account and get back to managing your communications.
         </p>
     </div>
 </SectionContent>
 
 <div class="text-center lg:text-left">
-    <div class="lg:hidden flex justify-center items-center mb-8">
+    <div class="mb-8 flex items-center justify-center lg:hidden">
         <img src="smslive-logo-2.png"
              alt="SMSLive247"
              class="h-10 w-auto" />
@@ -51,8 +51,8 @@
 
 <p class="text-center text-sm text-slate-500">
     Wait, I remember my password! 
-    <a href="@Const.Routes.Login" class="text-brand-500 font-semibold decoration-brand-500/30
-        hover:text-brand-600 hover:decoration-brand-500 transition-all" data-discover="true">
+    <a href="@Const.Routes.Login" class="text-brand-500 decoration-brand-500/30 font-semibold
+        transition-all hover:text-brand-600 hover:decoration-brand-500" data-discover="true">
         Sign In
      </a>
 </p>
@@ -86,16 +86,16 @@
 
             if (response.StatusCode == 401) //unauthorized
             {
-                await alert.Error("Access denied!", "Error");
+                await alert.Error("Access denied!");
             }
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
-            await alert.Error(ex.Message, "Api Error");
+            await alert.Error(ex.Message);
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
         finally
         {

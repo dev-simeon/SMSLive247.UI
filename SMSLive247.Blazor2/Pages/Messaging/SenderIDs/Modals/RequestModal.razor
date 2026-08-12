@@ -45,12 +45,10 @@
     private bool isVisible = false;
     private bool isSubmitting = false;
     private SenderIdRequest request = new();
-    private string? senderIdError;
 
     public void Show()
     {
         request = new SenderIdRequest();
-        senderIdError = null;
         isVisible = true;
         StateHasChanged();
     }
@@ -59,31 +57,23 @@
     {
         try
         {
-            senderIdError = null;
+            isSubmitting = true;
 
             if (string.IsNullOrWhiteSpace(request.SenderID))
-            {
-                senderIdError = "Sender ID is required.";
-                return;
-            }
+                throw new Exception("Sender ID is required.");
 
             if (request.SenderID.Length > 11)
-            {
-                senderIdError = "Sender ID cannot exceed 11 characters.";
-                return;
-            }
-
-            isSubmitting = true;
+                throw new Exception("Sender ID cannot exceed 11 characters.");
 
             await apiClient.SenderIdCreateAsync(request);
 
-            await alert.Success("Sender ID requested successfully.", "Success");
+            await alert.Success("Sender ID requested successfully.");
             await OnCompleted.InvokeAsync();
             isVisible = false;
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Error");
+            await alert.Error(ex.Message);
         }
         finally
         {

@@ -30,7 +30,7 @@ namespace SMSLive247.UI.Shared
             {
                 Items = null;
                 ErrorMessage = ex.Message;
-                await alert.Confirm(ex.Message, "Api Error");
+                await alert.Confirm(ex.Message);
             }
             finally
             {
