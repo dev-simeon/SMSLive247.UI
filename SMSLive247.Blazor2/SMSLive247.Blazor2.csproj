@@ -39,7 +39,12 @@
   <ItemGroup>
     <Content Include="Pages\Messaging\Compose\Customized.razor" />
     <Content Include="Pages\Messaging\Compose\_Index.razor" />
+    <Content Include="Pages\Messaging\Compose\RecipientChip.razor" />
     <Content Include="Pages\Messaging\Compose\Simple.razor" />
+    <Compile Include="Pages\Messaging\Compose\Modals\RecipientSelections.cs" />
+    <Content Include="Pages\Messaging\Compose\Modals\SelectContactsModal.razor" />
+    <Content Include="Pages\Messaging\Compose\Modals\SelectBulkFilesModal.razor" />
+    <Content Include="Pages\Messaging\Compose\Modals\SelectTemplateFileModal.razor" />
   </ItemGroup>
 
   <ItemGroup>

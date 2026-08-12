@@ -1,10 +1,335 @@
-@* Customized Message Tab *@
-@* Matches React: src/pages/Messaging/components/CustomizedMessageTab.tsx *@
+@using System.Text
+@using System.Text.RegularExpressions
+@using SMSLive247.Blazor2.Pages.Messaging.Compose.Modals
 
-<div class="bg-white rounded-xl border border-slate-100 shadow-sm p-6 lg:p-8">
-    <p class="text-slate-500 text-sm">Customized message compose form — coming soon.</p>
-</div>
+@if (isLoading)
+{
+    <div class="rounded-xl border border-slate-200 bg-white p-8 text-sm text-slate-500">Loading compose options...</div>
+}
+else
+{
+    <div class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm lg:p-8">
+        <div class="mb-8 max-w-sm">
+            <h3 class="mb-4 text-lg font-semibold text-slate-800">Sender ID</h3>
+            <FormSelect TValue="string" @bind-Value="senderId" Required="true" IconStyle="Icon.IconStyle.ChevronDown">
+                <option value="">Select Approved Sender ID...</option>
+                @foreach (var item in senderIds)
+                {
+                    <option value="@item.SenderID">@item.SenderID</option>
+                }
+            </FormSelect>
+            <a href="@Const.Routes.Messaging.SenderIds" class="mt-2 inline-block text-xs font-medium text-brand-500 hover:underline">Request a new sender ID</a>
+        </div>
+
+        <hr class="my-8 border-slate-100" />
+
+        <section class="mb-8">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <h3 class="text-lg font-semibold text-slate-800">Data Source</h3>
+                <a href="data:text/csv;charset=utf-8,Phone%2CName%0A2348012345678%2CAda" download="template-sample.csv" class="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-slate-600"><Icon Style="Icon.IconStyle.Download" CssClass="text-base" />Sample CSV</a>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <label class="group flex min-h-60 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed @(hasDataSource ? "border-emerald-400 bg-emerald-50" : "border-slate-300 bg-white hover:border-brand-400 hover:bg-slate-50") p-6 text-center md:col-span-2">
+                    <InputFile class="hidden" accept=".csv" OnChange="SelectUpload" />
+                    <div class="mb-3 rounded-full @(hasDataSource ? "bg-emerald-100 text-emerald-600" : "bg-blue-50 text-brand-500") p-3"><Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-3xl" /></div>
+                    @if (selectedUpload is not null)
+                    {
+                        <p class="max-w-full truncate text-sm font-semibold text-emerald-700">@selectedUpload.Name</p>
+                        <p class="mt-1 text-xs text-emerald-600">@FormatFileSize(selectedUpload.Size) - ready to upload</p>
+                    }
+                    else if (selectedExistingFile is not null)
+                    {
+                        <p class="max-w-full truncate text-sm font-semibold text-emerald-700">@selectedExistingFile.Description</p>
+                        <p class="mt-1 text-xs text-emerald-600">@selectedExistingFile.TotalNumbers.ToString("N0") records from file history</p>
+                    }
+                    else
+                    {
+                        <p class="text-sm font-medium text-slate-900">Drop CSV here or <span class="text-brand-500">browse files</span></p>
+                        <p class="mt-1 text-xs text-slate-500">Maximum file size: 10 MB</p>
+                    }
+                    <button type="button" @onclick:stopPropagation="true" @onclick="OpenTemplateFiles" class="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm hover:border-brand-300 hover:bg-slate-50"><Icon Style="Icon.IconStyle.PlusCircle" CssClass="text-base text-brand-500" />Select from History</button>
+                </label>
+
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
+                    <h4 class="mb-4 text-xs font-bold uppercase tracking-wider text-slate-500">Configuration</h4>
+                    <FormSelect TValue="int?" Label="Recipient Phone Column" @bind-Value="phoneColumn" Required="true" disabled="@(!headers.Any())">
+                        @if (!headers.Any())
+                        {
+                            <option value="">Waiting for a CSV file...</option>
+                        }
+                        @for (var index = 0; index < headers.Count; index++)
+                        {
+                            <option value="@index">@headers[index]</option>
+                        }
+                    </FormSelect>
+                    @if (previewRows.Count > 0)
+                    {
+                        <p class="mt-2 flex items-center gap-1 text-xs text-slate-500"><Icon Style="Icon.IconStyle.Info" CssClass="text-sm" />@previewRows.Count preview rows loaded</p>
+                    }
+                </div>
+            </div>
+
+        </section>
+
+        <hr class="my-8 border-slate-100" />
+
+        <section class="mb-8">
+            <div class="mb-4 flex items-center justify-between gap-3">
+                <h3 class="text-lg font-semibold text-slate-800">Message Content</h3>
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <button type="button" @onclick="ClearMessage" class="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700"><Icon Style="Icon.IconStyle.RefreshCcw" CssClass="text-sm" />Clear message</button>
+                }
+            </div>
+            <div class="flex flex-col gap-6 xl:flex-row">
+                <div class="flex-1">
+                    <textarea @bind="message" @bind:event="oninput" maxlength="918" class="h-64 w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100" placeholder="Example: Hello {Name}, your bill for {Month} is ready..."></textarea>
+                    <div class="mt-2 flex flex-wrap justify-between gap-2 text-xs text-slate-500"><span>Use the fields from your file to personalize each message.</span><span><strong class="text-slate-700">@message.Length</strong> characters, <strong class="text-slate-700">@messageParts</strong> part@(messageParts == 1 ? "" : "s")</span></div>
+                </div>
+                <aside class="w-full overflow-hidden rounded-xl border border-slate-200 bg-white xl:w-72">
+                    <div class="border-b border-slate-200 bg-slate-50 px-4 py-3"><span class="text-xs font-bold uppercase tracking-wider text-slate-600">Available Fields</span><p class="mt-1 text-[11px] text-slate-400">Click a field to add it to the message.</p></div>
+                    <div class="max-h-64 space-y-2 overflow-y-auto p-3">
+                        @if (!headers.Any())
+                        {
+                            <p class="py-8 text-center text-xs text-slate-400">Choose a CSV file to see columns.</p>
+                        }
+                        @foreach (var header in headers)
+                        {
+                            <button type="button" @onclick="() => AddPlaceholder(header)" class="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-left text-sm font-mono text-slate-700 hover:border-brand-300 hover:bg-brand-50">@Placeholder(header)<Icon Style="Icon.IconStyle.PlusCircle" CssClass="text-base text-brand-500" /></button>
+                        }
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <hr class="my-8 border-slate-100" />
+
+        <section>
+            <h3 class="mb-4 text-lg font-semibold text-slate-800">Preview Messages</h3>
+            <div class="rounded-xl border border-slate-200 p-4 sm:p-6">
+                @if (!previewRows.Any() || string.IsNullOrWhiteSpace(message))
+                {
+                    <p class="py-10 text-center text-sm text-slate-500">Choose a CSV file and compose a message to preview your personalized messages.</p>
+                }
+                else
+                {
+                    <div class="space-y-4">
+                        @foreach (var row in previewRows.Take(3).Select((value, index) => new { value, index }))
+                        {
+                            <div class="border-l-4 border-brand-200 bg-slate-50 p-4">
+                                <div class="mb-2 flex justify-between gap-3 text-xs"><span class="font-semibold uppercase tracking-wider text-slate-400">Message #@(row.index + 1)</span><span class="truncate text-brand-600">@PhoneFor(row.value)</span></div>
+                                <p class="whitespace-pre-wrap break-words font-mono text-sm leading-6 text-slate-700">@ResolvePlaceholders(message, row.value)</p>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+
+        <div class="mt-8 border-t border-slate-100 pt-6">
+            <div class="mb-5 flex flex-wrap items-center gap-5 text-sm text-slate-700">
+                <label class="flex items-center gap-2"><input type="radio" name="customSendTime" checked="@(!scheduleForLater)" @onchange="_ => scheduleForLater = false" /> Send immediately</label>
+                <label class="flex items-center gap-2"><input type="radio" name="customSendTime" checked="@scheduleForLater" @onchange="_ => scheduleForLater = true" /> Schedule for later</label>
+                @if (scheduleForLater)
+                {
+                    <input type="datetime-local" @bind="deliveryTime" class="rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500" />
+                }
+            </div>
+            <Button Text="Send Message" Icon="Icon.IconStyle.Mail" IsBusy="isSending" IsDisabled="@(string.IsNullOrWhiteSpace(message) || !hasDataSource)" OnClick="SendMessage" CssClass="w-full sm:w-auto" />
+        </div>
+    </div>
+}
+
+<SelectTemplateFileModal @ref="templateFilesModal" OnSelected="SelectHistoryFile" />
 
 @code {
-    // TODO: Implement customized (bulk file / personalized) message compose form
+    private const long MaxFileBytes = 10 * 1024 * 1024;
+    private readonly List<SenderIdResponse> senderIds = [];
+    private readonly List<string> headers = [];
+    private readonly List<Dictionary<string, string>> previewRows = [];
+    private bool isLoading = true;
+    private bool isSending;
+    private bool scheduleForLater;
+    private string senderId = "";
+    private string message = "";
+    private int? phoneColumn;
+    private DateTime? deliveryTime;
+    private IBrowserFile? selectedUpload;
+    private BatchFileResponse? selectedExistingFile;
+    private SelectTemplateFileModal templateFilesModal = new();
+
+    private bool hasDataSource => selectedUpload is not null || selectedExistingFile is not null;
+    private int messageParts => string.IsNullOrEmpty(message) ? 0 : message.Length <= 160 ? 1 : (int)Math.Ceiling(message.Length / 153d);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var senderTask = apiClient.SenderIdListAsync(1, 500, null);
+            await senderTask;
+            senderIds.AddRange(senderTask.Result.Result.Where(x => string.Equals(x.Status, "Approved", StringComparison.OrdinalIgnoreCase)));
+            senderId = senderIds.FirstOrDefault()?.SenderID ?? "";
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Compose Message");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SelectUpload(InputFileChangeEventArgs args)
+    {
+        selectedUpload = args.File;
+        selectedExistingFile = null;
+        await LoadCsvPreview(selectedUpload);
+    }
+
+    private async Task SelectHistoryFile(BatchFileResponse file)
+    {
+        selectedExistingFile = file;
+        selectedUpload = null;
+        try
+        {
+            var download = await apiClient.BatchFileDownloadAsync(file.BatchFileID);
+            await LoadCsvPreview(download.Stream, file.Description);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Unable to Read File");
+        }
+    }
+
+    private Task OpenTemplateFiles(MouseEventArgs _) => templateFilesModal.Show(selectedExistingFile?.BatchFileID);
+
+    private async Task LoadCsvPreview(IBrowserFile file)
+    {
+        if (!file.Name.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+        {
+            headers.Clear();
+            previewRows.Clear();
+            phoneColumn = null;
+            return;
+        }
+
+        await using var stream = file.OpenReadStream(MaxFileBytes);
+        await LoadCsvPreview(stream, file.Name);
+    }
+
+    private async Task LoadCsvPreview(Stream stream, string fileName)
+    {
+        headers.Clear();
+        previewRows.Clear();
+        phoneColumn = null;
+
+        if (!fileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, leaveOpen: true);
+        var firstLine = await reader.ReadLineAsync();
+        if (string.IsNullOrWhiteSpace(firstLine)) return;
+
+        headers.AddRange(ReadCsvLine(firstLine));
+        string? line;
+        while (previewRows.Count < 3 && (line = await reader.ReadLineAsync()) is not null)
+        {
+            var values = ReadCsvLine(line);
+            if (values.Count == 0) continue;
+            var row = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            for (var index = 0; index < headers.Count; index++) row[headers[index]] = index < values.Count ? values[index] : "";
+            previewRows.Add(row);
+        }
+        phoneColumn = headers.FindIndex(x => x.Contains("phone", StringComparison.OrdinalIgnoreCase) || x.Contains("mobile", StringComparison.OrdinalIgnoreCase));
+        if (phoneColumn < 0 && headers.Count > 0) phoneColumn = 0;
+    }
+
+    private Task ClearMessage() { message = ""; return Task.CompletedTask; }
+    private Task AddPlaceholder(string header) { message += Placeholder(header); return Task.CompletedTask; }
+    private string Placeholder(string header) => $"{{{Regex.Replace(header, @"\s+", "")}}}";
+    private string PhoneFor(Dictionary<string, string> row) => phoneColumn is int index && index >= 0 && index < headers.Count && row.TryGetValue(headers[index], out var number) ? number : "No phone number";
+
+    private string ResolvePlaceholders(string value, Dictionary<string, string> row)
+    {
+        foreach (var header in headers)
+            value = Regex.Replace(value, $@"\{{\s*{Regex.Escape(header.Replace(" ", ""))}\s*\}}", row.GetValueOrDefault(header, ""), RegexOptions.IgnoreCase);
+        return value;
+    }
+
+    private async Task SendMessage(MouseEventArgs _)
+    {
+        if (string.IsNullOrWhiteSpace(senderId) || string.IsNullOrWhiteSpace(message) || !hasDataSource || !phoneColumn.HasValue)
+        {
+            await alert.Error("Choose an approved sender ID, a data source, recipient phone column, and message.", "Compose Message");
+            return;
+        }
+        if (scheduleForLater && !deliveryTime.HasValue)
+        {
+            await alert.Error("Choose a delivery date and time, or send the message immediately.", "Compose Message");
+            return;
+        }
+
+        isSending = true;
+        try
+        {
+            var fileId = selectedExistingFile?.BatchFileID;
+            if (selectedUpload is not null)
+            {
+                await using var stream = selectedUpload.OpenReadStream(MaxFileBytes);
+                var response = await apiClient.BatchFileCreateAsync(null, new FileParameter(stream, selectedUpload.Name, selectedUpload.ContentType));
+                fileId = response.Result.BatchFileID;
+            }
+            if (string.IsNullOrWhiteSpace(fileId)) throw new InvalidOperationException("The selected file could not be prepared.");
+
+            await apiClient.SmsBatchCsvCreateAsync(new SmsBatchCsvRequest
+            {
+                SenderID = senderId,
+                MessageText = message.Trim(),
+                BatchFileID = fileId,
+                PhoneNumberColumn = phoneColumn.Value,
+                DeliveryTime = scheduleForLater ? new DateTimeOffset(deliveryTime!.Value) : null
+            });
+            await alert.Success(scheduleForLater ? "Your personalized messages have been scheduled." : "Your personalized messages are being processed.", "Message Created");
+            message = "";
+            selectedUpload = null;
+            selectedExistingFile = null;
+            headers.Clear();
+            previewRows.Clear();
+            phoneColumn = null;
+            scheduleForLater = false;
+            deliveryTime = null;
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Unable to Send Message");
+        }
+        finally
+        {
+            isSending = false;
+        }
+    }
+
+    private static List<string> ReadCsvLine(string line)
+    {
+        var fields = new List<string>();
+        var builder = new StringBuilder();
+        var inQuotes = false;
+        for (var index = 0; index < line.Length; index++)
+        {
+            var character = line[index];
+            if (character == '"')
+            {
+                if (inQuotes && index + 1 < line.Length && line[index + 1] == '"') { builder.Append(character); index++; }
+                else inQuotes = !inQuotes;
+            }
+            else if (character == ',' && !inQuotes) { fields.Add(builder.ToString().Trim()); builder.Clear(); }
+            else builder.Append(character);
+        }
+        fields.Add(builder.ToString().Trim());
+        return fields;
+    }
+
+    private static string FormatFileSize(long bytes) => bytes < 1024 * 1024 ? $"{bytes / 1024d:0.0} KB" : $"{bytes / 1024d / 1024d:0.0} MB";
 }

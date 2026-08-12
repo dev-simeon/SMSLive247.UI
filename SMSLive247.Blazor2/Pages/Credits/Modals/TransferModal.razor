@@ -1,4 +1,5 @@
 <Modal Title="Transfer Credit" @bind-IsVisible="isVisible">
+
     <Body>
         <EditForm id="wf3" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
 
@@ -10,20 +11,16 @@
             </div>
 
             <div class="space-y-4">
-                <FormInput Label="Recipient Email"
-                            PlaceHolder="user@example.com"
-                            Type="email"
-                            IconStyle="Icon.IconStyle.Mail"
-                            @bind-Value="model.Recipient"
-                            Required="true" />
+                <FormInput Label="Recipient Email" PlaceHolder="user@example.com" Type="email"
+                           IconStyle="Icon.IconStyle.Mail" @bind-Value="model.Recipient" Required="true" />
 
                 <div class="space-y-1.5">
                     <label class="block text-sm font-medium text-slate-700">
                         Credits
                     </label>
-                    <InputNumber class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm sm:text-sm"
-                                    min="50"
-                                    @bind-Value="model.Credits" />
+                    <InputNumber
+                    class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm sm:text-sm"
+                    min="50" @bind-Value="model.Credits" />
                     @if (model.Credits > 0 && model.Credits < 50)
                     {
                         <p class="text-xs text-red-500 font-semibold mt-1">
@@ -42,10 +39,9 @@
                     <label class="block text-sm font-medium text-slate-700">
                         Remarks
                     </label>
-                    <textarea rows="3"
-                                @bind="model.Remarks"
-                                class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm sm:text-sm resize-none"
-                                placeholder="Optional note..."></textarea>
+                    <textarea rows="3" @bind="model.Remarks"
+                              class="w-full px-3 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm sm:text-sm resize-none"
+                              placeholder="Optional note..."></textarea>
                 </div>
             </div>
 
@@ -62,7 +58,8 @@
                     <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">
                         New Balance
                     </span>
-                    <span class="block text-lg font-mono font-bold mt-1 @(newBalance < 0 ? "text-red-600" : "text-brand-600")">
+                    <span
+                        class="block text-lg font-mono font-bold mt-1 @(newBalance < 0 ? "text-red-600" : "text-brand-600")">
                         @newBalance.ToString("#,##0.##")
                     </span>
                 </div>
@@ -70,16 +67,9 @@
         </EditForm>
     </Body>
     <Footer>
-        <Button IsSubmit="true"
-                Text="Transfer Credits"
-                Icon="Icon.IconStyle.ChevronRight"
-                IsBusy="@isSubmitting"
-                IsDisabled="@(!canSubmit)"
-                form="wf3" />
-        <Button Text="Cancel"
-                Style="Button.ButtonStyle.Secondary"
-                IsDisabled="@isSubmitting"
-                OnClick="Close" />
+        <Button IsSubmit="true" Text="Transfer Credits" Icon="Icon.IconStyle.ChevronRight" IsBusy="@isSubmitting"
+                IsDisabled="@(!canSubmit)" form="wf3" />
+        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" IsDisabled="@isSubmitting" OnClick="Close" />
     </Footer>
 </Modal>
 
