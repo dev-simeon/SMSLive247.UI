@@ -1,7 +1,7 @@
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border @GetBadgeCss()">
+﻿<span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium @GetBadgeCss()">
     @if (ShowDot)
     {
-        <span class="w-1.5 h-1.5 rounded-full @GetDotCss()"></span>
+        <span class="h-1.5 w-1.5 rounded-full @GetDotCss()"></span>
     }
     @Value
 </span>
@@ -19,11 +19,11 @@
     {
         return GetBadgeStyleFromVariant() switch
         {
-            BadgeStyle.Success => "bg-emerald-50 text-emerald-700 border-emerald-100",
-            BadgeStyle.Pending => "bg-amber-50 text-amber-700 border-amber-100",
-            BadgeStyle.Danger => "bg-red-50 text-red-700 border-red-100",
-            BadgeStyle.Info => "bg-blue-50 text-blue-700 border-blue-100",
-            _ => "bg-slate-50 text-slate-700 border-slate-100"
+            BadgeStyle.Success  => "bg-emerald-50 text-emerald-700 border-emerald-300",
+            BadgeStyle.Pending  => "bg-amber-50 text-amber-700 border-amber-300",
+            BadgeStyle.Danger   => "bg-red-50 text-red-700 border-red-300",
+            BadgeStyle.Info     => "bg-blue-50 text-blue-700 border-blue-300",
+            _                   => "bg-slate-50 text-slate-700 border-slate-300"
         };
     }
 
@@ -31,11 +31,11 @@
     {
         return GetBadgeStyleFromVariant() switch
         {
-            BadgeStyle.Success => "bg-emerald-500",
-            BadgeStyle.Pending => "bg-amber-500",
-            BadgeStyle.Danger => "bg-red-500",
-            BadgeStyle.Info => "bg-blue-500",
-            _ => "bg-slate-500"
+            BadgeStyle.Success  => "bg-emerald-500",
+            BadgeStyle.Pending  => "bg-amber-500",
+            BadgeStyle.Danger   => "bg-red-500",
+            BadgeStyle.Info     => "bg-blue-500",
+            _                   => "bg-slate-500"
         };
     }
 
@@ -66,11 +66,11 @@
     {
         return value.ToUpperInvariant() switch
         {
-            "COMPLETED" => BadgeStyle.Success,
-            "RUNNING" => BadgeStyle.Pending,
-            "PAUSED" => BadgeStyle.Info,
-            "ABORTED" => BadgeStyle.Danger,
-            _ => BadgeStyle.Neutral
+            "APPROVED"  => BadgeStyle.Success,
+            "PENDING"   => BadgeStyle.Pending,
+            "DELETED"   => BadgeStyle.Info,
+            "REJECTED"  => BadgeStyle.Danger,
+            _           => BadgeStyle.Neutral
         };
     }
 

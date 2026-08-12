@@ -10,12 +10,26 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <ResourcePreloader />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@100;200;300;400;500" />
     <link rel="stylesheet" href="@Assets["SMSLive247.Blazor2.styles.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <ImportMap />
     <script src="https://cdn.jsdelivr.net/npm/@@tailwindcss/browser@4"></script>
     <style type="text/tailwindcss" data-desc="Tailwind default theme styles">
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #cbd5e1;
+                border-radius: 3px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
             @@theme {
                 --font-sans: "Inter", sans-serif;
                 --color-brand-50: #eff6ff;

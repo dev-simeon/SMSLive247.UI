@@ -1,15 +1,14 @@
-@inject NavigationManager nav
+﻿@inject NavigationManager nav
 
-<header class="h-16 bg-white/90 backdrop-blur-md border-b border-slate-200 flex items-center 
-                justify-between px-4 sm:px-6 sticky top-0 z-10">
+<header class="sticky top-0 z-10 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur-md sm:px-6">
     <div class="flex items-center gap-3">
         <button @onclick="OnMenuClick"
-                class="lg:hidden p-2 -ml-2 text-slate-600 hover:text-brand-600 rounded-md">
+                class="-ml-2 rounded-md p-2 text-slate-600 hover:text-brand-600 lg:hidden">
             <Icon Style="Icon.IconStyle.Menu" />
         </button>
 
         @* Mobile Logo *@
-        <div class="lg:hidden flex items-center">
+        <div class="flex items-center lg:hidden">
             <img src="/smslive-logo-2.png" alt="SMSLive247" class="h-8 w-auto" />
         </div>
 
@@ -17,13 +16,13 @@
         <Breadcrumbs></Breadcrumbs>
     </div>
 
-    <div class="flex items-center gap-4 ml-auto">
+    <div class="ml-auto flex items-center gap-4">
         @* Credits Pill *@
-        <div class="hidden sm:flex items-center gap-4 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-200">
+        <div class="hidden items-center gap-4 rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 sm:flex">
             <div class="flex items-center gap-2">
-                <span class="flex items-center text-blue-500 p-0.5"
+                <span class="flex items-center p-0.5 text-blue-500"
                       title="Available Credits">
-                    <Icon Style="Icon.IconStyle.Coins" />
+                    <Icon Style="Icon.IconStyle.Coins" CssStyle="font-weight: 200;" />
                 </span>
                 <span class="text-sm font-bold text-slate-800">
                     5,000.00
@@ -34,9 +33,9 @@
         @* Actions *@
         <Button Icon="Icon.IconStyle.CreditCard" Text="Top Up" OnClick="NavigateToTopup" />
 
-        <button class="relative p-2 text-slate-400 hover:text-slate-600 transition-colors">
+        <button class="relative p-2 text-slate-400 transition-colors hover:text-slate-600">
             <Icon Style="Icon.IconStyle.Bell" />
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full border-2 border-white bg-red-500"></span>
         </button>
     </div>
 </header>
