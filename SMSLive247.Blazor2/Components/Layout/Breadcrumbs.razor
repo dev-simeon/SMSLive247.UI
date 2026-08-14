@@ -1,12 +1,12 @@
 ﻿@implements IDisposable
 @inject NavigationManager nav
 
-<div class="hidden md:flex items-center gap-2 text-sm text-slate-500">
+<div class="hidden items-center gap-2 text-slate-500 md:flex">
     @if (match.Child != null)
     {
         @if (@match.Parent.Title != null)
         {
-            <span class="text-slate-400 hover:text-slate-600 cursor-pointer">
+            <span class="cursor-pointer text-slate-400 hover:text-slate-600">
                 @match.Parent.Title
             </span>
 

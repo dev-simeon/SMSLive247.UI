@@ -11,7 +11,7 @@
     </div>
 
     @* Table Content *@
-    <div class="unified-table-wrapper w-full overflow-x-auto">
+    <div class="">
         @ChildContent
     </div>
 
@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<style>
+@* <style>
     .unified-table-wrapper table {
         width: 100%;
         min-width: 100%;
@@ -81,7 +81,7 @@
         background-color: #f1f5f9 !important;
     }
 </style>
-
+ *@
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public RenderFragment? HeaderLeft { get; set; }

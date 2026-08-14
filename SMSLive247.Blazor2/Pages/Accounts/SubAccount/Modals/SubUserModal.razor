@@ -1,35 +1,35 @@
 ﻿<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm id="f3" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
+        <EditForm id="f3" Model="@subUser" OnValidSubmit="HandleSubmit" class="space-y-6">
             @if (editMode == EditModeEnum.CREATE)
             {
-                <FormInput Label="UserName" @bind-Value="model.AccountName" Required="true" />
-                <FormInput Label="First Name" @bind-Value="model.FirstName" Required="true" />
-                <FormInput Label="Last Name" @bind-Value="model.LastName" Required="true" />
-                <FormInput Label="Phone Number" @bind-Value="model.Phone" Required="true" />
-                <FormInput Label="Delivery Email" Type="email" @bind-Value="model.Email" Required="true" />
+                <FormInput Label="UserName" @bind-Value="subUser.AccountName" Required="true" />
+                <FormInput Label="First Name" @bind-Value="subUser.FirstName" Required="true" />
+                <FormInput Label="Last Name" @bind-Value="subUser.LastName" Required="true" />
+                <FormInput Label="Phone Number" @bind-Value="subUser.Phone" Required="true" />
+                <FormInput Label="Delivery Email" Type="email" @bind-Value="subUser.Email" Required="true" />
             }
             else if (editMode == EditModeEnum.EDIT)
             {
-                <FormInput Label="UserName" @bind-Value="model.AccountName" ReadOnly="true" />
-                <FormInput Label="First Name" @bind-Value="model.FirstName" Required="true" />
-                <FormInput Label="Last Name" @bind-Value="model.LastName" Required="true" />
-                <FormInput Label="Phone Number" @bind-Value="model.Phone" ReadOnly="true" />
-                <FormInput Label="Delivery Email" Type="email" @bind-Value="model.Email" ReadOnly="true" />
+                <FormInput Label="UserName" @bind-Value="subUser.AccountName" ReadOnly="true" />
+                <FormInput Label="First Name" @bind-Value="subUser.FirstName" Required="true" />
+                <FormInput Label="Last Name" @bind-Value="subUser.LastName" Required="true" />
+                <FormInput Label="Phone Number" @bind-Value="subUser.Phone" ReadOnly="true" />
+                <FormInput Label="Delivery Email" Type="email" @bind-Value="subUser.Email" ReadOnly="true" />
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700">API Key</label>
                     <div class="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
-                        @(Account?.Key != null ? BitConverter.ToString(Account.Key) : "N/A")
+                        @(subAccount?.Key != null ? BitConverter.ToString(subAccount.Key) : "N/A")
                     </div>
                 </div>
             }
             else if (editMode == EditModeEnum.VIEW)
             {
-                <FormInput Label="First Name" @bind-Value="model.FirstName" ReadOnly="true" />
-                <FormInput Label="Last Name" @bind-Value="model.LastName" ReadOnly="true" />
-                <FormInput Label="Phone Number" @bind-Value="model.Phone" ReadOnly="true" />
-                <FormInput Label="Delivery Email" Type="email" @bind-Value="model.Email" ReadOnly="true" />
+                <FormInput Label="First Name" @bind-Value="subUser.FirstName" ReadOnly="true" />
+                <FormInput Label="Last Name" @bind-Value="subUser.LastName" ReadOnly="true" />
+                <FormInput Label="Phone Number" @bind-Value="subUser.Phone" ReadOnly="true" />
+                <FormInput Label="Delivery Email" Type="email" @bind-Value="subUser.Email" ReadOnly="true" />
             }
         </EditForm>
     </Body>
@@ -51,28 +51,29 @@
 
 @code {
     [Parameter] public EventCallback OnCompleted { get; set; }
-    [CascadingParameter] public AccountResponse? Account { get; set; }
 
     private enum EditModeEnum { CREATE, EDIT, VIEW }
 
     private bool isVisible = false;
     private string modalTitle = "Sub User";
-    private AccountResponse model = new();
+    private AccountResponse subUser = new();
+    private AccountResponse? subAccount;
     private EditModeEnum editMode = EditModeEnum.CREATE;
 
-    public void Show(AccountResponse? subUser, bool readOnly = false)
+    public void Show(AccountResponse parent, AccountResponse? child, bool readOnly = false)
     {
-        if (subUser == null)
+        subAccount = parent;
+        if (child == null)
         {
             editMode = EditModeEnum.CREATE;
             modalTitle = "Add Sub User";
-            model = new();
+            subUser = new();
         }
         else
         {
             editMode = EditModeEnum.EDIT;
             modalTitle = "Edit Sub User";
-            model = subUser;
+            subUser = child;
 
             if (readOnly)
                 editMode = EditModeEnum.VIEW;
@@ -89,28 +90,28 @@
             {
                 var request = new AccountCreateRequest
                 {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Phone = model.Phone,
-                    Email = model.Email,
-                    AccountName = model.AccountName,
+                    FirstName = subUser.FirstName,
+                    LastName = subUser.LastName,
+                    Phone = subUser.Phone,
+                    Email = subUser.Email,
+                    AccountName = subUser.AccountName,
                     Password = GeneratePassword(12)
                 };
 
-                await subClient.Impersonate(Account).AccountCreateAsync(request);
+                await subClient.Impersonate(subAccount).AccountCreateAsync(request);
                 await alert.Success("Sub User created.");
             }
             else if (editMode == EditModeEnum.EDIT)
             {
                 var updateRequest = new AccountUpdateRequest
                 {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Phone = model.Phone,
-                    Email = model.Email,
+                    FirstName = subUser.FirstName,
+                    LastName = subUser.LastName,
+                    Phone = subUser.Phone,
+                    Email = subUser.Email,
                 };
 
-                await subClient.Impersonate(Account).AccountUpdateAsync(model.AccountID, updateRequest);
+                await subClient.Impersonate(subAccount).AccountUpdateAsync(subUser.AccountID, updateRequest);
                 await alert.Success("Sub User updated.");
             }
 

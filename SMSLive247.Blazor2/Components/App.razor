@@ -10,6 +10,7 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <ResourcePreloader />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:wght@100;200;300;400;500" />
     <link rel="stylesheet" href="@Assets["SMSLive247.Blazor2.styles.css"]" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
@@ -31,6 +32,25 @@
             }
 
             @@theme {
+                --font-sans: "Ubuntu", sans-serif;
+
+                --color-brand-50: #fdf4f0;
+                --color-brand-100: #fbe6df;
+                --color-brand-200: #f8cebf;
+                --color-brand-300: #f3ab91;
+                --color-brand-400: #ee8159;
+                --color-brand-500: #e95420;
+                --color-brand-600: #db4d1a;
+                --color-brand-700: #c6471b;
+                --color-brand-800: #ba431a;
+                --color-brand-900: #af3f18;
+                --color-background-light: #f6f7f8;
+                --color-background-dark: #101822; 
+
+
+
+
+               /*  
                 --font-sans: "Inter", sans-serif;
                 --color-brand-50: #eff6ff;
                 --color-brand-100: #dbeafe;
@@ -40,6 +60,8 @@
                 --color-brand-900: #1e3a8a;
                 --color-background-light: #f6f7f8;
                 --color-background-dark: #101822;
+                */
+
                 /* Register the custom enter keyframes */
                 --animate-enter: enter 200ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
                 @@keyframes enter {
@@ -83,19 +105,73 @@
 
             /* Global HTML Overrides */
             body {
+                font-size: 95%;
                 font-family: var(--font-sans);
                 background-color: #f8fafc; /* bg-slate-50 */
                 color: #0f172a; /* text-slate-900 */
                 -webkit-font-smoothing: antialiased;
             }
 
+            h1:focus, h2:focus, h3:focus, h4:focus, h5:focus, h6:focus {
+                outline: none;
+            }
+
             button, [role="button"], select, input[type="submit"] {
                 cursor: pointer;
             }
     </style>
-    <script src="js/tawk.js"></script>
-    <script>
-        window.smsliveLoadTawk(@((MarkupString)System.Text.Json.JsonSerializer.Serialize(settings.TawkToID)));
+    <script type="text/javascript" data-name="Script to load TawkTo Chat">
+            (function() {
+                window.LoadTawk = function(propertyId) {
+                    if (!propertyId || document.getElementById("tawk-script")) {
+                        return;
+                    }
+
+                    window.Tawk_API = window.Tawk_API || {};
+                    window.Tawk_LoadStart = new Date();
+
+                    window.Tawk_API.onLoad = function() {
+                        if (typeof window.Tawk_API.hideWidget === "function") {
+                            window.Tawk_API.hideWidget();
+                        }
+                    };
+
+                    window.Tawk_API.onChatMinimized = function() {
+                        if (typeof window.Tawk_API.hideWidget === "function") {
+                            window.Tawk_API.hideWidget();
+                        }
+                    };
+
+                    var script = document.createElement("script");
+                    script.id = "tawk-script";
+                    script.async = true;
+                    script.charset = "UTF-8";
+                    script.setAttribute("crossorigin", "*");
+
+                    var widgetId = propertyId.indexOf("/") >= 0 ? "" : "/1";
+                    script.src = "https://embed.tawk.to/" + propertyId + widgetId;
+
+                    var firstScript = document.getElementsByTagName("script")[0];
+                    if (firstScript && firstScript.parentNode) {
+                        firstScript.parentNode.insertBefore(script, firstScript);
+                    } else {
+                        document.head.appendChild(script);
+                    }
+                };
+
+                window.OpenTawkChat = function() {
+                    if (window.Tawk_API && typeof window.Tawk_API.showWidget === "function") {
+                        window.Tawk_API.showWidget();
+                        window.Tawk_API.maximize();
+                        return true;
+                    }
+
+                    alert("Live chat is still initializing. Please wait a moment and try again.");
+                    return false;
+                };
+            })();
+
+            //window.LoadTawk(@((MarkupString)settings.TawkToID));
     </script>
     <HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
 </head>

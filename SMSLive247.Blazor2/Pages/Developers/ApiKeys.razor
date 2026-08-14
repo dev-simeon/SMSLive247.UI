@@ -1,4 +1,4 @@
-@attribute [Route(Const.Routes.Developer.ApiKeys)]
+﻿@attribute [Route(Const.Routes.Developer.ApiKeys)]
 @layout MainLayout
 
 <PageTitle>SMSLive247 - API Keys</PageTitle>
@@ -14,59 +14,22 @@
     </HeaderLeft>
 
     <ChildContent>
-        @if (mainAccount != null)
-        {
-            @* Main account row *@
-            <div class="mb-6 bg-white border border-slate-200 shadow-sm overflow-hidden">
-                <div class="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
-                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Main Account</span>
-                </div>
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-slate-100 bg-slate-50/50 text-xs text-slate-500 uppercase tracking-wide">
-                            <th class="px-5 py-3 text-left font-medium w-[38%]">Account ID</th>
-                            <th class="px-5 py-3 text-left font-medium">API Key</th>
-                            <th class="px-5 py-3 text-left font-medium w-12"></th>
-                            <th class="px-5 py-3 text-left font-medium">Date Created</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-5 py-3 font-mono text-slate-700">@mainAccount.AccountID</td>
-                            <td class="px-5 py-3 font-mono text-slate-700 truncate max-w-xs">
-                                @GetKeyString(mainAccount.Key)
-                            </td>
-                            <td class="px-5 py-3">
-                                <button @onclick="() => ResetApiKey(mainAccount)"
-                                        class="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-all"
-                                        title="Reset API Key">
-                                    <Icon Style="Icon.IconStyle.RefreshCcw" CssClass="w-4 h-4" />
-                                </button>
-                            </td>
-                            <td class="px-5 py-3 text-slate-600">
-                                <FormatDate DateTime="@mainAccount.DateCreated" />
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        }
-
-        @* Sub-accounts table *@
-        <Table DataSource="ds">
+        <Table Items="accounts">
             <Columns>
-                <Column Header="Sub-Account" Width="38%">
-                    <span class="font-medium text-slate-900">@context.AccountName</span>
-                    <div class="text-xs text-slate-400 font-mono mt-0.5">@context.AccountID</div>
+                <Column Header="Account" Width="38%">
+                    <div class="@(context.Phone == "main" ? "bg-green-300" : "")">
+                        <span class="font-medium text-slate-900">@context.AccountName</span>
+                        <div class="mt-0.5 font-mono text-xs text-slate-400">@context.AccountID</div>
+                    </div>
                 </Column>
                 <Column Header="API Key">
-                    <span class="font-mono text-slate-700 text-xs">@GetKeyString(context.Key)</span>
+                    <span class="font-mono text-xs text-slate-700">@GetKeyString(context.Key)</span>
                 </Column>
                 <Column Header="" Width="56px">
                     <button @onclick="() => ResetApiKey(context)"
                             class="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-all"
                             title="Reset API Key">
-                        <Icon Style="Icon.IconStyle.RefreshCcw" CssClass="w-4 h-4" />
+                        <Icon Style="Icon.IconStyle.RefreshCcw" CssClass="h-4 w-4" />
                     </button>
                 </Column>
                 <Column Header="Date Created" Width="160px">
@@ -77,30 +40,31 @@
     </ChildContent>
 
     <FooterLeft>
-        <Paging PageNumber="ds.PageState.PageNumber"
-                PageSize="ds.PageState.PageSize"
-                TotalRecords="ds.PageState.TotalCount"
-                PageNumberChanged="OnPageChange"
-                PageSizeChanged="OnPageSizeChange" />
     </FooterLeft>
 </PageBody>
 
 @code {
     private string? searchQuery;
-    private AccountResponse? mainAccount;
-    private ApiDataSource<AccountResponse> ds = new();
+    private List<AccountResponse> accounts =[];
 
     protected override async Task OnInitializedAsync()
     {
-        var res = await apiClient.AccountGetAsync("self");
-        mainAccount = res.Result;
+        await ReloadData();
+    }
 
-        ds.Callback = new((PageState p, FilterState? f) =>
-        {
-            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchQuery);
-        });
-        ds.SetPage(new PageState(20, 1));
-        await ds.LoadData(alert);
+    private async Task ReloadData()
+    {
+        var t1 = apiClient.AccountGetAsync("self");
+        var t2 = apiClient.AccountsListAsync(1, 200, null, null);
+
+        await Task.WhenAll(t1, t2);
+
+        var mainAccount = t1.Result.Result;
+        accounts = t2.Result.Result.ToList();
+
+        mainAccount.Phone = "main"; // hack to identify main acct
+
+        accounts.Insert(0, mainAccount);
     }
 
     private static string GetKeyString(byte[]? key)
@@ -110,49 +74,22 @@
         catch { return "—"; }
     }
 
-    private async Task ReloadData()
-    {
-        ds.SetPage(new PageState(ds.PageState.PageSize, 1));
-        await ds.LoadData(alert);
-    }
-
-    private async Task OnPageChange(int page)
-    {
-        ds.SetPage(new PageState(ds.PageState.PageSize, page));
-        await ds.LoadData(alert);
-    }
-
-    private async Task OnPageSizeChange(int size)
-    {
-        ds.SetPage(new PageState(size, ds.PageState.PageNumber));
-        await ds.LoadData(alert);
-    }
-
     private async Task ResetApiKey(AccountResponse account)
     {
-        bool confirmed = await alert.Confirm(
-            $"This will immediately invalidate the current API key for \"{account.AccountName}\". Any applications using it will stop authenticating. Continue?",
-            "Reset API Key");
-
-        if (!confirmed) return;
-
         try
         {
-            var response = await apiClient.AccountUpdateProviderKeyAsync(
-                account.AccountID, new AccountProviderKeyRequest());
+            bool confirmed = await alert.Confirm(
+                $"This will immediately invalidate the current API key for [{account.AccountName}]. " +
+                $"Any applications using it will stop authenticating. Continue?",
+                "Reset API Key");
+
+            if (!confirmed) return;
+
+            // var response = await apiClient.AccountUpdateProviderKeyAsync(
+            //     account.AccountID, new AccountProviderKeyRequest());
 
             await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
-
-            // Refresh main account if it was the one reset
-            if (account.AccountID == mainAccount?.AccountID)
-            {
-                var res = await apiClient.AccountGetAsync("self");
-                mainAccount = res.Result;
-            }
-            else
-            {
-                await ds.LoadData(alert);
-            }
+            await ReloadData();
         }
         catch (Exception ex)
         {

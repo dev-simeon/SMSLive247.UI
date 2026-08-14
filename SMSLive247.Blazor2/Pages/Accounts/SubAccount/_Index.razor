@@ -5,16 +5,18 @@
 
 <PageTitle>Sub-Account Details</PageTitle>
 
-@if (account is not null)
+@if (subAccount is not null)
 {
-    <PageHeader Title="@account.AccountName">
+    <PageHeader Title="@subAccount.AccountName">
         <div class="mt-1 text-sm text-slate-500">
             <strong>Sub-Account Details </strong>
-            <small>@account.AccountID</small>
+            <small>@subAccount.AccountID</small>
+            <Badge Variant="@Badge.StatusVariant.ActiveInactive" 
+                Value="@(subAccount.Active ? "ACTIVE" : "DISABLED")" />
         </div>
     </PageHeader>
 
-    <CascadingValue Value="@account">
+    <CascadingValue Name="SubAccount" Value="@state">
         <Tabs>
             <TabPage Title="Details" Icon="Icon.IconStyle.Info">
                 <Details></Details>
@@ -54,8 +56,9 @@ else
 @code {
     [Parameter] public string? id { get; set; }
 
-    private AccountResponse? account;
+    private AccountState? state;
     private string? errorMessage;
+    private AccountResponse? subAccount => state?.Account;
 
     protected override async Task OnInitializedAsync()
     {
@@ -68,7 +71,7 @@ else
             }
 
             var response = await apiClient.AccountGetAsync(id);
-            account = response.Result;
+            state = new(response.Result);
         }
         catch (Exception ex)
         {

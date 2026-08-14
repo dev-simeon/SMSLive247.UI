@@ -53,7 +53,7 @@
 </PageBody>
 
 @code {
-    [CascadingParameter] public AccountResponse? Account { get; set; }
+    [CascadingParameter(Name = "SubAccount")] public required AccountState Sub { get; set; }
 
     private string? searchQuery;
     private DateTime? filterFrom;
@@ -71,9 +71,9 @@
     {
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            if (Account != null)
+            if (Sub.Account != null)
             {
-                return await subClient.Impersonate(Account).SmsBatchListAsync(
+                return await subClient.Impersonate(Sub.Account).SmsBatchListAsync(
                     p.PageNumber, p.PageSize, null, filterFrom, filterTo, searchQuery);
             }
             return ds.EmptyResponse;

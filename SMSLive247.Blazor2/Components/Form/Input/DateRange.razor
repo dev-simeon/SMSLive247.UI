@@ -18,11 +18,11 @@
 @if (Option == DateRangeFilter.CUSTOM)
 {
     <div class="flex h-full items-center border-l border-slate-200">
-        <input type="date" class="h-9 w-32 cursor-pointer bg-transparent px-2 text-sm text-slate-700 focus:outline-none"
+        <input type="date" class="h-9 w-32 cursor-pointer bg-transparent px-2 focus:outline-none"
                @bind="customStartDate" 
                @bind:after="OnCustomDateChanged" />
         <span class="px-0.5 text-slate-400">–</span>
-        <input type="date" class="h-9 w-32 cursor-pointer bg-transparent px-2 text-sm text-slate-700 focus:outline-none"
+        <input type="date" class="h-9 w-32 cursor-pointer bg-transparent px-2 focus:outline-none"
                @bind="customEndDate" 
                @bind:after="OnCustomDateChanged" />
     </div>

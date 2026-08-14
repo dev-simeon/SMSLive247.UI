@@ -1,14 +1,18 @@
-﻿<span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium @GetBadgeCss()">
+﻿@* <span class="inline-flex items-center gap-1.5 rounded-full border-2 px-2 py-0.5 font-bold text-[100] @GetBadgeCss()">
     @if (ShowDot)
     {
         <span class="h-1.5 w-1.5 rounded-full @GetDotCss()"></span>
     }
     @Value
 </span>
+ *@
+<span class="rounded-md px-2 py-1 text-xs font-bold text-white @GetBadgeCss()">
+    @Value
+</span>
 
 @code {
     public enum BadgeStyle { Success, Pending, Danger, Info, Neutral, }
-    public enum StatusVariant { SenderIdRequest, BatchMessage, DeliveryReport, UseBadgeStyle }
+    public enum StatusVariant { ActiveInactive, SenderIdRequest, BatchMessage, DeliveryReport, UseBadgeStyle }
 
     [Parameter] public StatusVariant Variant { get; set; } = StatusVariant.UseBadgeStyle;
     [Parameter] public BadgeStyle Style { get; set; } = BadgeStyle.Neutral;
@@ -17,25 +21,22 @@
 
     private string GetBadgeCss()
     {
-        return GetBadgeStyleFromVariant() switch
-        {
-            BadgeStyle.Success  => "bg-emerald-50 text-emerald-700 border-emerald-300",
-            BadgeStyle.Pending  => "bg-amber-50 text-amber-700 border-amber-300",
-            BadgeStyle.Danger   => "bg-red-50 text-red-700 border-red-300",
-            BadgeStyle.Info     => "bg-blue-50 text-blue-700 border-blue-300",
-            _                   => "bg-slate-50 text-slate-700 border-slate-300"
-        };
+        var color = GetColorString();
+        return $"bg-{color}-500";
+        //return $"bg-{color}-500 text-{color}-700 border-{color}-300";
     }
 
-    private string GetDotCss()
+    private string GetDotCss() => $"bg-{GetColorString()}-500";
+
+    private string GetColorString()
     {
         return GetBadgeStyleFromVariant() switch
         {
-            BadgeStyle.Success  => "bg-emerald-500",
-            BadgeStyle.Pending  => "bg-amber-500",
-            BadgeStyle.Danger   => "bg-red-500",
-            BadgeStyle.Info     => "bg-blue-500",
-            _                   => "bg-slate-500"
+            BadgeStyle.Success  => "green",
+            BadgeStyle.Pending  => "amber",
+            BadgeStyle.Danger   => "red",
+            BadgeStyle.Info     => "blue",
+            _                   => "slate"
         };
     }
 
@@ -43,10 +44,23 @@
     {
         return Variant switch
         {
+            StatusVariant.ActiveInactive    => MapActiveInactiveStatus(Value),
             StatusVariant.BatchMessage      => MapBatchMessageStatus(Value),
             StatusVariant.SenderIdRequest   => MapSenderIdRequestStatus(Value),
             StatusVariant.DeliveryReport    => MapDeliveryReportStatus(Value),
             _                               => Style,
+        };
+    }
+
+    private static BadgeStyle MapActiveInactiveStatus(string value)
+    {
+        return value.ToUpperInvariant() switch
+        {
+            "ACTIVE"    => BadgeStyle.Success,
+            "ENABLED"   => BadgeStyle.Success,
+            "INACTIVE"  => BadgeStyle.Danger,
+            "DISABLED"  => BadgeStyle.Danger,
+            _           => BadgeStyle.Neutral
         };
     }
 

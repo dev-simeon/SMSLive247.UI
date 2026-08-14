@@ -1,17 +1,21 @@
-@typeparam TItem
+﻿@typeparam TItem
 
-@if (Item == null)
+@if (IsHeaderRow)
 {
-    <th class="px-4 py-3 text-s font-bold text-brand-900 uppercase tracking-wider text-left" 
-        style="width: @Width; text-align: @Align">@Header</th>
+    <th class="px-4 py-2 font-medium text-nowrap"
+        style="width: @Width; text-align: @Align">
+        @Header
+    </th>
 }
 else 
 {
-    <td class="px-4 py-4" style="text-align: @Align">@ChildContent</td>
+    <td class="px-4 py-2 align-middle" style="text-align: @Align">@ChildContent</td>
 }
 
 @code {
+    [CascadingParameter(Name = "IsHeaderRow")] private bool IsHeaderRow { get; set; }
     [CascadingParameter] public TItem? Item { get; set; }
+
     [Parameter] public string? Header { get; set; }
     [Parameter] public string? Width { get; set; }
     [Parameter] public string? Align { get; set; }

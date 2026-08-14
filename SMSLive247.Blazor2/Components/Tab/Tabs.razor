@@ -1,10 +1,10 @@
-<CascadingValue Value="this">
+﻿<CascadingValue Value="this">
     <div class="border-b border-slate-300">
-        <nav class="-mb-px flex space-x-8 overflow-x-auto">
+        <nav class="-mb-px flex space-x-6 overflow-x-auto">
             @foreach (TabPage p in pages)
             {
                 <button type="button" @onclick="() => SetActivePage(p)"
-                        class="whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm 
+                        class="whitespace-nowrap py-4 px-4 border-b-3 font-medium 
                                flex items-center gap-2 transition-colors cursor-pointer
                         @(IsActive(p) 
                             ? "border-brand-500 text-brand-600" 
@@ -12,7 +12,7 @@
 
                     @if (p.Icon.HasValue)
                     {
-                        <Icon Style="@p.Icon.Value" CssClass="w-5 h-5" />
+                        <Icon Style="@p.Icon.Value" />
                     }
                     @p.Title
                 </button>

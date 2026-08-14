@@ -14,7 +14,7 @@
         <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="Add Sub-Account" Icon="Icon.IconStyle.PlusCircle" OnClick="() => subAccountModal.Show()" />
+        <Button Text="Add Sub-Account" Icon="Icon.IconStyle.PlusCircle" OnClick="() => createOrEditModal.Show()" />
     </HeaderRight>
 
     <ChildContent>
@@ -23,7 +23,7 @@
                 <Column Header="Sub-Account Name">
                     <button @onclick="() => nav.NavigateTo(SubAccountUrl(context.AccountID))"
                             class="font-medium text-brand-600 hover:text-brand-700 hover:underline text-left transition-colors">
-                        @(context.AccountName ?? "—")
+                        @context.AccountName
                     </button>
                 </Column>
                 <Column Header="Balance">
@@ -31,7 +31,7 @@
                         <span class="text-sm font-medium text-slate-700">
                             @context.Credits.ToString("#,##0.##")
                         </span>
-                        <button @onclick="async () => await transferModal.Show(context)"
+                        <button @onclick="() => transferModal.Show(Main.Account, context)"
                                 class="p-1 text-brand-600 hover:bg-brand-50 rounded-md transition-all"
                                 title="Transfer credits">
                             <Icon Style="Icon.IconStyle.PlusCircle" />
@@ -39,8 +39,8 @@
                     </div>
                 </Column>
                 <Column Header="Status">
-                    <Badge Style="@(context.Active ? Badge.BadgeStyle.Success : Badge.BadgeStyle.Neutral)"
-                           Value="@(context.Active ? "Active" : "Inactive")" />
+                    <Badge Variant="Badge.StatusVariant.ActiveInactive"
+                           Value="@(context.Active ? "ACTIVE" : "DISABLED")" />
                 </Column>
                 <Column Header="Date Created" Width="150px">
                     <FormatDate DateTime="@context.DateCreated" />
@@ -72,13 +72,15 @@
     </FooterLeft>
 </PageBody>
 
-<EditModal @ref="subAccountModal" OnCompleted="ReloadData" />
-<TransferModal @ref="transferModal" ParentId="self" OnCompleted="ReloadData" />
+<EditModal @ref="createOrEditModal" OnCompleted="ReloadData" />
+<TransferModal @ref="transferModal" OnCompleted="ReloadData" />
 
 @code {
+    [CascadingParameter(Name = "MainAccount")] private AccountState Main { get; set; } = null!;
+
     private string? searchQuery;
     private ApiDataSource<AccountResponse> ds = new();
-    private EditModal subAccountModal = new();
+    private EditModal createOrEditModal = new();
     private TransferModal transferModal = new();
 
     private string SubAccountUrl(string? id) =>

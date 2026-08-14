@@ -8,13 +8,13 @@
                     <div class="flex items-center gap-2">
                         <InputRadio id="toChild" Value="@true" />
                         <label for="toChild" class="text-sm text-slate-700">
-                            @ParentAccount?.AccountName → @subAccount.AccountName
+                            @parentAccount?.AccountName → @childAccount?.AccountName
                         </label>
                     </div>
                     <div class="flex items-center gap-2">
                         <InputRadio id="toParent" Value="@false" />
                         <label for="toParent" class="text-sm text-slate-700">
-                            @subAccount.AccountName → @ParentAccount?.AccountName
+                            @childAccount?.AccountName → @parentAccount?.AccountName
                         </label>
                     </div>
                 </InputRadioGroup>
@@ -24,11 +24,11 @@
                 <label class="mb-1 block text-sm font-medium text-slate-700">Credits</label>
                 <InputNumber
                 class="block w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:ring-brand-500 focus:ring-1 focus:outline-none"
-                @bind-Value="request.Credits" 
-                min="50"
-                @oninput="OnCreditChanged" 
-                required 
-                placeholder="Enter amount to transfer" />
+                    @bind-Value="request.Credits" 
+                    @oninput="OnCreditChanged"
+                    min="50"
+                    required 
+                    placeholder="Enter amount to transfer" />
             </div>
 
             <FormRow Cols="2">
@@ -53,21 +53,27 @@
 </Modal>
 
 @code {
-    [CascadingParameter] public AccountResponse? ParentAccount { get; set; }
     [Parameter] public EventCallback OnCompleted { get; set; }
 
     private bool isVisible = false;
-    private AccountResponse subAccount = new();
+    private AccountResponse? parentAccount;
+    private AccountResponse? childAccount;
     private TransferRequest request = new();
 
     private bool parentToChild = true;
-    private double senderOldBalance => parentToChild ? ParentAccount?.Credits ?? 0 : subAccount.Credits;
+    private double senderOldBalance => parentToChild ? parentAccount?.Credits ?? 0 : childAccount?.Credits ?? 0;
     private double senderNewBalance => senderOldBalance - request.Credits;
 
-    public void Show(AccountResponse child)
+    public void Show(AccountResponse parent, AccountResponse child)
     {
-        subAccount = child;
-        request = new TransferRequest();
+        parentAccount = parent;
+        childAccount = child;
+        request = new TransferRequest()
+            {
+                Credits = 50,
+                Recipient = childAccount.AccountID,
+                Remarks = $"Transfer from A to B"
+            };
 
         isVisible = true;
         StateHasChanged();

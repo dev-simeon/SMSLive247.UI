@@ -1,19 +1,24 @@
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
+@inject AuthenticationStateProvider auth;
 
-<div class="flex flex-col h-screen overflow-hidden bg-slate-50">
+<CascadingValue Value="@state" Name="MainAccount">
 
-    <div class="flex flex-1 overflow-hidden">
-        <Sidebar @bind-IsOpen="sidebarOpen"></Sidebar>
+    <div class="flex h-screen flex-col overflow-hidden bg-slate-50">
 
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden transition-all duration-300">
-            <Header OnMenuClick="() => setSidebarOpen(true)"></Header>
+        <div class="flex flex-1 overflow-hidden">
+            <Sidebar @bind-IsOpen="sidebarOpen"></Sidebar>
 
-            <main class="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth space-y-8">
-                @Body
-            </main>
+            <div class="flex min-w-0 flex-1 flex-col overflow-hidden transition-all duration-300">
+                <Header OnMenuClick="() => setSidebarOpen(true)"></Header>
+
+                <main class="flex-1 space-y-8 overflow-y-auto scroll-smooth p-4 sm:p-6">
+                    @Body
+                </main>
+            </div>
         </div>
     </div>
-</div>
+
+</CascadingValue>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -23,6 +28,19 @@
 
 @code {
     private bool sidebarOpen = false;
+    private AccountState? state;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync("self");
+            state = new(response.Result);
+        }
+        catch (Exception ex)
+        {
+        }
+    }
 
     private void setSidebarOpen(bool value)
     {

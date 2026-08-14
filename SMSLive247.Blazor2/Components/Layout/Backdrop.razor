@@ -1,0 +1,20 @@
+﻿@if (IsVisible)
+{
+    <!-- Transparent overlay to handle clicking outside -->
+    <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        @onclick="@OnClose"></div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; } = false;
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    private async Task OnClose()
+    {
+        IsVisible = false;
+        if (IsVisibleChanged.HasDelegate)
+        {
+            await IsVisibleChanged.InvokeAsync(IsVisible);
+        }
+    }
+}

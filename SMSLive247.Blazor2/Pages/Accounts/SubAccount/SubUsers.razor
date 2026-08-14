@@ -6,7 +6,7 @@
         </SearchBox>
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="Add Sub User" Icon="Icon.IconStyle.PlusCircle" OnClick="() => subUserModal.Show(null)" />
+        <Button Text="Add Sub User" Icon="Icon.IconStyle.PlusCircle" OnClick="() => subUserModal.Show(Sub.Account, null)" />
     </HeaderRight>
 
     <ChildContent>
@@ -29,9 +29,10 @@
                         <span class="font-medium text-slate-900">
                             <FormatNumber Number="@context.Credits"></FormatNumber>
                         </span>
-                        <Button Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(context)" CssClass="text-xs px-2 py-1">
+                        @* <Button Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(context)" 
+                            CssClass="text-xs px-2 py-1">
                             Add/Remove Credit
-                        </Button>
+                        </Button> *@
                     </div>
                 </Column>
                 <Column Header="Status">
@@ -48,8 +49,8 @@
                         </span>
                     }
                 </Column>
-                <Column>
-                    <Actions OnEdit="() => subUserModal.Show(context)"
+                <Column Header="ddd">
+                    <Actions OnEdit="() => subUserModal.Show(Sub.Account, context)"
                              OnDelete="() => DeleteSubUser(context)">
                     </Actions>
                 </Column>
@@ -70,7 +71,7 @@
 <TransferModal @ref="transferModal" OnCompleted="ReloadData"></TransferModal>
 
 @code {
-    [CascadingParameter] public AccountResponse? Account { get; set; }
+    [CascadingParameter(Name = "SubAccount")] public required AccountState Sub { get; set; }
 
     private string? searchQuery;
     private SubUserModal subUserModal = new();
@@ -81,9 +82,9 @@
     {
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            if (Account != null)
+            if (Sub.Account != null)
             {
-                return await subClient.Impersonate(Account).AccountsListAsync(
+                return await subClient.Impersonate(Sub.Account).AccountsListAsync(
                     p.PageNumber, p.PageSize, null, searchQuery);
             }
             return ds.EmptyResponse;
@@ -116,11 +117,11 @@
         var question = $"Are you sure you want to delete the sub user '{account.AccountName}'?";
         bool confirmed = await alert.Confirm(question, "Confirm Deletion");
 
-        if (confirmed && Account != null)
+        if (confirmed && Sub.Account != null)
         {
             try
             {
-                await subClient.Impersonate(Account).AccountDeleteAsync(account.AccountID);
+                await subClient.Impersonate(Sub.Account).AccountDeleteAsync(account.AccountID);
                 await alert.Success("Sub User deleted.");
                 await ReloadData();
             }

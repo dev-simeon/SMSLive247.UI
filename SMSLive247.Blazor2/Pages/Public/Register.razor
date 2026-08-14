@@ -10,7 +10,7 @@
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
         <h1 class="mb-6 text-4xl leading-tight font-bold">Everything you need to reach your customers.</h1>
-        <p class="mb-8 text-lg leading-relaxed text-blue-100">
+        <p class="mb-8 text-lg leading-relaxed text-slate-100">
             Join thousands of businesses sending millions of messages daily with
             the most reliable bulk SMS platform in Nigeria.
         </p>
@@ -22,7 +22,7 @@
                 </svg>
                 <div>
                     <p class="font-semibold">Robust API Integration</p>
-                    <p class="mt-0.5 text-xs text-blue-100">Connect your enterprise workflows in minutes.</p>
+                    <p class="mt-0.5 text-xs text-slate-100">Connect your enterprise workflows in minutes.</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm">
@@ -31,7 +31,7 @@
                 </svg>
                 <div>
                     <p class="font-semibold">Scalable Infrastructure</p>
-                    <p class="mt-0.5 text-xs text-blue-100">High throughput for time-critical notifications.</p>
+                    <p class="mt-0.5 text-xs text-slate-100">High throughput for time-critical notifications.</p>
                 </div>
             </div>
         </div>
@@ -40,7 +40,7 @@
 
 <div class="text-center lg:text-left">
     <div class="mb-8 flex items-center justify-center lg:hidden">
-        <img src="smslive-logo-2.png" alt="SMSLive247" class="h-10 w-auto" />
+        <img src="smslive-logo-2.png" alt="SMSLive247" class="h-10 w-auto rounded-lg" />
     </div>
     <h2 class="text-3xl font-bold text-slate-900">Create Account</h2>
     <p class="mt-2 text-slate-500">Join the SMSLive247 enterprise platform today.</p>
@@ -104,13 +104,14 @@
 
     @if (model.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
     {
-        <p class="mt-1 text-xs text-red-500">Passwords do not match.</p>
+        <p class="mt-1 text-red-500">Passwords do not match.</p>
     }
 
     <div class="flex items-center">
-        <InputCheckbox @bind-Value="termsAccepted" id="terms"
-                       class="text-brand-500 h-4 w-4 rounded border-slate-200 focus:ring-brand-500" />
-        <label class="ml-2 block text-sm text-slate-600" for="terms">
+        <InputCheckbox @bind-Value="termsAccepted" id="terms" style="accent-color: lime"
+                       class="bg-brand-500 h-4 w-4 rounded-lg border-slate-200 focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none" />
+        
+                       <label class="ml-2 block text-sm text-slate-600" for="terms">
             I have read and accepted the
             <a href="@Const.Routes.Legal.Terms" target="_blank"
                class="text-brand-500 hover:text-brand-600">Agreement</a> and

@@ -38,15 +38,13 @@ namespace SMSLive247.UI.Shared
             }
         }
 
-        public Func<PageState, FilterState?, Task<SwaggerResponse<ICollection<T>>>>? Callback { get; set; } 
+        public SwaggerResponse<ICollection<T>> EmptyResponse => new(204, new Dictionary<string, IEnumerable<string>>(), []);
+        public Func<PageState, FilterState?, Task<SwaggerResponse<ICollection<T>>>>? Callback { get; set; }
         public PagedList<T>? Items { get; private set; }
         public PageState PageState { get; private set; } = new(10, 1);
-        public FilterState? FilterState { get; private set; } 
+        public FilterState? FilterState { get; private set; }
         public bool IsLoading { get; private set; } = false;
         public string? ErrorMessage { get; private set; }
-
-         public SwaggerResponse<ICollection<T>> EmptyResponse =>  
-            new(204, new Dictionary<string, IEnumerable<string>>(), []);
     }
 
     public record class FilterState();

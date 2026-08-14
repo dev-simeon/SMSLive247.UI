@@ -1,4 +1,4 @@
-@attribute [CascadingTypeParameter(nameof(TItem))]
+﻿@attribute [CascadingTypeParameter(nameof(TItem))]
 @typeparam TItem
 
 @if (Columns == null)
@@ -8,16 +8,18 @@
 else
 {
     <div>
-        <table>
+        <table class="w-full min-w-full border-collapse text-left">
             <thead>
-                <tr>
-                    @Columns(default)
+                <tr class="bg-brand-100 border-brand-300 border-b-2">
+                    <CascadingValue Name="IsHeaderRow" Value="true" IsFixed="true">
+                        @Columns(default)
+                    </CascadingValue>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-100 bg-white">
                 @if (IsLoading())
                 {
-                    <tr>
+                    <tr class="transition-colors duration-150 ease-in-out hover:bg-slate-50/50">
                         <td colspan="20" class="px-4 py-12 text-center text-slate-500">
                             <Loading BoolCheck="false"></Loading>
                         </td>
@@ -26,16 +28,16 @@ else
                 else if (items == null)
                 {
                     <tr>
-                        <td colspan="20" class="px-4 py-12 text-center text-slate-500">
-                            <span class="badge text-bg-info">NULL items </span>
+                        <td colspan="20" class="px-4 py-12 text-center text-red-500">
+                            <span class="bg-red-100">@(DataSource?.ErrorMessage ?? "Errors occured")</span>
                         </td>
                     </tr>
                 }
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="20" class="px-4 py-12 text-center text-slate-500">
-                            <span class="badge text-bg-info">@EmptyMessage</span>
+                        <td colspan="20" class="px-4 py-12 text-center">
+                            <span class="text-yellow-700">@EmptyMessage</span>
                         </td>
                     </tr>
                 }
@@ -43,11 +45,18 @@ else
                 {
                     @foreach (TItem item in items)
                     {
-                        <tr class="@GetSelectedCss(item)" @onclick="e => ToggleRow(item)">
-                            <CascadingValue Value="item">
-                                @Columns(item)
-                            </CascadingValue>
-                        </tr>
+                        <ErrorBoundary>
+                            <ChildContent>
+                                <tr @key="item" class="h-[60px] hover:bg-slate-100 @GetSelectedCss(item)" @onclick="e => ToggleRow(item)">
+                                    <CascadingValue Value="item">
+                                        @Columns(item)
+                                    </CascadingValue>
+                                </tr>
+                            </ChildContent>
+                            <ErrorContent>
+                                <tr><td colspan="20">Couldn't render this row.</td></tr>
+                            </ErrorContent>
+                        </ErrorBoundary>
                     }
                 }
             </tbody>
@@ -70,7 +79,7 @@ else
     protected override void OnParametersSet()
     {
         // if (DataSource == null && Items == null)
-        // throw new InvalidOperationException("Please set either DataSource or Items properties");
+        //     throw new InvalidOperationException("Please set either DataSource or Items properties");
 
         if (DataSource != null && Items != null)
             throw new InvalidOperationException("You should set only one of DataSource and Items properties");
@@ -101,6 +110,7 @@ else
         if (SelectedItems.Contains(item))
         {
             SelectedItems.Remove(item);
+            await OnSelectedItemChanged.InvokeAsync(item);
             return;
         }
 
@@ -115,6 +125,7 @@ else
     {
         if (AllowSelect && SelectedItems.Contains(item))
             return "table-select-row";
+
         return null;
     }
 

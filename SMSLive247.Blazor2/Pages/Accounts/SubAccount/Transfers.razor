@@ -6,7 +6,10 @@
         </SearchBox>
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="Add/Remove Credit" OnClick="() => transferModal.Show(Account)" />
+        @if (Sub.Account != null)
+        {
+            <Button Text="Add/Remove Credit" OnClick="() => transferModal.Show(Main.Account, Sub.Account)" />
+        }
     </HeaderRight>
 
     <ChildContent>
@@ -40,23 +43,23 @@
     </FooterLeft>
 </PageBody>
 
-<TransferModal @ref="transferModal" ParentId="self" OnCompleted="ReloadData"></TransferModal>
+<TransferModal @ref="transferModal" OnCompleted="ReloadData"></TransferModal>
 
 @code {
-    [CascadingParameter] public AccountResponse? Account { get; set; }
+    [CascadingParameter(Name = "SubAccount")] public required AccountState Sub { get; set; }
+    [CascadingParameter(Name = "MainAccount")] public required AccountState Main { get; set; }
 
     private string? searchQuery;
     private TransferModal transferModal = new();
-
     private ApiDataSource<TransferResponse> ds = new();
 
     protected override async Task OnInitializedAsync()
     {
         ds.Callback = new(async (PageState p, FilterState? f) =>
         {
-            if (Account != null)
+            if (Sub.Account != null)
             {
-                return await subClient.Impersonate(Account).TransferListAsync(
+                return await subClient.Impersonate(Sub.Account).TransferListAsync(
                     p.PageNumber, p.PageSize, null, searchQuery);
             }
             return ds.EmptyResponse;
