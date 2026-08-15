@@ -27,12 +27,12 @@
         <Table Items="filteredItems">
             <Columns>
                 <Column Header="Sender ID">
-                    <span class="font-medium text-slate-900">@(string.IsNullOrEmpty(context.SenderID) ? "—" : context.SenderID)</span>
+                    @context.SenderID
                 </Column>
                 <Column Header="Purpose / Sample Message" Width="40%">
                     <div class="flex flex-col">
-                        <div class="mb-0.5 text-sm font-medium text-slate-900">@(string.IsNullOrEmpty(context.Purpose) ? "—" : context.Purpose)</div>
-                        <div class="max-w-md truncate text-xs text-slate-500">@(string.IsNullOrEmpty(context.SampleText) ? "—" : context.SampleText)</div>
+                        <div class="mb-0.5 text-sm font-medium text-slate-900">@context.Purpose</div>
+                        <div class="max-w-md truncate text-xs text-slate-500">@context.SampleText</div>
                     </div>
                 </Column>
                 <Column Header="Date Requested">

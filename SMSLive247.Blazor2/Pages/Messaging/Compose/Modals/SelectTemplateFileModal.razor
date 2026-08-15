@@ -1,9 +1,9 @@
-<Modal Title="Select Personalization File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+﻿<Modal Title="Select Personalization File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
     <Body>
         <div class="space-y-4">
             <div class="flex items-end gap-3">
                 <div class="flex-1"><FormInput Label="Search files" @bind-Value="searchTerm" Required="false" Placeholder="Search files..." /></div>
-                <Button Text="Refresh" Icon="Icon.IconStyle.RefreshCcw" Style="Button.ButtonStyle.Secondary" IsBusy="isLoading" OnClick="Refresh" CssClass="min-w-0 px-3" />
+                <Button Text="Refresh" Icon="Icon.IconStyle.Refresh" Style="Button.ButtonStyle.Secondary" IsBusy="isLoading" OnClick="Refresh" CssClass="min-w-0 px-3" />
             </div>
             <div class="max-h-96 overflow-y-auto rounded-lg border border-slate-200">
                 @if (isLoading)
@@ -20,7 +20,7 @@
                         @foreach (var file in filteredFiles)
                         {
                             <label class="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 hover:bg-slate-50">
-                                <span class="flex min-w-0 items-center gap-3"><input type="radio" name="templateFile" checked="@(selectedId == file.BatchFileID)" @onchange="_ => selectedId = file.BatchFileID" /><Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-brand-500" /><span class="min-w-0"><span class="block truncate text-sm font-medium text-slate-800">@file.Description</span><span class="block text-xs uppercase text-slate-400">@file.FileType</span></span></span>
+                                <span class="flex min-w-0 items-center gap-3"><input type="radio" name="templateFile" checked="@(selectedId == file.BatchFileID)" @onchange="_ => selectedId = file.BatchFileID" /><Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-brand-500" /><span class="min-w-0"><span class="block truncate text-sm font-medium text-slate-800">@file.Description</span><span class="block text-xs text-slate-400 uppercase">@file.FileType</span></span></span>
                                 <span class="shrink-0 rounded bg-slate-100 px-2 py-1 text-xs font-medium text-slate-700">@file.TotalNumbers.ToString("N0")</span>
                             </label>
                         }

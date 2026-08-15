@@ -1,4 +1,4 @@
-<PageBody>
+﻿<PageBody>
     <HeaderLeft>
         <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
@@ -12,23 +12,23 @@
                     <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@context.Status" />
                 </Column>
                 <Column Header="Sender" Width="100px">
-                    <span class="font-medium text-slate-900 text-sm">@context.SenderID?.ToUpper()</span>
+                    <span class="text-sm font-medium text-slate-900">@context.SenderID?.ToUpper()</span>
                 </Column>
                 <Column Header="Message">
-                    <p class="text-sm text-slate-600 truncate max-w-md" title="@context.MessageText">@context.MessageText</p>
+                    <p class="max-w-md truncate text-sm text-slate-600" title="@context.MessageText">@context.MessageText</p>
                 </Column>
                 <Column>
                     <Actions>
-                        <button class="flex items-center gap-3 px-4 py-2 text-sm text-brand-700 hover:bg-brand-50 w-full text-left transition-colors"
+                        <button class="text-brand-700 flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors hover:bg-brand-50"
                                 @onclick="e => ResumeBatch(context.BatchID)"
                                 @onclick:stopPropagation="true" title="Resume Batch">
-                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-brand-500 w-4 h-4 text-center" />
+                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-brand-500 h-4 w-4 text-center" />
                             Send Immediately
                         </button>
-                        <button class="flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors"
+                        <button class="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-red-600 transition-colors hover:bg-red-50"
                                 @onclick="e => AbortBatch(context.BatchID)"
                                 @onclick:stopPropagation="true" title="Abort Batch">
-                            <Icon Style="Icon.IconStyle.Close" CssClass="text-red-500 w-4 h-4 text-center" />
+                            <Icon Style="Icon.IconStyle.Close" CssClass="h-4 w-4 text-center text-red-500" />
                             Abort
                         </button>
                     </Actions>

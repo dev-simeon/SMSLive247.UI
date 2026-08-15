@@ -1,0 +1,134 @@
+﻿<div class="relative inline-block text-left" @onclick:stopPropagation="true">
+    <button type="button" id="@buttonId" @onclick="ToggleMenu" disabled="@Disabled" title="Actions"
+        class="size-7 rounded-full bg-slate-100 p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none">
+        <Icon Style="Icon.IconStyle.MoreVertical" CssStyle="font-size: 1rem;" />
+    </button>
+    
+    @if (isMenuOpen)
+    {
+        <div class="fixed inset-0 z-[9998]" @onclick="CloseMenu"></div>
+        
+        <div class="fixed z-[9999] w-48 rounded-sm border border-slate-200 bg-white text-left shadow-xl focus:outline-none"
+             style="top: @(menuTop)px; left: @(menuLeft)px;">
+            <div class="flex flex-col py-1.5">
+                @ChildContent
+
+                @if (ViewLink != null)
+                {
+                    <a href="@ViewLink" class="@ItemClass" @onclick="CloseMenu">
+                        <Icon Style="Icon.IconStyle.Eye" CssClass="@ButtonClass" />
+                        View Details
+                    </a>
+                }
+                @if (OnView.HasDelegate)
+                {
+                    <button class="@ItemClass" @onclick="HandleView">
+                        <Icon Style="Icon.IconStyle.Eye" CssClass="@ButtonClass" />
+                        View Details
+                    </button>
+                }
+                @if (EditLink != null)
+                {
+                    <a href="@EditLink" class="@ItemClass" @onclick="CloseMenu">
+                        <Icon Style="Icon.IconStyle.PenSquare" CssClass="@ButtonClass" />
+                        Edit
+                    </a>
+                }
+                @if (OnEdit.HasDelegate)
+                {
+                    <button class="@ItemClass" @onclick="HandleEdit">
+                        <Icon Style="Icon.IconStyle.PenSquare" CssClass="@ButtonClass" />
+                        Edit
+                    </button>
+                }
+                @if (OnSave.HasDelegate)
+                {
+                    <button class="@ItemClass" @onclick="HandleSave">
+                        <Icon Style="Icon.IconStyle.CheckCircle" CssClass="@ButtonClass" />
+                        Save Changes
+                    </button>
+                }
+                @if (OnDownload.HasDelegate)
+                {
+                    <button class="@ItemClass" @onclick="HandleDownload">
+                        <Icon Style="Icon.IconStyle.Download" CssClass="@ButtonClass" />
+                        Download
+                    </button>
+                }
+                @if (OnCancel.HasDelegate)
+                {
+                    <button class="@ItemClass" @onclick="HandleCancel">
+                        <Icon Style="Icon.IconStyle.Close" CssClass="@ButtonClass" />
+                        Cancel Edit
+                    </button>
+                }
+                @if (DeleteLink != null)
+                {
+                    <a href="@DeleteLink" class="@DangerItemClass" @onclick="CloseMenu">
+                        <Icon Style="Icon.IconStyle.Trash" CssClass="@ButtonClass" />
+                        Delete
+                    </a>
+                }
+                @if (OnDelete.HasDelegate)
+                {
+                    <button class="@DangerItemClass" @onclick="HandleDelete">
+                        <Icon Style="Icon.IconStyle.Trash" CssClass="@ButtonClass" />
+                        Delete
+                    </button>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Inject] IJSRuntime JS { get; set; } = default!;
+
+    [Parameter] public EventCallback OnView { get; set; }
+    [Parameter] public EventCallback OnEdit { get; set; }
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnDelete { get; set; }
+    [Parameter] public EventCallback OnDownload { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    [Parameter] public string? ViewLink { get; set; }
+    [Parameter] public string? EditLink { get; set; }
+    [Parameter] public string? DeleteLink { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string ButtonClass { get; set; } = "text-brand-500";
+    [Parameter] public bool Disabled { get; set; } = false;
+
+    private bool isMenuOpen = false;
+    private double menuTop = 0;
+    private double menuLeft = 0;
+    private string buttonId = $"actions-btn-{Guid.NewGuid():N}";
+
+    private string ItemClass = "flex items-center gap-2.5 px-3 py-2 text-slate-700 hover:bg-slate-100 w-full text-left transition-colors";
+    private string DangerItemClass = "flex items-center gap-2.5 px-3 py-2 text-red-600 hover:bg-red-50 w-full text-left transition-colors";
+
+    private async Task ToggleMenu()
+    {
+        if (Disabled) return;
+        if (!isMenuOpen)
+        {
+            // Get the button's screen position so we can anchor the fixed menu below it
+            var rect = await JS.InvokeAsync<BoundingRect>("eval", 
+                $"(() => {{ const r = document.getElementById('{buttonId}').getBoundingClientRect(); return {{top: r.bottom + window.scrollY, left: r.right + window.scrollX - 192}}; }})()");
+            menuTop = rect.Top;
+            menuLeft = rect.Left;
+        }
+        isMenuOpen = !isMenuOpen;
+    }
+
+    private void CloseMenu() => isMenuOpen = false;
+
+    private async Task HandleView() { CloseMenu(); await OnView.InvokeAsync(); }
+    private async Task HandleEdit() { CloseMenu(); await OnEdit.InvokeAsync(); }
+    private async Task HandleSave() { CloseMenu(); await OnSave.InvokeAsync(); }
+    private async Task HandleDownload() { CloseMenu(); await OnDownload.InvokeAsync(); }
+    private async Task HandleCancel() { CloseMenu(); await OnCancel.InvokeAsync(); }
+    private async Task HandleDelete() { CloseMenu(); await OnDelete.InvokeAsync(); }
+
+    private record BoundingRect(double Top, double Left);
+}

@@ -1,88 +1,64 @@
-<div class="relative inline-block text-left" @onclick:stopPropagation="true">
-    <button type="button" id="@buttonId" @onclick="ToggleMenu" class="@ButtonClass" disabled="@Disabled" title="Actions">
-        <Icon Style="Icon.IconStyle.MoreVertical" CssClass="text-lg" />
-    </button>
-    
-    @if (isMenuOpen)
-    {
-        <div class="fixed inset-0 z-[9998]" @onclick="CloseMenu"></div>
-        
-        <div class="fixed z-[9999] w-48 rounded-xl bg-white shadow-xl border border-slate-200 focus:outline-none text-left"
-             style="top: @(menuTop)px; left: @(menuLeft)px;">
-            <div class="py-1.5 flex flex-col">
-                @ChildContent
+﻿<div class="float-end inline-flex">
+    @ChildContent
 
-                @if (ViewLink != null)
-                {
-                    <a href="@ViewLink" class="@ItemClass" @onclick="CloseMenu">
-                        <Icon Style="Icon.IconStyle.Eye" CssClass="text-slate-400 w-4 h-4 text-center" />
-                        View Details
-                    </a>
-                }
-                @if (OnView.HasDelegate)
-                {
-                    <button class="@ItemClass" @onclick="HandleView">
-                        <Icon Style="Icon.IconStyle.Eye" CssClass="text-slate-400 w-4 h-4 text-center" />
-                        View Details
-                    </button>
-                }
-                @if (EditLink != null)
-                {
-                    <a href="@EditLink" class="@ItemClass" @onclick="CloseMenu">
-                        <Icon Style="Icon.IconStyle.PenSquare" CssClass="text-slate-400 w-4 h-4 text-center" />
-                        Edit
-                    </a>
-                }
-                @if (OnEdit.HasDelegate)
-                {
-                    <button class="@ItemClass" @onclick="HandleEdit">
-                        <Icon Style="Icon.IconStyle.PenSquare" CssClass="text-slate-400 w-4 h-4 text-center" />
-                        Edit
-                    </button>
-                }
-                @if (OnSave.HasDelegate)
-                {
-                    <button class="@ItemClass" @onclick="HandleSave">
-                        <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-emerald-500 w-4 h-4 text-center" />
-                        Save Changes
-                    </button>
-                }
-                @if (OnDownload.HasDelegate)
-                {
-                    <button class="@ItemClass" @onclick="HandleDownload">
-                        <Icon Style="Icon.IconStyle.Download" CssClass="text-slate-400 w-4 h-4 text-center" />
-                        Download
-                    </button>
-                }
-                @if (OnCancel.HasDelegate)
-                {
-                    <button class="@ItemClass" @onclick="HandleCancel">
-                        <Icon Style="Icon.IconStyle.Close" CssClass="text-amber-500 w-4 h-4 text-center" />
-                        Cancel Edit
-                    </button>
-                }
-                @if (DeleteLink != null)
-                {
-                    <a href="@DeleteLink" class="@DangerItemClass" @onclick="CloseMenu">
-                        <Icon Style="Icon.IconStyle.Trash" CssClass="text-red-500 w-4 h-4 text-center" />
-                        Delete
-                    </a>
-                }
-                @if (OnDelete.HasDelegate)
-                {
-                    <button class="@DangerItemClass" @onclick="HandleDelete">
-                        <Icon Style="Icon.IconStyle.Trash" CssClass="text-red-500 w-4 h-4 text-center" />
-                        Delete
-                    </button>
-                }
-            </div>
-        </div>
+    @if (ViewLink != null)
+    {
+        <a class="@ButtonClass" disabled="@Disabled" href="@ViewLink" title="View">
+            <Icon Style="Icon.IconStyle.Eye" CssClass="@IconClass" />
+        </a>
+    }
+    @if (EditLink != null)
+    {
+        <a class="@ButtonClass" disabled="@Disabled" href="@EditLink" title="Edit">
+            <Icon Style="Icon.IconStyle.PenSquare" CssClass="@IconClass" />
+        </a>
+    }
+    @if (DeleteLink != null)
+    {
+        <a class="@ButtonClass" disabled="@Disabled" href="@DeleteLink" title="Delete">
+            <Icon Style="Icon.IconStyle.Trash" CssClass="@IconClass" />
+        </a>
+    }
+
+    @if (OnView.HasDelegate)
+    {
+        <button class="@ButtonClass" disabled="@Disabled" @onclick="@OnView" @onclick:stopPropagation="true" title="View">
+            <Icon Style="Icon.IconStyle.Eye" CssClass="@IconClass" />
+        </button>
+    }
+    @if (OnEdit.HasDelegate)
+    {
+        <button class="@ButtonClass" disabled="@Disabled" @onclick="@OnEdit" @onclick:stopPropagation="true" title="Edit">
+            <Icon Style="Icon.IconStyle.PenSquare" CssClass="@IconClass" />
+        </button>
+    }
+    @if (OnSave.HasDelegate)
+    {
+        <button class="@ButtonClass" disabled="@Disabled" @onclick="@OnSave" @onclick:stopPropagation="true" title="Save Changes">
+            <Icon Style="Icon.IconStyle.Save" CssClass="@IconClass" />
+        </button>
+    }
+    @if (OnDelete.HasDelegate)
+    {
+        <button class="@ButtonClass" disabled="@Disabled" @onclick="@OnDelete" @onclick:stopPropagation="true" title="Delete">
+            <Icon Style="Icon.IconStyle.Trash" CssClass="@IconClass" />
+        </button>
+    }
+    @if (OnDownload.HasDelegate)
+    {
+        <button class="@ButtonClass" disabled="@Disabled" @onclick="@OnDownload" @onclick:stopPropagation="true" title="Download">
+            <Icon Style="Icon.IconStyle.Download" CssClass="@IconClass" />
+        </button>
+    }
+    @if (OnCancel.HasDelegate)
+    {
+        <button class="@ButtonClass" disabled="@Disabled" @onclick="@OnCancel" @onclick:stopPropagation="true" title="Cancel Edit">
+            <Icon Style="Icon.IconStyle.Close" CssClass="@IconClass" />
+        </button>
     }
 </div>
 
 @code {
-    [Inject] IJSRuntime JS { get; set; } = default!;
-
     [Parameter] public EventCallback OnView { get; set; }
     [Parameter] public EventCallback OnEdit { get; set; }
     [Parameter] public EventCallback OnSave { get; set; }
@@ -95,39 +71,7 @@
     [Parameter] public string? DeleteLink { get; set; }
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public string ButtonClass { get; set; } = "p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none";
+    [Parameter] public string ButtonClass { get; set; } = "inline-flex items-center justify-center px-3 py-2 focus:z-10 focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none transition-colors";
+    [Parameter] public string IconClass { get; set; } = "text-brand-400 hover:text-brand-700";
     [Parameter] public bool Disabled { get; set; } = false;
-
-    private bool isMenuOpen = false;
-    private double menuTop = 0;
-    private double menuLeft = 0;
-    private string buttonId = $"actions-btn-{Guid.NewGuid():N}";
-
-    private string ItemClass = "flex items-center gap-2.5 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 w-full text-left transition-colors";
-    private string DangerItemClass = "flex items-center gap-2.5 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors";
-
-    private async Task ToggleMenu()
-    {
-        if (Disabled) return;
-        if (!isMenuOpen)
-        {
-            // Get the button's screen position so we can anchor the fixed menu below it
-            var rect = await JS.InvokeAsync<BoundingRect>("eval", 
-                $"(() => {{ const r = document.getElementById('{buttonId}').getBoundingClientRect(); return {{top: r.bottom + window.scrollY, left: r.right + window.scrollX - 192}}; }})()");
-            menuTop = rect.Top;
-            menuLeft = rect.Left;
-        }
-        isMenuOpen = !isMenuOpen;
-    }
-
-    private void CloseMenu() => isMenuOpen = false;
-
-    private async Task HandleView() { CloseMenu(); await OnView.InvokeAsync(); }
-    private async Task HandleEdit() { CloseMenu(); await OnEdit.InvokeAsync(); }
-    private async Task HandleSave() { CloseMenu(); await OnSave.InvokeAsync(); }
-    private async Task HandleDownload() { CloseMenu(); await OnDownload.InvokeAsync(); }
-    private async Task HandleCancel() { CloseMenu(); await OnCancel.InvokeAsync(); }
-    private async Task HandleDelete() { CloseMenu(); await OnDelete.InvokeAsync(); }
-
-    private record BoundingRect(double Top, double Left);
 }

@@ -1,11 +1,11 @@
-@attribute [Route(Const.Routes.Home)]
+﻿@attribute [Route(Const.Routes.Home)]
 @attribute [Route(Const.Routes.Account.Dashboard)]
 @layout MainLayout
 @inject NavigationManager nav
 
 <PageTitle>Dashboard</PageTitle>
 
-<div class="mx-auto max-w-7xl space-y-8 animate-in fade-in slide-in-from-top-2">
+<div class="animate-in fade-in slide-in-from-top-2 mx-auto max-w-7xl space-y-8">
     <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
@@ -25,15 +25,15 @@
                                 @DisplayName
                             </h3>
                             <div class="mt-1 flex items-center gap-2">
-                                <span class="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold tracking-widest text-emerald-600 uppercase">
-                                    <Icon Style="Icon.IconStyle.Shield" CssClass="inline-flex items-center justify-center text-[12px] leading-none" />
+                                <span class="inline-flex items-center gap-1 rounded bg-emerald-50 px-1.5 py-0.5 font-bold tracking-widest text-[10px] text-emerald-600 uppercase">
+                                    <Icon Style="Icon.IconStyle.Shield" CssClass="inline-flex items-center justify-center leading-none text-[12px]" />
                                     Active
                                 </span>
                             </div>
                         </div>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">
+                        <p class="font-bold tracking-widest text-[10px] text-slate-400 uppercase">
                             Account ID
                         </p>
                         <p class="inline-block rounded-md bg-slate-50 px-2 py-1 font-mono text-sm text-slate-700">
@@ -52,23 +52,23 @@
                 <span class="text-4xl font-black text-slate-900 transition-colors group-hover:text-brand-600">
                     @FormatNumber(account?.Credits ?? 0)
                 </span>
-                <span class="mt-4 flex items-center gap-2 text-sm font-bold tracking-wide text-brand-600 uppercase transition-colors group-hover:text-brand-700">
+                <span class="text-brand-600 mt-4 flex items-center gap-2 text-sm font-bold tracking-wide uppercase transition-colors group-hover:text-brand-700">
                     Top Up Now
-                    <Icon Style="Icon.IconStyle.PlusCircle" CssClass="inline-flex items-center justify-center text-[16px] leading-none" />
+                    <Icon Style="Icon.IconStyle.PlusCircle" CssClass="inline-flex items-center justify-center leading-none text-[16px]" />
                 </span>
             </button>
         </div>
 
-        <div class="group relative flex flex-col justify-center gap-6 overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-600 p-6 sm:p-8">
+        <div class="group border-brand-500/20 bg-brand-600 relative flex flex-col justify-center gap-6 overflow-hidden rounded-2xl border p-6 sm:p-8">
             <div class="absolute top-0 right-0 -mt-16 -mr-16 h-32 w-32 rounded-full bg-white/5 transition-transform duration-700 group-hover:scale-150"></div>
             <div class="relative z-10">
                 <h3 class="mb-1 text-lg font-bold text-white">Quick Action</h3>
-                <p class="text-sm text-brand-100 opacity-90">Start messaging instantly.</p>
+                <p class="text-brand-100 text-sm opacity-90">Start messaging instantly.</p>
             </div>
             <button type="button"
                     @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Compose)"
                     class="relative z-10 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3.5 text-sm font-bold tracking-wide text-brand-600 uppercase shadow-sm transition-all hover:bg-brand-50 active:scale-95">
-                <Icon Style="Icon.IconStyle.PenSquare" CssClass="inline-flex items-center justify-center text-[20px] leading-none" />
+                <Icon Style="Icon.IconStyle.PenSquare" CssClass="inline-flex items-center justify-center leading-none text-[20px]" />
                 Compose Message
             </button>
         </div>
@@ -77,7 +77,7 @@
     @if (LowBalance)
     {
         <div class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <Icon Style="Icon.IconStyle.AlertCircle" CssClass="inline-flex items-center justify-center text-[20px] leading-none text-amber-600" />
+            <Icon Style="Icon.IconStyle.AlertCircle" CssClass="inline-flex items-center justify-center leading-none text-[20px] text-amber-600" />
             <div>
                 <p class="text-sm font-bold text-amber-900">Critical Balance Alert!</p>
                 <p class="text-xs text-amber-700">
@@ -91,7 +91,7 @@
         <div class="space-y-4 xl:col-span-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <Icon Style="Icon.IconStyle.RefreshCcw" CssClass="inline-flex items-center justify-center text-[20px] leading-none text-brand-600" />
+                    <Icon Style="Icon.IconStyle.Refresh" CssClass="text-brand-600 inline-flex items-center justify-center leading-none text-[20px]" />
                     <h3 class="text-lg font-bold tracking-tight text-slate-800">Recent Messages</h3>
                 </div>
                 <button type="button"
@@ -105,10 +105,10 @@
                 <table class="w-full text-left text-sm">
                     <thead class="border-b border-slate-100 bg-slate-50/80">
                         <tr>
-                            <th class="px-6 py-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase">ID</th>
-                            <th class="px-6 py-4 text-[10px] font-bold tracking-widest text-slate-400 uppercase">Sender ID</th>
-                            <th class="px-6 py-4 text-center text-[10px] font-bold tracking-widest text-slate-400 uppercase">Status</th>
-                            <th class="px-6 py-4 text-right text-[10px] font-bold tracking-widest text-slate-400 uppercase">Date</th>
+                            <th class="px-6 py-4 font-bold tracking-widest text-[10px] text-slate-400 uppercase">ID</th>
+                            <th class="px-6 py-4 font-bold tracking-widest text-[10px] text-slate-400 uppercase">Sender ID</th>
+                            <th class="px-6 py-4 text-center font-bold tracking-widest text-[10px] text-slate-400 uppercase">Status</th>
+                            <th class="px-6 py-4 text-right font-bold tracking-widest text-[10px] text-slate-400 uppercase">Date</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -138,8 +138,8 @@
                                 <tr class="group cursor-pointer transition-colors hover:bg-brand-50/40"
                                     @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)">
                                     <td class="px-6 py-4">
-                                        <span class="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-1 font-mono text-xs font-bold text-brand-600 transition-colors group-hover:bg-brand-100">
-                                            <Icon Style="Icon.IconStyle.Mail" CssClass="inline-flex items-center justify-center text-[12px] leading-none" />
+                                        <span class="bg-brand-50 text-brand-600 inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-mono text-xs font-bold transition-colors group-hover:bg-brand-100">
+                                            <Icon Style="Icon.IconStyle.Mail" CssClass="inline-flex items-center justify-center leading-none text-[12px]" />
                                             #@batch.BatchID
                                         </span>
                                     </td>
@@ -193,11 +193,11 @@
                         {
                             <div class="group/item flex items-center gap-3">
                                 <div class="@GetPurchaseIconClass(purchase)">
-                                    <Icon Style="@GetPurchaseIcon(purchase)" CssClass="inline-flex items-center justify-center text-[16px] leading-none" />
+                                    <Icon Style="@GetPurchaseIcon(purchase)" CssClass="inline-flex items-center justify-center leading-none text-[16px]" />
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <p class="truncate text-xs leading-tight font-bold text-slate-800">Credits Purchase</p>
-                                    <p class="text-[10px] font-medium text-slate-400">
+                                    <p class="font-medium text-[10px] text-slate-400">
                                         @FormatDate(purchase.DateCreated)
                                     </p>
                                 </div>
@@ -213,7 +213,7 @@
                         @onclick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)"
                         class="mt-6 flex w-full items-center justify-center gap-2 py-2 text-[10px] font-bold leading-none tracking-widest text-brand-500 uppercase hover:underline">
                     Purchase History
-                    <Icon Style="Icon.IconStyle.ChevronRight" CssClass="inline-flex translate-y-px items-center justify-center text-[14px] leading-none" />
+                    <Icon Style="Icon.IconStyle.ChevronRight" CssClass="inline-flex translate-y-px items-center justify-center leading-none text-[14px]" />
                 </button>
             </div>
         </div>

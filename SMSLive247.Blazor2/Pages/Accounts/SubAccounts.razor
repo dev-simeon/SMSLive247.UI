@@ -26,17 +26,15 @@
                         @context.AccountName
                     </button>
                 </Column>
-                <Column Header="Balance">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium text-slate-700">
-                            @context.Credits.ToString("#,##0.##")
-                        </span>
-                        <button @onclick="() => transferModal.Show(Main.Account, context)"
-                                class="p-1 text-brand-600 hover:bg-brand-50 rounded-md transition-all"
-                                title="Transfer credits">
-                            <Icon Style="Icon.IconStyle.PlusCircle" />
-                        </button>
-                    </div>
+                <Column Header="Balance" Align="right">
+                    <span class="">
+                        @context.Credits.ToString("#,##0.##")
+                    </span>
+                    <button @onclick="() => transferModal.Show(Main.Account, context)"
+                            class=""
+                            title="Transfer credits">
+                        <Icon Style="Icon.IconStyle.Refresh" />
+                    </button>
                 </Column>
                 <Column Header="Status">
                     <Badge Variant="Badge.StatusVariant.ActiveInactive"
@@ -46,14 +44,7 @@
                     <FormatDate DateTime="@context.DateCreated" />
                 </Column>
                 <Column Header="Account ID">
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-slate-600">@context.AccountID</span>
-                        <button @onclick="() => CopyToClipboard(context.AccountID)"
-                                class="text-slate-400 hover:text-brand-600 transition-colors"
-                                title="Copy ID">
-                            <Icon Style="Icon.IconStyle.FileText" />
-                        </button>
-                    </div>
+                    @context.AccountID
                 </Column>
                 <Column>
                     <Actions ViewLink="@SubAccountUrl(context.AccountID)"

@@ -35,9 +35,9 @@
                     </div>
                 </Column>
                 <Column>
-                    <Actions ViewLink="@($"/messaging/{context.BatchID}")"
+                    <ActionsMenu ViewLink="@($"/messaging/{context.BatchID}")"
                              OnDelete="e => DeleteBatch(context.BatchID)">
-                    </Actions>
+                    </ActionsMenu>
                 </Column>
                 </Columns>
             </Table>
