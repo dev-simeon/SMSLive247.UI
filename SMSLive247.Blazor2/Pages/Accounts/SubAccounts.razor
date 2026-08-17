@@ -21,7 +21,7 @@
         <Table DataSource="ds">
             <Columns>
                 <Column Header="Sub-Account Name">
-                    <button @onclick="() => nav.NavigateTo(SubAccountUrl(context.AccountID))"
+                    <button @onclick="() => nav.NavigateTo(Const.Routes.Account.SubAccountDetailsUrl(context.AccountID))"
                             class="font-medium text-brand-600 hover:text-brand-700 hover:underline text-left transition-colors">
                         @context.AccountName
                     </button>
@@ -47,7 +47,7 @@
                     @context.AccountID
                 </Column>
                 <Column>
-                    <Actions ViewLink="@SubAccountUrl(context.AccountID)"
+                    <Actions ViewLink="@Const.Routes.Account.SubAccountDetailsUrl(context.AccountID)"
                              OnDelete="e => DeleteSubAccount(context)" />
                 </Column>
             </Columns>
@@ -73,9 +73,6 @@
     private ApiDataSource<AccountResponse> ds = new();
     private EditModal createOrEditModal = new();
     private TransferModal transferModal = new();
-
-    private string SubAccountUrl(string? id) =>
-        Const.Routes.Account.Details(id ?? "");
 
     protected override async Task OnInitializedAsync()
     {

@@ -1,29 +1,32 @@
 ﻿<div class="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
     <div class="flex h-10 w-fit items-stretch overflow-hidden rounded-lg border border-slate-300
                 bg-white shadow-sm focus-within:border-brand-500 focus-within:ring-brand-500/30 focus-within:ring-4">
-
         <input type="text"
                placeholder="@Placeholder"
-               @bind-value="_currentSearchTerm"
-               @onkeydown="@(async e => { if (e.Key == "Enter") await TriggerSearch(); })"
-               class="h-full px-3.5 text-sm text-slate-700 bg-transparent focus:outline-none w-72" />
+               @value="_currentSearchTerm"
+               @onkeydown="@HandleKeydown"
+               @oninput="@HandleChange"
+               class="h-full w-72 bg-transparent px-3.5 text-sm text-slate-700 focus:outline-none" />
 
         @ChildContent
 
-        <button type="button" 
-                @onclick="TriggerSearch" 
-                class="bg-brand-500 flex h-full cursor-pointer items-center justify-center px-3.5 text-white transition-colors hover:bg-brand-800">
-            @* <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" 
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg> *@
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
-                 stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
-                 class="lucide lucide-search h-4.5 w-4.5">
-                 <path d="m21 21-4.34-4.34"></path>
-                 <circle cx="11" cy="11" r="8"></circle>
-            </svg>
-        </button>
+        @if (!InstantSearch)
+        {
+            <button type="button"
+                    @onclick="TriggerSearch"
+                    class="bg-brand-500 flex h-full cursor-pointer items-center justify-center px-3.5 text-white transition-colors hover:bg-brand-800">
+                @* <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg> *@
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                     class="lucide lucide-search h-4.5 w-4.5">
+                    <path d="m21 21-4.34-4.34"></path>
+                    <circle cx="11" cy="11" r="8"></circle>
+                </svg>
+            </button>
+        }
     </div>
 </div>
 
@@ -33,6 +36,7 @@
     [Parameter] public EventCallback OnSearch { get; set; }
     [Parameter] public string Placeholder { get; set; } = "Search...";
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool InstantSearch { get; set; } = false;
 
     private string _currentSearchTerm = "";
 
@@ -42,9 +46,21 @@
             _currentSearchTerm = SearchTerm ?? "";
     }
 
+    private async Task HandleChange(ChangeEventArgs e)
+    {
+        _currentSearchTerm = e.Value?.ToString()?.Trim() ?? "";
+        if (InstantSearch) await TriggerSearch();
+    }
+
+    private async Task HandleKeydown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await TriggerSearch();
+    }
+
     private async Task TriggerSearch()
     {
         await SearchTermChanged.InvokeAsync(_currentSearchTerm);
         if (OnSearch.HasDelegate) await OnSearch.InvokeAsync();
+        StateHasChanged();
     }
 }

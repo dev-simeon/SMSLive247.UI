@@ -8,7 +8,7 @@
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search by country or operator..." @bind-SearchTerm="searchText" OnSearch="ApplySearch" />
+        <SearchBox @bind-SearchTerm="searchText" OnSearch="ApplySearch" />
     </HeaderLeft>
     <HeaderRight>
         <Button Text="Export CSV" Icon="Icon.IconStyle.Download" Style="Button.ButtonStyle.Secondary" />

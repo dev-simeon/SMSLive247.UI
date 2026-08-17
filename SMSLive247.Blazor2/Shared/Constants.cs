@@ -1,4 +1,5 @@
 ﻿using SMSLive247.Blazor2.Components.Utilities;
+using SMSLive247.Blazor2.Pages.Accounts;
 
 namespace SMSLive247.UI.Shared
 {
@@ -7,11 +8,12 @@ namespace SMSLive247.UI.Shared
         public static class Routes
         {
             // Auth
-            public const string Home = "/";
+            public const string Dashboard = "/dashboard";
             public const string Login = "/login";
             public const string Logoff = "/logout";
             public const string Register = "/register";
-            public const string ForgotPassword = "/forgot";
+            public const string ForgotPassword = "/forgot-password";
+
             public const string NotFound = "/not-found";
 
             public static class Legal
@@ -24,18 +26,20 @@ namespace SMSLive247.UI.Shared
             {
                 public const string Compose = "/messaging/compose";
                 public const string Messages = "/messaging/messages";
+                public const string MessageDetails = "/messaging/messages/{id}";
                 public const string Contacts = "/messaging/contacts";
                 public const string SenderIds = "/messaging/sender-ids";
+                public static string MessageDetailsUrl(long id) => MessageDetails.Replace("{id}", id.ToString());
             }
 
             public static class Account
             {
-                public const string Dashboard = "/account/dashboard";
+                //public const string Dashboard = "/account/dashboard";
                 public const string SubAccounts = "/account/sub-accounts";
                 public const string SubAccountDetails = "/account/sub-accounts/{id}";
                 public const string Profile = "/account/profile";
-
-                public static string Details(string id) => SubAccountDetails.Replace("{id}", id);
+                public static string SubAccountDetailsUrl(string id) => SubAccountDetails.Replace("{id}", id.ToString());
+                public static string SubAccountDetailsUrl(Guid id) => SubAccountDetails.Replace("{id}", id.ToString());
             }
 
             public static class Wallet
@@ -67,7 +71,7 @@ namespace SMSLive247.UI.Shared
             {
                 Items =
                 [
-                    new NavItem { Title = "Dashboard", Url = Routes.Account.Dashboard, Icon = Icon.IconStyle.Home }
+                    new NavItem { Title = "Dashboard", Url = Routes.Dashboard, Icon = Icon.IconStyle.Home }
                 ]
             },
             new NavItem

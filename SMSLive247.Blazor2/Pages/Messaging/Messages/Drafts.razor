@@ -1,6 +1,6 @@
 ﻿<PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search messages..." @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
             <DateRange DateRangeChanged="OnDateRangeChanged" />
         </SearchBox>
     </HeaderLeft>

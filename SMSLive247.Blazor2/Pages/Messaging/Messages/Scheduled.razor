@@ -12,10 +12,10 @@
                     <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@context.Status" />
                 </Column>
                 <Column Header="Sender" Width="100px">
-                    <span class="text-sm font-medium text-slate-900">@context.SenderID?.ToUpper()</span>
+                    <strong>@context.SenderID</strong>
                 </Column>
                 <Column Header="Message">
-                    <p class="max-w-md truncate text-sm text-slate-600" title="@context.MessageText">@context.MessageText</p>
+                    <p class="wrap-break-word">@context.MessageText</p>
                 </Column>
                 <Column>
                     <Actions>

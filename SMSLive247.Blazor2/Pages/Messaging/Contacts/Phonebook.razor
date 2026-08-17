@@ -2,7 +2,8 @@
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="@(viewMode == "groups" ? "Search groups..." : "Search contacts...")"
+        <SearchBox Placeholder="@(viewMode == "groups" ? "Search Groups..." : "Search Contacts...")"
+                   InstantSearch="true"
                    @bind-SearchTerm="searchQuery">
             
         </SearchBox>
@@ -27,7 +28,7 @@
     <ChildContent>
         @if (viewMode == "contacts")
         {
-            <Table Items="PaginatedContacts" EmptyMessage="No contacts found.">
+            <Table Items="FilteredContacts" EmptyMessage="No contacts found.">
                 <Columns>
                     <Column Header="Name">
                         <div class="flex items-center gap-3">
@@ -72,7 +73,7 @@
         }
         else
         {
-            <Table Items="PaginatedGroups" EmptyMessage="No groups found.">
+            <Table Items="FilteredGroups" EmptyMessage="No groups found.">
                 <Columns>
                     <Column Header="Group Name">
                         <div class="flex items-center gap-3">
@@ -99,20 +100,6 @@
     </ChildContent>
 
     <FooterLeft>
-        @if (viewMode == "contacts")
-        {
-            <Paging @bind-PageNumber="contactsPage"
-                    @bind-PageSize="pageSize"
-                    TotalRecords="FilteredContacts.Count">
-            </Paging>
-        }
-        else
-        {
-            <Paging @bind-PageNumber="groupsPage"
-                    @bind-PageSize="pageSize"
-                    TotalRecords="FilteredGroups.Count">
-            </Paging>
-        }
     </FooterLeft>
 </PageBody>
 
@@ -122,10 +109,6 @@
 @code {
     private string viewMode = "contacts"; // "contacts" | "groups"
     private string? searchQuery;
-
-    private int contactsPage = 1;
-    private int groupsPage = 1;
-    private int pageSize = 25;
 
     private List<ContactResponse> contacts = new();
     private List<GroupResponse> groups = new();
@@ -162,8 +145,6 @@
     {
         viewMode = mode;
         searchQuery = null;
-        contactsPage = 1;
-        groupsPage = 1;
     }
 
     private List<ContactResponse> FilteredContacts
@@ -181,17 +162,6 @@
         }
     }
 
-    private List<ContactResponse> PaginatedContacts
-    {
-        get
-        {
-            return FilteredContacts
-                .Skip((contactsPage - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-        }
-    }
-
     private List<GroupResponse> FilteredGroups
     {
         get
@@ -203,17 +173,6 @@
             return groups.Where(g =>
                 g.GroupName != null && g.GroupName.ToLowerInvariant().Contains(q)
             ).ToList();
-        }
-    }
-
-    private List<GroupResponse> PaginatedGroups
-    {
-        get
-        {
-            return FilteredGroups
-                .Skip((groupsPage - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
         }
     }
 

@@ -19,19 +19,11 @@
     <div class="ml-auto flex items-center gap-4">
         @* Credits Pill *@
         <div class="hidden items-center gap-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-1.5 sm:flex">
-            <div class="flex items-center gap-2">
-                <span class="text-brand-500 flex items-center p-0.5"
-                      title="Available Credits">
-                    <Icon Style="Icon.IconStyle.Coins" CssStyle="font-weight: 300;" />
-                </span>
-                <span class="font-bold text-slate-800">
-                    5,000.00
-                </span>
-            </div>
+            <FormatCredit Credits="@(AvailableCredits ?? 0_000)" Title="Available Credits" />
         </div>
 
         @* Actions *@
-        <Button Icon="Icon.IconStyle.CreditCard" Text="Top Up" 
+        <Button Icon="Icon.IconStyle.CreditCard" Text="Buy Credits" 
                 OnClick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)" />
 
         <button class="relative p-2 text-slate-400 transition-colors hover:text-slate-600">
@@ -43,5 +35,5 @@
 
 @code {
     [Parameter] public EventCallback OnMenuClick { get; set; }
-
+    [Parameter] public double? AvailableCredits { get; set; }  
 }
