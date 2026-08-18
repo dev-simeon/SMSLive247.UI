@@ -1,4 +1,4 @@
-﻿@using System.Text.RegularExpressions
+@using System.Text.RegularExpressions
 @using SMSLive247.Blazor2.Pages.Messaging.Compose.Modals
 @inject NavigationManager nav
 
@@ -8,163 +8,195 @@
 }
 else
 {
-    <div class="rounded-xl border border-slate-100 bg-white p-6 shadow-sm lg:p-8">
-        <div class="mb-8 max-w-sm">
-            <h3 class="mb-4 text-lg font-semibold text-slate-800">Sender ID</h3>
-            <FormSelect TValue="string" @bind-Value="senderId" Required="true" IconStyle="Icon.IconStyle.ChevronDown">
-                <option value="">Select Approved Sender ID...</option>
-                @foreach (var item in senderIds)
-                {
-                    <option value="@item.SenderID">@item.SenderID</option>
-                }
-            </FormSelect>
-            <a href="@Const.Routes.Messaging.SenderIds" class="text-brand-500 mt-2 inline-block text-xs font-medium hover:underline">Request a new sender ID</a>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        <hr class="my-8 border-slate-100" />
+        <!-- Main Column (col-lg-8) -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
 
-        <section class="mb-8">
-            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
-                <h3 class="text-lg font-semibold text-slate-800">Recipients</h3>
-                @if (totalRecipients > 0)
-                {
-                    <div class="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-1.5 text-sm text-slate-500">
-                        <span>Total Recipients:</span>
-                        <span class="font-bold text-slate-900">@totalRecipients.ToString("N0")</span>
+            <!-- Sender ID Card -->
+            <div class="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
+                <label class="block text-sm font-semibold text-slate-800 mb-3">From (Sender ID)</label>
+                <div class="flex">
+                    <div class="flex w-10 shrink-0 items-center justify-center rounded-l-lg border-y border-l border-slate-200 bg-slate-50 text-slate-400">
+                        <Icon Style="Icon.IconStyle.User" CssClass="text-lg" />
                     </div>
-                }
+                    <div class="w-full sm:max-w-xs">
+                        <FormSelect TValue="string" @bind-Value="senderId" Required="true" IconStyle="Icon.IconStyle.ChevronDown" CssClass="rounded-l-none">
+                            <option value="">Select Approved Sender ID...</option>
+                            @foreach (var item in senderIds)
+                            {
+                                <option value="@item.SenderID">@item.SenderID</option>
+                            }
+                        </FormSelect>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs">
+                    <a href="@Const.Routes.Messaging.SenderIds" class="text-brand-500 font-medium hover:underline">Click here to request for more SenderIDs</a>
+                </div>
             </div>
 
-            <div class="flex flex-col gap-5">
-                <div class="flex flex-wrap gap-2 sm:gap-3">
-                    <Button Text="Add Manual" Icon="Icon.IconStyle.PenSquare" Style="@(showManual ? Button.ButtonStyle.Primary : Button.ButtonStyle.Secondary)" OnClick="ToggleManual" CssClass="px-3 sm:px-5" />
-                    <Button Text="Add from Contacts" Icon="Icon.IconStyle.Users" Style="Button.ButtonStyle.Secondary" OnClick="OpenContacts" CssClass="px-3 sm:px-5" />
-                    <Button Text="Select Bulk File" Icon="Icon.IconStyle.FileText" Style="Button.ButtonStyle.Secondary" OnClick="OpenFiles" CssClass="px-3 sm:px-5" />
+            <!-- Recipients Card -->
+            <div class="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <h4 class="text-lg font-semibold text-slate-800">To (Recipients)</h4>
+                    @if (totalRecipients > 0)
+                    {
+                        <span class="rounded bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">Total: @totalRecipients.ToString("N0")</span>
+                    }
                 </div>
 
-                @if (manualRecipientCount > 0 || selectedContacts.Count > 0 || selectedGroups.Count > 0 || selectedFiles.Count > 0)
-                {
-                    <div class="flex flex-col gap-3 pt-2">
-                        <div class="flex items-start gap-3">
-                            <span class="mt-2 min-w-13.5 shrink-0 text-right text-sm font-semibold text-slate-400">Added:</span>
-                            <div class="min-w-0 flex-1 space-y-3">
-                                @if (manualRecipientCount > 0 || selectedContacts.Count > 0)
+                <!-- Raw Numbers -->
+                <div class="mb-4">
+                    <Button Text="Paste..." Icon="Icon.IconStyle.PenSquare" Style="@(showManual ? Button.ButtonStyle.Primary : Button.ButtonStyle.Secondary)" OnClick="ToggleManual" CssClass="mb-1" />
+                    <p class="text-xs text-slate-500 mb-3">Type or paste your recipients phone numbers.</p>
+                    
+                    @if (showManual)
+                    {
+                        <div class="relative w-full rounded-xl border border-slate-200 bg-white shadow-sm mt-2">
+                            <button type="button" @onclick="ClearManual" title="Remove manual recipients" class="absolute top-3 right-3 z-10 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
+                                <Icon Style="Icon.IconStyle.Close" CssClass="text-base" />
+                            </button>
+                            <textarea @bind="manualNumbers" @bind:event="oninput" @bind:after="SanitizeNumbers"
+                                      class="h-32 w-full resize-y rounded-t-xl border-0 bg-transparent px-4 py-4 font-mono text-sm text-slate-900 placeholder-slate-400 outline-none"
+                                      placeholder="Paste phone numbers here (separated by comma or new line)..."></textarea>
+                            <div class="flex items-center justify-between rounded-b-xl border-t border-slate-100 bg-slate-50 px-4 py-2">
+                                <span class="flex items-center gap-1.5 text-xs text-slate-500">
+                                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                                    Duplicates will be removed automatically
+                                </span>
+                                @if (manualRecipientCount > 0)
                                 {
-                                    <div class="flex cursor-grab items-center gap-2 overflow-x-auto py-0.5 pb-1 select-none active:cursor-grabbing">
-                                        @if (manualRecipientCount > 0)
-                                        {
-                                            <RecipientChip Label="@($"Manual ({manualRecipientCount})")" OnRemove="ClearManualRecipients" />
-                                        }
-                                        @foreach (var contact in selectedContacts)
-                                        {
-                                            <RecipientChip Label="@contact.Name" OnRemove="() => RemoveContact(contact.Id)" />
-                                        }
-                                    </div>
-                                }
-
-                                @if (selectedGroups.Count > 0)
-                                {
-                                    <div class="flex cursor-grab items-center gap-2 overflow-x-auto py-0.5 pb-1 select-none active:cursor-grabbing">
-                                        @foreach (var group in selectedGroups)
-                                        {
-                                            <RecipientChip Label="@($"Group: {group.Name} ({group.Count:N0})")" LeadingIcon="Icon.IconStyle.Users" OnRemove="() => RemoveGroup(group.Id)" />
-                                        }
-                                    </div>
-                                }
-
-                                @if (selectedFiles.Count > 0)
-                                {
-                                    <div class="flex cursor-grab items-center gap-2 overflow-x-auto py-0.5 pb-1 select-none active:cursor-grabbing">
-                                        @foreach (var file in selectedFiles)
-                                        {
-                                            <RecipientChip Label="@($"File: {file.Name} ({file.Count:N0})")" LeadingIcon="Icon.IconStyle.FileText" OnRemove="() => RemoveFile(file.FileId)" />
-                                        }
-                                    </div>
+                                    <span class="text-brand-500 text-xs font-semibold">@manualRecipientCount number@(manualRecipientCount == 1 ? "" : "s")</span>
                                 }
                             </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
 
-                @if (showManual)
-                {
-                    <div class="relative max-w-2xl rounded-xl border border-slate-200 bg-white shadow-sm">
-                        <button type="button" @onclick="ClearManual" title="Remove manual recipients" class="absolute top-3 right-3 z-10 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600">
-                            <Icon Style="Icon.IconStyle.Close" CssClass="text-base" />
-                        </button>
-                        <textarea @bind="manualNumbers" @bind:event="oninput" @bind:after="SanitizeNumbers"
-                                  class="h-32 w-full resize-y rounded-t-xl border-0 bg-transparent px-4 py-4 font-mono text-sm text-slate-900 placeholder-slate-400 outline-none"
-                                  placeholder="Paste phone numbers here (separated by comma or new line)..."></textarea>
-                        <div class="flex items-center justify-between rounded-b-xl border-t border-slate-100 bg-slate-50 px-4 py-3">
-                            <span class="flex items-center gap-1.5 text-xs text-slate-500">
-                                <span class="inline-block h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                                Duplicates will be removed automatically
-                            </span>
-                            @if (manualRecipientCount > 0)
+                <hr class="border-slate-100 my-4" />
+
+                <!-- From Contacts -->
+                <div class="mb-4">
+                    <Button Text="Contacts..." Icon="Icon.IconStyle.Users" Style="Button.ButtonStyle.Secondary" OnClick="OpenContacts" CssClass="mb-1" />
+                    <p class="text-xs text-slate-500">Select numbers from your Phonebook or Groups.</p>
+
+                    @if (selectedContacts.Count > 0 || selectedGroups.Count > 0)
+                    {
+                        <div class="flex cursor-grab flex-wrap items-center gap-2 mt-3 p-3 bg-slate-50 border border-slate-100 rounded-lg">
+                            @foreach (var contact in selectedContacts)
                             {
-                                <span class="text-brand-500 text-xs font-semibold">@manualRecipientCount number@(manualRecipientCount == 1 ? "" : "s") detected</span>
+                                <RecipientChip Label="@contact.Name" OnRemove="() => RemoveContact(contact.Id)" />
+                            }
+                            @foreach (var group in selectedGroups)
+                            {
+                                <RecipientChip Label="@($"Group: {group.Name} ({group.Count:N0})")" LeadingIcon="Icon.IconStyle.Users" OnRemove="() => RemoveGroup(group.Id)" />
                             }
                         </div>
+                    }
+                </div>
+
+                <hr class="border-slate-100 my-4" />
+
+                <!-- From Bulk Files -->
+                <div>
+                    <Button Text="Bulk Files..." Icon="Icon.IconStyle.FileText" Style="Button.ButtonStyle.Secondary" OnClick="OpenFiles" CssClass="mb-1" />
+                    <p class="text-xs text-slate-500">Include your Batch Files numbers.</p>
+
+                    @if (selectedFiles.Count > 0)
+                    {
+                        <div class="flex cursor-grab flex-wrap items-center gap-2 mt-3 p-3 bg-slate-50 border border-slate-100 rounded-lg">
+                            @foreach (var file in selectedFiles)
+                            {
+                                <RecipientChip Label="@($"File: {file.Name} ({file.Count:N0})")" LeadingIcon="Icon.IconStyle.FileText" OnRemove="() => RemoveFile(file.FileId)" />
+                            }
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+            <!-- Message Card -->
+            <div class="rounded-xl border border-slate-200 bg-white shadow-sm p-6 mb-8 lg:mb-0">
+                <div class="flex items-center justify-between mb-3">
+                    <label class="text-sm font-semibold text-slate-800">What (Your Message)</label>
+                    <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded">@messageParts part@(messageParts == 1 ? "" : "s")</span>
+                </div>
+                
+                <textarea @bind="message" @bind:event="oninput" maxlength="918" class="h-44 w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-brand-100 focus:ring-2" placeholder="Type your message here..."></textarea>
+                
+                <div class="mt-2 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Messages longer than 160 characters are charged per page.</span>
+                    @if (!string.IsNullOrWhiteSpace(message))
+                    {
+                        <button type="button" class="text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1" @onclick="ClearMessage">
+                            <Icon Style="Icon.IconStyle.Close" CssClass="text-xs" /> Clear
+                        </button>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Side Column (col-lg-4) -->
+        <div class="lg:col-span-1">
+            <div class="sticky top-6 flex flex-col gap-6">
+
+                <!-- Schedule Card -->
+                <div class="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
+                    <label class="block text-sm font-semibold text-slate-800 mb-4">When (Schedule)</label>
+                    
+                    <div class="flex flex-col gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="scheduleOption" class="h-4 w-4 text-brand-600 border-slate-300 focus:ring-brand-500" checked="@(!showScheduler)" @onchange="() => { showScheduler = false; deliveryTime = null; }" />
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-brand-600">Send Immediately</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="scheduleOption" class="h-4 w-4 text-brand-600 border-slate-300 focus:ring-brand-500" checked="@showScheduler" @onchange="() => showScheduler = true" />
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-brand-600">Schedule for Later</span>
+                        </label>
                     </div>
-                }
-            </div>
 
-        </section>
-
-        <hr class="my-8 border-slate-100" />
-
-        <section>
-            <div class="mb-4 flex items-center justify-between gap-3">
-                <h3 class="text-lg font-semibold text-slate-800">Message Content</h3>
-                @if (!string.IsNullOrWhiteSpace(message))
-                {
-                    <button type="button" @onclick="ClearMessage" class="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700"><Icon Style="Icon.IconStyle.Refresh" CssClass="text-sm" />Clear message</button>
-                }
-            </div>
-            <textarea @bind="message" @bind:event="oninput" maxlength="918" class="h-44 w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-brand-100 focus:ring-2" placeholder="Type your message here..."></textarea>
-            <div class="mt-2 flex flex-wrap justify-between gap-2 text-xs text-slate-500">
-                <span>Messages longer than 160 characters are charged per page.</span>
-                <span><strong class="text-slate-700">@message.Length</strong> characters, <strong class="text-slate-700">@messageParts</strong> part@(messageParts == 1 ? "" : "s")</span>
-            </div>
-        </section>
-
-        <div class="mt-6 border-t border-slate-100 pt-8">
-            @if (showScheduler)
-            {
-                <div class="animate-in fade-in zoom-in-95 mb-6 w-fit rounded-xl border border-slate-200 p-5 duration-200">
-                    <div class="max-w-xs">
-                        <h4 class="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-700">
-                            <Icon Style="Icon.IconStyle.Clock" CssClass="text-brand-500 text-base" />
-                            Schedule Delivery
-                        </h4>
-                        <div class="flex flex-col items-start gap-5">
-                            <div class="w-full">
-                                <div class="mb-1.5 flex items-center justify-between">
-                                    <label class="block text-xs font-medium text-slate-600">Date &amp; Time</label>
-                                    <button type="button" @onclick="() => nav.NavigateTo(Const.Routes.Account.Profile)" class="flex items-center gap-0.5 text-[10px] font-bold tracking-tight text-brand-600 uppercase hover:text-brand-700">
-                                        <Icon Style="Icon.IconStyle.User" CssClass="text-xs" />
-                                        Change
-                                    </button>
+                    @if (showScheduler)
+                    {
+                        <div class="mt-5 pt-5 border-t border-slate-100 animate-in slide-in-from-top-2">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-semibold text-slate-600">Date &amp; Time</span>
+                                <button type="button" @onclick="() => nav.NavigateTo(Const.Routes.Account.Profile)" class="flex items-center gap-1 text-[10px] font-bold text-brand-600 hover:text-brand-700 uppercase">
+                                    <Icon Style="Icon.IconStyle.User" CssClass="text-xs" /> Change
+                                </button>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-l-lg border-y border-l border-slate-200 bg-slate-50 text-slate-400">
+                                    <Icon Style="Icon.IconStyle.Clock" CssClass="text-base" />
                                 </div>
-                                <input type="datetime-local" @bind="deliveryTime" min="@MinimumDeliveryTime" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm outline-none focus:border-brand-500 focus:ring-brand-500 focus:ring-2" />
+                                <input type="datetime-local" @bind="deliveryTime" min="@MinimumDeliveryTime" class="w-full rounded-r-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-brand-500 focus:ring-2" />
                             </div>
-                            <div class="flex w-full flex-col gap-2.5 min-[400px]:flex-row">
-                                <Button Text="Confirm Schedule" Icon="Icon.IconStyle.Clock" IsBusy="isSending" IsDisabled="@(!deliveryTime.HasValue || !CanSend)" OnClick="SendScheduledMessage" CssClass="w-full min-[400px]:w-auto" />
-                                <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="HideScheduler" CssClass="w-full min-[400px]:w-auto" />
-                            </div>
+                            <div class="mt-2 text-[10px] text-slate-500">Your time zone is: West/Central Africa GMT +1</div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Action Card -->
+                <div class="rounded-xl border border-slate-200 bg-white shadow-sm p-6">
+                    <div class="flex flex-col gap-3">
+                        @if (showScheduler)
+                        {
+                            <Button Text="Queue Message" Icon="Icon.IconStyle.Clock" Style="Button.ButtonStyle.Secondary" IsBusy="isSending" IsDisabled="@(!deliveryTime.HasValue || !CanSend)" OnClick="SendScheduledMessage" CssClass="w-full justify-center py-3 text-base shadow-sm" />
+                        }
+                        else
+                        {
+                            <Button Text="Send SMS Now!" Icon="Icon.IconStyle.Mail" Style="Button.ButtonStyle.Primary" IsBusy="isSending" IsDisabled="@(!CanSend)" OnClick="SendMessage" CssClass="w-full justify-center py-3 text-base shadow-sm" />
+                        }
+
+                        <div class="text-center mt-2 text-sm text-slate-500">
+                            <strong>Total Recipients: @totalRecipients.ToString("N0")</strong>
                         </div>
                     </div>
                 </div>
-            }
 
-            @if (!showScheduler)
-            {
-                <div class="animate-in fade-in zoom-in-95 flex w-full flex-col items-center gap-3 duration-200 min-[400px]:w-auto min-[400px]:flex-row">
-                    <Button Text="Send Message" Icon="Icon.IconStyle.Mail" IsBusy="isSending" IsDisabled="@(!CanSend)" OnClick="SendMessage" CssClass="w-full px-5 whitespace-nowrap sm:px-8 min-[400px]:w-auto" />
-                    <Button Text="Schedule for Later" Icon="Icon.IconStyle.Clock" Style="Button.ButtonStyle.Secondary" IsDisabled="isSending" OnClick="ShowScheduler" CssClass="w-full whitespace-nowrap min-[400px]:w-auto" />
-                </div>
-            }
+            </div>
         </div>
+
     </div>
 }
 

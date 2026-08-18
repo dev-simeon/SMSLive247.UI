@@ -1,4 +1,4 @@
-﻿<Modal Title="@ModalTitle" Size="Modal.ModalSize.ExtraLarge" @bind-IsVisible="isVisible">
+<Modal Title="@ModalTitle" Size="Modal.ModalSize.ExtraLarge" @bind-IsVisible="isVisible">
     <Body>
         <EditForm id="GroupForm" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
             <FormInput Label="Group Name"
@@ -7,140 +7,47 @@
                        disabled="@isEditMode"
                        Required="true" />
 
-            <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="block text-sm font-semibold text-slate-700">
-                            Browse System Contacts
-                        </label>
-                    </div>
-
-                    <div class="flex h-[29rem] flex-col">
-                        <div class="relative mb-3">
-                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <Icon Style="Icon.IconStyle.Info" CssClass="h-4 w-4 text-slate-400" />
-                            </div>
-                            <input type="text"
-                                   @bind="pickerSearch"
-                                   @bind:event="oninput"
-                                   placeholder="Find a contact..."
-                                   class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2.5 pr-3 pl-9 text-sm transition-all outline-none focus:ring-brand-500/20 focus:border-brand-500 focus:bg-white focus:ring-2" />
-                        </div>
-
-                        <div class="flex-1 overflow-hidden overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-sm">
-                            @if (isLoadingContacts)
-                            {
-                                <div class="flex h-full flex-col items-center justify-center gap-2">
-                                    <div class="border-brand-500 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"></div>
-                                    <p class="font-medium text-[10px] text-slate-400">
-                                        Fetching contacts...
-                                    </p>
-                                </div>
-                            }
-                            else if (FilteredContacts.Count > 0)
-                            {
-                                <div class="divide-y divide-slate-100">
-                                    @foreach (var contact in FilteredContacts)
-                                    {
-                                        var selected = IsSelected(contact.PhoneNumber);
-                                        <button type="button"
-                                                @onclick="() => ToggleContact(contact.PhoneNumber)"
-                                                class="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors group @(selected ? "bg-brand-50/40" : "")">
-                                            <div class="flex min-w-0 items-center gap-3 text-left">
-                                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-bold text-[10px] transition-all @(selected ? "bg-brand-500 text-white shadow-md" : "bg-slate-100 text-slate-600")">
-                                                    @GetInitials(contact.ContactName)
-                                                </div>
-                                                <div class="truncate">
-                                                    <p class="truncate text-xs font-semibold text-slate-900">
-                                                        @(string.IsNullOrEmpty(contact.ContactName) ? "—" : contact.ContactName)
-                                                    </p>
-                                                    <p class="font-mono text-[10px] text-slate-400">
-                                                        @contact.PhoneNumber
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-all @(selected ? "bg-brand-500 border-brand-500 text-white" : "bg-white border-slate-200")">
-                                                @if (selected)
-                                                {
-                                                    <Icon Style="Icon.IconStyle.CheckCircle" CssClass="h-3 w-3" />
-                                                }
-                                            </div>
-                                        </button>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="flex h-full flex-col items-center justify-center p-4 text-center">
-                                    <p class="text-xs text-slate-400">No contacts found</p>
-                                </div>
-                            }
+            <div class="border-t border-slate-100 pt-4">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Select Members <span class="text-xs text-slate-500 font-normal italic">(@selectedPhoneNumbers.Count selected)</span>
+                    </label>
+                    <div class="flex gap-3">
+                        <div class="flex-1">
+                            <FormInput Label="" @bind-Value="pickerSearch" Required="false" Placeholder="Find a contact..." />
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="block text-sm font-semibold text-slate-700">
-                            Selected Group Members
-                            <span class="ml-2 text-xs font-normal text-slate-400">
-                                (@selectedPhoneNumbers.Count)
-                            </span>
-                        </label>
-                    </div>
-
-                    <div class="flex h-[29rem] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                        <div class="flex justify-between border-b border-slate-200 bg-slate-50/80 px-4 py-2">
-                            <span class="font-bold tracking-wider text-[10px] text-slate-500 uppercase">
-                                Contact
-                            </span>
-                            <span class="font-bold tracking-wider text-[10px] text-slate-500 uppercase">
-                                Action
-                            </span>
-                        </div>
-
-                        <div class="flex-1 divide-y divide-slate-100 overflow-y-auto">
-                            @if (selectedPhoneNumbers.Count > 0)
+                <div class="overflow-x-hidden overflow-y-auto h-64 border border-slate-200 rounded-lg p-3 bg-slate-50 shadow-inner">
+                    @if (isLoadingContacts)
+                    {
+                        <p class="text-sm text-slate-500 italic">Fetching contacts...</p>
+                    }
+                    else if (FilteredContacts.Count == 0)
+                    {
+                        <p class="text-sm text-slate-500 italic">No contacts found</p>
+                    }
+                    else
+                    {
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            @foreach (var contact in FilteredContacts)
                             {
-                                @foreach (var phone in selectedPhoneNumbers)
-                                {
-                                    var contact = contacts.FirstOrDefault(c => c.PhoneNumber == phone);
-                                    <div class="flex items-center justify-between px-4 py-2.5 transition-colors hover:bg-slate-50/50">
-                                        <div class="flex items-center gap-2.5 truncate">
-                                            <div class="bg-brand-50 text-brand-600 flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-bold text-[10px]">
-                                                @GetInitials(contact?.ContactName)
-                                            </div>
-                                            <div class="truncate">
-                                                <p class="mb-1 truncate text-xs leading-none font-semibold text-slate-900">
-                                                    @(string.IsNullOrEmpty(contact?.ContactName) ? "Direct Number" : contact.ContactName)
-                                                </p>
-                                                <p class="font-mono text-[10px] text-slate-500">
-                                                    @phone
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <button type="button"
-                                                @onclick="() => ToggleContact(phone)"
-                                                class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                                title="Remove from group">
-                                            <Icon Style="Icon.IconStyle.Trash" CssClass="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                }
-                            }
-                            else
-                            {
-                                <div class="flex h-full flex-col items-center justify-center gap-3 p-8 text-center">
-                                    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-50 text-slate-200">
-                                        <Icon Style="Icon.IconStyle.Users" CssClass="h-6 w-6" />
-                                    </div>
-                                    <p class="max-w-40 text-xs leading-relaxed text-slate-400">
-                                        No members selected. Start by picking contacts.
-                                    </p>
+                                var phone = contact.PhoneNumber ?? "";
+                                var name = string.IsNullOrWhiteSpace(contact.ContactName) ? phone : contact.ContactName;
+                                var selected = IsSelected(phone);
+                                
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox"
+                                           value="@phone" checked="@selected"
+                                           id="gc-@phone" @onchange="_ => ToggleContact(phone)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
+                                    <label class="text-sm text-slate-700 cursor-pointer select-none truncate" for="gc-@phone" title="@name (@phone)">
+                                        @name
+                                    </label>
                                 </div>
                             }
                         </div>
-                    </div>
+                    }
                 </div>
             </div>
         </EditForm>
@@ -174,7 +81,7 @@
     private string pickerSearch = string.Empty;
     private GroupFormModel model = new();
     private List<ContactResponse> contacts = [];
-    private HashSet<string> selectedPhoneNumbers = [];
+    private HashSet<string> selectedPhoneNumbers = new(StringComparer.OrdinalIgnoreCase);
 
     private string ModalTitle => isEditMode ? "Edit Group Members" : "Create New Group";
 
@@ -201,7 +108,7 @@
         selectedPhoneNumbers = group?.Members?
             .Select(x => x.PhoneNumber)
             .Where(x => !string.IsNullOrWhiteSpace(x))
-            .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+            .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         pickerSearch = string.Empty;
         isVisible = true;
         _ = LoadContacts(group);
@@ -241,7 +148,7 @@
         }
     }
 
-    private void ToggleContact(string? phoneNumber)
+    private void ToggleContact(string phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
             return;
@@ -250,19 +157,8 @@
             selectedPhoneNumbers.Remove(phoneNumber);
     }
 
-    private bool IsSelected(string? phoneNumber) =>
+    private bool IsSelected(string phoneNumber) =>
         !string.IsNullOrWhiteSpace(phoneNumber) && selectedPhoneNumbers.Contains(phoneNumber);
-
-    private string GetInitials(string? name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            return "?";
-
-        var trimmed = name.Trim();
-        return trimmed.Length == 1
-            ? trimmed.ToUpperInvariant()
-            : trimmed[..2].ToUpperInvariant();
-    }
 
     private async Task HandleSubmit()
     {
@@ -303,9 +199,8 @@
         }
     }
 
-    private Task Close()
+    private void Close()
     {
         isVisible = false;
-        return Task.CompletedTask;
     }
 }

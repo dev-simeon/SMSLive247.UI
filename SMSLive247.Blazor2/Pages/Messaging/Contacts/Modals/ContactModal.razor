@@ -1,70 +1,89 @@
-﻿<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
+<Modal Title="@ModalTitle" Size="Modal.ModalSize.Medium" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm id="ContactForm" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
-            <FormInput Label="Full Name"
-                       PlaceHolder="e.g. Sarah Smith"
-                       IconStyle="Icon.IconStyle.User"
-                       @bind-Value="model.ContactName"
-                       Required="true" />
+        <EditForm id="ContactForm" Model="@editModel" OnValidSubmit="HandleSubmit" class="space-y-4">
+            @if (!isEditMode)
+            {
+                <div class="space-y-3">
+                    @for (int i = 0; i < contactFields.Count; i++)
+                    {
+                        var index = i;
+                        <div class="flex gap-3">
+                            <div class="flex-1">
+                                <FormInput Label="@(index == 0 ? "Contact Name" : "")"
+                                           PlaceHolder="Name"
+                                           @bind-Value="contactFields[index].ContactName"
+                                           Required="false" />
+                            </div>
+                            <div class="flex-1">
+                                <FormInput Label="@(index == 0 ? "Phone Number" : "")"
+                                           PlaceHolder="Phone"
+                                           Type="tel"
+                                           @bind-Value="contactFields[index].PhoneNumber"
+                                           Required="false" />
+                            </div>
+                        </div>
+                    }
+                </div>
 
-            <div class="space-y-1">
+                <div class="pt-2">
+                    <button type="button" class="flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors" @onclick="AddField">
+                        <span class="flex items-center justify-center pt-0.5"><Icon Style="Icon.IconStyle.PlusCircle" CssClass="h-4 w-4" /></span>
+                        <span>Add More Contact</span>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <FormInput Label="Contact Name"
+                           PlaceHolder="e.g. Sarah Smith"
+                           @bind-Value="editModel.ContactName"
+                           Required="true" />
+
                 <FormInput Label="Phone Number"
                            PlaceHolder="+234 800 000 0000"
                            Type="tel"
-                           @bind-Value="model.PhoneNumber"
-                           disabled="@isEditMode"
+                           @bind-Value="editModel.PhoneNumber"
+                           disabled="true"
                            Required="true" />
-                <p class="flex items-center gap-1 text-xs text-slate-500">
-                    <Icon Style="Icon.IconStyle.Info" CssClass="h-3.5 w-3.5" />
-                    Please include country code.
-                </p>
+            }
+
+            <div class="mt-6 border-t border-slate-100 pt-4">
+                <label class="block text-sm font-medium text-slate-700 mb-2">
+                    Assign to Groups <span class="text-xs text-slate-500 font-normal italic">(Optional)</span>
+                </label>
+
+                @if (isLoadingGroups)
+                {
+                    <p class="text-sm text-slate-500 italic">Loading groups...</p>
+                }
+                else if (groups.Count > 0)
+                {
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        @foreach (var group in groups)
+                        {
+                            var name = group.GroupName ?? "";
+                            var selected = selectedGroups.Contains(name);
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox"
+                                       value="@name" checked="@selected"
+                                       id="cg-@name" @onchange="_ => ToggleGroup(name)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
+                                <label class="text-sm text-slate-700 cursor-pointer select-none truncate" for="cg-@name" title="@name">
+                                    @name
+                                </label>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-sm text-slate-500 italic">No groups found.</p>
+                }
             </div>
-
-                <div class="space-y-2">
-                    <div class="flex justify-between">
-                        <label class="block text-sm font-medium text-slate-700">
-                            Assign to Groups
-                        </label>
-                        <span class="text-xs text-slate-500 italic">Optional</span>
-                    </div>
-
-                    <div class="max-h-48 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-3">
-                        @if (isLoadingGroups)
-                        {
-                            <div class="flex items-center justify-center py-4">
-                                <div class="border-brand-500 h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"></div>
-                            </div>
-                        }
-                        else if (groups.Count > 0)
-                        {
-                            <div class="grid grid-cols-1 gap-2">
-                                @foreach (var group in groups)
-                                {
-                                    <button type="button"
-                                            @onclick="() => ToggleGroup(group.GroupName)"
-                                            class="@GetGroupButtonClass(group.GroupName)">
-                                        <span>@group.GroupName</span>
-                                        @if (IsSelected(group.GroupName))
-                                        {
-                                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="h-4 w-4" />
-                                        }
-                                    </button>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <p class="py-4 text-center text-xs text-slate-400">
-                                No groups found. Create a group first to assign contacts.
-                            </p>
-                        }
-                    </div>
-                </div>
         </EditForm>
     </Body>
     <Footer>
         <Button IsSubmit="true"
-                Text="@(isEditMode ? "Update Contact" : "Save Contact")"
+                Text="@(isEditMode ? "Update Contact" : "Save Contacts")"
                 Icon="Icon.IconStyle.Save"
                 IsBusy="@isSubmitting"
                 form="ContactForm" />
@@ -78,28 +97,46 @@
 @code {
     [Parameter] public EventCallback OnCompleted { get; set; }
 
+    private class ContactEntry
+    {
+        public string ContactName { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+    }
+
     private bool isVisible;
     private bool isEditMode;
     private bool isSubmitting;
     private bool isLoadingGroups;
     private string? originalPhoneNumber;
-    private ContactUpdateRequest model = new();
+    
+    private ContactUpdateRequest editModel = new();
+    private List<ContactEntry> contactFields = [];
     private List<GroupResponse> groups = [];
-    private HashSet<string> selectedGroups = [];
+    private HashSet<string> selectedGroups = new(StringComparer.OrdinalIgnoreCase);
 
-    private string ModalTitle => isEditMode ? "Edit Contact" : "Add New Contact";
+    private string ModalTitle => isEditMode ? "Edit Contact" : "Add New Contacts";
 
     public void Show(ContactResponse? contact = null)
     {
         isEditMode = contact != null;
         originalPhoneNumber = contact?.PhoneNumber;
-        model = new ContactUpdateRequest
+        
+        if (isEditMode)
         {
-            ContactName = contact?.ContactName ?? string.Empty,
-            PhoneNumber = contact?.PhoneNumber ?? string.Empty,
-            Groups = contact?.Groups?.ToList() ?? []
-        };
-        selectedGroups = model.Groups?.ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+            editModel = new ContactUpdateRequest
+            {
+                ContactName = contact?.ContactName ?? string.Empty,
+                PhoneNumber = contact?.PhoneNumber ?? string.Empty,
+                Groups = contact?.Groups?.ToList() ?? []
+            };
+            selectedGroups = editModel.Groups?.ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+        }
+        else
+        {
+            contactFields = [new(), new(), new(), new(), new()];
+            selectedGroups.Clear();
+        }
+
         isVisible = true;
         _ = LoadGroups();
         StateHasChanged();
@@ -124,54 +161,59 @@
         }
     }
 
-    private void ToggleGroup(string? groupName)
+    private void ToggleGroup(string groupName)
     {
-        if (string.IsNullOrWhiteSpace(groupName))
-            return;
-
-        if (!selectedGroups.Add(groupName))
-            selectedGroups.Remove(groupName);
+        if (string.IsNullOrWhiteSpace(groupName)) return;
+        if (!selectedGroups.Add(groupName)) selectedGroups.Remove(groupName);
     }
 
-    private bool IsSelected(string? groupName) =>
-        !string.IsNullOrWhiteSpace(groupName) && selectedGroups.Contains(groupName);
-
-    private string GetGroupButtonClass(string? groupName)
+    private void AddField()
     {
-        var selected = IsSelected(groupName);
-        return selected
-            ? "flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all bg-brand-50 text-brand-700 border border-brand-200 shadow-sm"
-            : "flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all bg-white text-slate-600 border border-slate-200 hover:border-brand-300";
+        contactFields.Add(new());
     }
 
     private async Task HandleSubmit()
     {
-        if (string.IsNullOrWhiteSpace(model.ContactName) || string.IsNullOrWhiteSpace(model.PhoneNumber))
-        {
-            await alert.Error("Please enter both contact name and phone number.", "Validation Error");
-            return;
-        }
-
         isSubmitting = true;
-        model.Groups = selectedGroups.ToList();
 
         try
         {
+            var selectedGroupList = selectedGroups.ToList();
+
             if (isEditMode)
             {
-                await apiClient.ContactUpdateAsync(originalPhoneNumber ?? model.PhoneNumber, model);
+                if (string.IsNullOrWhiteSpace(editModel.ContactName) || string.IsNullOrWhiteSpace(editModel.PhoneNumber))
+                {
+                    await alert.Error("Please enter both contact name and phone number.", "Validation Error");
+                    return;
+                }
+
+                editModel.Groups = selectedGroupList;
+                await apiClient.ContactUpdateAsync(originalPhoneNumber ?? editModel.PhoneNumber, editModel);
                 await alert.Success("Contact updated successfully.");
             }
             else
             {
-                var request = new ContactCreateRequest
+                var validContacts = contactFields.Where(x => !string.IsNullOrWhiteSpace(x.PhoneNumber)).ToList();
+                if (validContacts.Count == 0)
                 {
-                    ContactName = model.ContactName,
-                    PhoneNumber = model.PhoneNumber,
-                    Groups = model.Groups
-                };
-                await apiClient.ContactCreateAsync(request);
-                await alert.Success("Contact created successfully.");
+                    await alert.Error("Please enter at least one phone number.", "Validation Error");
+                    return;
+                }
+
+                var tasks = validContacts.Select(contact =>
+                {
+                    var request = new ContactCreateRequest
+                    {
+                        ContactName = contact.ContactName,
+                        PhoneNumber = contact.PhoneNumber,
+                        Groups = selectedGroupList
+                    };
+                    return apiClient.ContactCreateAsync(request);
+                });
+
+                await Task.WhenAll(tasks);
+                await alert.Success($"{validContacts.Count} contact(s) created successfully.");
             }
 
             isVisible = false;
@@ -188,9 +230,8 @@
         }
     }
 
-    private Task Close()
+    private void Close()
     {
         isVisible = false;
-        return Task.CompletedTask;
     }
 }

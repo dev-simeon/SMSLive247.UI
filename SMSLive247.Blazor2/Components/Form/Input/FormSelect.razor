@@ -1,4 +1,4 @@
-﻿@typeparam TValue
+@typeparam TValue
 @inherits InputBase<TValue?>
 
 <div>
@@ -80,6 +80,7 @@
     [Parameter] public Icon.IconStyle? IconStyle { get; set; }
     [Parameter] public bool IsEmbedded { get; set; } = false;
     [Parameter] public string? HelpText { get; set; }
+    [Parameter] public string? CssClass { get; set; }
 
     // additional validation parameters
     [Parameter] public bool Required { get; set; } = true;
@@ -120,10 +121,15 @@
 
     private string GetCssClass()
     {
-        return IsEmbedded
+        var css = IsEmbedded
             // ? "h-9 px-3 border-l border-slate-200 text-slate-700 focus:outline-none cursor-pointer"
             ? "pl-3 pr-8 h-10 border-l border-slate-200 text-slate-600 focus:outline-none w-full appearance-none bg-white hover:bg-slate-50 transition-colors"
             : "appearance-none block w-full px-3 py-2.5 border rounded-lg bg-white text-slate-900 transition-all border-slate-200";
+
+        if (!string.IsNullOrWhiteSpace(CssClass))
+            css += $" {CssClass}";
+
+        return css;
     }
 
     private async Task OnChange(ChangeEventArgs e)
