@@ -1,102 +1,110 @@
-﻿@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
+@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="@(viewMode == "groups" ? "Search Groups..." : "Search Contacts...")"
+        <SearchBox Placeholder="Search..."
                    InstantSearch="true"
                    @bind-SearchTerm="searchQuery">
-            
         </SearchBox>
-        <div class="flex h-10 shrink-0 items-center rounded-lg bg-slate-100 p-1">
-            <button type="button"
-                    @onclick='() => SetViewMode("contacts")'
-                    class="@(viewMode == "contacts" ? "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer bg-white text-brand-600 shadow-sm" : "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer text-slate-500 hover:text-slate-900")">
-                All Contacts
-            </button>
-            <button type="button"
-                    @onclick='() => SetViewMode("groups")'
-                    class="@(viewMode == "groups" ? "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer bg-white text-brand-600 shadow-sm" : "px-4 py-1.5 h-8 rounded-md text-sm font-medium transition-all cursor-pointer text-slate-500 hover:text-slate-900")">
-                Groups
-            </button>
-        </div>
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="New Group" Icon="Icon.IconStyle.PlusCircle" Style="Button.ButtonStyle.Secondary" OnClick="HandleNewGroup" />
-        <Button Text="Add Contact" Icon="Icon.IconStyle.PlusCircle" OnClick="HandleAddContact" />
+        <Button Text="Add Contacts..." Style="Button.ButtonStyle.Primary" OnClick="HandleAddContact" />
+        <Button Text="Create Group..." Style="Button.ButtonStyle.Primary" OnClick="HandleNewGroup" />
     </HeaderRight>
 
     <ChildContent>
-        @if (viewMode == "contacts")
-        {
-            <Table Items="FilteredContacts" EmptyMessage="No contacts found.">
-                <Columns>
-                    <Column Header="Name">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600">
-                                @GetInitials(context.ContactName)
+        <!-- Groups Bar -->
+        <div class="mb-4 flex items-center justify-between border-y border-cyan-200 bg-cyan-50/70 px-4 py-3">
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-semibold text-slate-700">Groups:</span>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var group in groups)
+                    {
+                        bool isSelected = selectedGroups.Contains(group.GroupName ?? string.Empty);
+                        <div class="flex items-center overflow-hidden rounded-md border transition-colors cursor-pointer @(isSelected ? "border-brand-500 bg-brand-500 text-white shadow-sm" : "border-cyan-300 bg-white text-cyan-800 hover:bg-cyan-50 shadow-sm")"
+                             @onclick="() => ToggleGroup(group.GroupName)">
+                            <div class="flex items-center px-3 py-1.5 text-sm font-medium">
+                                @(string.IsNullOrEmpty(group.GroupName) ? "—" : group.GroupName)
+                                <span class="ml-2 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold @(isSelected ? "bg-white text-brand-600" : "bg-cyan-100 text-cyan-700")">
+                                    @(group.Members?.Count ?? 0)
+                                </span>
                             </div>
-                            <div>
-                                <p class="text-sm font-medium text-slate-900">@(string.IsNullOrEmpty(context.ContactName) ? "—" : context.ContactName)</p>
-                            </div>
-                        </div>
-                    </Column>
-                    <Column Header="Phone Number">
-                        <span class="font-mono text-sm text-slate-600">@(string.IsNullOrEmpty(context.PhoneNumber) ? "—" : context.PhoneNumber)</span>
-                    </Column>
-                    <Column Header="Groups">
-                        <div class="flex flex-wrap gap-1">
-                            @if (context.Groups != null && context.Groups.Any())
+                            @if (isSelected)
                             {
-                                @foreach (var g in context.Groups)
-                                {
-                                    <span class="bg-brand-50 text-brand-700 border-brand-100 rounded border px-2 py-0.5 font-bold text-[10px] uppercase">
-                                        @g
+                                <div class="flex items-center bg-brand-600 px-2 self-stretch gap-2 border-l border-brand-400">
+                                    <span @onclick="() => HandleEditGroup(group)" @onclick:stopPropagation="true" class="cursor-pointer flex items-center justify-center pt-0.5">
+                                        <Icon Style="Icon.IconStyle.PenSquare" CssClass="h-4 w-4 text-white hover:text-slate-200 transition-colors" />
                                     </span>
-                                }
-                            }
-                            else
-                            {
-                                <span class="text-xs text-slate-400 italic">None</span>
+                                    <span @onclick="() => HandleDeleteGroup(group.GroupName)" @onclick:stopPropagation="true" class="cursor-pointer flex items-center justify-center pt-0.5">
+                                        <Icon Style="Icon.IconStyle.Trash" CssClass="h-4 w-4 text-white hover:text-slate-200 transition-colors" />
+                                    </span>
+                                </div>
                             }
                         </div>
-                    </Column>
-                    <Column Header="Date Added">
-                        <FormatDate DateTime="@context.DateCreated"></FormatDate>
-                    </Column>
-                    <Column>
-                        <Actions OnEdit="() => HandleEditContact(context)"
-                                 OnDelete="() => HandleDeleteContact(context.PhoneNumber)">
-                        </Actions>
-                    </Column>
-                </Columns>
-            </Table>
-        }
-        else
-        {
-            <Table Items="FilteredGroups" EmptyMessage="No groups found.">
-                <Columns>
-                    <Column Header="Group Name">
-                        <div class="flex items-center gap-3">
-                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
-                                <Icon Style="Icon.IconStyle.Users" CssClass="h-5 w-5" />
+                    }
+                    @if (!groups.Any())
+                    {
+                        <span class="text-xs text-slate-500 italic py-1">No groups found.</span>
+                    }
+                </div>
+            </div>
+            
+            <!-- Multi-select toggle switch -->
+            <div class="flex items-center ml-4 shrink-0">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer" @bind="MultiSelectGroup" />
+                    <div class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Contacts Grid -->
+        <div class="border-l border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 bg-white rounded-sm overflow-hidden mb-8">
+            @foreach (var contact in FilteredContacts)
+            {
+                bool isSelected = selectedContactPhone == contact.PhoneNumber;
+                <div class="border-r border-b border-slate-200 p-4 relative cursor-pointer group transition-colors @(isSelected ? "bg-brand-50 ring-inset ring-2 ring-brand-500 z-10" : "hover:bg-slate-50")"
+                     @onclick="() => ToggleContact(contact.PhoneNumber)">
+                    
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <div class="text-sm font-medium text-slate-800">@(string.IsNullOrEmpty(contact.ContactName) ? "—" : contact.ContactName)</div>
+                            <div class="text-xs text-slate-500 mt-0.5 font-mono">@(string.IsNullOrEmpty(contact.PhoneNumber) ? "—" : contact.PhoneNumber)</div>
+                        </div>
+                        @if (isSelected)
+                        {
+                            <div class="flex items-center gap-2">
+                                <button type="button" @onclick="() => HandleEditContact(contact)" @onclick:stopPropagation="true" class="text-slate-400 hover:text-brand-600 transition-colors">
+                                    <Icon Style="Icon.IconStyle.PenSquare" CssClass="h-4 w-4" />
+                                </button>
+                                <button type="button" @onclick="() => HandleDeleteContact(contact.PhoneNumber)" @onclick:stopPropagation="true" class="text-slate-400 hover:text-red-600 transition-colors">
+                                    <Icon Style="Icon.IconStyle.Trash" CssClass="h-4 w-4" />
+                                </button>
                             </div>
-                            <span class="text-sm font-semibold text-slate-900">@(string.IsNullOrEmpty(context.GroupName) ? "—" : context.GroupName)</span>
-                        </div>
-                    </Column>
-                    <Column Header="Members">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-sm font-semibold text-slate-900">@(context.Members?.Count ?? 0)</span>
-                            <span class="text-xs text-slate-500">contacts</span>
-                        </div>
-                    </Column>
-                    <Column>
-                        <Actions OnEdit="() => HandleEditGroup(context)"
-                                 OnDelete="() => HandleDeleteGroup(context.GroupName)">
-                        </Actions>
-                    </Column>
-                </Columns>
-            </Table>
-        }
+                        }
+                    </div>
+
+                    <div class="mt-2.5 flex flex-wrap gap-1">
+                        @if (contact.Groups != null && contact.Groups.Any())
+                        {
+                            @foreach (var g in contact.Groups)
+                            {
+                                <span class="rounded bg-teal-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                                    @g
+                                </span>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            
+            @if (!FilteredContacts.Any())
+            {
+                <div class="col-span-full py-12 text-center text-slate-500 border-r border-b border-slate-200">
+                    No contacts found.
+                </div>
+            }
+        </div>
     </ChildContent>
 
     <FooterLeft>
@@ -104,16 +112,35 @@
 </PageBody>
 
 <ContactModal @ref="contactModal" OnCompleted="FetchData" />
-<GroupModal @ref="groupModal" OnCompleted="OnGroupSaved" />
+<GroupModal @ref="groupModal" OnCompleted="FetchData" />
 
 @code {
-    private string viewMode = "contacts"; // "contacts" | "groups"
     private string? searchQuery;
 
     private List<ContactResponse> contacts = new();
     private List<GroupResponse> groups = new();
     private ContactModal contactModal = new();
     private GroupModal groupModal = new();
+
+    private List<string> selectedGroups = new();
+    private bool multiSelectGroup = false;
+    private string? selectedContactPhone;
+
+    private bool MultiSelectGroup
+    {
+        get => multiSelectGroup;
+        set
+        {
+            multiSelectGroup = value;
+            if (!multiSelectGroup && selectedGroups.Count > 1)
+            {
+                // keep only the first one if turning off multi-select
+                var first = selectedGroups.First();
+                selectedGroups.Clear();
+                selectedGroups.Add(first);
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -141,39 +168,59 @@
         }
     }
 
-    private void SetViewMode(string mode)
-    {
-        viewMode = mode;
-        searchQuery = null;
-    }
-
     private List<ContactResponse> FilteredContacts
     {
         get
         {
-            if (string.IsNullOrWhiteSpace(searchQuery))
-                return contacts;
+            var result = contacts.AsEnumerable();
 
-            var q = searchQuery.Trim().ToLowerInvariant();
-            return contacts.Where(c =>
-                (c.ContactName != null && c.ContactName.ToLowerInvariant().Contains(q)) ||
-                (c.PhoneNumber != null && c.PhoneNumber.ToLowerInvariant().Contains(q))
-            ).ToList();
+            if (selectedGroups.Any())
+            {
+                foreach (var g in selectedGroups)
+                {
+                    result = result.Where(c => c.Groups != null && c.Groups.Contains(g, StringComparer.OrdinalIgnoreCase));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                var q = searchQuery.Trim().ToLowerInvariant();
+                result = result.Where(c =>
+                    (c.ContactName != null && c.ContactName.ToLowerInvariant().Contains(q)) ||
+                    (c.PhoneNumber != null && c.PhoneNumber.ToLowerInvariant().Contains(q))
+                );
+            }
+
+            return result.ToList();
         }
     }
 
-    private List<GroupResponse> FilteredGroups
+    private void ToggleGroup(string? groupName)
     {
-        get
-        {
-            if (string.IsNullOrWhiteSpace(searchQuery))
-                return groups;
+        if (string.IsNullOrEmpty(groupName)) return;
 
-            var q = searchQuery.Trim().ToLowerInvariant();
-            return groups.Where(g =>
-                g.GroupName != null && g.GroupName.ToLowerInvariant().Contains(q)
-            ).ToList();
+        if (selectedGroups.Contains(groupName))
+        {
+            selectedGroups.Remove(groupName);
         }
+        else
+        {
+            if (!MultiSelectGroup)
+            {
+                selectedGroups.Clear();
+            }
+            selectedGroups.Add(groupName);
+        }
+    }
+
+    private void ToggleContact(string? phone)
+    {
+        if (string.IsNullOrEmpty(phone)) return;
+
+        if (selectedContactPhone == phone)
+            selectedContactPhone = null;
+        else
+            selectedContactPhone = phone;
     }
 
     private string GetInitials(string? name)
@@ -226,12 +273,6 @@
     private void HandleEditGroup(GroupResponse group)
     {
         groupModal.Show(group);
-    }
-
-    private async Task OnGroupSaved()
-    {
-        viewMode = "groups";
-        await FetchData();
     }
 
     private async Task HandleDeleteGroup(string? groupId)
