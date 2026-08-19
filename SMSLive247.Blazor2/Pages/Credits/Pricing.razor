@@ -1,47 +1,147 @@
-﻿@attribute [Route(Const.Routes.Wallet.Pricing)]
+@attribute [Route(Const.Routes.Wallet.Pricing)]
 @layout MainLayout
 
+<PageTitle>SMSLive247 - Pricing</PageTitle>
+
+<PageHeader 
+    Title="Pricing" 
+    SubTitle="Calculate your SMS credits instantly. Enter the quantity you need below." />
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        @* Left Column: Calculator *@
+        <div class="lg:col-span-4">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 h-full flex flex-col">
+                <div class="space-y-6 flex-1">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">
+                            Quantity/Credits
+                        </label>
+                        <div class="relative">
+                            <input type="number"
+                                   @bind="quantity" @bind:event="oninput"
+                                   min="500"
+                                   class="block w-full rounded-lg border-0 py-3 pl-4 pr-16 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-brand-500 sm:text-sm font-mono outline-none"
+                                   placeholder="e.g. 10000" />
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <span class="text-slate-500 text-[10px] font-bold">
+                                    CREDITS
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-5 space-y-4 border border-slate-200">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-500">Credit Price</span>
+                            <span class="font-bold text-slate-800">
+                                ₦ @(CurrentTier?.Price.ToString("0.00") ?? "0.00")
+                            </span>
+                        </div>
+                        <div class="border-t border-slate-200 pt-4 flex justify-between items-center">
+                            <span class="text-slate-500 font-medium">
+                                Total Amount
+                            </span>
+                            <span class="font-bold text-xl text-brand-600">
+                                ₦ @totalCost.ToString("#,##0.00")
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-[11px] text-blue-700 flex items-center gap-2">
+                        <Icon Style="Icon.IconStyle.Info" CssClass="w-4 h-4 shrink-0" />
+                        <p>Transaction charges would be added at checkout.</p>
+                    </div>
+
+                    <button @onclick="HandleProceedPayment"
+                            class="w-full bg-brand-500 hover:bg-brand-600 text-white px-6 py-3.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2 active:scale-95 mt-2">
+                        <span>
+                            Proceed to Buy
+                        </span>
+                        <Icon Style="Icon.IconStyle.ChevronRight" CssClass="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        @* Right Column: Pricing Tiers *@
+        <div class="lg:col-span-8">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
+                <div class="p-5 bg-slate-50/50 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">
+                        Volume Pricing Guide
+                    </h3>
+                </div>
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase tracking-widest font-bold border-b border-slate-200">
+                                <th class="px-6 py-4">Min Qty</th>
+                                <th class="px-6 py-4">Max Qty</th>
+                                <th class="px-6 py-4 text-right">Price (₦)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach (var tier in pricingTiers)
+                            {
+                                bool isActive = IsTierActive(tier);
+                                <tr class="transition-colors @(isActive ? "bg-brand-50 border-l-4 border-l-brand-500" : "hover:bg-slate-50")">
+                                    <td class="px-6 py-4 text-sm font-medium @(isActive ? "text-brand-700" : "text-slate-600")">
+                                        @tier.MinQuantity.ToString("#,##0")
+                                    </td>
+                                    <td class="px-6 py-4 text-sm @(isActive ? "text-brand-700" : "text-slate-600")">
+                                        @(tier.MaxQuantity == 0 ? "Unlimited" : tier.MaxQuantity.ToString("#,##0"))
+                                    </td>
+                                    <td class="px-6 py-4 text-right text-sm font-bold @(isActive ? "text-brand-700" : "text-slate-900")">
+                                        @tier.Price.ToString("0.00")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
 @code {
-    // private long quantity = 1000;
-    // private string currencySymbol = "₦";
+    [Inject] private NavigationManager nav { get; set; } = default!;
 
-    // private PriceCalcResponse? priceCalc;
-    // private List<PriceSlotResponse>? priceSlots;
+    private long quantity = 10000;
+    private List<PriceSlotResponse> pricingTiers = new();
 
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     try
-    //     {
-    //         var t1 = apiClient.PriceCalculateAsync(null, quantity, "N");
-    //         var t2 = apiClient.PriceListAsync();
+    private PriceSlotResponse? CurrentTier => pricingTiers.FirstOrDefault(t => IsTierActive(t)) ?? pricingTiers.FirstOrDefault();
+    
+    private double totalCost => quantity * (CurrentTier?.Price ?? 0);
 
-    //         await Task.WhenAll(t1, t2);
+    private bool IsTierActive(PriceSlotResponse tier)
+    {
+        long max = tier.MaxQuantity == 0 ? long.MaxValue : tier.MaxQuantity;
+        return quantity >= tier.MinQuantity && quantity <= max;
+    }
 
-    //         priceSlots = t2.Result.Result.ToList();
-    //         priceCalc = t1.Result.Result;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         await alert.Error(ex.Message);
-    //     }
-    // }
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchPricing();
+    }
 
-    // private async Task CalculatePrice()
-    // {
-    //     try
-    //     {
-    //         priceCalc = null;
-    //         StateHasChanged();
+    private async Task FetchPricing()
+    {
+        try
+        {
+            var res = await apiClient.PriceListAsync();
+            if (res.Result != null)
+            {
+                pricingTiers = res.Result.ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error("Failed to load pricing data: " + ex.Message);
+        }
+    }
 
-    //         var result = await apiClient.PriceCalculateAsync(null, quantity, "N");
-
-    //         if (result.StatusCode == 200)
-    //             priceCalc = result.Result;
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         await alert.Error(ex.Message);
-    //     }
-    // }
+    private void HandleProceedPayment()
+    {
+        nav.NavigateTo(Const.Routes.Wallet.BuyCredits);
+    }
 }
