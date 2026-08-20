@@ -1,8 +1,8 @@
-<Modal Title="Select Contacts" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+﻿@* <Modal Title="Select Contacts" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
     <Body>
-        <div class="flex flex-col flex-1 h-full min-h-[400px]">
+        <div class="flex h-full min-h-[400px] flex-1 flex-col">
             <!-- Tabs for Individual / Groups -->
-            <div class="border-b border-slate-100 bg-slate-50/50 px-1 mb-4">
+            <div class="mb-4 border-b border-slate-100 bg-slate-50/50 px-1">
                 <div class="flex gap-4 sm:gap-6">
                     <button type="button" @onclick="() => SetTab(ContactTab.Individual)" class="@GetTabClass(ContactTab.Individual)">
                         <Icon Style="Icon.IconStyle.Users" CssClass="text-base leading-none" />
@@ -25,7 +25,7 @@
 
             <!-- Header area (search + select all) -->
             <div class="mb-4">
-                <div class="flex gap-3 mb-3">
+                <div class="mb-3 flex gap-3">
                     <div class="w-1/2">
                         <FormInput Label="" @bind-Value="searchTerm" Required="false" Placeholder="@SearchPlaceholder" />
                     </div>
@@ -40,27 +40,27 @@
 
                 <div class="flex items-center gap-2">
                     <input type="checkbox" id="ct-all" checked="@AllPageContactsSelected" @onchange="ToggleAllContacts" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                    <label for="ct-all" class="text-sm font-medium text-slate-700 cursor-pointer select-none">Select All</label>
+                    <label for="ct-all" class="cursor-pointer text-sm font-medium text-slate-700 select-none">Select All</label>
                 </div>
             </div>
 
             <!-- Results area -->
-            <div class="overflow-x-hidden overflow-y-auto flex-1 h-64 border border-slate-200 rounded-lg p-4 bg-slate-50 shadow-inner">
+            <div class="h-64 flex-1 overflow-x-hidden overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-inner">
                 @if (isLoading)
                 {
-                    <p class="text-slate-500 italic text-sm">Loading...</p>
+                    <p class="text-sm text-slate-500 italic">Loading...</p>
                 }
                 else if (!string.IsNullOrWhiteSpace(errorMessage))
                 {
-                    <p class="text-red-500 text-sm">@errorMessage</p>
+                    <p class="text-sm text-red-500">@errorMessage</p>
                 }
                 else if (ActiveCount == 0)
                 {
-                    <p class="text-slate-500 italic text-sm">@EmptyMessage</p>
+                    <p class="text-sm text-slate-500 italic">@EmptyMessage</p>
                 }
                 else
                 {
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         @if (activeTab == ContactTab.Individual)
                         {
                             @foreach (var item in FilteredContacts.OrderBy(x => x.ContactName))
@@ -73,7 +73,7 @@
                                     <input type="checkbox"
                                            value="@phone" checked="@selected"
                                            id="ct-@phone" @onchange="_ => ToggleContact(phone)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                                    <label class="text-sm text-slate-700 cursor-pointer select-none truncate" for="ct-@phone" title="@name (@phone)">
+                                    <label class="cursor-pointer truncate text-sm text-slate-700 select-none" for="ct-@phone" title="@name (@phone)">
                                         @name
                                     </label>
                                 </div>
@@ -91,7 +91,7 @@
                                     <input type="checkbox"
                                            value="@name" checked="@selected"
                                            id="gr-@name" @onchange="_ => ToggleGroup(name)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                                    <label class="text-sm text-slate-700 cursor-pointer select-none truncate" for="gr-@name" title="@name (@count)">
+                                    <label class="cursor-pointer truncate text-sm text-slate-700 select-none" for="gr-@name" title="@name (@count)">
                                         @name (@count)
                                     </label>
                                 </div>
@@ -104,7 +104,7 @@
             @if (totalSelected > 0)
             {
                 <div class="mt-3 text-right">
-                    <span class="rounded bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">Total Selected: @totalSelected</span>
+                    <span class="bg-brand-50 text-brand-700 rounded px-2.5 py-1 text-xs font-bold">Total Selected: @totalSelected</span>
                 </div>
             }
         </div>
@@ -308,3 +308,4 @@
 
     private string RefreshIconClass => isLoading ? "h-4 w-4 animate-spin text-brand-500" : "h-4 w-4";
 }
+ *@

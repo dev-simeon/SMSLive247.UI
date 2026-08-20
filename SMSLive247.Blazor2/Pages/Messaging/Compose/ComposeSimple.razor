@@ -1,0 +1,170 @@
+﻿@using SMSLive247.Blazor2.Pages.Messaging.Compose.Modals
+@using SMSLive247.Blazor2.Pages.Messaging.Compose.Common
+
+@if (model is null)
+{
+    <div class="rounded-xl border border-slate-200 bg-white p-8 text-sm text-slate-500">Loading compose options...</div>
+}
+else
+{
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+
+        <!-- Main Column (col-lg-8) -->
+        <div class="flex flex-col gap-6 lg:col-span-2">
+
+            <!-- Recipients Card -->
+            <Card HeaderText="Select Recipients">
+                <HeaderRight>
+                    <span class="bg-brand-50 text-brand-700 rounded px-2.5 py-1 text-sm">
+                        Total Recipients: @model.GrandTotal().ToString("N0")
+                    </span>
+                </HeaderRight>
+                <ChildContent>
+                    <RecipientList 
+                                Caption="Raw Numbers" 
+                                Description="Type or paste your recipients phone numbers." 
+                                Recipients="model.Numbers"
+                                ButtonText="Paste..."
+                                ButtonIcon="Icon.IconStyle.PenSquare"
+                                ButtonStyle="Button.ButtonStyle.Secondary"
+                                OnClick="() => rawNumbersModal.Show(model.Numbers)">
+                    </RecipientList>
+
+                    <RecipientList Caption="From Contacts" 
+                                   Description="Select numbers from your Phonebook."
+                                   Recipients="model.Contacts"
+                                   ButtonText="Contacts..."
+                                   ButtonIcon="Icon.IconStyle.Users"
+                                   ButtonStyle="Button.ButtonStyle.Secondary"
+                                   OnClick="() => contactsModal.Show(model.Contacts)">
+                    </RecipientList>
+
+                    <RecipientList Caption="From Bulk Files"
+                                   Description="Include your Batch Files numbers."
+                                   Recipients="model.BatchFiles"
+                                   ButtonText="Bulk Files..."
+                                   ButtonIcon="Icon.IconStyle.FileText"
+                                   ButtonStyle="Button.ButtonStyle.Secondary"
+                                   OnClick="() => bulkfilesModal.Show(model.BatchFiles)">
+                    </RecipientList>
+
+                </ChildContent>
+            </Card>
+
+            <!-- Message Card -->
+            <Card HeaderText="Type your Message here">
+                <HeaderRight>
+                    <span class="bg-brand-50 rounded px-2.5 py-1 text-sm text-slate-500">
+                        @model.CounterText
+                    </span>
+                </HeaderRight>
+                <ChildContent>
+                    <textarea @bind="message" @bind:event="oninput" 
+                              placeholder="Type your message here..."
+                              maxlength="918" rows="8"
+                              class="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-brand-100 focus:ring-2">
+                    </textarea>
+
+                    <div class="mt-1 flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Messages longer than 160 characters are charged per page.</span>
+                        @if (!string.IsNullOrWhiteSpace(message))
+                        {
+                            <button type="button" class="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600">
+                                <Icon Style="Icon.IconStyle.Close" CssClass="text-xs" /> Clear
+                            </button>
+                        }
+                    </div>
+                </ChildContent>
+            </Card>
+        </div>
+
+        <!-- Side Column (col-lg-4) -->
+        <div class="lg:col-span-1">
+            <div class="sticky top-6 flex flex-col gap-6">
+                <!-- Sender ID Card -->
+                <SenderIdCard SenderIDs="@model.SenderIds"></SenderIdCard>
+                <!-- Schedule Card -->
+                <SchedulerCard Model="@model"></SchedulerCard>
+            </div>                
+        </div>
+    </div>
+}
+
+<SelectContacts     @ref="contactsModal"    OnSelected="(items) => model?.UpdateContacts(items)" />
+<SelectRawNumbers   @ref="rawNumbersModal"  OnSelected="(items) => model?.UpdateNumbers(items)" CountryCode="234" />
+<SelectBulkfiles    @ref="bulkfilesModal"   OnSelected="(items) => model?.UpdateBulkfiles(items)" />
+
+@code {
+    private SelectContacts contactsModal = new();
+    private SelectBulkfiles bulkfilesModal = new();
+    private SelectRawNumbers rawNumbersModal = new();
+
+    private ComposeSimpleModel? model;
+    private string message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var t1 = apiClient.SenderIdListAsync(1, 500, null);
+            var t2 = apiClient.BatchFileListAsync();
+            var t3 = apiClient.ContactListAsync();
+
+            await Task.WhenAll(t1, t2, t3);
+
+            model = new(t1.Result.Result, t3.Result.Result, t2.Result.Result);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message);
+        }
+    }
+
+    private async Task SendMessageCore(DateTimeOffset? scheduledDeliveryTime)
+    {
+        // var numbers = ParseNumbers(manualNumbers);
+        // var phoneNumbers = selectedContacts
+        //     .Select(x => x.Phone)
+        //     .Concat(selectedGroups.SelectMany(x => x.MemberPhones))
+        //     .Where(x => !string.IsNullOrWhiteSpace(x))
+        //     .Distinct(StringComparer.Ordinal)
+        //     .ToList();
+        // var fileIds = selectedFiles.Select(x => x.FileId).ToList();
+
+        // if (string.IsNullOrWhiteSpace(senderId) || string.IsNullOrWhiteSpace(message) || (numbers.Count == 0 && phoneNumbers.Count == 0 && fileIds.Count == 0))
+        // {
+        //     await alert.Error("Choose an approved sender ID, add recipients, and enter a message.", "Compose Message");
+        //     return;
+        // }
+
+        // isSending = true;
+        // try
+        // {
+        //     await apiClient.SmsBatchCreateAsync(new SmsBatchRequest
+        //     {
+        //         SenderID = senderId,
+        //         MessageText = message.Trim(),
+        //         RawNumbers = string.Join(',', numbers),
+        //         PhoneNumbers = phoneNumbers,
+        //         BatchFileIDs = fileIds,
+        //         DeliveryTime = scheduledDeliveryTime
+        //     });
+        //     await alert.Success(scheduledDeliveryTime.HasValue ? "Your message has been scheduled." : "Your message is being sent.", "Message Created");
+        //     manualNumbers = "";
+        //     message = "";
+        //     selectedFiles.Clear();
+        //     selectedContacts.Clear();
+        //     selectedGroups.Clear();
+        //     showScheduler = false;
+        //     deliveryTime = null;
+        // }
+        // catch (Exception ex)
+        // {
+        //     await alert.Error(ex.Message, "Unable to Send Message");
+        // }
+        // finally
+        // {
+        //     isSending = false;
+        // }
+    }
+}

@@ -1,6 +1,7 @@
-﻿@using System.Text
+﻿@* @using System.Text
 @using System.Text.RegularExpressions
 @using SMSLive247.Blazor2.Pages.Messaging.Compose.Modals
+@using SMSLive247.Blazor2.Pages.Messaging.Compose.Common
 
 @if (isLoading)
 {
@@ -157,7 +158,7 @@ else
     private DateTime? deliveryTime;
     private IBrowserFile? selectedUpload;
     private BatchFileResponse? selectedExistingFile;
-    private SelectTemplateFileModal templateFilesModal = new();
+    // private SelectTemplateFileModal templateFilesModal = new();
 
     private bool hasDataSource => selectedUpload is not null || selectedExistingFile is not null;
     private int messageParts => string.IsNullOrEmpty(message) ? 0 : message.Length <= 160 ? 1 : (int)Math.Ceiling(message.Length / 153d);
@@ -333,3 +334,4 @@ else
 
     private static string FormatFileSize(long bytes) => bytes < 1024 * 1024 ? $"{bytes / 1024d:0.0} KB" : $"{bytes / 1024d / 1024d:0.0} MB";
 }
+ *@

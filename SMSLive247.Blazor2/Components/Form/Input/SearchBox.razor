@@ -1,12 +1,13 @@
-﻿<div class="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
-    <div class="flex h-10 w-fit items-stretch overflow-hidden rounded-lg border border-slate-300
-                bg-white shadow-sm focus-within:border-brand-500 focus-within:ring-brand-500/30 focus-within:ring-4">
+﻿<div class="flex flex-col gap-4 sm:w-auto sm:flex-row sm:items-center">
+    <div class="flex h-10 w-full items-stretch overflow-hidden rounded-lg border border-slate-300
+        bg-white shadow-sm focus-within:border-brand-500 focus-within:ring-brand-500/30 focus-within:ring-4">
         <input type="text"
                placeholder="@Placeholder"
                @value="_currentSearchTerm"
                @onkeydown="@HandleKeydown"
                @oninput="@HandleChange"
-               class="h-full w-72 bg-transparent px-3.5 text-sm text-slate-700 focus:outline-none" />
+               @attributes="AdditionalAttributes"  
+               class="h-full flex-grow px-3.5 text-sm text-slate-700 focus:outline-none" />
 
         @ChildContent
 
@@ -37,6 +38,7 @@
     [Parameter] public string Placeholder { get; set; } = "Search...";
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public bool InstantSearch { get; set; } = false;
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string _currentSearchTerm = "";
 

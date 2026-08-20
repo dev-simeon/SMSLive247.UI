@@ -1,4 +1,4 @@
-﻿<EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Sent Message"
+﻿@* <EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Sent Message"
     OnDelete="OnDelete"
     OnCompleted="OnCompleted">
     <FormInputNumber Label="Batch ID" @bind-Value="editor.Model.BatchID" disabled></FormInputNumber>
@@ -6,20 +6,20 @@
     <FormField Label="Message">
         <InputTextArea class="form-control" @bind-Value="editor.Model.MessageText" rows="5" disabled></InputTextArea>
     </FormField>
-</EditModal>
+</EditModal> *@
 
 @code {
     [Parameter] public EventCallback OnCompleted { get; set; }
-    private EditModal<SmsBatchResponse> editor = new();
+    // private EditModal<SmsBatchResponse> editor = new();
 
-    public void Delete(SmsBatchResponse item) => editor.Delete(item);
+    // public void Delete(SmsBatchResponse item) => editor.Delete(item);
 
-    private async Task OnDelete()
-    {
-        var question = "Are you sure you want to delete this message?";
-        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+    // private async Task OnDelete()
+    // {
+    //     var question = "Are you sure you want to delete this message?";
+    //     bool confirmed = await alert.Confirm(question, "Confirm Deletion");
         
-        if (confirmed)
-            await apiClient.SmsBatchDeleteAsync((int)editor.Model.BatchID);
-    }
+    //     if (confirmed)
+    //         await apiClient.SmsBatchDeleteAsync((int)editor.Model.BatchID);
+    // }
 }

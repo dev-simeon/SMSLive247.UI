@@ -8,82 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Pages\Accounts\**" />
-    <Compile Remove="Pages\Credits\Modals\**" />
-    <Compile Remove="Pages\Messaging\**" />
-    <Content Remove="Pages\Accounts\**" />
-    <Content Remove="Pages\Credits\Modals\**" />
-    <Content Remove="Pages\Messaging\**" />
-    <EmbeddedResource Remove="Pages\Accounts\**" />
-    <EmbeddedResource Remove="Pages\Credits\Modals\**" />
-    <EmbeddedResource Remove="Pages\Messaging\**" />
-    <None Remove="Pages\Accounts\**" />
-    <None Remove="Pages\Credits\Modals\**" />
-    <None Remove="Pages\Messaging\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Pages\Messaging\Messages\Drafts.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Pages\Messaging\SenderIDs\Requests.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Pages\Messaging\Messages\_Index.razor" />
-    <Content Include="Pages\Messaging\Messages\Scheduled.razor" />
-    <Content Include="Pages\Messaging\Messages\Sent.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Pages\Messaging\Compose\Customized.razor" />
-    <Content Include="Pages\Messaging\Compose\_Index.razor" />
-    <Content Include="Pages\Messaging\Compose\RecipientChip.razor" />
-    <Content Include="Pages\Messaging\Compose\Simple.razor" />
-    <Compile Include="Pages\Messaging\Compose\Modals\RecipientSelections.cs" />
-    <Content Include="Pages\Messaging\Compose\Modals\SelectContactsModal.razor" />
-    <Content Include="Pages\Messaging\Compose\Modals\SelectBulkFilesModal.razor" />
-    <Content Include="Pages\Messaging\Compose\Modals\SelectTemplateFileModal.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Pages\Messaging\Contacts\BulkFiles.razor" />
-    <Content Include="Pages\Messaging\Contacts\CsvFiles.razor" />
-    <Content Include="Pages\Messaging\Contacts\_Index.razor" />
-    <Content Include="Pages\Messaging\Contacts\Phonebook.razor" />
-    <Content Include="Pages\Messaging\Contacts\Modals\ContactModal.razor" />
-    <Content Include="Pages\Messaging\Contacts\Modals\GroupModal.razor" />
-    <Content Include="Pages\Messaging\Contacts\Modals\BulkFileModal.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Pages\Accounts\Profile.razor" />
-    <Content Include="Pages\Accounts\Modals\ProfileModal.razor" />
-    <Content Include="Pages\Accounts\Modals\PasswordModal.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Pages\Accounts\SubAccounts.razor" />
-    <Content Include="Pages\Accounts\SubAccount\_Index.razor" />
-    <Content Include="Pages\Accounts\SubAccount\Details.razor" />
-    <Content Include="Pages\Accounts\SubAccount\Messages.razor" />
-    <Content Include="Pages\Accounts\SubAccount\SubUsers.razor" />
-    <Content Include="Pages\Accounts\SubAccount\Transfers.razor" />
-    <Content Include="Pages\Accounts\SubAccount\Modals\SubUserModal.razor" />
-    <Content Include="Pages\Accounts\SubAccount\Modals\TransferModal.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Pages\Credits\Modals\TransferModal.razor" />
-    <Content Include="Pages\Credits\Modals\PurchaseModal.razor" />
-    <Content Include="Pages\Accounts\SubAccount\Modals\EditModal.razor" />
-    <Content Include="Pages\Messaging\SenderIDs\Modals\RequestModal.razor" />
-    <ProjectReference Include="..\SMSLive247.ApiClient\SMSLive247.ApiClient.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Blazor.LocalStorage" Version="10.1.0" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
+    <ProjectReference Include="..\SMSLive247.ApiClient\SMSLive247.ApiClient.csproj" />
   </ItemGroup>
 
 </Project>

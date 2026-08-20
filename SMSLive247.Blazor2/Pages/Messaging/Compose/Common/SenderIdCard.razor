@@ -1,0 +1,47 @@
+﻿<Card HeaderText="From">
+    <div class="flex">
+        <div class="flex w-10 shrink-0 items-center justify-center rounded-l-lg border-y border-l border-slate-200 bg-slate-50 text-slate-400">
+            <Icon Style="Icon.IconStyle.User" CssClass="text-lg" />
+        </div>
+        <div class="w-full sm:max-w-xs">
+            @{
+                var approved = SenderIDs.Where(x => x.Status == "APPROVED").ToList();
+                var others = SenderIDs.Where(x => x.Status != "APPROVED").ToList();
+            }
+            <FormSelect TValue="string" @bind-Value="senderId" Required="true"
+                        IconStyle="Icon.IconStyle.ChevronDown" CssClass="rounded-l-none">
+                <option value="">-Select Sender ID-</option>
+                @if (approved.Count > 0)
+                {
+                    <optgroup label="Approved">
+                        @foreach (var item in approved)
+                        {
+                            <option value="@item.SenderID">@item.SenderID</option>
+                        }
+                    </optgroup>
+                }
+                @if (others.Count > 0)
+                {
+                    <optgroup label="Pending/Rejected">
+                        @foreach (var item in others)
+                        {
+                            <option value="@item.SenderID" disabled>@item.SenderID</option>
+                        }
+                    </optgroup>
+                }
+            </FormSelect>
+        </div>
+    </div>
+    <div class="mt-2 text-sm">
+        <a href="@Const.Routes.Messaging.SenderIds" class="text-brand-500 hover:underline">
+            Click here to request for SenderIDs
+        </a>
+    </div>
+</Card>
+
+@code {
+    [Parameter] public List<SenderIdResponse> SenderIDs { get; set; } = [];
+
+    private string senderId = "";
+    
+}

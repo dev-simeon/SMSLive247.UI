@@ -1,0 +1,107 @@
+﻿@inject NavigationManager nav
+
+<Card HeaderText="When to send">
+    <div class="flex flex-col gap-3">
+        <label class="group flex cursor-pointer items-center gap-3">
+            <input type="radio" name="scheduleOption"
+                   class="text-brand-600 h-4 w-4 border-slate-300 focus:ring-brand-500"
+                   checked="@(!deliveryTime.HasValue)" @onchange="() => { deliveryTime = null; }" />
+            <span class="text-slate-700 group-hover:text-brand-600">
+                Send Immediately
+            </span>
+        </label>
+        <label class="group flex cursor-pointer items-center gap-3">
+            <input type="radio" name="scheduleOption"
+                   class="text-brand-600 h-4 w-4 border-slate-300 focus:ring-brand-500"
+                   checked="@deliveryTime.HasValue" @onchange="() => deliveryTime = DateTime.Now" />
+            <span class="text-slate-700 group-hover:text-brand-600">
+                Schedule for Later
+            </span>
+        </label>
+    </div>
+
+    @if (deliveryTime.HasValue)
+    {
+        <div class="animate-in slide-in-from-top-2 pt-2">
+            <div class="mb-2 flex items-center justify-between">
+                <span class="text-slate-600">Send Later at</span>
+                @* <button type="button" @onclick="() => nav.NavigateTo(Const.Routes.Account.Profile)"
+                        class="flex items-center gap-1 text-[10px] font-bold text-brand-600 hover:text-brand-700 uppercase">
+                    <Icon Style="Icon.IconStyle.User" CssClass="text-xs" /> Change
+                </button> *@
+            </div>
+            <div class="flex items-center">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-l-lg border-y border-l border-slate-200 bg-slate-50 text-slate-400">
+                    <Icon Style="Icon.IconStyle.Clock" CssClass="text-base" />
+                </div>
+                <input type="datetime-local" @bind="deliveryTime" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                       class="w-full rounded-r-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none focus:border-brand-500 focus:ring-brand-500 focus:ring-2" />
+            </div>
+            <div class="mt-2 text-sm text-slate-500">Your time zone is: West/Central Africa GMT +1</div>
+        </div>
+    }
+</Card>
+
+<Card>
+    <div class="flex flex-col gap-3">
+        @{
+            var totalRecipients = Model?.GrandTotal() ?? 0;
+        }
+
+        @if (true)
+        {
+            <div class="mt-2 text-center text-sm text-slate-500">
+                Total Recipients: <strong>@totalRecipients.ToString("N0")</strong>
+            </div>
+        }
+
+        @if (deliveryTime.HasValue)
+        {
+            <Button IsBusy="IsSending"
+                    Text="Queue Message"
+                    Icon="Icon.IconStyle.Clock"
+                    Style="Button.ButtonStyle.Primary"
+                    IsDisabled="@(!deliveryTime.HasValue || !allowSend)"
+                    OnClick="ScheduledSubmit"
+                    CssClass="w-full py-3">
+            </Button>
+        }
+        else
+        {
+            <Button IsBusy="IsSending"
+                    Text="Send SMS Now!"
+                    Icon="Icon.IconStyle.Mail"
+                    Style="Button.ButtonStyle.Primary"
+                    IsDisabled="@(!allowSend)"
+                    OnClick="ImmediateSubmit"
+                    CssClass="w-full py-3">
+            </Button>
+        }
+
+        <div class="mt-2 text-center text-sm text-slate-500">
+            Total Recipients: <strong>@totalRecipients.ToString("N0")</strong>
+        </div>
+    </div>
+</Card>
+
+@code {
+    [Parameter] public bool IsSending { get; set; }
+    [Parameter] public BaseComposeModel? Model { get; set; }
+    [Parameter] public EventCallback<DateTimeOffset?> OnSubmit { get; set; }
+
+    private DateTime? deliveryTime;
+    private bool allowSend => (Model?.GrandTotal() ?? 0) > 0;
+
+    private Task ImmediateSubmit(MouseEventArgs e)
+    {
+        return OnSubmit.InvokeAsync(null);
+    }
+
+    private Task ScheduledSubmit(MouseEventArgs e)
+    {
+        if (!deliveryTime.HasValue)
+            return alert.Error("Choose a delivery date and time, or send the message immediately.", "Compose Message");
+
+        return OnSubmit.InvokeAsync(new DateTimeOffset(deliveryTime.Value));
+    }
+}

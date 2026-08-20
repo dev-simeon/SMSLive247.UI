@@ -1,4 +1,4 @@
-﻿<EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Draft Message"
+﻿@* <EditModal TItem="SmsBatchResponse" @ref="editor" LabelText="Draft Message"
            OnUpdate="OnUpdate"
            OnDelete="OnDelete">
     <FormInputText Label="Sender ID" @bind-Value="editor.Model.SenderID"></FormInputText>
@@ -6,12 +6,12 @@
         <InputTextArea class="form-control" @bind-Value="editor.Model.MessageText" rows="5"></InputTextArea>
     </FormField>
 </EditModal>
-
+ *@
 @code {
-    private EditModal<SmsBatchResponse> editor = new();
+    // private EditModal<SmsBatchResponse> editor = new();
 
-    public void Show(SmsBatchResponse? item = null) => editor.Show(item);
-    public void Delete(SmsBatchResponse item) => editor.Delete(item);
+    // public void Show(SmsBatchResponse? item = null) => editor.Show(item);
+    // public void Delete(SmsBatchResponse item) => editor.Delete(item);
 
     private async Task OnUpdate()
     {
@@ -25,12 +25,12 @@
         // await apiClient.UpdateSmsMessageAsync(request);
     }
 
-    private async Task OnDelete()
-    {
-        var question = "Are you sure you want to delete this message?";
-        bool confirmed = await alert.Confirm(question, "Confirm Deletion");
+    // private async Task OnDelete()
+    // {
+    //     var question = "Are you sure you want to delete this message?";
+    //     bool confirmed = await alert.Confirm(question, "Confirm Deletion");
        
-        if (confirmed)
-            await apiClient.SmsBatchDeleteAsync((int)editor.Model.BatchID);
-    }
+    //     if (confirmed)
+    //         await apiClient.SmsBatchDeleteAsync((int)editor.Model.BatchID);
+    // }
 }

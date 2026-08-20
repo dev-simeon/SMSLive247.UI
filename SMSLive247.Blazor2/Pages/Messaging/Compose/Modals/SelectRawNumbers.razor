@@ -1,0 +1,58 @@
+﻿<Modal Title="Enter Recipients Manually" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+    <Body>
+        <div class="flex h-[400px] flex-1 flex-col">
+            <p class="mb-4 text-slate-500">
+                Enter recipient phone numbers by typing or pasting them, separated by commas
+                or new line or spaces.
+            </p>
+
+            <textarea @bind="manualNumbers" tabindex="1"
+                      class="h-64 flex-1 overflow-y-scroll rounded-lg border border-slate-200 p-4 shadow-inner transition-all focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none"
+                      placeholder="Type or Paste phone numbers here (separated by comma or new line)..."></textarea>
+
+            <div class="mt-3">
+                <span class="px-2.5 py-1 text-slate-500">
+                    Phone numbers without a country code will default to @CountryCode.
+                </span>
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <Button Text="Confirm" Icon="Icon.IconStyle.PlusCircle" OnClick="Confirm" />
+        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="Close" />
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter, EditorRequired] public EventCallback<List<ContactModel>> OnSelected { get; set; }
+    [Parameter, EditorRequired] public int CountryCode { get; set; } = 234;
+
+    private bool isVisible;
+    private string manualNumbers = string.Empty;
+
+    public void Show(List<ContactModel> items)
+    {
+        manualNumbers = string.Join(", ", items.Select(x => x.Name));
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
+
+    public async Task Confirm()
+    {
+        var items = manualNumbers
+            .ConvertRawUploadToList(CountryCode)
+            .Select(number => new ContactModel(number))
+            .ToList();
+
+        await OnSelected.InvokeAsync(items);
+        isVisible = false;
+        StateHasChanged();
+    }
+
+}

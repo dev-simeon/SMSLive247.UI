@@ -2,7 +2,9 @@
     <Body>
         <div class="space-y-4">
             <div class="flex items-end gap-3">
-                <div class="flex-1"><FormInput Label="Search files" @bind-Value="searchTerm" Required="false" Placeholder="Search files..." /></div>
+                <div class="flex-1">
+                    <FormInput Label="Search files" @bind-Value="searchTerm" Required="false" Placeholder="Search files..." />
+                </div>
                 <Button Text="Refresh" Icon="Icon.IconStyle.Refresh" Style="Button.ButtonStyle.Secondary" IsBusy="isLoading" OnClick="Refresh" CssClass="min-w-0 px-3" />
             </div>
             <div class="max-h-96 overflow-y-auto rounded-lg border border-slate-200">
