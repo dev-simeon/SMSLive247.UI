@@ -1,88 +1,29 @@
+
 @attribute [Route(Const.Routes.Developer.ApiDocs)]
 @layout MainLayout
 
 <PageTitle>SMSLive247 - API Documentation</PageTitle>
 
-<PageHeader Title="API Documentation"
-            SubTitle="Explore the SMSLive247 REST API to integrate SMS into your applications." />
-
-<PageBody>
-    <HeaderLeft>
-        <span class="text-sm text-slate-500">Base URL: <code class="font-mono bg-slate-100 px-2 py-0.5 rounded text-brand-700">https://api.smslive247.com/v1</code></span>
-    </HeaderLeft>
-    <HeaderRight>
-        <Button Icon="Icon.IconStyle.BookOpen" Text="Full API Reference" />
-    </HeaderRight>
-    <ChildContent>
-        <div class="p-6 space-y-6">
-
-            @* Quickstart *@
-            <div class="border border-slate-200 rounded-xl overflow-hidden">
-                <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 flex items-center gap-2">
-                    <Icon Style="Icon.IconStyle.Terminal" CssClass="w-4 h-4 text-brand-500" />
-                    <span class="text-sm font-semibold text-slate-700">Quick Start — Send an SMS</span>
-                </div>
-                <div class="p-5">
-                    <pre class="text-xs font-mono text-slate-700 bg-slate-950 text-green-300 rounded-lg p-4 overflow-x-auto whitespace-pre"><code>POST /sms/send
-Authorization: Bearer {API_KEY}
-Content-Type: application/json
-
-{
-  "sender_id": "MYAPP",
-  "recipients": ["+2348000000000"],
-  "message":    "Hello from SMSLive247!"
-}</code></pre>
-                </div>
-            </div>
-
-            @* Endpoint List *@
-            <div class="space-y-3">
-                <h3 class="text-sm font-semibold text-slate-600 uppercase tracking-wider">Available Endpoints</h3>
-                @foreach (var ep in endpoints)
-                {
-                    <div class="flex items-start gap-4 p-4 border border-slate-200 rounded-xl bg-white hover:border-brand-200 transition-colors">
-                        <span class="shrink-0 px-2 py-1 text-[10px] font-bold rounded uppercase @GetMethodClass(ep.Method)">
-                            @ep.Method
-                        </span>
-                        <div>
-                            <code class="text-sm font-mono text-slate-800">@ep.Path</code>
-                            <p class="text-xs text-slate-500 mt-0.5">@ep.Description</p>
-                        </div>
-                    </div>
-                }
-            </div>
-
-        </div>
-    </ChildContent>
-    <FooterLeft>
-        <p class="text-xs text-slate-400">Use your API key from the API Keys page to authenticate all requests.</p>
-    </FooterLeft>
-</PageBody>
+<PageHeader 
+    Title="API Documentation" 
+    SubTitle="Integrate SMSLive247 into your applications using our resting APIs." />
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 flex-1 min-h-[500px] flex flex-col justify-center items-center text-center">
+        <h2 class="text-lg font-bold text-slate-900 mb-2">
+            Explore the API
+        </h2>
+        <p class="text-slate-500 max-w-md text-sm leading-relaxed mb-6">
+            Check out our interactive REST API references to start integrating
+            SMSLive247 into your applications seamlessly.
+        </p>
+        <a href="https://smslive247api.readme.io/v5.0/reference/introduction"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="flex min-h-[37.6px] transform items-center justify-center gap-2 rounded-lg px-5 py-2 transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] bg-brand-500 hover:bg-brand-600 text-white border border-transparent shadow-sm focus:ring-brand-500 text-sm font-medium">
+            <Icon Style="Icon.IconStyle.BookOpen" CssStyle="font-weight: 300; font-size: 1.1rem;" />
+            View API Reference
+        </a>
+    </div>
 
 @code {
-    private string GetMethodClass(string method) => method switch
-    {
-        "GET"    => "bg-blue-100 text-blue-700",
-        "POST"   => "bg-green-100 text-green-700",
-        "PUT"    => "bg-yellow-100 text-yellow-700",
-        "DELETE" => "bg-red-100 text-red-700",
-        _        => "bg-slate-100 text-slate-600"
-    };
-
-    private record Endpoint(string Method, string Path, string Description);
-
-    private List<Endpoint> endpoints = new()
-    {
-        new("POST",   "/sms/send",            "Send a simple or bulk SMS message"),
-        new("GET",    "/sms/batches",          "List all sent message batches"),
-        new("GET",    "/sms/batches/{id}",     "Get details of a specific batch"),
-        new("DELETE", "/sms/batches/{id}",     "Cancel a scheduled batch"),
-        new("GET",    "/contacts",             "List all contacts in your phonebook"),
-        new("POST",   "/contacts",             "Add a new contact"),
-        new("DELETE", "/contacts/{phone}",     "Remove a contact by phone number"),
-        new("GET",    "/sender-ids",           "List your registered sender IDs"),
-        new("POST",   "/sender-ids",           "Request a new sender ID"),
-        new("GET",    "/account/balance",      "Get current credits balance"),
-        new("GET",    "/account/sub-accounts", "List sub-accounts"),
-    };
 }
+
