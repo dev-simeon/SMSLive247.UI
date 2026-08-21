@@ -1,0 +1,99 @@
+@inject IJSRuntime JS
+
+<div class="relative group @MaxWidthClass @CssClass">
+    <div id="@EditorId" 
+         contenteditable="true" 
+         class="w-full @HeightClass px-4 pt-4 pb-14 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-slate-900 placeholder-slate-400 overflow-y-auto text-base leading-relaxed font-sans shadow-sm transition-shadow outline-none break-words whitespace-pre-wrap"
+         placeholder="@Placeholder"
+         @ref="editorElement">
+    </div>
+
+    <!-- Counter badge — bottom-right -->
+    @{
+        var isNearLimit = Remaining <= 20;
+        var isOver = Remaining < 0;
+
+        var badgeClass = isOver ? "bg-red-50 border-red-200" : (isNearLimit ? "bg-amber-50 border-amber-200" : "bg-slate-50 border-slate-200");
+        var countClass = isOver ? "text-red-600" : (isNearLimit ? "text-amber-600" : "text-slate-900");
+    }
+    <div class="absolute bottom-4 right-4 flex items-center gap-3 text-xs py-1.5 px-3 rounded-md shadow-sm border pointer-events-none transition-colors @badgeClass">
+        <div class="flex flex-col items-end">
+            <span class="text-slate-500 font-medium">Characters</span>
+            <span class="font-bold text-[13px] @countClass">
+                @Chars
+                <span class="text-slate-400 font-normal"> / @Max</span>
+            </span>
+        </div>
+
+        <div class="w-px h-6 bg-slate-200"></div>
+
+        <div class="flex flex-col items-end">
+            <span class="text-slate-500 font-medium">Pages</span>
+            <span class="text-slate-900 font-bold text-[13px]">@Pages</span>
+        </div>
+
+        <div class="w-px h-6 bg-slate-200"></div>
+
+        <div class="flex flex-col items-end">
+            <span class="text-slate-500 font-medium">Remaining</span>
+            <span class="font-bold text-[13px] @countClass">
+                @Math.Abs(Remaining)
+                @(isOver ? " over" : "")
+            </span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    
+    [Parameter] public string Placeholder { get; set; } = "Type your message here...";
+    [Parameter] public string HeightClass { get; set; } = "h-56";
+    [Parameter] public string MaxWidthClass { get; set; } = "max-w-2xl";
+    [Parameter] public string CssClass { get; set; } = "";
+
+    // Counter properties
+    [Parameter] public int Chars { get; set; } = 0;
+    [Parameter] public int Pages { get; set; } = 1;
+    [Parameter] public int Max { get; set; } = 160;
+    [Parameter] public int Remaining { get; set; } = 160;
+
+    private string EditorId = "editor-" + Guid.NewGuid().ToString("N");
+    private ElementReference editorElement;
+    private DotNetObjectReference<MessageTemplateEditor>? objRef;
+    private bool isInitialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("ContentEditor.initialize", EditorId, objRef);
+            isInitialized = true;
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnContentChanged(string rawText)
+    {
+        if (Value != rawText)
+        {
+            Value = rawText;
+            await ValueChanged.InvokeAsync(rawText);
+        }
+    }
+
+    public async Task InsertPlaceholderAsync(string fieldName)
+    {
+        if (!isInitialized) return;
+        
+        var chipHtml = $"<span contenteditable=\"false\" data-value=\"{{{fieldName}}}\" class=\"bg-brand-100 text-brand-700 px-2 py-0.5 rounded-full mx-1 font-mono text-xs font-bold inline-block align-middle shadow-sm\">{fieldName}</span>";
+        await JS.InvokeVoidAsync("ContentEditor.insertChip", EditorId, chipHtml);
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+}

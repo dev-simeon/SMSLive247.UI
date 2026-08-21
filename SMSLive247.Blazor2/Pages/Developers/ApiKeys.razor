@@ -16,35 +16,32 @@
     <ChildContent>
         <Table Items="accounts">
             <Columns>
-                <Column Header="Account" Width="38%">
-                    <div>
-                        <span class="font-medium text-slate-900">@context.AccountName</span>
-                        <div class="mt-0.5 font-mono text-xs text-slate-400">@context.AccountID</div>
-                    </div>
+                <Column Header="Account" Width="25%">
+                    <span class="font-medium text-slate-900">@context.AccountName</span>
                 </Column>
                 <Column Header="Type">
                     <Badge Style="@(context.Phone == "main" ? Badge.BadgeStyle.Success : Badge.BadgeStyle.Neutral)" 
                            Value="@(context.Phone == "main" ? "MAIN ACCOUNT" : "SUB ACCOUNT")" />
                 </Column>
                 <Column Header="API Key">
-                    <div class="flex items-center gap-3">
-                        <span class="font-mono text-xs text-slate-700">
-                            @(IsKeyVisible(context) ? GetKeyString(context.Key) : "••••••••••••••••••••••••••••••••")
-                        </span>
-                        <button @onclick="() => ToggleKeyVisibility(context)" class="text-slate-400 hover:text-slate-600 transition-colors" title="Toggle visibility">
+                    <span class="font-mono text-base text-slate-700 tracking-wider whitespace-nowrap">
+                        @(IsKeyVisible(context) ? GetKeyString(context.Key) : "********-****-****-****-************")
+                    </span>
+                </Column>
+                <Column Header="" Width="96px">
+                    <div class="flex items-center justify-start gap-2">
+                        <button @onclick="() => ToggleKeyVisibility(context)" class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-md transition-colors" title="Toggle visibility">
                             <Icon Style="@(IsKeyVisible(context) ? Icon.IconStyle.EyeOff : Icon.IconStyle.Eye)" CssClass="h-4 w-4" />
                         </button>
+                        @if (IsKeyVisible(context))
+                        {
+                            <button @onclick="() => ResetApiKey(context)"
+                                    class="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-all"
+                                    title="Reset API Key">
+                                <Icon Style="Icon.IconStyle.Refresh" CssClass="h-4 w-4" />
+                            </button>
+                        }
                     </div>
-                </Column>
-                <Column Header="" Width="56px">
-                    @if (IsKeyVisible(context))
-                    {
-                        <button @onclick="() => ResetApiKey(context)"
-                                class="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-all"
-                                title="Reset API Key">
-                            <Icon Style="Icon.IconStyle.Refresh" CssClass="h-4 w-4" />
-                        </button>
-                    }
                 </Column>
                 <Column Header="Date Created" Width="160px">
                     <FormatDate DateTime="@context.DateCreated" />
@@ -110,8 +107,8 @@
 
             if (!confirmed) return;
 
-            // var response = await apiClient.AccountUpdateProviderKeyAsync(
-            //     account.AccountID, new AccountProviderKeyRequest());
+            var response = await apiClient.AccountUpdateProviderKeyAsync(
+                account.AccountID, new AccountProviderKeyRequest());
 
             await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
             await ReloadData();
