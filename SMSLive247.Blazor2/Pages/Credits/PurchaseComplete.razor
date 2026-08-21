@@ -1,0 +1,180 @@
+@page "/credits/purchase-complete"
+@layout MainLayout
+@inject NavigationManager nav
+@using Microsoft.AspNetCore.WebUtilities
+
+<PageTitle>SMSLive247 - Purchase Complete</PageTitle>
+
+@if (status == "loading")
+{
+    <div class="flex-1 flex items-center justify-center p-8 min-h-[500px]">
+        <div class="flex flex-col items-center gap-3 text-slate-400">
+            <div class="w-10 h-10 border-4 border-slate-200 border-t-brand-500 rounded-full animate-spin"></div>
+            <p class="text-sm font-medium">Verifying payment…</p>
+        </div>
+    </div>
+}
+else if (status == "cancelled")
+{
+    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-[500px]">
+        <div class="max-w-xl w-full mx-auto text-center space-y-6">
+            <div class="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center mx-auto ring-8 ring-amber-50/50">
+                <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-10 h-10 text-amber-400" />
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 mb-2">Payment Cancelled</h1>
+                <p class="text-slate-500">
+                    You cancelled the payment or it was not completed. No charge was made to your account.
+                </p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button @onclick='() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)'
+                        class="flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-medium transition-all">
+                    <Icon Style="Icon.IconStyle.CreditCard" CssClass="w-4 h-4" /> Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else if (status == "failed")
+{
+    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-[500px]">
+        <div class="max-w-xl w-full mx-auto text-center space-y-6">
+            <div class="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto ring-8 ring-red-50/50">
+                <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-10 h-10 text-red-400" />
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 mb-2">Payment Verification Failed</h1>
+                <p class="text-slate-500">
+                    We could not verify your transaction. If you were charged, please contact support with your payment reference.
+                </p>
+                @if (!string.IsNullOrEmpty(transactionId))
+                {
+                    <p class="mt-3 text-xs font-mono text-slate-400 bg-slate-50 px-3 py-2 rounded-lg inline-block">
+                        Ref: @transactionId
+                    </p>
+                }
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button @onclick='() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)'
+                        class="flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-medium transition-all">
+                    <Icon Style="Icon.IconStyle.CreditCard" CssClass="w-4 h-4" /> Try Again
+                </button>
+            </div>
+        </div>
+    </div>
+}
+else if (status == "success" && purchase != null)
+{
+    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-[500px]">
+        <div class="max-w-xl w-full mx-auto space-y-6">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden relative">
+                <div aria-hidden class="absolute inset-0 pointer-events-none opacity-[0.07]"
+                     style="background-image: radial-gradient(#136dec 1px, transparent 1px), radial-gradient(#10b981 1px, transparent 1px); background-size: 20px 20px; background-position: 0 0, 10px 10px;">
+                </div>
+
+                <div class="relative p-8 flex flex-col items-center text-center">
+                    <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-6 ring-8 ring-emerald-50">
+                        <Icon Style="Icon.IconStyle.CheckCircle" CssClass="w-11 h-11 text-emerald-500" />
+                    </div>
+
+                    <h1 class="text-2xl font-bold text-slate-900 mb-2">Payment Successful!</h1>
+                    <p class="text-slate-500 mb-8">Your transaction has been completed successfully.</p>
+
+                    <div class="w-full bg-slate-50 rounded-xl p-5 border border-slate-100 mb-6 text-left">
+                        <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4">
+                            Transaction Summary
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500">Transaction ID</span>
+                                <span class="font-mono font-medium text-slate-900 text-xs break-all text-right max-w-[220px]">
+                                    @(purchase.Reference ?? transactionId ?? "—")
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500">Credits Purchased</span>
+                                <span class="font-medium text-slate-900">
+                                    @(purchase.Quantity.ToString("#,##0")) SMS
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-slate-500">Payment Method</span>
+                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold tracking-wide">
+                                    @(purchase.ProviderID?.ToUpper() ?? "PAYSTACK")
+                                </span>
+                            </div>
+
+                            <div class="border-t border-slate-200 pt-3 flex justify-between items-center">
+                                <span class="font-semibold text-slate-700">Amount Paid</span>
+                                <span class="text-lg font-bold text-slate-900">
+                                    @((purchase.Amount + purchase.Fee).ToString("₦ #,##0.00"))
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 w-full">
+                        <button @onclick='() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)'
+                                class="flex items-center justify-center gap-2 px-4 py-2.5 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg font-medium transition-colors text-sm">
+                            <Icon Style="Icon.IconStyle.Menu" CssClass="w-4 h-4" /> View History
+                        </button>
+                        <button @onclick='() => nav.NavigateTo(Const.Routes.Messaging.Compose)'
+                                class="flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-lg font-medium shadow-sm shadow-brand-500/30 transition-colors text-sm">
+                            <Icon Style="Icon.IconStyle.PenSquare" CssClass="w-4 h-4" /> Go to Compose
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string status = "loading";
+    private string? transactionId;
+    private PurchaseResponse? purchase;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var uri = nav.ToAbsoluteUri(nav.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("trxref", out var trxrefValue))
+        {
+            transactionId = trxrefValue;
+        }
+        else if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("reference", out var refValue))
+        {
+            transactionId = refValue;
+        }
+
+        if (string.IsNullOrEmpty(transactionId))
+        {
+            nav.NavigateTo(Const.Routes.Wallet.BuyCredits, replace: true);
+            return;
+        }
+
+        try
+        {
+            var res = await apiClient.PurchaseCompleteAsync(transactionId);
+            var data = res.Result;
+
+            if (data != null && data.IsPaid)
+            {
+                purchase = data;
+                status = "success";
+            }
+            else
+            {
+                // IsPaid false = user cancelled on Paystack
+                nav.NavigateTo(Const.Routes.Wallet.BuyCredits, replace: true);
+            }
+        }
+        catch (Exception)
+        {
+            // Verification failed
+            status = "failed";
+        }
+    }
+}

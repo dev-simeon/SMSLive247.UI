@@ -1,4 +1,4 @@
-﻿using CsvHelper;
+using CsvHelper;
 using System.Data;
 using System.Text;
 using System.Text.Json;
@@ -103,10 +103,11 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
             CounterText = "Type your Message here";
         }
 
+        public long TotalRecipients { get; set; }
+
         public override long GrandTotal()
         {
-            //int c1 = BatchCsvFiles.Where(x => x.Selected).Sum(x => x.Count);
-            return BatchCsvFiles.Count;
+            return TotalRecipients;
         }
     }
 

@@ -1,0 +1,105 @@
+<Modal Title="Select Template File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+    <Body>
+        <div class="flex h-[400px] flex-1 flex-col">
+            <p class="mb-4 text-slate-500">Choose from your previously uploaded CSV files.</p>
+
+            <div class="mb-4">
+                <SearchBox InstantSearch="true" 
+                           SearchTermChanged="OnSearchChanged" 
+                           Placeholder="Search files..." />
+            </div>
+
+            <div tabindex="0" class="h-64 flex-1 overflow-y-scroll rounded-lg border border-slate-300 p-4 shadow-inner">
+                @if (Files == null || Files.Count == 0)
+                {
+                    <p>No CSV file found</p>
+                }
+                else
+                {
+                    <div class="flex flex-col gap-2">
+                        @foreach (var f in Files.Where(x => visibleIds.Contains(x.BatchFileID)))
+                        {
+                            <div class="flex items-center gap-2">
+                                <input type="radio"
+                                       name="template_file_selection"
+                                       value="@f.BatchFileID"
+                                       checked="@(selectedId == f.BatchFileID)"
+                                       id="tf-@f.BatchFileID"
+                                       @onchange="() => selectedId = f.BatchFileID"
+                                       class="accent-brand-500 h-4 w-4 border-slate-300 focus:ring-brand-500" />
+                                <label class="cursor-pointer truncate text-slate-700 select-none" for="tf-@f.BatchFileID">
+                                    @f.Description <span class="ml-1 text-sm text-slate-400">(@f.TotalNumbers.ToString("N0") rows)</span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </Body>
+    <Footer>
+        <Button Text="Confirm" Icon="Icon.IconStyle.PlusCircle" OnClick="Confirm" IsDisabled="@string.IsNullOrEmpty(selectedId)" />
+        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="Close" />
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public List<BatchFileResponse>? Files { get; set; }
+    [Parameter, EditorRequired] public EventCallback<BatchFileResponse> OnSelected { get; set; }
+
+    private bool isVisible;
+    private string? selectedId;
+    private HashSet<string> visibleIds = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Files != null && visibleIds.Count == 0)
+        {
+            visibleIds = Files.Select(x => x.BatchFileID).ToHashSet();
+        }
+    }
+
+    public void Show(string? currentId)
+    {
+        selectedId = currentId;
+        if (Files != null)
+        {
+            visibleIds = Files.Select(x => x.BatchFileID).ToHashSet();
+        }
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
+
+    public async Task Confirm()
+    {
+        var file = Files?.FirstOrDefault(x => x.BatchFileID == selectedId);
+        if (file != null)
+        {
+            await OnSelected.InvokeAsync(file);
+        }
+        isVisible = false;
+        StateHasChanged();
+    }
+
+    private void OnSearchChanged(string search)
+    {
+        if (Files == null) return;
+        
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var noCase = StringComparison.OrdinalIgnoreCase;
+            visibleIds = Files.Where(x => x.Description.Contains(search, noCase)).Select(x => x.BatchFileID).ToHashSet();
+        }
+        else
+        {
+            visibleIds = Files.Select(x => x.BatchFileID).ToHashSet();
+        }
+        StateHasChanged();
+    }
+}

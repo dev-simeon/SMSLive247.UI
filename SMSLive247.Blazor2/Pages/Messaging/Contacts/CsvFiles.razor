@@ -1,6 +1,4 @@
-﻿
-
-@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
+﻿@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
 
 <PageBody>
     <HeaderLeft>
@@ -19,33 +17,32 @@
                             <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="h-5 w-5" />
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-slate-900">@(string.IsNullOrEmpty(context.Description) ? "—" : context.Description)</p>
-                            <p class="font-mono text-xs text-slate-400 uppercase">@context.FileType</p>
+                            <p class="text-sm font-medium text-slate-900">@(string.IsNullOrEmpty(context.Description) ?
+                                                                                                                                                                                                                                                                                       "—" : context.Description)</p>
+                                <p class="font-mono text-xs text-slate-400 uppercase">@context.FileType</p>
+                            </div>
                         </div>
-                    </div>
-                </Column>
-                <Column Header="Records">
-                    <span class="text-sm font-semibold text-slate-900">@context.TotalNumbers.ToString("#,##0")</span>
-                </Column>
-                <Column Header="Date Uploaded">
-                    <FormatDate DateTime="@context.DateCreated" />
-                </Column>
-                <Column>
-                    <Actions OnDownload="() => HandleDownload(context.BatchFileID)"
-                             OnDelete="() => HandleDelete(context.BatchFileID, context.Description)">
-                    </Actions>
-                </Column>
-            </Columns>
-        </Table>
-    </ChildContent>
+                    </Column>
+                    <Column Header="Records">
+                        <span class="text-sm font-semibold text-slate-900">@context.TotalNumbers.ToString("#,##0")</span>
+                    </Column>
+                    <Column Header="Date Uploaded">
+                        <FormatDate DateTime="@context.DateCreated" />
+                    </Column>
+                    <Column>
+                        <Actions OnDownload="() => HandleDownload(context.BatchFileID)"
+                                 OnDelete="() => HandleDelete(context.BatchFileID, context.Description)">
+                        </Actions>
+                    </Column>
+                </Columns>
+            </Table>
+        </ChildContent>
 
-    <FooterLeft>
-        <Paging @bind-PageNumber="pageNumber"
-                @bind-PageSize="pageSize"
-                TotalRecords="FilteredFiles.Count">
-        </Paging>
-    </FooterLeft>
-</PageBody>
+        <FooterLeft>
+            <Paging @bind-PageNumber="pageNumber" @bind-PageSize="pageSize" TotalRecords="FilteredFiles.Count">
+            </Paging>
+        </FooterLeft>
+    </PageBody>
 
 <BulkFileModal @ref="uploadModal" ForCSV="true" OnCompleted="FetchFiles" />
 

@@ -1,4 +1,4 @@
-﻿using SMSLive247.Blazor2.Components.Utilities;
+using SMSLive247.Blazor2.Components.Utilities;
 using SMSLive247.Blazor2.Pages.Accounts;
 
 namespace SMSLive247.UI.Shared
@@ -45,6 +45,7 @@ namespace SMSLive247.UI.Shared
             public static class Wallet
             {
                 public const string BuyCredits = "/credits/purchase";
+                public const string PurchaseComplete = "/credits/purchase-complete";
                 public const string Deposits = "/credits/deposits";
                 public const string Transfers = "/credits/transfers";
                 public const string Pricing = "/credits/pricing";
