@@ -9,6 +9,7 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
         public int Count { get; init; }
         public bool Selected { get; set; } = false;
         public bool Visible { get; set; } = true;
+        public ContactResponse Response { get; init; }
 
         public ContactModel() { }
 
@@ -29,7 +30,7 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
             Name = name;
             Count = count;
             Selected = selected;
-            //Response = contact ?? new() { ContactName = name, PhoneNumber = key };
+            Response = contact ?? new() { ContactName = name, PhoneNumber = key };
         }
     }
 }

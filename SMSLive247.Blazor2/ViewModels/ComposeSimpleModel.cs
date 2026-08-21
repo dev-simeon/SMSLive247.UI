@@ -11,15 +11,22 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
 {
     public abstract class BaseComposeModel
     {
-        public string CounterText { get; set; } = "Type your Message here";
+        public bool IsBusy { get; set; }
+        public string ClearMessage() => MessageText = string.Empty;
+        public string CounterText() => MessageText.CountSmsMessages(5);
         public List<SenderIdResponse> SenderIds { get; protected set; } = [];
-        public abstract long GrandTotal();
+
+        public DateTime? DeliveryTime { get; set; }  
+        public string SenderID { get; set; } = string.Empty;
+        public string MessageText { get; set; } = string.Empty;
+        public string DeliveryEmail { get; set; } = string.Empty;
+        //public string RouteID { get; set; } = string.Empty;
+
+        public abstract long CountRecipients();
     }
 
     public class ComposeSimpleModel : BaseComposeModel
     {
-        public SmsBatchRequest Request { get; private set; } = new();
-
         public List<ContactModel> Contacts { get; private set; } = [];
         public List<ContactModel> BatchFiles { get; private set; } = [];
         public List<ContactModel> Numbers { get; private set; } = [];
@@ -28,7 +35,7 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
         public void UpdateBulkfiles(List<ContactModel> items) =>  BatchFiles = items;
         public void UpdateNumbers(List<ContactModel> items) => Numbers = items;
 
-        public override long GrandTotal()
+        public override long CountRecipients()
         {
             int c1 = Contacts.Where(x => x.Selected).Sum(x => x.Count);
             int c2 = Numbers.Where(x => x.Selected).Sum(x => x.Count);
@@ -50,21 +57,35 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
                .Select(x => new ContactModel(x))
                .ToList();
 
-            Request.DeliveryTime = DateTime.Now;
+            //Request.DeliveryTime = DateTime.Now;
         }
+
+        public SmsBatchRequest CreateRequest()
+        {
+            return new SmsBatchRequest()
+            {
+                BatchFileIDs = BatchFiles.Where(x => x.Selected).Select(x => x.Key).ToList(),
+                PhoneNumbers = Contacts.Where(x => x.Selected).Select(x => x.Key).ToList(),
+                RawNumbers = string.Join(",", Numbers),
+                DeliveryTime = base.DeliveryTime,
+                DeliveryEmail = base.DeliveryEmail,
+                MessageText = base.MessageText,
+                SenderID = base.SenderID,
+                //RouteID = string.Empty,
+            };
+        }
+
     }
 
     public class ComposeTemplateModel : BaseComposeModel
     {
-        public string DeliveryEmail = string.Empty; //TODO; add to API model
-        public SmsBatchCsvRequest Request { get; private set; } = new();
-
+        public int PhoneNumberColumn { get; set; }
+        public string BatchFileID { get; set; } = string.Empty;
 
         public List<BatchFileResponse> BatchCsvFiles { get; private set; } = [];
         public List<DataColumn> DataColumns => dataTable.Columns.Cast<DataColumn>().ToList();
         public List<DataRow> DataRows => dataTable.Rows.Cast<DataRow>().ToList();
-        public bool IsValidPhoneColumn => dataTable.IsPhoneNumberColumn(Request.PhoneNumberColumn);
-        //public bool IsLoaded => dataTable.Columns.Count > 0;
+        public bool IsValidPhoneColumn => dataTable.IsPhoneNumberColumn(PhoneNumberColumn);
 
         private readonly DataTable dataTable = new();
 
@@ -76,7 +97,20 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
             BatchCsvFiles = batchFiles.Where(x => x.FileType == "csv")
                                       .OrderByDescending(x => x.DateCreated)
                                       .ToList();
-            Request.DeliveryTime = DateTime.Now;
+        }
+
+        public SmsBatchCsvRequest CreateRequest()
+        {
+            return new SmsBatchCsvRequest()
+            {
+                BatchFileID = "22",
+                PhoneNumberColumn = 0,
+                DeliveryTime = base.DeliveryTime,
+                DeliveryEmail = base.DeliveryEmail,
+                MessageText = base.MessageText,
+                SenderID = base.SenderID,
+                //RouteID = string.Empty,
+            };
         }
 
         public void LoadData(Stream stream, string batchId)
@@ -88,8 +122,8 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
             dataTable.Columns.Clear(); // ??
             dataTable.Load(dr);
             // Detect the column index for phone numbers
-            Request.PhoneNumberColumn = dataTable.DetectPhoneNumberColumn();
-            Request.BatchFileID = batchId;
+            PhoneNumberColumn = dataTable.DetectPhoneNumberColumn();
+            BatchFileID = batchId;
         }
 
         public void ClearData()
@@ -99,11 +133,10 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
 
         public void ClearMessage()
         {
-            Request.MessageText = string.Empty;
-            CounterText = "Type your Message here";
+            MessageText = string.Empty;
         }
 
-        public override long GrandTotal()
+        public override long CountRecipients()
         {
             //int c1 = BatchCsvFiles.Where(x => x.Selected).Sum(x => x.Count);
             return BatchCsvFiles.Count;
@@ -117,12 +150,6 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
             var json = JsonSerializer.Serialize(source);
             return JsonSerializer.Deserialize<List<T>>(json)!;
         }
-
-        //public static List<ContactModel> DeepClone(IEnumerable<ContactModel> source)
-        //{
-        //    var json = JsonSerializer.Serialize(source);
-        //    return  JsonSerializer.Deserialize<List<ContactModel>>(json)!;
-        //}
 
         public static bool IsPhoneNumberColumn(this DataTable records, int columnIndex)
         {
@@ -171,6 +198,21 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
                     sourceParts[p - 1] = "{" + sourceParts[p - 1].Replace(" ", "").ToUpper() + "}";
             }
             return string.Join("", sourceParts);
+        }
+
+        public static string CountSmsMessages(this string? strSmsText, int smsMaxParts)
+        {
+            if (string.IsNullOrWhiteSpace(strSmsText))
+                return string.Empty;
+
+            int intSmsLength = strSmsText.GetValidGsmTextLength();
+            int intSmsParts = GetMessageParts(intSmsLength);
+            int intNextMax = intSmsParts == 1 ? 160 : intSmsParts * 153;
+
+            if (intSmsParts > smsMaxParts)
+                return "Maximum SMS characters reached!";
+
+            return $"{intSmsLength} / {intNextMax}  ({intSmsParts} page{(intSmsParts > 1 ? "s" : null)})";
         }
 
         public static async Task<string> CountSmsMessages(AlertService alert, string? strSmsText, int smsMaxParts)

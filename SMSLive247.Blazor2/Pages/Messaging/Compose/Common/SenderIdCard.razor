@@ -5,10 +5,14 @@
         </div>
         <div class="w-full sm:max-w-xs">
             @{
-                var approved = SenderIDs.Where(x => x.Status == "APPROVED").ToList();
-                var others = SenderIDs.Where(x => x.Status != "APPROVED").ToList();
+                var senderIds = Model?.SenderIds ?? [];
+                var approved = senderIds.Where(x => x.Status == "APPROVED").ToList();
+                var others = senderIds.Where(x => x.Status != "APPROVED").ToList();
             }
-            <FormSelect TValue="string" @bind-Value="senderId" Required="true"
+            <FormSelect TValue="string" 
+                        Required="true"
+                        @bind-Value="Model.SenderID" 
+                        @bind-Value:after="HandleChange"
                         IconStyle="Icon.IconStyle.ChevronDown" CssClass="rounded-l-none">
                 <option value="">-Select Sender ID-</option>
                 @if (approved.Count > 0)
@@ -40,8 +44,12 @@
 </Card>
 
 @code {
-    [Parameter] public List<SenderIdResponse> SenderIDs { get; set; } = [];
+    [Parameter] public BaseComposeModel? Model { get; set; }
+    [Parameter] public EventCallback<string> SenderIDChanged { get; set; } 
 
-    private string senderId = "";
-    
+    public async Task HandleChange()
+    {
+        if (SenderIDChanged.HasDelegate)
+            await SenderIDChanged.InvokeAsync(Model?.SenderID ?? "");
+    }
 }

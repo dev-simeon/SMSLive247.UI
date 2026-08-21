@@ -15,37 +15,48 @@ else
             <!-- Recipients Card -->
             <Card HeaderText="Select Recipients">
                 <HeaderRight>
-                    <span class="bg-brand-50 text-brand-700 rounded px-2.5 py-1 text-sm">
-                        Total Recipients: @model.GrandTotal().ToString("N0")
+                    <span class="bg-brand-50 rounded px-2.5 py-1 text-xs text-slate-500">
+                        Total Recipients: @model.CountRecipients().ToString("N0")
                     </span>
                 </HeaderRight>
                 <ChildContent>
-                    <RecipientList 
-                                Caption="Raw Numbers" 
-                                Description="Type or paste your recipients phone numbers." 
-                                Recipients="model.Numbers"
-                                ButtonText="Paste..."
-                                ButtonIcon="Icon.IconStyle.PenSquare"
-                                ButtonStyle="Button.ButtonStyle.Secondary"
-                                OnClick="() => rawNumbersModal.Show(model.Numbers)">
+                    <RecipientList Caption="Raw Numbers" Recipients="model.Numbers"
+                                   OnClick="() => rawNumbersModal.Show(model.Numbers)">
+                        <Button Text="Paste..."
+                                Icon="Icon.IconStyle.PenSquare"
+                                Style="Button.ButtonStyle.Secondary"
+                                OnClick="() => rawNumbersModal.Show(model.Numbers)"
+                                CssClass="w-[160px]">
+                        </Button>
+                        <p class="mt-1 text-slate-500">
+                            Type or paste your recipients phone numbers.
+                        </p>
                     </RecipientList>
 
-                    <RecipientList Caption="From Contacts" 
-                                   Description="Select numbers from your Phonebook."
-                                   Recipients="model.Contacts"
-                                   ButtonText="Contacts..."
-                                   ButtonIcon="Icon.IconStyle.Users"
-                                   ButtonStyle="Button.ButtonStyle.Secondary"
+                    <RecipientList Caption="From Contacts" Recipients="model.Contacts"
                                    OnClick="() => contactsModal.Show(model.Contacts)">
+                        <Button Text="Contacts..."
+                                Icon="Icon.IconStyle.Users"
+                                Style="Button.ButtonStyle.Secondary"
+                                OnClick="() => contactsModal.Show(model.Contacts)"
+                                CssClass="w-[160px]">
+                        </Button>
+                        <p class="mt-1 text-slate-500">
+                            Select numbers from your Phonebook.
+                        </p>
                     </RecipientList>
 
-                    <RecipientList Caption="From Bulk Files"
-                                   Description="Include your Batch Files numbers."
-                                   Recipients="model.BatchFiles"
-                                   ButtonText="Bulk Files..."
-                                   ButtonIcon="Icon.IconStyle.FileText"
-                                   ButtonStyle="Button.ButtonStyle.Secondary"
+                    <RecipientList Caption="From Bulk Files" Recipients="model.BatchFiles"
                                    OnClick="() => bulkfilesModal.Show(model.BatchFiles)">
+                        <Button Text="Bulk Files..."
+                                Icon="Icon.IconStyle.FileText"
+                                Style="Button.ButtonStyle.Secondary"
+                                OnClick="() => bulkfilesModal.Show(model.BatchFiles)"
+                                CssClass="w-[160px]">
+                        </Button>
+                        <p class="mt-1 text-slate-500">
+                            Include your Batch Files numbers.
+                        </p>
                     </RecipientList>
 
                 </ChildContent>
@@ -54,12 +65,12 @@ else
             <!-- Message Card -->
             <Card HeaderText="Type your Message here">
                 <HeaderRight>
-                    <span class="bg-brand-50 rounded px-2.5 py-1 text-sm text-slate-500">
-                        @model.CounterText
+                    <span class="bg-brand-50 rounded px-2.5 py-1 text-xs text-slate-500">
+                        @model.CounterText()
                     </span>
                 </HeaderRight>
                 <ChildContent>
-                    <textarea @bind="message" @bind:event="oninput" 
+                    <textarea @bind="model.MessageText" @bind:event="oninput" 
                               placeholder="Type your message here..."
                               maxlength="918" rows="8"
                               class="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-brand-100 focus:ring-2">
@@ -67,9 +78,9 @@ else
 
                     <div class="mt-1 flex items-center justify-between">
                         <span class="text-sm text-slate-500">Messages longer than 160 characters are charged per page.</span>
-                        @if (!string.IsNullOrWhiteSpace(message))
+                        @if (!string.IsNullOrWhiteSpace(model.MessageText))
                         {
-                            <button type="button" class="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600">
+                            <button type="button" class="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600" @onclick="() => model.ClearMessage()">
                                 <Icon Style="Icon.IconStyle.Close" CssClass="text-xs" /> Clear
                             </button>
                         }
@@ -82,9 +93,9 @@ else
         <div class="lg:col-span-1">
             <div class="sticky top-6 flex flex-col gap-6">
                 <!-- Sender ID Card -->
-                <SenderIdCard SenderIDs="@model.SenderIds"></SenderIdCard>
+                <SenderIdCard Model="@model" SenderIDChanged="SenderIdChanged"></SenderIdCard>
                 <!-- Schedule Card -->
-                <SchedulerCard Model="@model"></SchedulerCard>
+                <SchedulerCard Model="@model" OnSubmit="SendMessageCore"></SchedulerCard>
             </div>                
         </div>
     </div>
@@ -98,9 +109,7 @@ else
     private SelectContacts contactsModal = new();
     private SelectBulkfiles bulkfilesModal = new();
     private SelectRawNumbers rawNumbersModal = new();
-
     private ComposeSimpleModel? model;
-    private string message = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -120,51 +129,47 @@ else
         }
     }
 
-    private async Task SendMessageCore(DateTimeOffset? scheduledDeliveryTime)
+    private async Task SenderIdChanged(string senderId)
     {
-        // var numbers = ParseNumbers(manualNumbers);
-        // var phoneNumbers = selectedContacts
-        //     .Select(x => x.Phone)
-        //     .Concat(selectedGroups.SelectMany(x => x.MemberPhones))
-        //     .Where(x => !string.IsNullOrWhiteSpace(x))
-        //     .Distinct(StringComparer.Ordinal)
-        //     .ToList();
-        // var fileIds = selectedFiles.Select(x => x.FileId).ToList();
+        StateHasChanged();
+    }
 
-        // if (string.IsNullOrWhiteSpace(senderId) || string.IsNullOrWhiteSpace(message) || (numbers.Count == 0 && phoneNumbers.Count == 0 && fileIds.Count == 0))
-        // {
-        //     await alert.Error("Choose an approved sender ID, add recipients, and enter a message.", "Compose Message");
-        //     return;
-        // }
+    private async Task SendMessageCore(DateTimeOffset? deliveryTime)
+    {
+        if (model is null)
+        {
+            await alert.Error("model should not be null");
+            return;
+        }
 
-        // isSending = true;
-        // try
-        // {
-        //     await apiClient.SmsBatchCreateAsync(new SmsBatchRequest
-        //     {
-        //         SenderID = senderId,
-        //         MessageText = message.Trim(),
-        //         RawNumbers = string.Join(',', numbers),
-        //         PhoneNumbers = phoneNumbers,
-        //         BatchFileIDs = fileIds,
-        //         DeliveryTime = scheduledDeliveryTime
-        //     });
-        //     await alert.Success(scheduledDeliveryTime.HasValue ? "Your message has been scheduled." : "Your message is being sent.", "Message Created");
-        //     manualNumbers = "";
-        //     message = "";
-        //     selectedFiles.Clear();
-        //     selectedContacts.Clear();
-        //     selectedGroups.Clear();
-        //     showScheduler = false;
-        //     deliveryTime = null;
-        // }
-        // catch (Exception ex)
-        // {
-        //     await alert.Error(ex.Message, "Unable to Send Message");
-        // }
-        // finally
-        // {
-        //     isSending = false;
-        // }
+        try
+        {
+            model.IsBusy = true;
+
+            if (string.IsNullOrWhiteSpace(model.SenderID))
+                throw new Exception("Choose an approved sender ID.");
+
+            if (string.IsNullOrWhiteSpace(model.MessageText))
+                throw new Exception("Enter a message.");
+
+            if (model.CountRecipients() == 0)
+                throw new Exception("Add recipients");
+
+            var request = model.CreateRequest();
+            var result = await apiClient.SmsBatchCreateAsync(request);
+
+            await alert.Success(deliveryTime.HasValue
+                ? "Your message has been scheduled."
+                : "Your message is being sent."
+                , "Message Created");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Unable to Send Message");
+        }
+        finally
+        {
+            model.IsBusy = false;
+        }
     }
 }

@@ -44,16 +44,20 @@
 
 <Card>
     <div class="flex flex-col gap-3">
-        @{
-            var totalRecipients = Model?.GrandTotal() ?? 0;
-        }
-
-        @if (true)
-        {
-            <div class="mt-2 text-center text-sm text-slate-500">
-                Total Recipients: <strong>@totalRecipients.ToString("N0")</strong>
-            </div>
-        }
+        <div class="mt-2 text-left text-sm text-red-500">
+            @if (totalRecipients == 0)
+            {
+                <p>Please select at least one recipient</p>
+            }
+            @if (string.IsNullOrWhiteSpace(Model?.SenderID))
+            {
+                <p>Please select a sender ID</p>
+            }
+            @if (string.IsNullOrWhiteSpace(Model?.MessageText))
+            {
+                <p>Please enter a message</p>
+            }
+        </div>
 
         @if (deliveryTime.HasValue)
         {
@@ -61,7 +65,7 @@
                     Text="Queue Message"
                     Icon="Icon.IconStyle.Clock"
                     Style="Button.ButtonStyle.Primary"
-                    IsDisabled="@(!deliveryTime.HasValue || !allowSend)"
+                    IsDisabled="@(!allowSend)"
                     OnClick="ScheduledSubmit"
                     CssClass="w-full py-3">
             </Button>
@@ -90,7 +94,10 @@
     [Parameter] public EventCallback<DateTimeOffset?> OnSubmit { get; set; }
 
     private DateTime? deliveryTime;
-    private bool allowSend => (Model?.GrandTotal() ?? 0) > 0;
+    private long totalRecipients => Model?.CountRecipients() ?? 0;
+    private bool allowSend => totalRecipients > 0   && 
+        !string.IsNullOrWhiteSpace(Model?.SenderID) && 
+        !string.IsNullOrWhiteSpace(Model?.MessageText);
 
     private Task ImmediateSubmit(MouseEventArgs e)
     {

@@ -1,82 +1,68 @@
-<Modal Title="@ModalTitle" Size="Modal.ModalSize.Medium" @bind-IsVisible="isVisible">
+<Modal Title="@modalTitle" Size="Modal.ModalSize.Medium" @bind-IsVisible="isVisible">
     <Body>
         <EditForm id="ContactForm" Model="@editModel" OnValidSubmit="HandleSubmit" class="space-y-4">
             @if (!isEditMode)
             {
-                <div class="space-y-3">
+                <div class="space-y-1">
                     @for (int i = 0; i < contactFields.Count; i++)
                     {
                         var index = i;
-                        <div class="flex gap-3">
+                        <div class="flex gap-2">
                             <div class="flex-1">
-                                <FormInput Label="@(index == 0 ? "Contact Name" : "")"
-                                           PlaceHolder="Name"
-                                           @bind-Value="contactFields[index].ContactName"
-                                           Required="false" />
+                                <FormInput PlaceHolder="@($"Contact Name {@index + 1}")"
+                                           @bind-Value="contactFields[index].ContactName" />
                             </div>
                             <div class="flex-1">
-                                <FormInput Label="@(index == 0 ? "Phone Number" : "")"
-                                           PlaceHolder="Phone"
-                                           Type="tel"
-                                           @bind-Value="contactFields[index].PhoneNumber"
-                                           Required="false" />
+                                <FormInput PlaceHolder="@($"Phone Number {@index + 1}")" Type="tel"
+                                           @bind-Value="contactFields[index].PhoneNumber" />
                             </div>
                         </div>
                     }
                 </div>
 
-                <div class="pt-2">
-                    <button type="button" class="flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors" @onclick="AddField">
-                        <span class="flex items-center justify-center pt-0.5"><Icon Style="Icon.IconStyle.PlusCircle" CssClass="h-4 w-4" /></span>
+                <div class="">
+                    <button type="button" class="text-brand-600 hover:text-brand-700" 
+                            @onclick="AddField">
                         <span>Add More Contact</span>
                     </button>
                 </div>
             }
             else
             {
-                <FormInput Label="Contact Name"
-                           PlaceHolder="e.g. Sarah Smith"
-                           @bind-Value="editModel.ContactName"
-                           Required="true" />
+                <div class="flex gap-2">
+                    <FormInput Label="Contact Name" class="flex-1"
+                               PlaceHolder="e.g. Sarah Smith"
+                               @bind-Value="editModel.ContactName"
+                               Required="true" />
 
-                <FormInput Label="Phone Number"
-                           PlaceHolder="+234 800 000 0000"
-                           Type="tel"
-                           @bind-Value="editModel.PhoneNumber"
-                           disabled="true"
-                           Required="true" />
+                    <FormInput Label="Phone Number" class="flex-1"
+                               PlaceHolder="+2348000000000"
+                               Type="tel" disabled="true"
+                               @bind-Value="editModel.PhoneNumber"
+                               Required="true" />
+                </div>
             }
 
-            <div class="mt-6 border-t border-slate-100 pt-4">
-                <label class="block text-sm font-medium text-slate-700 mb-2">
-                    Assign to Groups <span class="text-xs text-slate-500 font-normal italic">(Optional)</span>
-                </label>
+            <div class="pt-1">
+                @if (AllGroups.Count > 0)
+                {
+                    <label class="font-medium text-slate-700 mb-2">
+                        Assign to Groups <span class="font-xs text-slate-400 italic">(Optional)</span>
+                    </label>
 
-                @if (isLoadingGroups)
-                {
-                    <p class="text-sm text-slate-500 italic">Loading groups...</p>
-                }
-                else if (groups.Count > 0)
-                {
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        @foreach (var group in groups)
+                    <div class="flex gap-3">
+                        @foreach (var group in AllGroups)
                         {
-                            var name = group.GroupName ?? "";
-                            var selected = selectedGroups.Contains(name);
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-1">
                                 <input type="checkbox"
-                                       value="@name" checked="@selected"
-                                       id="cg-@name" @onchange="_ => ToggleGroup(name)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                                <label class="text-sm text-slate-700 cursor-pointer select-none truncate" for="cg-@name" title="@name">
-                                    @name
+                                       value="@group.Key" checked="@group.Selected"
+                                       id="cg-@group.Key" @onchange="e => OnGroupSelect(e, group)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
+                                <label class="text-sm text-slate-700 cursor-pointer select-none truncate" for="cg-@group.Key" title="@group.Key">
+                                    @group.Key
                                 </label>
                             </div>
                         }
                     </div>
-                }
-                else
-                {
-                    <p class="text-sm text-slate-500 italic">No groups found.</p>
                 }
             </div>
         </EditForm>
@@ -87,6 +73,7 @@
                 Icon="Icon.IconStyle.Save"
                 IsBusy="@isSubmitting"
                 form="ContactForm" />
+
         <Button Text="Cancel"
                 Style="Button.ButtonStyle.Secondary"
                 IsDisabled="@isSubmitting"
@@ -95,90 +82,61 @@
 </Modal>
 
 @code {
+    [Parameter] public List<GroupModel> AllGroups { get; set; } = [];
     [Parameter] public EventCallback OnCompleted { get; set; }
-
-    private class ContactEntry
-    {
-        public string ContactName { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-    }
 
     private bool isVisible;
     private bool isEditMode;
     private bool isSubmitting;
-    private bool isLoadingGroups;
-    private string? originalPhoneNumber;
-    
-    private ContactUpdateRequest editModel = new();
-    private List<ContactEntry> contactFields = [];
-    private List<GroupResponse> groups = [];
-    private HashSet<string> selectedGroups = new(StringComparer.OrdinalIgnoreCase);
 
-    private string ModalTitle => isEditMode ? "Edit Contact" : "Add New Contacts";
+    private ContactUpdateRequest editModel = new();
+    private List<ContactResponse> contactFields = [];
+
+    private string modalTitle => isEditMode ? "Edit Contact" : "Add New Contacts";
 
     public void Show(ContactResponse? contact = null)
     {
         isEditMode = contact != null;
-        originalPhoneNumber = contact?.PhoneNumber;
-        
-        if (isEditMode)
+        AllGroups.ForEach(x => x.Selected = false);
+
+        if (contact != null)
         {
             editModel = new ContactUpdateRequest
             {
-                ContactName = contact?.ContactName ?? string.Empty,
-                PhoneNumber = contact?.PhoneNumber ?? string.Empty,
-                Groups = contact?.Groups?.ToList() ?? []
+                ContactName = contact.ContactName,
+                PhoneNumber = contact.PhoneNumber,
+                Groups = contact.Groups
             };
-            selectedGroups = editModel.Groups?.ToHashSet(StringComparer.OrdinalIgnoreCase) ?? [];
+
+            if (contact.Groups != null)
+                AllGroups.Where(x => contact.Groups.Contains(x.Key))
+                    .ToList().ForEach(x => x.Selected = true);
         }
         else
         {
             contactFields = [new(), new(), new(), new(), new()];
-            selectedGroups.Clear();
         }
 
         isVisible = true;
-        _ = LoadGroups();
         StateHasChanged();
-    }
-
-    private async Task LoadGroups()
-    {
-        isLoadingGroups = true;
-        try
-        {
-            var response = await apiClient.GroupListAsync();
-            groups = response.Result?.ToList() ?? [];
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Groups");
-        }
-        finally
-        {
-            isLoadingGroups = false;
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
-    private void ToggleGroup(string groupName)
-    {
-        if (string.IsNullOrWhiteSpace(groupName)) return;
-        if (!selectedGroups.Add(groupName)) selectedGroups.Remove(groupName);
     }
 
     private void AddField()
     {
         contactFields.Add(new());
     }
+    
+    private void OnGroupSelect(ChangeEventArgs e, GroupModel group)
+    {
+        group.Selected = (bool?)e.Value ?? false;
+    }
 
     private async Task HandleSubmit()
     {
         isSubmitting = true;
-
         try
         {
-            var selectedGroupList = selectedGroups.ToList();
+            var selectedGroups = AllGroups.Where(x => x.Selected).Select(x => x.Key).ToList();
 
             if (isEditMode)
             {
@@ -188,8 +146,8 @@
                     return;
                 }
 
-                editModel.Groups = selectedGroupList;
-                await apiClient.ContactUpdateAsync(originalPhoneNumber ?? editModel.PhoneNumber, editModel);
+                editModel.Groups = selectedGroups;
+                await apiClient.ContactUpdateAsync(editModel.PhoneNumber, editModel);
                 await alert.Success("Contact updated successfully.");
             }
             else
@@ -207,7 +165,7 @@
                     {
                         ContactName = contact.ContactName,
                         PhoneNumber = contact.PhoneNumber,
-                        Groups = selectedGroupList
+                        Groups = selectedGroups
                     };
                     return apiClient.ContactCreateAsync(request);
                 });
