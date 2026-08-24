@@ -1,4 +1,4 @@
-<Modal Title="@ModalTitle" Size="Modal.ModalSize.ExtraLarge" @bind-IsVisible="isVisible">
+<Modal Title="@modalTitle" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
     <Body>
         <EditForm id="GroupForm" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
             <FormInput Label="Group Name"
@@ -7,49 +7,41 @@
                        disabled="@isEditMode"
                        Required="true" />
 
-            <div class="border-t border-slate-100 pt-4">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                        Select Members <span class="text-xs text-slate-500 font-normal italic">(@selectedPhoneNumbers.Count selected)</span>
-                    </label>
-                    <div class="flex gap-3">
-                        <div class="flex-1">
-                            <FormInput Label="" @bind-Value="pickerSearch" Required="false" Placeholder="Find a contact..." />
-                        </div>
-                    </div>
-                </div>
+            <SearchBox InstantSearch="true" Placeholder="Find a contact..." @bind-SearchTerm="pickerSearch"></SearchBox>
 
-                <div class="overflow-x-hidden overflow-y-auto h-64 border border-slate-200 rounded-lg p-3 bg-slate-50 shadow-inner">
-                    @if (isLoadingContacts)
-                    {
-                        <p class="text-sm text-slate-500 italic">Fetching contacts...</p>
-                    }
-                    else if (FilteredContacts.Count == 0)
-                    {
-                        <p class="text-sm text-slate-500 italic">No contacts found</p>
-                    }
-                    else
-                    {
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            @foreach (var contact in FilteredContacts)
-                            {
-                                var phone = contact.PhoneNumber ?? "";
-                                var name = string.IsNullOrWhiteSpace(contact.ContactName) ? phone : contact.ContactName;
-                                var selected = IsSelected(phone);
-                                
-                                <div class="flex items-center gap-2">
-                                    <input type="checkbox"
-                                           value="@phone" checked="@selected"
-                                           id="gc-@phone" @onchange="_ => ToggleContact(phone)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                                    <label class="text-sm text-slate-700 cursor-pointer select-none truncate" for="gc-@phone" title="@name (@phone)">
-                                        @name
-                                    </label>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
+            <div class="overflow-x-hidden overflow-y-auto h-64 border border-slate-200 rounded-lg p-3 bg-slate-50 shadow-inner">
+                @{
+                    var filteredContacts = AllContacts.Where(x => x.Visible);
+                }
+
+                @if (!filteredContacts.Any())
+                {
+                    <p class="text-sm text-slate-500 italic">No contacts found</p>
+                }
+                else
+                {
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        @foreach (var contact in filteredContacts)
+                        {
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox"
+                                       value="@contact.Key" checked="@contact.Selected"
+                                       id="gc-@contact.Key" @onchange="e => OnContactSelect(e, contact)"
+                                       class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
+                                <label class="text-sm text-slate-700 cursor-pointer select-none truncate" 
+                                       for="gc-@contact.Key" title="@contact.Name (@contact.Key)">
+                                    @contact.Name
+                                </label>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
+
+            <label class="text-slate-400">
+                @AllContacts.Where(x => x.Selected).Count() Members Selected
+            </label>
+
         </EditForm>
     </Body>
     <Footer>
@@ -58,6 +50,7 @@
                 Icon="Icon.IconStyle.Save"
                 IsBusy="@isSubmitting"
                 form="GroupForm" />
+
         <Button Text="Cancel"
                 Style="Button.ButtonStyle.Secondary"
                 IsDisabled="@isSubmitting"
@@ -66,99 +59,37 @@
 </Modal>
 
 @code {
-    private sealed class GroupFormModel
-    {
-        public string GroupName { get; set; } = string.Empty;
-    }
-
     [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public List<ContactModel> AllContacts { get; set; } = [];
 
     private bool isVisible;
     private bool isEditMode;
     private bool isSubmitting;
-    private bool isLoadingContacts;
-    private string? originalGroupName;
     private string pickerSearch = string.Empty;
-    private GroupFormModel model = new();
-    private List<ContactResponse> contacts = [];
-    private HashSet<string> selectedPhoneNumbers = new(StringComparer.OrdinalIgnoreCase);
+    private GroupResponse model = new();
 
-    private string ModalTitle => isEditMode ? "Edit Group Members" : "Create New Group";
-
-    private List<ContactResponse> FilteredContacts
-    {
-        get
-        {
-            if (string.IsNullOrWhiteSpace(pickerSearch))
-                return contacts;
-
-            var q = pickerSearch.Trim().ToLowerInvariant();
-            return contacts.Where(c =>
-                (c.ContactName != null && c.ContactName.ToLowerInvariant().Contains(q))
-                || (c.PhoneNumber != null && c.PhoneNumber.ToLowerInvariant().Contains(q)))
-                .ToList();
-        }
-    }
+    private string modalTitle => isEditMode ? "Edit Group Members" : "Create New Group";
 
     public void Show(GroupResponse? group = null)
     {
+        AllContacts.ForEach(x => x.Selected = false);
         isEditMode = group != null;
-        originalGroupName = group?.GroupName;
-        model = new GroupFormModel { GroupName = group?.GroupName ?? string.Empty };
-        selectedPhoneNumbers = group?.Members?
-            .Select(x => x.PhoneNumber)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        pickerSearch = string.Empty;
+        model = group ?? new();
+
+        if (group != null)
+        {
+            var selected = group.Members.Select(x => x.PhoneNumber).ToList();
+            AllContacts.Where(x => selected.Contains(x.Key))
+                .ToList().ForEach(x => x.Selected = true);
+        }
         isVisible = true;
-        _ = LoadContacts(group);
         StateHasChanged();
     }
 
-    private async Task LoadContacts(GroupResponse? group)
+    private void OnContactSelect(ChangeEventArgs e, ContactModel contact)
     {
-        isLoadingContacts = true;
-        try
-        {
-            var response = await apiClient.ContactListAsync();
-            contacts = response.Result?.ToList() ?? [];
-
-            if (group != null)
-            {
-                var membersFromContacts = contacts
-                    .Where(c => c.PhoneNumber != null
-                        && c.Groups != null
-                        && c.Groups.Contains(group.GroupName))
-                    .Select(c => c.PhoneNumber);
-
-                selectedPhoneNumbers = selectedPhoneNumbers
-                    .Concat(membersFromContacts)
-                    .Where(x => !string.IsNullOrWhiteSpace(x))
-                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            }
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Contacts");
-        }
-        finally
-        {
-            isLoadingContacts = false;
-            await InvokeAsync(StateHasChanged);
-        }
+        contact.Selected = (bool?)e.Value ?? false;
     }
-
-    private void ToggleContact(string phoneNumber)
-    {
-        if (string.IsNullOrWhiteSpace(phoneNumber))
-            return;
-
-        if (!selectedPhoneNumbers.Add(phoneNumber))
-            selectedPhoneNumbers.Remove(phoneNumber);
-    }
-
-    private bool IsSelected(string phoneNumber) =>
-        !string.IsNullOrWhiteSpace(phoneNumber) && selectedPhoneNumbers.Contains(phoneNumber);
 
     private async Task HandleSubmit()
     {
@@ -169,19 +100,18 @@
         }
 
         isSubmitting = true;
-        var groupName = (originalGroupName ?? model.GroupName).Trim();
-        var members = selectedPhoneNumbers.ToList();
+        var selectedMembers = AllContacts.Where(x => x.Selected).Select(x => x.Key).ToList();
 
         try
         {
             if (isEditMode)
             {
-                await apiClient.GroupUpdateAsync(groupName, members);
+                await apiClient.GroupUpdateAsync(model.GroupName, selectedMembers);
                 await alert.Success("Group updated successfully.");
             }
             else
             {
-                await apiClient.GroupCreateAsync(model.GroupName.Trim(), members);
+                await apiClient.GroupCreateAsync(model.GroupName.Trim(), selectedMembers);
                 await alert.Success("Group created successfully.");
             }
 

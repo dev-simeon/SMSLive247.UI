@@ -8,9 +8,7 @@
             }
         </div>
     </div> *@
-
-
-    <div class="mb-3 rounded-lg border bg-sky-100 shadow-sm">
+    <div class="mb-3 rounded-lg border border-slate-200 bg-slate-100 shadow-md">
         <div class="cursor-pointer p-4" @onclick="OnClick">
             <div class="flex items-center justify-between">
                 <div>
@@ -20,14 +18,14 @@
                     </h6>
                 </div>
                 <div>
-                    <Icon Style="Icon.IconStyle.Trash" title="Delete All" CssStyle="font-weight: 300;" />
-                    <Icon Style="@ButtonIcon" title="Edit Selection" CssStyle="font-weight: 300;" />
+                    <Icon Style="Icon.IconStyle.Trash" CssStyle="font-weight: 300;" title="Delete All" />
+                    <Icon Style="Icon.IconStyle.PenSquare" CssStyle="font-weight: 300;" title="Edit Selection" />
                 </div>
             </div>
             @foreach (var item in Selected)
             {
-                <span class="mr-1 inline-block rounded-md bg-sky-700 px-2 py-0.5 text-xs font-medium text-white">
-                    @item.Name
+                <span class="mr-1 inline-block rounded-md bg-green-700 px-2 py-0.5 text-xs font-medium text-white">
+                    @item.Name @* <i class="h-full w-9 bg-red-500">x</i> *@
                 </span>
             }
         </div>
@@ -36,23 +34,15 @@
 else
 {
     <div class="mb-2 flex gap-4">
-        <Button Text="@ButtonText"
-                Icon="@ButtonIcon"
-                Style="@ButtonStyle"
-                OnClick="@OnClick"
-                CssClass="w-[160px]" />
-        <p class="mt-1 text-slate-500">@Description</p>
+        @ChildContent
     </div>
 }
 
 @code {
+    [Parameter] public string? Caption { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public List<ContactModel> Recipients { get; set; } = [];
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
-    [Parameter, EditorRequired] public string? Caption { get; set; }
-    [Parameter, EditorRequired] public string? ButtonText { get; set; }
-    [Parameter, EditorRequired] public string? Description { get; set; }
-    [Parameter, EditorRequired] public Icon.IconStyle ButtonIcon { get; set; }
-    [Parameter, EditorRequired] public Button.ButtonStyle ButtonStyle { get; set; } = Button.ButtonStyle.Secondary;
-    [Parameter, EditorRequired] public List<ContactModel> Recipients { get; set; } = [];
 
     public List<ContactModel> Selected => Recipients.Where(x => x.Selected).ToList();
 

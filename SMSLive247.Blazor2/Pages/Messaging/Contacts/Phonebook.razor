@@ -2,107 +2,113 @@
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox Placeholder="Search..."
-                   InstantSearch="true"
-                   @bind-SearchTerm="searchQuery">
+        <SearchBox Placeholder="Search..." 
+                   InstantSearch="true" 
+                   SearchTermChanged="e => OnSearch(e)">
         </SearchBox>
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="Add Contacts..." Style="Button.ButtonStyle.Primary" OnClick="HandleAddContact" />
-        <Button Text="Create Group..." Style="Button.ButtonStyle.Primary" OnClick="HandleNewGroup" />
+        <Button Text="Add Contacts..." Icon="Icon.IconStyle.PlusCircle" OnClick="() => contactModal.Show()" />
+        <Button Text="Create Group..." Icon="Icon.IconStyle.PlusCircle" OnClick="() => groupModal.Show()" />
     </HeaderRight>
 
     <ChildContent>
         <!-- Groups Bar -->
-        <div class="mb-4 flex items-center justify-between border-y border-cyan-200 bg-cyan-50/70 px-4 py-3">
+        <header class="mb-4 flex justify-between bg-cyan-100 px-4 py-3">
             <div class="flex items-center gap-4">
-                <span class="text-sm font-semibold text-slate-700">Groups:</span>
-                <div class="flex flex-wrap gap-2">
-                    @foreach (var group in groups)
-                    {
-                        bool isSelected = selectedGroups.Contains(group.GroupName ?? string.Empty);
-                        <div class="flex items-center overflow-hidden rounded-md border transition-colors cursor-pointer @(isSelected ? "border-brand-500 bg-brand-500 text-white shadow-sm" : "border-cyan-300 bg-white text-cyan-800 hover:bg-cyan-50 shadow-sm")"
-                             @onclick="() => ToggleGroup(group.GroupName)">
-                            <div class="flex items-center px-3 py-1.5 text-sm font-medium">
-                                @(string.IsNullOrEmpty(group.GroupName) ? "—" : group.GroupName)
-                                <span class="ml-2 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold @(isSelected ? "bg-white text-brand-600" : "bg-cyan-100 text-cyan-700")">
-                                    @(group.Members?.Count ?? 0)
+                <span>Groups: </span>
+                @foreach (var group in groups ?? [])
+                {
+                    var selectedCss = group.Selected ? "bg-cyan-600 text-white" : "bg-white text-cyan-600";
+
+                    <input type="checkbox"
+                           value="@group.Name" checked="@group.Selected"
+                           id="g-@group.Key" @onchange="e => OnGroupSelect(e, group)"
+                           class="hidden" />
+
+                    <label for="g-@group.Key" 
+                           class="flex items-center py-1.5 px-3 rounded-lg border-1 border-cyan-600 transition-colors cursor-pointer @selectedCss">
+                        @group.Name
+                        <span class="ml-2 flex py-0.5 px-2 rounded text-sm bg-yellow-500 text-white font-bold">
+                            @group.Count.ToString("#,##0")
+                        </span>
+                        @if (group.Selected)
+                        {
+                            <div class="flex text-white pl-2 gap-1 leading-none">
+                                <span @onclick="() => groupModal.Show(group.Response)">
+                                    <Icon Style="Icon.IconStyle.PenSquare" FontSize="1.5em" />
+                                </span>
+                                <span @onclick="() => groupModal.Show(group.Response)">
+                                    <Icon Style="Icon.IconStyle.Trash" FontSize="1.5em" />
                                 </span>
                             </div>
-                            @if (isSelected)
-                            {
-                                <div class="flex items-center bg-brand-600 px-2 self-stretch gap-2 border-l border-brand-400">
-                                    <span @onclick="() => HandleEditGroup(group)" @onclick:stopPropagation="true" class="cursor-pointer flex items-center justify-center pt-0.5">
-                                        <Icon Style="Icon.IconStyle.PenSquare" CssClass="h-4 w-4 text-white hover:text-slate-200 transition-colors" />
-                                    </span>
-                                    <span @onclick="() => HandleDeleteGroup(group.GroupName)" @onclick:stopPropagation="true" class="cursor-pointer flex items-center justify-center pt-0.5">
-                                        <Icon Style="Icon.IconStyle.Trash" CssClass="h-4 w-4 text-white hover:text-slate-200 transition-colors" />
-                                    </span>
-                                </div>
-                            }
-                        </div>
-                    }
-                    @if (!groups.Any())
-                    {
-                        <span class="text-xs text-slate-500 italic py-1">No groups found.</span>
-                    }
-                </div>
+                        }
+                    </label>
+                }
             </div>
             
             <!-- Multi-select toggle switch -->
             <div class="flex items-center ml-4 shrink-0">
                 <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="sr-only peer" @bind="MultiSelectGroup" />
+                    <input type="checkbox" class="sr-only peer" @bind="multiSelectGroup" />
                     <div class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
                 </label>
             </div>
-        </div>
+        </header>
 
         <!-- Contacts Grid -->
-        <div class="border-l border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 bg-white rounded-sm overflow-hidden mb-8">
-            @foreach (var contact in FilteredContacts)
-            {
-                bool isSelected = selectedContactPhone == contact.PhoneNumber;
-                <div class="border-r border-b border-slate-200 p-4 relative cursor-pointer group transition-colors @(isSelected ? "bg-brand-50 ring-inset ring-2 ring-brand-500 z-10" : "hover:bg-slate-50")"
-                     @onclick="() => ToggleContact(contact.PhoneNumber)">
-                    
-                    <div class="flex items-start justify-between">
-                        <div>
-                            <div class="text-sm font-medium text-slate-800">@(string.IsNullOrEmpty(contact.ContactName) ? "—" : contact.ContactName)</div>
-                            <div class="text-xs text-slate-500 mt-0.5 font-mono">@(string.IsNullOrEmpty(contact.PhoneNumber) ? "—" : contact.PhoneNumber)</div>
-                        </div>
-                        @if (isSelected)
-                        {
-                            <div class="flex items-center gap-2">
-                                <button type="button" @onclick="() => HandleEditContact(contact)" @onclick:stopPropagation="true" class="text-slate-400 hover:text-brand-600 transition-colors">
-                                    <Icon Style="Icon.IconStyle.PenSquare" CssClass="h-4 w-4" />
-                                </button>
-                                <button type="button" @onclick="() => HandleDeleteContact(contact.PhoneNumber)" @onclick:stopPropagation="true" class="text-slate-400 hover:text-red-600 transition-colors">
-                                    <Icon Style="Icon.IconStyle.Trash" CssClass="h-4 w-4" />
-                                </button>
-                            </div>
-                        }
-                    </div>
-
-                    <div class="mt-2.5 flex flex-wrap gap-1">
-                        @if (contact.Groups != null && contact.Groups.Any())
-                        {
-                            @foreach (var g in contact.Groups)
-                            {
-                                <span class="rounded bg-teal-600 px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
-                                    @g
-                                </span>
-                            }
-                        }
-                    </div>
-                </div>
+        <div class="flex flex-wrap px-6 py-3">
+            @{
+                var filteredContacts = contacts?.Where(x => x.Visible) ?? [];
             }
-            
-            @if (!FilteredContacts.Any())
+            @if (!filteredContacts.Any())
             {
-                <div class="col-span-full py-12 text-center text-slate-500 border-r border-b border-slate-200">
+                <div class="w-full py-12 text-center text-slate-500">
                     No contacts found.
                 </div>
+            }
+            else
+            {
+                @foreach (var contact in filteredContacts)
+                {
+                    var selectedCss = contact.Selected
+                        ? "bg-cyan-100 ring-inset ring-2 ring-cyan-600"
+                        : "hover:bg-slate-50";
+
+                    <div class="border border-slate-200 p-3 pt-2 transition-colors @selectedCss"
+                         style="width: 196px;"
+                         @onclick="e => OnContactSelect(e, contact)">
+                    
+                        <div>
+                            <div class="">@contact.Response.ContactName</div>
+                            <div class="flex text-slate-400 font-mono">
+                                @contact.Response.PhoneNumber
+                                @if (contact.Selected)
+                                {
+                                    <div class="flex items-center gap-1 ml-2 leading-none">
+                                        <button type="button" @onclick="() => contactModal.Show(contact.Response)"
+                                                class="hover:text-brand-600">
+                                            <Icon Style="Icon.IconStyle.PenSquare" FontSize="1.3em" />
+                                        </button>
+                                        <button type="button" @onclick="() => contactModal.Show(contact.Response)"
+                                                class="hover:text-brand-600">
+                                            <Icon Style="Icon.IconStyle.Trash" FontSize="1.3em" />
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-1 mt-1">
+                            @foreach (var group in (contact.Response.Groups ?? []))
+                            {
+                                <span class="rounded bg-cyan-600 px-2 py-0.5 text-xs font-bold text-white">
+                                    @group
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
             }
         </div>
     </ChildContent>
@@ -111,10 +117,101 @@
     </FooterLeft>
 </PageBody>
 
-<ContactModal @ref="contactModal" OnCompleted="FetchData" />
-<GroupModal @ref="groupModal" OnCompleted="FetchData" />
+
+<ContactModal @ref="contactModal" OnCompleted="FetchData" AllGroups="groups" />
+<GroupModal @ref="groupModal" OnCompleted="FetchData" AllContacts="contacts" />
 
 @code {
+    private GroupModal groupModal = new();
+    private ContactModal contactModal = new();
+
+    private List<GroupModel>? groups;
+    private List<ContactModel>? contacts;
+
+    private bool multiSelectGroup = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        try
+        {
+            var t1 = apiClient.ContactListAsync();
+            var t2 = apiClient.GroupListAsync();
+
+            await Task.WhenAll(t1, t2);
+
+            contacts = t1.Result.Result.Select(x => new ContactModel(x)).ToList();
+            groups = t2.Result.Result.Select(x => new GroupModel(x)).ToList();
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error");
+        }
+    }
+
+    private void OnSearch(string? input = null)
+    {
+        if (groups == null || contacts == null) return;
+
+        var searchText = input ?? string.Empty;
+        var selectedGroups = groups.Where(g => g.Selected).ToList();
+
+        if (string.IsNullOrEmpty(searchText) && selectedGroups.Count == 0)
+        {
+            //no filter, show everything
+            contacts.ForEach(x => x.Visible = true);
+            return;
+        }
+
+        //otherwise, hide all before search
+        contacts.ForEach(x => x.Visible = false);
+
+        var temp = contacts.AsEnumerable();
+
+        //filter by group
+        foreach (var group in selectedGroups)
+        {
+            var members = group.Contacts.Select(c => c.Key).ToList();
+            temp = temp.Where(c => members.Contains(c.Key));
+        }
+
+        // search by text
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            temp = temp.Where(c => c.Key.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+                                || c.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+        }
+
+        temp.ToList().ForEach(x => x.Visible = true);
+    }
+
+    private void OnContactSelect(MouseEventArgs e, ContactModel contact)
+    {
+        if (contacts == null) return;
+
+        var oldState = contact.Selected;
+        contacts.ForEach(x => x.Selected = false);
+        contact.Selected = !oldState;
+    }
+
+    private void OnGroupSelect(ChangeEventArgs e, GroupModel group)
+    {
+        if (groups == null) return;
+
+        if (multiSelectGroup == false)
+            groups.ForEach(x => x.Selected = false);
+
+        group.Selected = (bool?)e.Value ?? false;
+        OnSearch();
+    }
+
+}
+
+@* @code {
     private string? searchQuery;
 
     private List<ContactResponse> contacts = new();
@@ -235,21 +332,6 @@
         return trimmed.Substring(0, 2).ToUpperInvariant();
     }
 
-    private void HandleNewGroup()
-    {
-        groupModal.Show();
-    }
-
-    private void HandleAddContact()
-    {
-        contactModal.Show();
-    }
-
-    private void HandleEditContact(ContactResponse contact)
-    {
-        contactModal.Show(contact);
-    }
-
     private async Task HandleDeleteContact(string? phoneNo)
     {
         if (string.IsNullOrEmpty(phoneNo)) return;
@@ -268,11 +350,6 @@
                 await alert.Error("Failed to delete contact.");
             }
         }
-    }
-
-    private void HandleEditGroup(GroupResponse group)
-    {
-        groupModal.Show(group);
     }
 
     private async Task HandleDeleteGroup(string? groupId)
@@ -295,3 +372,4 @@
         }
     }
 }
+ *@
