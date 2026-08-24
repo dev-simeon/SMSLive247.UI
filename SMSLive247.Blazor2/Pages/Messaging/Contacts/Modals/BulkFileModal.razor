@@ -1,90 +1,82 @@
-<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
+<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
         <div class="space-y-5">
+            @{
+                string demo = "";
+            }
+            <FormInput Label="Select File"
+                       Type="file" @bind-Value="demo"
+                       accept="@acceptedFileTypes" 
+                       HelpText="@supportedFormatsText"
+                       OnFileChange="FileSelected" />
 
-            @* ── File picker ── *@
-            <div class="space-y-1">
-                <label class="block text-sm font-medium text-slate-700">Select File</label>
-                <InputFile class="block w-full text-sm text-slate-700
-                                  file:mr-4 file:py-2 file:px-4
-                                  file:rounded-lg file:border-0
-                                  file:text-sm file:font-semibold
-                                  file:bg-brand-50 file:text-brand-700
-                                  hover:file:bg-brand-100 file:cursor-pointer
-                                  border border-slate-200 rounded-lg bg-white py-1.5 px-2 cursor-pointer"
-                           accept="@AcceptedFileTypes"
-                           OnChange="FileSelected" />
-                <p class="text-xs text-slate-400">
-                    Supported formats: @SupportedFormatsText
-                </p>
-            </div>
-
-            @* ── For CSV: File Name field ── *@
             @if (ForCSV)
             {
                 <FormInput Label="File Name"
-                           PlaceHolder="Enter a name for this file e.g. Campaign July"
-                           @bind-Value="fileName" />
+                           PlaceHolder="e.g. July Campaign"
+                           @bind-Value="newFileName" />
             }
-
-            @* ── For Bulk: Organise (new vs merge) ── *@
-            @if (!ForCSV)
+            else  
             {
                 <div>
-                    <label class="mb-2 block text-sm font-medium text-slate-700">Organize File</label>
+                    <span class="uppercase text-sm font-medium text-brand-400">Organize File</span>
                     <div class="flex gap-6">
-                        <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                        <label class="flex cursor-pointer items-center gap-2 text-slate-700">
                             <input type="radio" class="accent-brand-500"
-                                   name="organise_@_uid"
-                                   checked="@(groupMode == "NEW")"
-                                   @onchange='_ => groupMode = "NEW"' />
+                                   name="organise_123"
+                                   checked="@(!isMergeMode)"
+                                   @onchange="e => isMergeMode = false" />
                             Save as new file
                         </label>
-                        <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                        <label class="flex cursor-pointer items-center gap-2 text-slate-700">
                             <input type="radio" class="accent-brand-500"
-                                   name="organise_@_uid"
-                                   checked="@(groupMode == "MERGE")"
-                                   @onchange='_ => groupMode = "MERGE"' />
+                                   name="organise_123"
+                                   checked="@(isMergeMode)"
+                                   @onchange="e => isMergeMode = true" />
                             Merge into existing file
                         </label>
                     </div>
                 </div>
 
-                @if (groupMode == "NEW")
+                @if (isMergeMode == false)
                 {
-                    <FormInput Label="File Name"
-                               PlaceHolder="Enter a name for this file"
-                               @bind-Value="fileName" />
+                    <FormInput Label="New File Name"
+                               PlaceHolder="e.g New Customers"
+                               @bind-Value="newFileName" 
+                               Required="true" />
                 }
-                else if (groupMode == "MERGE")
+                else 
                 {
-                    <FormSelect TValue="string" Label="Select Existing File" @bind-Value="mergeFileId" Required="true">
+                    <FormSelect Label="Select Existing File" 
+                                @bind-Value="mergeFileId" 
+                                Required="true">
                         <option value="">— Choose a file to merge into —</option>
-                        @foreach (var f in existingBulkFiles)
+                        @foreach (var f in ExistingFiles)
                         {
                             <option value="@f.BatchFileID">@f.Description (@f.TotalNumbers.ToString("N0") records)</option>
                         }
                     </FormSelect>
                 }
 
-                <FormSelect Label="Country Code"
+             @*    <FormSelect Label="Country Code"
                             Variant="FormSelect<int?>.SelectType.Country"
-                            @bind-Value="countryCode" />
+                            @bind-Value="countryCode" /> *@
             }
 
-            <p class="flex items-center gap-1.5 text-xs text-slate-500">
-                <Icon Style="Icon.IconStyle.Info" CssClass="h-3.5 w-3.5 shrink-0" />
+            <p class="flex items-center gap-1.5 text-sm text-slate-400">
+                @* <Icon Style="Icon.IconStyle.Info" CssClass="h-3.5 w-3.5 shrink-0" /> *@
                 Note: Duplicate numbers will be removed.
             </p>
         </div>
     </Body>
 
     <Footer>
-        <Button Text="@SubmitLabel"
+        <Button Text="Upload & Process"
                 Icon="Icon.IconStyle.Download"
                 IsBusy="@isSubmitting"
-                IsDisabled="@IsSubmitDisabled"
+                IsDisabled="@(selectedFile == null)"
                 OnClick="HandleUpload" />
+
         <Button Text="Cancel"
                 Style="Button.ButtonStyle.Secondary"
                 IsDisabled="@isSubmitting"
@@ -93,77 +85,64 @@
 </Modal>
 
 @code {
-    private const long MaxFileBytes = 20 * 1024 * 1024;
+    private const long maxFileBytes = 20 * 1024 * 1024;
 
     [Parameter] public bool ForCSV { get; set; }
     [Parameter] public EventCallback OnCompleted { get; set; }
     [Parameter] public List<BatchFileResponse> ExistingFiles { get; set; } = [];
 
     private bool isVisible;
+    private bool isMergeMode; //true: merge, false: newFile
     private bool isSubmitting;
-    private IBrowserFile? selectedFile;
-    private int? countryCode;
-    private string groupMode = "NEW";
-    private string fileName = string.Empty;
+    private int countryCode = 234;
+    private string newFileName = string.Empty;
     private string mergeFileId = string.Empty;
-    private readonly string _uid = Guid.NewGuid().ToString("N")[..6];
+    private IBrowserFile? selectedFile;
 
-    private List<BatchFileResponse> existingBulkFiles =>
-        ExistingFiles.Where(f => string.Equals(f.FileType, "txt", StringComparison.OrdinalIgnoreCase)).ToList();
+    private string modalTitle => ForCSV ? "Upload CSV / Excel File" : "Upload Bulk File";
+    private string acceptedFileTypes => ForCSV ? ".csv,.xls,.xlsx,.xlx" : ".txt,.text";
+    private string supportedFormatsText => "Supported formats: " + acceptedFileTypes.Replace(".", "").Replace(",", ", ").ToUpperInvariant();
 
-    private string ModalTitle => ForCSV ? "Upload CSV / Excel File" : "Upload Bulk File";
-    private string SubmitLabel => groupMode == "MERGE" ? "Merge & Process" : "Upload & Process";
-    private string AcceptedFileTypes => ForCSV ? ".csv,.xls,.xlsx,.xlx" : ".txt,.text";
-    private string SupportedFormatsText => AcceptedFileTypes.Replace(".", "").Replace(",", ", ").ToUpperInvariant();
-
-    private bool IsSubmitDisabled
+    public void Show(int cCode = 234)
     {
-        get
-        {
-            if (selectedFile == null) return true;
-            if (!ForCSV && groupMode == "MERGE" && string.IsNullOrWhiteSpace(mergeFileId)) return true;
-            return false;
-        }
-    }
-
-    public void Show(List<BatchFileResponse>? allFiles = null)
-    {
+        isMergeMode = false;
+        countryCode = cCode;
         selectedFile = null;
-        countryCode = null;
-        groupMode = "NEW";
-        fileName = string.Empty;
+        newFileName = string.Empty;
         mergeFileId = string.Empty;
-        if (allFiles != null)
-            ExistingFiles = allFiles;
         isVisible = true;
         StateHasChanged();
     }
 
-    private void FileSelected(InputFileChangeEventArgs e) => selectedFile = e.File;
+    private void Close()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
 
     private async Task HandleUpload()
     {
         if (selectedFile == null) return;
 
-        if (!ForCSV && !countryCode.HasValue)
-        {
-            await alert.Error("Please select a country code.", "Validation Error");
-            return;
-        }
-
         isSubmitting = true;
         try
         {
-            await using var stream = selectedFile.OpenReadStream(MaxFileBytes);
+            await using var stream = selectedFile.OpenReadStream(maxFileBytes);
             var file = new FileParameter(stream, selectedFile.Name, selectedFile.ContentType);
 
-            if (!ForCSV && groupMode == "MERGE" && !string.IsNullOrWhiteSpace(mergeFileId))
+            if (!ForCSV && isMergeMode == true)
             {
+                if (string.IsNullOrWhiteSpace(mergeFileId))
+                    throw new Exception("Please select a file to merge into.");
+
                 await apiClient.BatchFileUpdateAsync(mergeFileId, countryCode, file);
                 await alert.Success("File merged successfully.");
             }
             else
             {
+                if (string.IsNullOrWhiteSpace(newFileName))
+                    throw new Exception("Please enter a name for the new file.");
+
                 await apiClient.BatchFileCreateAsync(countryCode, file);
                 await alert.Success("File uploaded successfully.");
             }
@@ -182,9 +161,5 @@
         }
     }
 
-    private Task Close()
-    {
-        isVisible = false;
-        return Task.CompletedTask;
-    }
+    private void FileSelected(InputFileChangeEventArgs e) => selectedFile = e.File;
 }

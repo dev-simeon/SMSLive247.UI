@@ -47,16 +47,16 @@
     </FooterLeft>
 </PageBody>
 
-<BulkFileModal @ref="uploadModal" OnCompleted="FetchFiles" />
+<BulkFileModal @ref="uploadModal" OnCompleted="FetchFiles" ExistingFiles="files" />
 
 @code {
     private string? searchQuery;
     private int pageNumber = 1;
     private int pageSize = 25;
 
-    private List<BatchFileResponse> files = new();
     private bool isLoading = false;
     private BulkFileModal uploadModal = new();
+    private List<BatchFileResponse> files = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -107,7 +107,7 @@
 
     private void HandleUpload()
     {
-        uploadModal.Show(files);
+        uploadModal.Show();
     }
 
     private async Task HandleDownload(string? fileId)

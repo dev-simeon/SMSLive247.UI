@@ -14,12 +14,12 @@
 
     <ChildContent>
         <!-- Groups Bar -->
-        <header class="mb-4 flex justify-between bg-cyan-100 px-4 py-3">
+        <header class="mb-4 flex justify-between bg-brand-100 px-4 py-3">
             <div class="flex items-center gap-4">
                 <span>Groups: </span>
                 @foreach (var group in groups ?? [])
                 {
-                    var selectedCss = group.Selected ? "bg-cyan-600 text-white" : "bg-white text-cyan-600";
+                    var selectedCss = group.Selected ? "bg-brand-600 text-white" : "bg-white text-brand-600";
 
                     <input type="checkbox"
                            value="@group.Name" checked="@group.Selected"
@@ -27,7 +27,7 @@
                            class="hidden" />
 
                     <label for="g-@group.Key" 
-                           class="flex items-center py-1.5 px-3 rounded-lg border-1 border-cyan-600 transition-colors cursor-pointer @selectedCss">
+                           class="flex items-center py-1.5 px-3 rounded-lg border-1 border-brand-600 transition-colors cursor-pointer @selectedCss">
                         @group.Name
                         <span class="ml-2 flex py-0.5 px-2 rounded text-sm bg-yellow-500 text-white font-bold">
                             @group.Count.ToString("#,##0")
@@ -72,7 +72,7 @@
                 @foreach (var contact in filteredContacts)
                 {
                     var selectedCss = contact.Selected
-                        ? "bg-cyan-100 ring-inset ring-2 ring-cyan-600"
+                        ? "bg-brand-100 ring-inset ring-2 ring-brand-600"
                         : "hover:bg-slate-50";
 
                     <div class="border border-slate-200 p-3 pt-2 transition-colors @selectedCss"
@@ -102,7 +102,7 @@
                         <div class="flex flex-wrap gap-1 mt-1">
                             @foreach (var group in (contact.Response.Groups ?? []))
                             {
-                                <span class="rounded bg-cyan-600 px-2 py-0.5 text-xs font-bold text-white">
+                                <span class="rounded bg-brand-600 px-2 py-0.5 text-xs font-bold text-white">
                                     @group
                                 </span>
                             }
