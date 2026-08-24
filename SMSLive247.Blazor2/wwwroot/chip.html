@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail-style Inline Chips</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --bg-color: #f1f3f4;
+            --text-color: #3c4043;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #fafafa;
+        }
+
+        .form-group {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #202124;
+        }
+
+        /* The contenteditable element acting as the input field */
+        .chips-editor {
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 8px;
+            min-height: 44px;
+            line-height: 28px; /* Matches chip height for perfect text alignment */
+            background-color: #fff;
+            box-sizing: border-box;
+            outline: none;
+            font-size: 14px;
+            color: var(--text-color);
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+            .chips-editor:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 1px var(--primary-color);
+            }
+
+        /* The visual "Pill" or "Chip" - MUST be inline-flex or inline-block */
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 0 10px;
+            margin: 2px 4px;
+            border-radius: 16px;
+            font-size: 14px;
+            height: 26px;
+            vertical-align: middle;
+            user-select: none;
+        }
+
+        /* The "X" delete button */
+        .chip-close {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #70757a;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+            .chip-close:hover {
+                color: #202124;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="form-group">
+        <label for="chipsEditor">To:</label>
+        <!-- Use contenteditable so the text cursor can move anywhere dynamically -->
+        <div class="chips-editor" id="chipsEditor" contenteditable="true"></div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('chipsEditor');
+
+        editor.addEventListener('keydown', (e) => {
+            // Create a chip on Enter or Comma
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault(); // Stop native line break or character insertion
+
+                const selection = window.getSelection();
+                if (!selection.rangeCount) return;
+
+                const range = selection.getRangeAt(0);
+                // Find the specific text node the user is typing into
+                const textNode = range.startContainer;
+
+                if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                    const textValue = textNode.nodeValue.trim();
+
+                    if (textValue !== '') {
+                        // Create the uneditable chip
+                        const chip = createChipElement(textValue);
+
+                        // Replace the raw text node with the new chip element
+                        textNode.parentNode.replaceChild(chip, textNode);
+
+                        // Move cursor directly after the newly created chip
+                        const newRange = document.createRange();
+                        newRange.setStartAfter(chip);
+                        newRange.collapse(true);
+                        selection.removeAllRanges();
+                        selection.addRange(newRange);
+
+                        // Insert a trailing space or text node so the user can keep typing easily
+                        document.execCommand('insertText', false, ' ');
+                    }
+                }
+            }
+        });
+
+        function createChipElement(text) {
+            const chip = document.createElement('span');
+            chip.classList.add('chip');
+            // CRITICAL: Keeps the chip text safe from accidental browser backspace/edits
+            chip.setAttribute('contenteditable', 'false');
+            chip.innerText = text;
+
+            const closeBtn = document.createElement('span');
+            closeBtn.classList.add('chip-close');
+            closeBtn.innerHTML = '&times;';
+
+            closeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                chip.remove();
+                editor.focus();
+            });
+
+            chip.appendChild(closeBtn);
+            return chip;
+        }
+    </script>
+
+</body>
+</html>

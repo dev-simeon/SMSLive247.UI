@@ -131,14 +131,9 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
             dataTable.Clear();
         }
 
-        public void ClearMessage()
-        {
-            MessageText = string.Empty;
-        }
-
         public override long CountRecipients()
         {
-            return TotalRecipients;
+            return DataRows.Count;
         }
     }
 
