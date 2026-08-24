@@ -179,7 +179,7 @@ else
         <div class="lg:col-span-1">
             <div class="sticky top-6 flex flex-col gap-6">
                 <!-- Sender ID Card -->
-                <SenderIdCard @ref="senderIdCard" SenderIDs="@model?.SenderIds"></SenderIdCard>
+                <SenderIdCard Model="@model" @ref="senderIdCard"></SenderIdCard>
                 
                 <!-- Schedule Card -->
                 <SchedulerCard Model="@model" IsSending="isSending" OnSubmit="SendMessageCore"></SchedulerCard>
@@ -246,7 +246,7 @@ else
         if (model != null)
         {
             using var countStream = new MemoryStream(uploadedFileBytes);
-            model.TotalRecipients = await CountLinesAsync(countStream);
+            // model.TotalRecipients = await CountLinesAsync(countStream);
         }
 
         using var previewStream = new MemoryStream(uploadedFileBytes);
@@ -259,7 +259,7 @@ else
         selectedUpload = null;
         if (model != null)
         {
-            model.TotalRecipients = file.TotalNumbers;
+            // model.TotalRecipients = file.TotalNumbers;
         }
         try
         {
@@ -339,7 +339,7 @@ else
 
     private async Task SendMessageCore(DateTimeOffset? scheduledDeliveryTime)
     {
-        var senderId = senderIdCard?.SenderId;
+        var senderId = "senderIdCard?.SenderId";
         if (string.IsNullOrWhiteSpace(senderId) || string.IsNullOrWhiteSpace(message) || !hasDataSource || !phoneColumn.HasValue)
         {
             await alert.Error("Choose an approved sender ID, a data source, recipient phone column, and message.", "Compose Message");
