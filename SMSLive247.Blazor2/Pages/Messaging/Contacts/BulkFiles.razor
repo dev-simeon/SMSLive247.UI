@@ -1,4 +1,4 @@
-﻿
+
 
 @using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
 
@@ -107,7 +107,7 @@
 
     private void HandleUpload()
     {
-        uploadModal.Show();
+        uploadModal.Show(files);
     }
 
     private async Task HandleDownload(string? fileId)

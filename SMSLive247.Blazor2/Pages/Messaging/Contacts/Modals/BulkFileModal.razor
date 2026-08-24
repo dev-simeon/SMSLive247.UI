@@ -1,82 +1,89 @@
-﻿<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
+<Modal Title="@ModalTitle" @bind-IsVisible="isVisible">
     <Body>
-        <div class="space-y-6">
+        <div class="space-y-5">
+
+            @* ── File picker ── *@
+            <div class="space-y-1">
+                <label class="block text-sm font-medium text-slate-700">Select File</label>
+                <InputFile class="block w-full text-sm text-slate-700
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-lg file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-brand-50 file:text-brand-700
+                                  hover:file:bg-brand-100 file:cursor-pointer
+                                  border border-slate-200 rounded-lg bg-white py-1.5 px-2 cursor-pointer"
+                           accept="@AcceptedFileTypes"
+                           OnChange="FileSelected" />
+                <p class="text-xs text-slate-400">
+                    Supported formats: @SupportedFormatsText
+                </p>
+            </div>
+
+            @* ── For CSV: File Name field ── *@
+            @if (ForCSV)
+            {
+                <FormInput Label="File Name"
+                           PlaceHolder="Enter a name for this file e.g. Campaign July"
+                           @bind-Value="fileName" />
+            }
+
+            @* ── For Bulk: Organise (new vs merge) ── *@
             @if (!ForCSV)
             {
+                <div>
+                    <label class="mb-2 block text-sm font-medium text-slate-700">Organize File</label>
+                    <div class="flex gap-6">
+                        <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                            <input type="radio" class="accent-brand-500"
+                                   name="organise_@_uid"
+                                   checked="@(groupMode == "NEW")"
+                                   @onchange='_ => groupMode = "NEW"' />
+                            Save as new file
+                        </label>
+                        <label class="flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                            <input type="radio" class="accent-brand-500"
+                                   name="organise_@_uid"
+                                   checked="@(groupMode == "MERGE")"
+                                   @onchange='_ => groupMode = "MERGE"' />
+                            Merge into existing file
+                        </label>
+                    </div>
+                </div>
+
+                @if (groupMode == "NEW")
+                {
+                    <FormInput Label="File Name"
+                               PlaceHolder="Enter a name for this file"
+                               @bind-Value="fileName" />
+                }
+                else if (groupMode == "MERGE")
+                {
+                    <FormSelect TValue="string" Label="Select Existing File" @bind-Value="mergeFileId" Required="true">
+                        <option value="">— Choose a file to merge into —</option>
+                        @foreach (var f in existingBulkFiles)
+                        {
+                            <option value="@f.BatchFileID">@f.Description (@f.TotalNumbers.ToString("N0") records)</option>
+                        }
+                    </FormSelect>
+                }
+
                 <FormSelect Label="Country Code"
                             Variant="FormSelect<int?>.SelectType.Country"
                             @bind-Value="countryCode" />
             }
 
-            <div class="space-y-4">
-                <label class="block text-sm font-medium text-slate-700">
-                    Upload File
-                </label>
-
-                @if (selectedFile == null)
-                {
-                    <label class="group relative flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 transition-all duration-200 hover:border-brand-500 hover:bg-slate-100">
-                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <div class="text-brand-600 mb-3 rounded-full bg-blue-50 p-3 transition-all duration-200 group-hover:bg-white group-hover:shadow-md">
-                                <Icon Style="Icon.IconStyle.Download" CssClass="h-8 w-8" />
-                            </div>
-                            <p class="mb-2 text-sm font-medium text-slate-700">
-                                <span class="text-brand-600 hover:underline">Click to upload</span>
-                                or drag and drop
-                            </p>
-                            <p class="text-xs text-slate-500 uppercase">
-                                @SupportedFormatsText
-                            </p>
-                        </div>
-                        <InputFile class="hidden" OnChange="FileSelected" accept="@AcceptedFileTypes" />
-                    </label>
-                }
-                else
-                {
-                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                        <div class="mb-2 flex items-center justify-between">
-                            <div class="flex min-w-0 items-center gap-3">
-                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
-                                    <Icon Style="@(ForCSV ? Icon.IconStyle.FileSpreadsheet : Icon.IconStyle.FileText)" CssClass="h-6 w-6" />
-                                </div>
-                                <div class="flex min-w-0 flex-col">
-                                    <span class="truncate text-sm font-semibold text-slate-900">
-                                        @selectedFile.Name
-                                    </span>
-                                    <span class="text-xs text-slate-500">
-                                        @FormatFileSize(selectedFile.Size) - Ready
-                                    </span>
-                                </div>
-                            </div>
-                            <button type="button"
-                                    @onclick="ClearFile"
-                                    class="p-1 text-slate-400 transition-colors hover:text-red-500"
-                                    title="Remove file">
-                                <Icon Style="Icon.IconStyle.Trash" CssClass="h-5 w-5" />
-                            </button>
-                        </div>
-                        <div class="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-                            <div class="h-1.5 w-full rounded-full bg-emerald-500"></div>
-                        </div>
-                    </div>
-                }
-
-                <p class="px-1 text-xs text-slate-400">
-                    Supported formats: @SupportedFormatsText
-                </p>
-            </div>
-
             <p class="flex items-center gap-1.5 text-xs text-slate-500">
                 <Icon Style="Icon.IconStyle.Info" CssClass="h-3.5 w-3.5 shrink-0" />
-                Duplicate numbers will be automatically removed during processing.
+                Note: Duplicate numbers will be removed.
             </p>
         </div>
     </Body>
+
     <Footer>
-        <Button Text="Upload & Process"
+        <Button Text="@SubmitLabel"
                 Icon="Icon.IconStyle.Download"
                 IsBusy="@isSubmitting"
-                IsDisabled="@(selectedFile == null)"
+                IsDisabled="@IsSubmitDisabled"
                 OnClick="HandleUpload" />
         <Button Text="Cancel"
                 Style="Button.ButtonStyle.Secondary"
@@ -90,38 +97,53 @@
 
     [Parameter] public bool ForCSV { get; set; }
     [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public List<BatchFileResponse> ExistingFiles { get; set; } = [];
 
     private bool isVisible;
     private bool isSubmitting;
     private IBrowserFile? selectedFile;
     private int? countryCode;
+    private string groupMode = "NEW";
+    private string fileName = string.Empty;
+    private string mergeFileId = string.Empty;
+    private readonly string _uid = Guid.NewGuid().ToString("N")[..6];
+
+    private List<BatchFileResponse> existingBulkFiles =>
+        ExistingFiles.Where(f => string.Equals(f.FileType, "txt", StringComparison.OrdinalIgnoreCase)).ToList();
 
     private string ModalTitle => ForCSV ? "Upload CSV / Excel File" : "Upload Bulk File";
+    private string SubmitLabel => groupMode == "MERGE" ? "Merge & Process" : "Upload & Process";
     private string AcceptedFileTypes => ForCSV ? ".csv,.xls,.xlsx,.xlx" : ".txt,.text";
-    private string SupportedFormatsText => AcceptedFileTypes.Replace(".", "").Replace(",", ", ");
+    private string SupportedFormatsText => AcceptedFileTypes.Replace(".", "").Replace(",", ", ").ToUpperInvariant();
 
-    public void Show()
+    private bool IsSubmitDisabled
+    {
+        get
+        {
+            if (selectedFile == null) return true;
+            if (!ForCSV && groupMode == "MERGE" && string.IsNullOrWhiteSpace(mergeFileId)) return true;
+            return false;
+        }
+    }
+
+    public void Show(List<BatchFileResponse>? allFiles = null)
     {
         selectedFile = null;
         countryCode = null;
+        groupMode = "NEW";
+        fileName = string.Empty;
+        mergeFileId = string.Empty;
+        if (allFiles != null)
+            ExistingFiles = allFiles;
         isVisible = true;
         StateHasChanged();
     }
 
-    private void FileSelected(InputFileChangeEventArgs e)
-    {
-        selectedFile = e.File;
-    }
-
-    private void ClearFile()
-    {
-        selectedFile = null;
-    }
+    private void FileSelected(InputFileChangeEventArgs e) => selectedFile = e.File;
 
     private async Task HandleUpload()
     {
-        if (selectedFile == null)
-            return;
+        if (selectedFile == null) return;
 
         if (!ForCSV && !countryCode.HasValue)
         {
@@ -134,9 +156,18 @@
         {
             await using var stream = selectedFile.OpenReadStream(MaxFileBytes);
             var file = new FileParameter(stream, selectedFile.Name, selectedFile.ContentType);
-            await apiClient.BatchFileCreateAsync(countryCode, file);
 
-            await alert.Success("File uploaded successfully.");
+            if (!ForCSV && groupMode == "MERGE" && !string.IsNullOrWhiteSpace(mergeFileId))
+            {
+                await apiClient.BatchFileUpdateAsync(mergeFileId, countryCode, file);
+                await alert.Success("File merged successfully.");
+            }
+            else
+            {
+                await apiClient.BatchFileCreateAsync(countryCode, file);
+                await alert.Success("File uploaded successfully.");
+            }
+
             isVisible = false;
             await OnCompleted.InvokeAsync();
         }
@@ -155,16 +186,5 @@
     {
         isVisible = false;
         return Task.CompletedTask;
-    }
-
-    private static string FormatFileSize(long bytes)
-    {
-        if (bytes <= 0)
-            return "0 Bytes";
-
-        string[] sizes = ["Bytes", "KB", "MB", "GB"];
-        var order = Math.Min(sizes.Length - 1, (int)Math.Floor(Math.Log(bytes, 1024)));
-        var size = bytes / Math.Pow(1024, order);
-        return $"{size:0.##} {sizes[order]}";
     }
 }
