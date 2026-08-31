@@ -82,7 +82,7 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
         public int PhoneNumberColumn { get; set; }
         public string BatchFileID { get; set; } = string.Empty;
 
-        public List<BatchFileResponse> BatchCsvFiles { get; private set; } = [];
+        public List<BatchFileResponse> BatchCsvFiles { get; set; } = [];
         public List<DataColumn> DataColumns => dataTable.Columns.Cast<DataColumn>().ToList();
         public List<DataRow> DataRows => dataTable.Rows.Cast<DataRow>().ToList();
         public bool IsValidPhoneColumn => dataTable.IsPhoneNumberColumn(PhoneNumberColumn);
@@ -94,9 +94,16 @@ namespace SMSLive247.Blazor2.Pages.ViewModels
             IEnumerable<BatchFileResponse> batchFiles)
         {
             SenderIds = senderIds.ToList();
-            BatchCsvFiles = batchFiles.Where(x => x.FileType == "csv")
-                                      .OrderByDescending(x => x.DateCreated)
-                                      .ToList();
+            UpdateBatchFiles(batchFiles);
+        }
+
+        public void UpdateBatchFiles(IEnumerable<BatchFileResponse> batchFiles)
+        {
+            BatchCsvFiles = batchFiles.Where(x =>
+            {
+                var type = x.FileType?.ToLowerInvariant();
+                return type == "csv" || type == "xls" || type == "xlsx" || type == "xlx";
+            }).OrderByDescending(x => x.DateCreated).ToList();
         }
 
         public SmsBatchCsvRequest CreateRequest()

@@ -1,25 +1,34 @@
 <Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
         <div class="space-y-5">
-            @{
-                string demo = "";
-            }
-            <FormInput Label="Select File"
-                       Type="file" @bind-Value="demo"
-                       accept="@acceptedFileTypes" 
-                       HelpText="@supportedFormatsText"
-                       OnFileChange="FileSelected" />
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Select File</label>
+                <InputFile class="block w-full text-sm text-slate-700
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-lg file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-brand-50 file:text-brand-700
+                                  hover:file:bg-brand-100 file:cursor-pointer
+                                  border border-slate-200 rounded-lg bg-white py-1.5 px-2 cursor-pointer focus:outline-none"
+                           accept="@acceptedFileTypes" 
+                           OnChange="FileSelected" />
+                <p class="mt-1 text-xs text-slate-400">@supportedFormatsText</p>
+            </div>
 
             @if (ForCSV)
             {
-                <FormInput Label="File Name"
-                           PlaceHolder="e.g. July Campaign"
-                           @bind-Value="newFileName" />
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">File Name</label>
+                    <input type="text"
+                           class="block w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
+                           placeholder="e.g. July Campaign"
+                           @bind="newFileName" @bind:event="oninput" />
+                </div>
             }
             else  
             {
                 <div>
-                    <span class="uppercase text-sm font-medium text-brand-400">Organize File</span>
+                    <span class="block text-sm font-medium text-slate-700 mb-2">Organize File</span>
                     <div class="flex gap-6">
                         <label class="flex cursor-pointer items-center gap-2 text-slate-700">
                             <input type="radio" class="accent-brand-500"
@@ -38,33 +47,34 @@
                     </div>
                 </div>
 
-                @if (isMergeMode == false)
+                @if (!isMergeMode)
                 {
-                    <FormInput Label="New File Name"
-                               PlaceHolder="e.g New Customers"
-                               @bind-Value="newFileName" 
-                               Required="true" />
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">New File Name</label>
+                        <input type="text"
+                               class="block w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
+                               placeholder="e.g New Customers"
+                               @bind="newFileName" @bind:event="oninput" />
+                    </div>
                 }
                 else 
                 {
-                    <FormSelect Label="Select Existing File" 
-                                @bind-Value="mergeFileId" 
-                                Required="true">
-                        <option value="">— Choose a file to merge into —</option>
-                        @foreach (var f in ExistingFiles)
-                        {
-                            <option value="@f.BatchFileID">@f.Description (@f.TotalNumbers.ToString("N0") records)</option>
-                        }
-                    </FormSelect>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Select Existing File</label>
+                        <select class="block w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
+                                @bind="mergeFileId">
+                            <option value="">— Choose a file to merge into —</option>
+                            @foreach (var f in ExistingFiles)
+                            {
+                                <option value="@f.BatchFileID">@f.Description (@f.TotalNumbers.ToString("N0") records)</option>
+                            }
+                        </select>
+                    </div>
                 }
-
-             @*    <FormSelect Label="Country Code"
-                            Variant="FormSelect<int?>.SelectType.Country"
-                            @bind-Value="countryCode" /> *@
             }
 
-            <p class="flex items-center gap-1.5 text-sm text-slate-400">
-                @* <Icon Style="Icon.IconStyle.Info" CssClass="h-3.5 w-3.5 shrink-0" /> *@
+            <p class="flex items-center gap-1.5 text-xs text-slate-500">
+                <Icon Style="Icon.IconStyle.Info" CssClass="h-3.5 w-3.5 shrink-0 mt-px" />
                 Note: Duplicate numbers will be removed.
             </p>
         </div>
@@ -89,10 +99,11 @@
 
     [Parameter] public bool ForCSV { get; set; }
     [Parameter] public EventCallback OnCompleted { get; set; }
+    [Parameter] public EventCallback<BatchFileResponse> OnFileUploaded { get; set; }
     [Parameter] public List<BatchFileResponse> ExistingFiles { get; set; } = [];
 
     private bool isVisible;
-    private bool isMergeMode; //true: merge, false: newFile
+    private bool isMergeMode;
     private bool isSubmitting;
     private int countryCode = 234;
     private string newFileName = string.Empty;
@@ -122,33 +133,56 @@
 
     private async Task HandleUpload()
     {
-        if (selectedFile == null) return;
+        if (selectedFile == null)
+        {
+            await alert.Error("Please select a file first.", "Validation Error");
+            return;
+        }
 
         isSubmitting = true;
+        StateHasChanged();
+
         try
         {
             await using var stream = selectedFile.OpenReadStream(maxFileBytes);
-            var file = new FileParameter(stream, selectedFile.Name, selectedFile.ContentType);
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            ms.Position = 0;
 
-            if (!ForCSV && isMergeMode == true)
+            var ext = Path.GetExtension(selectedFile.Name);
+            var fileNameToSend = string.IsNullOrWhiteSpace(newFileName) 
+                ? selectedFile.Name 
+                : (newFileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase) ? newFileName : $"{newFileName}{ext}");
+
+            var file = new FileParameter(ms, fileNameToSend, selectedFile.ContentType);
+
+            if (!ForCSV && isMergeMode)
             {
                 if (string.IsNullOrWhiteSpace(mergeFileId))
-                    throw new Exception("Please select a file to merge into.");
+                {
+                    await alert.Error("Please select an existing file to merge into.", "Validation Error");
+                    return;
+                }
 
                 await apiClient.BatchFileUpdateAsync(mergeFileId, countryCode, file);
                 await alert.Success("File merged successfully.");
+                isVisible = false;
+                await OnCompleted.InvokeAsync();
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(newFileName))
-                    throw new Exception("Please enter a name for the new file.");
-
-                await apiClient.BatchFileCreateAsync(countryCode, file);
+                var response = await apiClient.BatchFileCreateAsync(countryCode, file);
                 await alert.Success("File uploaded successfully.");
+                isVisible = false;
+                if (OnFileUploaded.HasDelegate && response?.Result != null)
+                {
+                    await OnFileUploaded.InvokeAsync(response.Result);
+                }
+                else
+                {
+                    await OnCompleted.InvokeAsync();
+                }
             }
-
-            isVisible = false;
-            await OnCompleted.InvokeAsync();
         }
         catch (Exception ex)
         {
@@ -161,5 +195,13 @@
         }
     }
 
-    private void FileSelected(InputFileChangeEventArgs e) => selectedFile = e.File;
+    private void FileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        if (selectedFile != null && string.IsNullOrWhiteSpace(newFileName))
+        {
+            newFileName = Path.GetFileNameWithoutExtension(selectedFile.Name);
+        }
+        StateHasChanged();
+    }
 }

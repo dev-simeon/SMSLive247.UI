@@ -2,6 +2,7 @@
 @using System.Text
 @using System.Text.RegularExpressions
 @using SMSLive247.Blazor2.Pages.Messaging.Compose.Modals
+@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
 @using SMSLive247.Blazor2.Pages.Messaging.Compose.Common
 @using SMSLive247.Blazor2.Pages.ViewModels
 
@@ -17,83 +18,178 @@ else
             
             @if (currentStep == 1)
             {
-                <Card HeaderText="Step 1: Data Source">
-                    <HeaderRight>
-                        <a href="data:text/csv;charset=utf-8,Phone%2CName%0A2348012345678%2CAda" download="template-sample.csv" class="flex items-center gap-1 text-sm font-medium text-slate-400 hover:text-slate-600">
-                            <Icon Style="Icon.IconStyle.Download" CssClass="text-base" />Sample CSV
-                        </a>
-                    </HeaderRight>
+                <Card HeaderText="Step 1: Choose Sheet">
                     <ChildContent>
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-                            <label class="group flex min-h-60 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed @(hasDataSource ? "border-emerald-400 bg-emerald-50" : "border-slate-300 bg-white hover:border-brand-400 hover:bg-slate-50") p-6 text-center md:col-span-2">
-                                <InputFile class="hidden" accept=".csv" OnChange="SelectUpload" />
-                                <div class="mb-3 rounded-full @(hasDataSource ? "bg-emerald-100 text-emerald-600" : "bg-blue-50 text-brand-500") p-3"><Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-3xl" /></div>
-                                @if (selectedUpload is not null)
-                                {
-                                    <p class="max-w-full truncate text-sm font-semibold text-emerald-700">@selectedUpload.Name</p>
-                                    <p class="mt-1 text-xs text-emerald-600">@FormatFileSize(selectedUpload.Size) - ready to upload</p>
-                                }
-                                else if (selectedExistingFile is not null)
-                                {
-                                    <p class="max-w-full truncate text-sm font-semibold text-emerald-700">@selectedExistingFile.Description</p>
-                                    <p class="mt-1 text-xs text-emerald-600">@selectedExistingFile.TotalNumbers.ToString("N0") records from file history</p>
-                                }
-                                else
-                                {
-                                    <p class="text-sm font-medium text-slate-900">Drop CSV here or <span class="text-brand-500">browse files</span></p>
-                                    <p class="mt-1 text-xs text-slate-500">Maximum file size: 10 MB</p>
-                                }
-                                <button type="button" @onclick:stopPropagation="true" @onclick="OpenTemplateFiles" class="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm hover:border-brand-300 hover:bg-slate-50"><Icon Style="Icon.IconStyle.PlusCircle" CssClass="text-brand-500 text-base" />Select from History</button>
-                            </label>
-
-                            <div class="rounded-xl border border-slate-200 bg-slate-50 p-5">
-                                <h4 class="mb-4 text-xs font-bold tracking-wider text-slate-500 uppercase">Configuration</h4>
-                                <FormSelect TValue="int?" Label="Recipient Phone Column" @bind-Value="phoneColumn" Required="true" disabled="@(!headers.Any())">
-                                    @if (!headers.Any())
-                                    {
-                                        <option value="">Waiting for a CSV file...</option>
-                                    }
-                                    @for (var index = 0; index < headers.Count; index++)
-                                    {
-                                        <option value="@index">@headers[index]</option>
-                                    }
-                                </FormSelect>
-                                @if (previewRows.Count > 0)
-                                {
-                                    <p class="mt-2 flex items-center gap-1 text-xs text-slate-500"><Icon Style="Icon.IconStyle.Info" CssClass="text-sm" />First @previewRows.Count rows previewed below</p>
-                                }
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-900">Which sheet are we working with?</h3>
+                                <p class="mt-1 text-sm text-slate-500">Pick a sheet you've used before, or upload a new one. We'll show you a preview so you can confirm it's the right data before moving on.</p>
                             </div>
-                        </div>
 
-                        @if (previewRows.Count > 0)
-                        {
-                            <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200">
-                                <table class="w-full text-left text-sm text-slate-500">
-                                    <thead class="bg-slate-50 text-xs font-bold tracking-wider text-slate-600 uppercase">
-                                        <tr>
-                                            @foreach (var header in headers)
-                                            {
-                                                <th class="px-4 py-3">@header</th>
-                                            }
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-200 bg-white">
-                                        @foreach (var row in previewRows)
-                                        {
-                                            <tr>
-                                                @foreach (var header in headers)
+                            @if (!hasDataSource)
+                            {
+                                <!-- Upload / Select Options -->
+                                <div class="space-y-4">
+                                    <div class="flex flex-col sm:flex-row items-center gap-3">
+                                        <button type="button" @onclick="OpenTemplateFiles" class="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-4 text-sm font-semibold text-slate-700 shadow-sm hover:border-brand-500 hover:text-brand-600 hover:bg-slate-50 transition-all w-full">
+                                            <Icon Style="Icon.IconStyle.PlusCircle" CssClass="text-xl text-brand-500" />
+                                            <span>Select or Upload Sheet...</span>
+                                        </button>
+                                        <label class="flex items-center justify-center gap-2 cursor-pointer rounded-xl bg-brand-500 px-5 py-4 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition-colors shrink-0 w-full sm:w-auto">
+                                            <Icon Style="Icon.IconStyle.Download" CssClass="text-lg" />
+                                            <span>Upload Directly</span>
+                                            <InputFile class="hidden" accept=".csv,.xls,.xlsx,.xlx" OnChange="SelectUpload" />
+                                        </label>
+                                    </div>
+
+                                    @if (recentFiles.Any())
+                                    {
+                                        <div class="pt-2">
+                                            <h4 class="mb-3 text-xs font-bold tracking-wider text-slate-400 uppercase">Recently Used</h4>
+                                            <div class="space-y-2">
+                                                @foreach (var f in recentFiles)
                                                 {
-                                                    <td class="px-4 py-2 truncate max-w-[200px]" title="@row.GetValueOrDefault(header, "")">@row.GetValueOrDefault(header, "")</td>
+                                                    <div @onclick="() => SelectHistoryFile(f)" class="group flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 cursor-pointer hover:border-brand-300 hover:bg-white transition-all shadow-sm">
+                                                        <div class="flex items-center gap-3 min-w-0">
+                                                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100 transition-colors">
+                                                                <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-lg" />
+                                                            </div>
+                                                            <div class="min-w-0">
+                                                                <p class="truncate text-sm font-semibold text-slate-900 group-hover:text-brand-600">@f.Description</p>
+                                                                <p class="text-xs text-slate-400 mt-0.5">
+                                                                    <FormatDate DateTime="@f.DateCreated" /> &bull; @f.TotalNumbers.ToString("N0") rows
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="shrink-0 flex items-center gap-1 text-xs font-medium text-slate-400 group-hover:text-brand-600">
+                                                            <span>Use sheet</span>
+                                                            <Icon Style="Icon.IconStyle.ChevronRight" CssClass="text-sm" />
+                                                        </div>
+                                                    </div>
                                                 }
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <!-- Selected File Preview Section -->
+                                <div class="space-y-4">
+                                    <!-- Sheet summary header -->
+                                    <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                        <div class="flex items-center gap-3 min-w-0">
+                                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                                                <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-xl" />
+                                            </div>
+                                            <div class="min-w-0">
+                                                <p class="truncate text-sm font-bold text-slate-900">@CurrentFileName</p>
+                                                <p class="text-xs text-slate-500 font-mono mt-0.5">
+                                                    @CurrentFileRowCount.ToString("N0") rows &bull; @headers.Count columns &bull; showing first @previewRows.Count
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <button type="button" @onclick="OpenTemplateFiles" class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-sm hover:bg-slate-50">
+                                                Change Sheet
+                                            </button>
+                                            <button type="button" @onclick="ClearSelection" class="p-1.5 text-slate-400 hover:text-red-500 transition-colors" title="Remove sheet">
+                                                <Icon Style="Icon.IconStyle.Trash" CssClass="text-base" />
+                                            </button>
+                                        </div>
+                                    </div>
 
-                        <div class="mt-6 flex justify-end border-t border-slate-100 pt-4">
-                            <Button Text="Next Step" Style="Button.ButtonStyle.Primary" IsDisabled="@(!hasDataSource || phoneColumn == null)" OnClick="() => currentStep = 2" />
+                                    <!-- Recipient Phone Column Banner -->
+                                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50/80 px-4 py-2.5 text-xs text-brand-900">
+                                        <div class="flex items-center gap-2 font-medium">
+                                            <Icon Style="Icon.IconStyle.Phone" CssClass="text-brand-600 text-sm shrink-0" />
+                                            <span>
+                                                Recipient Phone Column: <strong class="font-bold text-slate-900">Column @GetColumnLetter(phoneColumn) &mdash; "@(phoneColumn.HasValue && phoneColumn >= 0 && phoneColumn < headers.Count ? headers[phoneColumn.Value] : "None")"</strong>
+                                            </span>
+                                        </div>
+                                        <span class="text-[11px] text-brand-700 italic">
+                                            Click any column header below to change
+                                        </span>
+                                    </div>
+
+                                    <!-- Spreadsheet Table Preview -->
+                                    @if (previewRows.Count > 0)
+                                    {
+                                        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                                            <table class="w-full text-left text-sm text-slate-600 border-collapse">
+                                                <thead>
+                                                    <!-- Letter row: A, B, C... -->
+                                                    <tr class="bg-slate-100/80 text-[11px] font-mono text-slate-400 border-b border-slate-200">
+                                                        <th class="w-12 px-3 py-1.5 text-center bg-slate-200/60 border-r border-slate-200">#</th>
+                                                        @for (var i = 0; i < headers.Count; i++)
+                                                        {
+                                                            var isSelectedCol = phoneColumn == i;
+                                                            <th class="px-4 py-1.5 text-center font-bold border-r border-slate-200 last:border-r-0 @(isSelectedCol ? "bg-brand-100 text-brand-700" : "")">
+                                                                @GetColumnLetter(i)
+                                                            </th>
+                                                        }
+                                                    </tr>
+                                                    <!-- Column names header row -->
+                                                    <tr class="bg-slate-50 text-xs font-semibold text-slate-700 border-b border-slate-200">
+                                                        <th class="w-12 px-3 py-2.5 text-center bg-slate-100 border-r border-slate-200 text-slate-400"></th>
+                                                        @for (var i = 0; i < headers.Count; i++)
+                                                        {
+                                                            var colIndex = i;
+                                                            var isSelectedCol = phoneColumn == colIndex;
+                                                            <th @onclick="() => SetPhoneColumn(colIndex)"
+                                                                title="Click to set '@headers[colIndex]' as recipient phone number column"
+                                                                class="px-4 py-2.5 border-r border-slate-200 last:border-r-0 cursor-pointer select-none transition-colors @(isSelectedCol ? "bg-brand-50 text-brand-700 ring-2 ring-inset ring-brand-500" : "hover:bg-slate-100 text-slate-700")">
+                                                                <div class="flex items-center justify-between gap-2">
+                                                                    <span class="truncate">@headers[colIndex]</span>
+                                                                    @if (isSelectedCol)
+                                                                    {
+                                                                        <span class="flex items-center gap-1 rounded bg-brand-500 px-1.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                                                                            <Icon Style="Icon.IconStyle.Phone" CssClass="text-[10px]" /> Recipient
+                                                                        </span>
+                                                                    }
+                                                                </div>
+                                                            </th>
+                                                        }
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-slate-100 bg-white font-sans">
+                                                    @for (var r = 0; r < previewRows.Count; r++)
+                                                    {
+                                                        var row = previewRows[r];
+                                                        <tr class="hover:bg-slate-50/70">
+                                                            <td class="w-12 px-3 py-2 text-center text-xs font-mono text-slate-400 bg-slate-50/80 border-r border-slate-200">
+                                                                @(r + 1)
+                                                            </td>
+                                                            @for (var i = 0; i < headers.Count; i++)
+                                                            {
+                                                                var isSelectedCol = phoneColumn == i;
+                                                                <td class="px-4 py-2 truncate max-w-[200px] border-r border-slate-100 last:border-r-0 @(isSelectedCol ? "bg-brand-50/30 font-medium text-slate-900" : "")"
+                                                                    title="@row.GetValueOrDefault(headers[i], "")">
+                                                                    @row.GetValueOrDefault(headers[i], "")
+                                                                </td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    }
+
+                                    <p class="text-xs text-slate-400">Only a preview &mdash; the full sheet is used when you continue.</p>
+
+                                    <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-slate-50 p-4">
+                                        <div class="flex items-center gap-2.5 text-sm text-slate-600">
+                                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-emerald-500 text-lg shrink-0" />
+                                            <span class="font-medium">Looks right? Continue to compose and personalize your message.</span>
+                                        </div>
+                                        <Button Text="Continue to Compose" 
+                                                Icon="Icon.IconStyle.ChevronRight" 
+                                                Style="Button.ButtonStyle.Primary" 
+                                                IsDisabled="@(!hasDataSource || phoneColumn == null)" 
+                                                OnClick="() => currentStep = 2" />
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </ChildContent>
                 </Card>
@@ -188,7 +284,12 @@ else
     </div>
 }
 
-<SelectTemplateFileModal @ref="templateFilesModal" Files="model?.BatchCsvFiles" OnSelected="SelectHistoryFile" />
+<SelectTemplateFileModal @ref="templateFilesModal" 
+                        Files="model?.BatchCsvFiles" 
+                        OnSelected="SelectHistoryFile"
+                        OnUploadRequested="() => csvUploadModal.Show()" />
+
+<BulkFileModal @ref="csvUploadModal" ForCSV="true" OnFileUploaded="OnCsvUploadedWithResult" OnCompleted="OnCsvUploadedRefresh" />
 
 @code {
     private const long MaxFileBytes = 10 * 1024 * 1024;
@@ -205,12 +306,17 @@ else
     private IBrowserFile? selectedUpload;
     private BatchFileResponse? selectedExistingFile;
     private SelectTemplateFileModal templateFilesModal = new();
+    private BulkFileModal csvUploadModal = new();
     private MessageTemplateEditor templateEditor;
     private SenderIdCard? senderIdCard;
     private byte[]? uploadedFileBytes;
 
     private bool hasDataSource => selectedUpload is not null || selectedExistingFile is not null;
     private int messageParts => string.IsNullOrEmpty(message) ? 0 : message.Length <= 160 ? 1 : (int)Math.Ceiling(message.Length / 153d);
+
+    private List<BatchFileResponse> recentFiles => model?.BatchCsvFiles?.Take(3).ToList() ?? new();
+    private string CurrentFileName => selectedUpload?.Name ?? selectedExistingFile?.Description ?? "Selected Sheet";
+    private long CurrentFileRowCount => selectedExistingFile?.TotalNumbers ?? (long)previewRows.Count;
 
     protected override async Task OnInitializedAsync()
     {
@@ -243,52 +349,87 @@ else
         await stream.CopyToAsync(ms);
         uploadedFileBytes = ms.ToArray();
 
-        if (model != null)
-        {
-            using var countStream = new MemoryStream(uploadedFileBytes);
-            // model.TotalRecipients = await CountLinesAsync(countStream);
-        }
-
         using var previewStream = new MemoryStream(uploadedFileBytes);
         await LoadCsvPreview(previewStream, selectedUpload.Name);
     }
 
     private async Task SelectHistoryFile(BatchFileResponse file)
     {
-        selectedExistingFile = file;
-        selectedUpload = null;
-        if (model != null)
-        {
-            // model.TotalRecipients = file.TotalNumbers;
-        }
         try
         {
             var download = await apiClient.BatchFileDownloadAsync(file.BatchFileID);
+            selectedExistingFile = file;
+            selectedUpload = null;
+            uploadedFileBytes = null;
             await LoadCsvPreview(download.Stream, file.Description);
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Unable to Read File");
+            await alert.Error("The content for this file could not be loaded from storage: " + ex.Message, "File Unavailable");
         }
     }
 
-    private void OpenTemplateFiles(MouseEventArgs _) => templateFilesModal.Show(selectedExistingFile?.BatchFileID);
-
-    private async Task LoadCsvPreview(IBrowserFile file)
+    private async Task OnCsvUploadedWithResult(BatchFileResponse newFile)
     {
-        if (!file.Name.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
-        {
-            headers.Clear();
-            previewRows.Clear();
-            phoneColumn = null;
-            return;
-        }
+        await RefreshFilesList();
+        await SelectHistoryFile(newFile);
+    }
 
-        if (uploadedFileBytes != null)
+    private async Task OnCsvUploadedRefresh()
+    {
+        await RefreshFilesList();
+        var newest = model?.BatchCsvFiles?.FirstOrDefault();
+        if (newest != null)
         {
-            using var stream = new MemoryStream(uploadedFileBytes);
-            await LoadCsvPreview(stream, file.Name);
+            await SelectHistoryFile(newest);
         }
+    }
+
+    private async Task RefreshFilesList()
+    {
+        try
+        {
+            var batchTask = await apiClient.BatchFileListAsync();
+            var allFiles = batchTask.Result?.ToList() ?? new();
+            if (model != null)
+            {
+                model.UpdateBatchFiles(allFiles);
+            }
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Error Refreshing Sheets");
+        }
+    }
+
+    private void OpenTemplateFiles() => templateFilesModal.Show(selectedExistingFile?.BatchFileID, model?.BatchCsvFiles);
+
+    private void ClearSelection()
+    {
+        selectedUpload = null;
+        selectedExistingFile = null;
+        uploadedFileBytes = null;
+        headers.Clear();
+        previewRows.Clear();
+        phoneColumn = null;
+    }
+
+    private void SetPhoneColumn(int colIndex)
+    {
+        phoneColumn = colIndex;
+    }
+
+    private static string GetColumnLetter(int? index)
+    {
+        if (!index.HasValue || index.Value < 0) return "-";
+        int i = index.Value;
+        string columnLetter = "";
+        while (i >= 0)
+        {
+            columnLetter = (char)('A' + (i % 26)) + columnLetter;
+            i = (i / 26) - 1;
+        }
+        return columnLetter;
     }
 
     private async Task LoadCsvPreview(Stream stream, string fileName)
@@ -297,7 +438,7 @@ else
         previewRows.Clear();
         phoneColumn = null;
 
-        if (!fileName.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(fileName))
             return;
 
         using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, leaveOpen: true);
@@ -314,7 +455,7 @@ else
             for (var index = 0; index < headers.Count; index++) row[headers[index]] = index < values.Count ? values[index] : "";
             previewRows.Add(row);
         }
-        phoneColumn = headers.FindIndex(x => x.Contains("phone", StringComparison.OrdinalIgnoreCase) || x.Contains("mobile", StringComparison.OrdinalIgnoreCase));
+        phoneColumn = headers.FindIndex(x => x.Contains("phone", StringComparison.OrdinalIgnoreCase) || x.Contains("mobile", StringComparison.OrdinalIgnoreCase) || x.Contains("number", StringComparison.OrdinalIgnoreCase) || x.Contains("tel", StringComparison.OrdinalIgnoreCase));
         if (phoneColumn < 0 && headers.Count > 0) phoneColumn = 0;
     }
 
@@ -339,7 +480,7 @@ else
 
     private async Task SendMessageCore(DateTimeOffset? scheduledDeliveryTime)
     {
-        var senderId = "senderIdCard?.SenderId";
+        var senderId = model?.SenderID;
         if (string.IsNullOrWhiteSpace(senderId) || string.IsNullOrWhiteSpace(message) || !hasDataSource || !phoneColumn.HasValue)
         {
             await alert.Error("Choose an approved sender ID, a data source, recipient phone column, and message.", "Compose Message");
@@ -353,7 +494,7 @@ else
             if (selectedUpload is not null && uploadedFileBytes is not null)
             {
                 using var stream = new MemoryStream(uploadedFileBytes);
-                var response = await apiClient.BatchFileCreateAsync(null, new FileParameter(stream, selectedUpload.Name, selectedUpload.ContentType));
+                var response = await apiClient.BatchFileCreateAsync(234, new FileParameter(stream, selectedUpload.Name, selectedUpload.ContentType));
                 fileId = response.Result.BatchFileID;
             }
             if (string.IsNullOrWhiteSpace(fileId)) throw new InvalidOperationException("The selected file could not be prepared.");
@@ -407,18 +548,4 @@ else
         fields.Add(builder.ToString().Trim());
         return fields;
     }
-
-    private async Task<long> CountLinesAsync(Stream stream)
-    {
-        try
-        {
-            using var reader = new StreamReader(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, leaveOpen: true);
-            long count = 0;
-            while (await reader.ReadLineAsync() != null) count++;
-            return count > 0 ? count - 1 : 0; // subtract header
-        }
-        catch { return 1; }
-    }
-
-    private static string FormatFileSize(long bytes) => bytes < 1024 * 1024 ? $"{bytes / 1024d:0.0} KB" : $"{bytes / 1024d / 1024d:0.0} MB";
 }

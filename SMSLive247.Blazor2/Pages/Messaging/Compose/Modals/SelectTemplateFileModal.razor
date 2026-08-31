@@ -1,44 +1,100 @@
-<Modal Title="Select Template File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+@using SMSLive247.Blazor2.Pages.ViewModels
+
+<Modal Title="Select Data Sheet" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
     <Body>
-        <div class="flex h-[400px] flex-1 flex-col">
-            <p class="mb-4 text-slate-500">Choose from your previously uploaded CSV files.</p>
-
-            <div class="mb-4">
-                <SearchBox InstantSearch="true" 
-                           SearchTermChanged="OnSearchChanged" 
-                           Placeholder="Search files..." />
+        <div class="flex flex-col gap-4">
+            <!-- Header actions: Search & Upload -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div class="flex-1">
+                    <SearchBox InstantSearch="true" 
+                               SearchTermChanged="OnSearchChanged" 
+                               Placeholder="Search files..." />
+                </div>
+                <div>
+                    <button type="button" 
+                            @onclick="RequestUpload" 
+                            class="flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition-colors w-full sm:w-auto">
+                        <Icon Style="Icon.IconStyle.Download" CssClass="text-base" />
+                        <span>Upload CSV/Excel File...</span>
+                    </button>
+                </div>
             </div>
 
-            <div tabindex="0" class="h-64 flex-1 overflow-y-scroll rounded-lg border border-slate-300 p-4 shadow-inner">
-                @if (Files == null || Files.Count == 0)
-                {
-                    <p>No CSV file found</p>
-                }
-                else
-                {
-                    <div class="flex flex-col gap-2">
-                        @foreach (var f in Files.Where(x => visibleIds.Contains(x.BatchFileID)))
-                        {
-                            <div class="flex items-center gap-2">
-                                <input type="radio"
-                                       name="template_file_selection"
-                                       value="@f.BatchFileID"
-                                       checked="@(selectedId == f.BatchFileID)"
-                                       id="tf-@f.BatchFileID"
-                                       @onchange="() => selectedId = f.BatchFileID"
-                                       class="accent-brand-500 h-4 w-4 border-slate-300 focus:ring-brand-500" />
-                                <label class="cursor-pointer truncate text-slate-700 select-none" for="tf-@f.BatchFileID">
-                                    @f.Description <span class="ml-1 text-sm text-slate-400">(@f.TotalNumbers.ToString("N0") rows)</span>
-                                </label>
-                            </div>
-                        }
-                    </div>
-                }
+            <!-- File Table List -->
+            <div class="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div class="max-h-80 overflow-y-auto">
+                    @if (filteredFiles.Count == 0)
+                    {
+                        <div class="py-12 text-center text-sm text-slate-400">
+                            <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="mx-auto mb-2 text-3xl text-slate-300" />
+                            <p>No sheets found.</p>
+                            <p class="text-xs text-slate-400 mt-1">Click "Upload CSV/Excel File..." above to add one.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="sticky top-0 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                                <tr>
+                                    <th class="w-10 px-4 py-3 text-center"></th>
+                                    <th class="px-4 py-3">File Name</th>
+                                    <th class="px-4 py-3">Date Uploaded</th>
+                                    <th class="px-4 py-3">Rows</th>
+                                    <th class="px-4 py-3 text-right">Format</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                @foreach (var f in filteredFiles)
+                                {
+                                    var isSelected = selectedId == f.BatchFileID;
+                                    <tr @onclick="() => selectedId = f.BatchFileID"
+                                        class="cursor-pointer transition-colors hover:bg-slate-50 @(isSelected ? "bg-brand-50/60 font-medium" : "")">
+                                        <td class="px-4 py-3 text-center" @onclick:stopPropagation="true">
+                                            <input type="radio"
+                                                   name="template_file_selection"
+                                                   value="@f.BatchFileID"
+                                                   checked="@isSelected"
+                                                   id="tf-@f.BatchFileID"
+                                                   @onchange="() => selectedId = f.BatchFileID"
+                                                   class="accent-brand-500 h-4 w-4 border-slate-300 focus:ring-brand-500" />
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex items-center gap-2.5">
+                                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                                                    <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-base" />
+                                                </div>
+                                                <label for="tf-@f.BatchFileID" class="cursor-pointer truncate max-w-xs font-medium text-slate-900" title="@f.Description">
+                                                    @f.Description
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-slate-500 whitespace-nowrap">
+                                            <FormatDate DateTime="@f.DateCreated" />
+                                        </td>
+                                        <td class="px-4 py-3 text-slate-700 whitespace-nowrap">
+                                            @f.TotalNumbers.ToString("N0") rows
+                                        </td>
+                                        <td class="px-4 py-3 text-right whitespace-nowrap">
+                                            <span class="rounded bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-semibold text-slate-600 uppercase">
+                                                @(string.IsNullOrWhiteSpace(f.FileType) ? "CSV" : f.FileType)
+                                            </span>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
             </div>
+
+            <p class="flex items-center gap-1 text-xs text-slate-400">
+                <Icon Style="Icon.IconStyle.Info" CssClass="text-sm" />
+                Supported formats: .CSV, .XLS, .XLSX, .XLX (Max 20 MB).
+            </p>
         </div>
     </Body>
     <Footer>
-        <Button Text="Confirm" Icon="Icon.IconStyle.PlusCircle" OnClick="Confirm" IsDisabled="@string.IsNullOrEmpty(selectedId)" />
+        <Button Text="Select Sheet" Icon="Icon.IconStyle.PlusCircle" OnClick="Confirm" IsDisabled="@string.IsNullOrEmpty(selectedId)" />
         <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="Close" />
     </Footer>
 </Modal>
@@ -46,26 +102,36 @@
 @code {
     [Parameter] public List<BatchFileResponse>? Files { get; set; }
     [Parameter, EditorRequired] public EventCallback<BatchFileResponse> OnSelected { get; set; }
+    [Parameter] public EventCallback OnUploadRequested { get; set; }
 
     private bool isVisible;
     private string? selectedId;
-    private HashSet<string> visibleIds = new();
+    private string searchTerm = string.Empty;
 
-    protected override void OnParametersSet()
+    private List<BatchFileResponse> allFilesList => Files ?? new();
+
+    private List<BatchFileResponse> filteredFiles
     {
-        if (Files != null && visibleIds.Count == 0)
+        get
         {
-            visibleIds = Files.Select(x => x.BatchFileID).ToHashSet();
+            if (string.IsNullOrWhiteSpace(searchTerm))
+                return allFilesList.OrderByDescending(x => x.DateCreated).ToList();
+
+            return allFilesList
+                .Where(x => x.Description != null && x.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(x => x.DateCreated)
+                .ToList();
         }
     }
 
-    public void Show(string? currentId)
+    public void Show(string? currentId = null, List<BatchFileResponse>? updatedFiles = null)
     {
         selectedId = currentId;
-        if (Files != null)
+        if (updatedFiles != null)
         {
-            visibleIds = Files.Select(x => x.BatchFileID).ToHashSet();
+            Files = updatedFiles;
         }
+        searchTerm = string.Empty;
         isVisible = true;
         StateHasChanged();
     }
@@ -78,7 +144,7 @@
 
     public async Task Confirm()
     {
-        var file = Files?.FirstOrDefault(x => x.BatchFileID == selectedId);
+        var file = allFilesList.FirstOrDefault(x => x.BatchFileID == selectedId);
         if (file != null)
         {
             await OnSelected.InvokeAsync(file);
@@ -89,17 +155,13 @@
 
     private void OnSearchChanged(string search)
     {
-        if (Files == null) return;
-        
-        if (!string.IsNullOrWhiteSpace(search))
-        {
-            var noCase = StringComparison.OrdinalIgnoreCase;
-            visibleIds = Files.Where(x => x.Description.Contains(search, noCase)).Select(x => x.BatchFileID).ToHashSet();
-        }
-        else
-        {
-            visibleIds = Files.Select(x => x.BatchFileID).ToHashSet();
-        }
+        searchTerm = search;
         StateHasChanged();
+    }
+
+    private async Task RequestUpload()
+    {
+        isVisible = false;
+        await OnUploadRequested.InvokeAsync();
     }
 }
