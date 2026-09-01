@@ -30,31 +30,35 @@ window.ContentEditor = {
 
         var tempDiv = document.createElement("div");
         tempDiv.innerHTML = chipHtml;
-        var frag = document.createDocumentFragment();
-        var node, lastNode;
+        var chipNode = tempDiv.firstElementChild || tempDiv.firstChild;
         
-        while ((node = tempDiv.firstChild)) {
-            lastNode = frag.appendChild(node);
-        }
-        
-        // Add a zero-width space after the chip so the cursor can move past it
-        var zwsp = document.createTextNode('\u200B');
-        frag.appendChild(zwsp);
+        // Single normal space text node after chip
+        var spaceNode = document.createTextNode(' ');
 
+        var frag = document.createDocumentFragment();
+        if (chipNode) {
+            frag.appendChild(chipNode);
+        }
+        frag.appendChild(spaceNode);
+
+        range.deleteContents();
         range.insertNode(frag);
 
-        // Preserve the selection
-        if (zwsp) {
-            range = range.cloneRange();
-            range.setStartAfter(zwsp);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
+        // Position cursor right after the space
+        range = range.cloneRange();
+        range.setStartAfter(spaceNode);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
         
-        // Trigger an input event to notify Blazor of changes (if we bind to oninput)
-        var event = new Event('input', { bubbles: true });
-        el.dispatchEvent(event);
+        // Notify Blazor of change immediately
+        if (el._dotNetHelper) {
+            var rawText = window.ContentEditor.getRawText(elementId);
+            el._dotNetHelper.invokeMethodAsync('OnContentChanged', rawText);
+        } else {
+            var event = new Event('input', { bubbles: true });
+            el.dispatchEvent(event);
+        }
     },
     
     getRawText: function (elementId) {
@@ -90,7 +94,14 @@ window.ContentEditor = {
         var el = document.getElementById(elementId);
         if (!el) return;
         
+        el._dotNetHelper = dotNetHelper;
+
         el.addEventListener('input', function() {
+            var rawText = window.ContentEditor.getRawText(elementId);
+            dotNetHelper.invokeMethodAsync('OnContentChanged', rawText);
+        });
+
+        el.addEventListener('keyup', function() {
             var rawText = window.ContentEditor.getRawText(elementId);
             dotNetHelper.invokeMethodAsync('OnContentChanged', rawText);
         });
