@@ -1,6 +1,5 @@
-﻿@* <i class="@GetBootstrapClass() @CssClass" style="font-size: 1.2rem; -webkit-text-stroke-width: 0.7px;"></i> *@
-<span class="@CssClass material-symbols-rounded "
-      style="font-size:@FontSize; font-variation-settings: 'wght' @FontWeight; @CssStyle" 
+<span class="@CssClass material-symbols-rounded"
+      style="@(string.IsNullOrWhiteSpace(FontSize) ? "" : $"font-size:{FontSize};") font-variation-settings: 'wght' @FontWeight; @CssStyle" 
       @attributes="AdditionalAttributes">@GetMaterialSymbolName()</span>
 
 @code {
@@ -17,6 +16,8 @@
     public enum IconStyle
     {
         ChevronRight,
+        ChevronLeft,
+        ArrowLeft,
         Bell,
         Info,
         Eye,
@@ -132,6 +133,8 @@
         return Style switch
         {
             IconStyle.ChevronRight => "bi bi-chevron-right",
+            IconStyle.ChevronLeft => "bi bi-chevron-left",
+            IconStyle.ArrowLeft => "bi bi-arrow-left",
             IconStyle.Bell => "bi bi-bell",
             IconStyle.Info => "bi bi-info-circle",
             IconStyle.Eye => "bi bi-eye",
@@ -178,6 +181,8 @@
         return Style switch
         {
             IconStyle.ChevronRight => "chevron_right",
+            IconStyle.ChevronLeft => "chevron_left",
+            IconStyle.ArrowLeft => "arrow_back",
             IconStyle.Bell => "notifications",
             IconStyle.Info => "info",
             IconStyle.Eye => "visibility",

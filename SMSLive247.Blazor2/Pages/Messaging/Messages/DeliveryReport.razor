@@ -1,0 +1,454 @@
+@attribute [Route(Const.Routes.Messaging.MessageDetails)]
+@layout MainLayout
+@inject NavigationManager nav
+
+<PageTitle>Delivery Report - SMSLive247</PageTitle>
+
+<div class="flex flex-col gap-6 max-w-7xl mx-auto pb-10">
+    <!-- ── BACK NAV ──────────────────────────────────────────────────── -->
+    <button @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)"
+            class="self-start inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-brand-600 transition-colors">
+        <Icon Style="Icon.IconStyle.ChevronLeft" CssClass="text-base" />
+        <span>Back to Messages</span>
+    </button>
+
+    <!-- ── UNIFIED HEADER CARD ────────────────────────────────────────── -->
+    <Card>
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+            <!-- Left: Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center border border-brand-100 text-brand-600 shrink-0">
+                    <Icon Style="Icon.IconStyle.Mail" CssClass="text-xl text-brand-600" />
+                </div>
+                <div>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">
+                        Message Delivery Report
+                    </p>
+                    <h1 class="text-2xl font-black text-slate-900 leading-tight">
+                        Batch #@(batch?.BatchID.ToString() ?? Id ?? "—")
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Right: Action Buttons -->
+            <div class="flex items-center gap-3 shrink-0">
+                <Button Text="Refresh"
+                        Icon="Icon.IconStyle.Refresh"
+                        Style="Button.ButtonStyle.Secondary"
+                        IsBusy="@isLoading"
+                        OnClick="FetchData" />
+            </div>
+        </div>
+
+        <!-- Info chips row -->
+        @if (batch != null)
+        {
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6">
+                <div class="flex items-center gap-3.5 min-w-0 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <span class="shrink-0 w-10 h-10 rounded-lg bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                        <Icon Style="Icon.IconStyle.Fingerprint" CssClass="text-xl text-slate-400" />
+                    </span>
+                    <div class="min-w-0 flex flex-col justify-center">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Sender ID</p>
+                        <p class="text-sm font-bold text-slate-700 truncate leading-none mt-1.5">@(batch.SenderID ?? "—")</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3.5 min-w-0 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <span class="shrink-0 w-10 h-10 rounded-lg bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                        <Icon Style="Icon.IconStyle.Clock" CssClass="text-xl text-slate-400" />
+                    </span>
+                    <div class="min-w-0 flex flex-col justify-center">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Sent On</p>
+                        <p class="text-sm font-bold text-slate-700 truncate leading-none mt-1.5">@batch.DateSubmitted.ToString("MMM dd, yyyy · hh:mm tt")</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3.5 min-w-0 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <span class="shrink-0 w-10 h-10 rounded-lg bg-white flex items-center justify-center text-blue-500 shadow-sm border border-slate-100">
+                        <Icon Style="Icon.IconStyle.Coins" CssClass="text-xl text-blue-500" />
+                    </span>
+                    <div class="min-w-0 flex flex-col justify-center">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Credits Charged</p>
+                        <p class="text-sm font-bold text-slate-700 truncate leading-none mt-1.5">@batch.CreditsCharged.ToString("N2")</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3.5 min-w-0 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
+                    <span class="shrink-0 w-10 h-10 rounded-lg bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                        <Icon Style="Icon.IconStyle.Mail" CssClass="text-xl text-slate-400" />
+                    </span>
+                    <div class="min-w-0 flex flex-col justify-center">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Message Parts</p>
+                        <p class="text-sm font-bold text-slate-700 truncate leading-none mt-1.5">@batch.MessageParts</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </Card>
+
+    <!-- ── CRITICAL ERROR BANNER (Only when batch itself fails) ─────────────────────────────────── -->
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-2">
+                <Icon Style="Icon.IconStyle.AlertCircle" CssClass="text-lg text-red-500 shrink-0" />
+                <span>@errorMessage</span>
+            </div>
+            <button @onclick="FetchData" class="text-sm font-bold text-red-800 underline hover:no-underline">Retry</button>
+        </div>
+    }
+
+    <!-- ── GRACEFUL PENDING REPORTS NOTICE ──────────────────────────────────── -->
+    @if (!isLoading && string.IsNullOrEmpty(errorMessage) && allReports.Count == 0 && batch != null)
+    {
+        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-blue-900 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                    <Icon Style="Icon.IconStyle.Clock" CssClass="text-lg text-blue-600" />
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-blue-900">Delivery Reports Pending</p>
+                    <p class="text-xs text-blue-700 mt-0.5">
+                        Delivery reports for this batch have not arrived yet from network operators. Click <strong>Refresh</strong> to check for new updates.
+                    </p>
+                </div>
+            </div>
+            <Button Text="Refresh Status"
+                    Icon="Icon.IconStyle.Refresh"
+                    Style="Button.ButtonStyle.Secondary"
+                    IsBusy="@isLoading"
+                    OnClick="FetchData" />
+        </div>
+    }
+
+    <!-- ── DONUT + RECIPIENT TABLE GRID ───────────────────────────────────── -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+        <!-- Donut / Delivery Breakdown Card -->
+        <div class="lg:col-span-1">
+            <Card HeaderText="Delivery Breakdown">
+                <HeaderRight>
+                    <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                        @total.ToString("#,##0") Total
+                    </span>
+                </HeaderRight>
+                <ChildContent>
+                    <!-- Donut Graphic -->
+                    <div class="flex items-center justify-center py-4">
+                        <div class="w-40 h-40 rounded-full relative" style="background: @GetDonutGradient();">
+                            <div class="absolute inset-3 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                                <span class="text-2xl font-black text-slate-900">@successRate%</span>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">Success</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Legend List -->
+                    <ul class="mt-3 divide-y divide-slate-100">
+                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-emerald-500"></span>
+                                <span class="text-sm font-medium text-slate-700">Delivered</span>
+                            </div>
+                            <span class="text-sm font-bold text-slate-900">@delivered.ToString("#,##0")</span>
+                        </li>
+
+                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-blue-500"></span>
+                                <span class="text-sm font-medium text-slate-700">Accepted</span>
+                            </div>
+                            <span class="text-sm font-bold text-slate-900">@accepted.ToString("#,##0")</span>
+                        </li>
+
+                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-amber-500"></span>
+                                <span class="text-sm font-medium text-slate-700">Undeliverable</span>
+                            </div>
+                            <span class="text-sm font-bold text-slate-900">@undelivered.ToString("#,##0")</span>
+                        </li>
+
+                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-red-500"></span>
+                                <span class="text-sm font-medium text-slate-700">Rejected</span>
+                            </div>
+                            <span class="text-sm font-bold text-slate-900">@rejected.ToString("#,##0")</span>
+                        </li>
+
+                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-violet-500"></span>
+                                <span class="text-sm font-medium text-slate-700">Expired</span>
+                            </div>
+                            <span class="text-sm font-bold text-slate-900">@expired.ToString("#,##0")</span>
+                        </li>
+                    </ul>
+                </ChildContent>
+            </Card>
+        </div>
+
+        <!-- Recipient Log Table Card (Using PageBody) -->
+        <div class="lg:col-span-3">
+            <PageBody>
+                <HeaderLeft>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Delivery Reports Log</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Detailed breakdown of each recipient's status</p>
+                    </div>
+                </HeaderLeft>
+                <HeaderRight>
+                    <div class="flex items-center gap-3">
+                        <div class="relative min-w-[200px]">
+                            <input type="text"
+                                   @bind="searchQuery"
+                                   @bind:event="oninput"
+                                   placeholder="Search phone / SMSC..."
+                                   class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 transition-all" />
+                        </div>
+                        <Button Text="Export CSV"
+                                Icon="Icon.IconStyle.Download"
+                                Style="Button.ButtonStyle.Secondary"
+                                IsDisabled="@(allReports.Count == 0)"
+                                OnClick="ExportCsv" />
+                    </div>
+                </HeaderRight>
+                <ChildContent>
+                    @if (isLoading)
+                    {
+                        <div class="flex justify-center items-center py-16">
+                            <Loading BoolCheck="false" />
+                        </div>
+                    }
+                    else
+                    {
+                        <Table Items="@filteredReports" AllowSelect="false" EmptyMessage="No delivery reports have arrived for this batch yet.">
+                            <Columns>
+                                <Column Header="Phone Number">
+                                    <span class="font-mono text-sm font-semibold text-slate-800">
+                                        @context.PhoneNumber
+                                    </span>
+                                </Column>
+                                <Column Header="Status">
+                                    <Badge Variant="Badge.StatusVariant.DeliveryReport" Value="@context.Status" />
+                                </Column>
+                                <Column Header="Report Date">
+                                    @if (context.ReportDate.HasValue)
+                                    {
+                                        <FormatDate DateTime="@context.ReportDate.Value.DateTime" />
+                                    }
+                                    else if (context.DateSubmitted.HasValue)
+                                    {
+                                        <FormatDate DateTime="@context.DateSubmitted.Value.DateTime" />
+                                    }
+                                    else
+                                    {
+                                        <span class="text-slate-400">—</span>
+                                    }
+                                </Column>
+                                <Column Header="SMSC Message ID">
+                                    <span class="text-sm text-slate-500 font-mono">
+                                        @context.SmscID
+                                    </span>
+                                </Column>
+                                <Column Header="Credits" Align="right">
+                                    <span class="text-sm font-semibold text-slate-700">
+                                        @context.CreditsCharged.ToString("F2")
+                                    </span>
+                                </Column>
+                            </Columns>
+                        </Table>
+                    }
+                </ChildContent>
+                <FooterLeft>
+                    <span class="text-xs text-slate-500 font-medium">
+                        Showing @filteredReports.Count of @allReports.Count recipient report@(allReports.Count == 1 ? "" : "s")
+                    </span>
+                </FooterLeft>
+            </PageBody>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Id { get; set; }
+
+    private SmsBatchResponse? batch;
+    private List<RecipientRow> allReports = [];
+    private bool isLoading = true;
+    private string? errorMessage;
+    private string searchQuery = "";
+
+    public class RecipientRow
+    {
+        public string Id { get; set; } = "";
+        public string PhoneNumber { get; set; } = "—";
+        public double CreditsCharged { get; set; } = 0;
+        public DateTimeOffset? DateSubmitted { get; set; }
+        public string Status { get; set; } = "UNKNOWN";
+        public string SmscID { get; set; } = "—";
+        public DateTimeOffset? ReportDate { get; set; }
+    }
+
+    private List<RecipientRow> filteredReports =>
+        string.IsNullOrWhiteSpace(searchQuery)
+            ? allReports
+            : allReports.Where(r =>
+                (r.PhoneNumber?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (r.SmscID?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false)).ToList();
+
+    private int delivered => allReports.Count(r => r.Status == "DELIVRD");
+    private int accepted => allReports.Count(r => r.Status == "ACCEPTD");
+    private int undelivered => allReports.Count(r => r.Status == "UNDELIV");
+    private int rejected => allReports.Count(r => r.Status == "REJECTD");
+    private int expired => allReports.Count(r => r.Status == "EXPIRED");
+    private int total => allReports.Count;
+
+    private string successRate => total > 0 ? $"{(double)delivered / total * 100:F1}" : "0.0";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchData();
+    }
+
+    private async Task FetchData()
+    {
+        if (string.IsNullOrWhiteSpace(Id) || !long.TryParse(Id, out long numericBatchId))
+        {
+            errorMessage = "Invalid batch identifier.";
+            isLoading = false;
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            // 1. Fetch batch information
+            try
+            {
+                var batchResponse = await apiClient.SmsBatchGetAsync(numericBatchId);
+                batch = batchResponse.Result;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+                return;
+            }
+
+            // 2. Fetch reports list (gracefully catch if reports are not yet available or 500 divide-by-zero on empty batch)
+            try
+            {
+                var reportsResponse = await apiClient.SmsBatchReportsListAsync(numericBatchId);
+                if (reportsResponse.Result != null)
+                {
+                    allReports = FlattenReports(reportsResponse.Result);
+                }
+                else
+                {
+                    allReports = [];
+                }
+            }
+            catch (ApiException)
+            {
+                // Network reports not yet generated on backend
+                allReports = [];
+            }
+            catch (Exception)
+            {
+                allReports = [];
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private static List<RecipientRow> FlattenReports(IEnumerable<SmsMessageResponse>? messages)
+    {
+        var list = new List<RecipientRow>();
+        if (messages == null) return list;
+
+        foreach (var msg in messages)
+        {
+            var reports = msg.Reports?.ToList() ?? new List<DeliveryReportResponse>();
+            if (reports.Count == 0)
+            {
+                list.Add(new RecipientRow
+                {
+                    Id = msg.MessageID ?? $"{msg.BatchID}-{list.Count}",
+                    PhoneNumber = msg.PhoneNumber ?? "—",
+                    CreditsCharged = msg.CreditsCharged,
+                    DateSubmitted = msg.DateSubmitted,
+                    Status = "UNKNOWN",
+                    SmscID = "—",
+                    ReportDate = null
+                });
+            }
+            else
+            {
+                for (int i = 0; i < reports.Count; i++)
+                {
+                    var rep = reports[i];
+                    list.Add(new RecipientRow
+                    {
+                        Id = $"{msg.MessageID ?? msg.BatchID.ToString()}-{i}",
+                        PhoneNumber = msg.PhoneNumber ?? "—",
+                        CreditsCharged = msg.CreditsCharged / (reports.Count > 0 ? reports.Count : 1),
+                        DateSubmitted = msg.DateSubmitted,
+                        Status = rep.Status ?? "UNKNOWN",
+                        SmscID = rep.SmscID ?? "—",
+                        ReportDate = rep.ReportDate
+                    });
+                }
+            }
+        }
+        return list;
+    }
+
+    private string GetDonutGradient()
+    {
+        if (total == 0) return "conic-gradient(#e2e8f0 0% 100%)";
+        double d = (double)delivered / total * 100;
+        double a = (double)accepted / total * 100;
+        double u = (double)undelivered / total * 100;
+        double r = (double)rejected / total * 100;
+        double e = (double)expired / total * 100;
+
+        double s1 = d;
+        double s2 = s1 + a;
+        double s3 = s2 + u;
+        double s4 = s3 + r;
+        double s5 = s4 + e;
+
+        return $"conic-gradient(#10b981 0% {s1:F1}%, #3b82f6 {s1:F1}% {s2:F1}%, #f59e0b {s2:F1}% {s3:F1}%, #ef4444 {s3:F1}% {s4:F1}%, #8b5cf6 {s4:F1}% {s5:F1}%, #e2e8f0 {s5:F1}% 100%)";
+    }
+
+    private async Task ExportCsv()
+    {
+        if (allReports.Count == 0) return;
+
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("Phone Number,Status,Report Date,SMSC Message ID,Credits");
+
+        foreach (var row in allReports)
+        {
+            var dateStr = row.ReportDate?.ToString("yyyy-MM-dd HH:mm:ss") ?? row.DateSubmitted?.ToString("yyyy-MM-dd HH:mm:ss") ?? "";
+            sb.AppendLine($"\"{row.PhoneNumber}\",\"{row.Status}\",\"{dateStr}\",\"{row.SmscID}\",\"{row.CreditsCharged:F2}\"");
+        }
+
+        var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+        var base64 = Convert.ToBase64String(bytes);
+        var filename = $"DeliveryReport_Batch_{batch?.BatchID.ToString() ?? Id ?? "export"}.csv";
+
+        await js.InvokeVoidAsync("eval", $"const a = document.createElement('a'); a.href = 'data:text/csv;base64,{base64}'; a.download = '{filename}'; a.click();");
+    }
+}
