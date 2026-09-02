@@ -1,7 +1,8 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager nav
 @inject AuthenticationStateProvider auth;
 
-<CascadingValue Value="@state" Name="MainAccount">
+<CascadingValue Value="@self" Name="MainAccount">
 
     <div class="flex h-screen flex-col overflow-hidden bg-slate-50">
 
@@ -10,7 +11,7 @@
 
             <div class="flex min-w-0 flex-1 flex-col overflow-hidden transition-all duration-300">
                 <Header OnMenuClick="() => setSidebarOpen(true)" 
-                    AvailableCredits="@state?.Account?.Credits"></Header>
+                    AvailableCredits="@self?.Account?.Credits"></Header>
 
                 <main class="flex-1 space-y-8 overflow-y-auto scroll-smooth p-4 sm:p-6">
                     @Body
@@ -29,17 +30,19 @@
 
 @code {
     private bool sidebarOpen = false;
-    private AccountState? state;
+    private AccountState? self;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var response = await apiClient.AccountGetAsync("self");
-            state = new(response.Result);
+            self = new(response.Result);
         }
         catch (Exception ex)
         {
+            await alert.Error(ex.Message);
+            nav.NavigateTo(Const.Routes.Logoff);
         }
     }
 

@@ -27,7 +27,7 @@
             <div class="flex flex-col sm:flex-row items-center gap-6">
                 <div class="relative">
                     <div class="w-24 h-24 rounded-full bg-brand-100 flex items-center justify-center text-brand-600 font-bold text-3xl border-4 border-white shadow-sm">
-                        @(account?.FirstName?.FirstOrDefault() ?? account?.AccountName?.FirstOrDefault() ?? '?')
+                        @account?.Initials
                     </div>
                     @* <button class="absolute bottom-0 right-0 bg-white p-1.5 rounded-full border border-slate-200 text-slate-500 hover:text-brand-600 shadow-sm transition-colors">
                             <Icon Style="Icon.IconStyle.Camera" CssClass="w-4 h-4" />
@@ -35,7 +35,7 @@
                 </div>
                 <div class="text-center sm:text-left">
                     <h2 class="text-base font-bold text-slate-900">
-                        @(string.IsNullOrWhiteSpace(account?.FirstName + account?.LastName) ? account?.AccountName ?? "—" : $"{account?.FirstName} {account?.LastName}")
+                        @account?.FullName
                     </h2>
                     <p class="text-slate-500 text-sm">
                         @(account?.Active == true ? "Active Account" : "Inactive Account")

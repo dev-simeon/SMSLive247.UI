@@ -72,7 +72,7 @@
             if (response.StatusCode == 200)
             {
                 httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", response.Result.AccessToken.ToString());
+                    new AuthenticationHeaderValue("Bearer", response.Result.AccessToken.ToString());
 
                 var apiKey = response.Result.AccessToken.ToString();
                 var member = new Authentication.SmsAuthProvider.UserClaims(model.Username, apiKey);

@@ -143,7 +143,7 @@
                 var member = new Authentication.SmsAuthProvider.UserClaims(model.Username, apiKey);
 
                 await ((Authentication.SmsAuthProvider)auth)
-                .SaveAuthenticationState(member);
+                    .SaveAuthenticationState(member);
 
                 nav.NavigateTo(Const.Routes.Dashboard);
                 return;

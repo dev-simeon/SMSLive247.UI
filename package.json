@@ -1,0 +1,26 @@
+{
+  "name": "smslive247.ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tw:watch": "npx @tailwindcss/cli -i ./SMSLive247.Blazor2/wwwroot/css/app.css -o ./SMSLive247.Blazor2/wwwroot/css/tailwind.css --watch",
+    "tw:build": "npx @tailwindcss/cli -i ./SMSLive247.Blazor2/wwwroot/css/app.css -o ./SMSLive247.Blazor2/wwwroot/css/tailwind.css --minify"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-simeon/SMSLive247.UI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dev-simeon/SMSLive247.UI/issues"
+  },
+  "homepage": "https://github.com/dev-simeon/SMSLive247.UI#readme",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}
