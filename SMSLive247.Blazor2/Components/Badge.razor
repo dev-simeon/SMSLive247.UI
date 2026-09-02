@@ -92,10 +92,10 @@
     {
         return value.ToUpperInvariant() switch
         {
-            "COMPLETED" => BadgeStyle.Success,
-            "RUNNING" => BadgeStyle.Pending,
-            "PAUSED" => BadgeStyle.Info,
-            "ABORTED" => BadgeStyle.Danger,
+            "DELIVRD" or "DELIVERED" or "COMPLETED" => BadgeStyle.Success,
+            "ACCEPTD" or "ACCEPTED" or "RUNNING" => BadgeStyle.Info,
+            "UNDELIV" or "UNDELIVERED" or "PENDING" => BadgeStyle.Pending,
+            "REJECTD" or "REJECTED" or "EXPIRED" or "ABORTED" => BadgeStyle.Danger,
             _ => BadgeStyle.Neutral
         };
     }
