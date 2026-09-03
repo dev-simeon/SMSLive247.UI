@@ -3,9 +3,6 @@
 @layout PublicLayout
 
 @inject Settings settings;
-@inject HttpClient httpClient
-@inject NavigationManager nav
-@inject AuthenticationStateProvider auth;
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -51,7 +48,7 @@
 
 <p class="text-center text-slate-500">
     Wait, I remember my password! 
-    <a href="@Const.Routes.Login" class="text-brand-500 decoration-brand-500/30 font-semibold
+    <a href="@Const.Routes.Login" class="font-semibold text-brand-500 decoration-brand-500/30
         transition-all hover:text-brand-600 hover:decoration-brand-500" data-discover="true">
         Sign In
      </a>
@@ -63,31 +60,13 @@
 
     private async Task ForgotAsync()
     {
-        isBusy = true;
         try
         {
+            isBusy = true;
             model.ParentID = settings.ParentID;
-            var response = await apiClient.LoginAsync(model);
+            var response = await apiClient.ResetPasswordAsync(model);
 
-            if (response.StatusCode == 200)
-            {
-                httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", response.Result.AccessToken.ToString());
-
-                var apiKey = response.Result.AccessToken.ToString();
-                var member = new Authentication.SmsAuthProvider.UserClaims(model.Username, apiKey);
-
-                await ((Authentication.SmsAuthProvider)auth)
-                .SaveAuthenticationState(member);
-
-                nav.NavigateTo(Const.Routes.Dashboard);
-                return;
-            }
-
-            if (response.StatusCode == 401) //unauthorized
-            {
-                await alert.Error("Access denied!");
-            }
+            //please complete this
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
@@ -102,5 +81,4 @@
             isBusy = false;
         }
     }
-
 }

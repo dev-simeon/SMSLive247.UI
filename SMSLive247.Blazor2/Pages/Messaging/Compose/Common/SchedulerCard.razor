@@ -4,7 +4,7 @@
     <div class="flex flex-col gap-3">
         <label class="group flex cursor-pointer items-center gap-3">
             <input type="radio" name="scheduleOption"
-                   class="text-brand-600 h-4 w-4 border-slate-300 focus:ring-brand-500"
+                   class="h-4 w-4 border-slate-300 text-brand-600 focus:ring-brand-500"
                    checked="@(!deliveryTime.HasValue)" @onchange="() => { deliveryTime = null; }" />
             <span class="text-slate-700 group-hover:text-brand-600">
                 Send Immediately
@@ -12,7 +12,7 @@
         </label>
         <label class="group flex cursor-pointer items-center gap-3">
             <input type="radio" name="scheduleOption"
-                   class="text-brand-600 h-4 w-4 border-slate-300 focus:ring-brand-500"
+                   class="h-4 w-4 border-slate-300 text-brand-600 focus:ring-brand-500"
                    checked="@deliveryTime.HasValue" @onchange="() => deliveryTime = DateTime.Now" />
             <span class="text-slate-700 group-hover:text-brand-600">
                 Schedule for Later
@@ -35,7 +35,7 @@
                     <Icon Style="Icon.IconStyle.Clock" CssClass="text-base" />
                 </div>
                 <input type="datetime-local" @bind="deliveryTime" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
-                       class="w-full rounded-r-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none focus:border-brand-500 focus:ring-brand-500 focus:ring-2" />
+                       class="w-full rounded-r-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500" />
             </div>
             <div class="mt-2 text-sm text-slate-500">Your time zone is: West/Central Africa GMT +1</div>
         </div>
@@ -64,7 +64,6 @@
             <Button IsBusy="IsSending"
                     Text="Queue Message"
                     Icon="Icon.IconStyle.Clock"
-                    Style="Button.ButtonStyle.Primary"
                     IsDisabled="@(!allowSend)"
                     OnClick="ScheduledSubmit"
                     CssClass="w-full py-3">
@@ -75,7 +74,6 @@
             <Button IsBusy="IsSending"
                     Text="Send SMS Now!"
                     Icon="Icon.IconStyle.Mail"
-                    Style="Button.ButtonStyle.Primary"
                     IsDisabled="@(!allowSend)"
                     OnClick="ImmediateSubmit"
                     CssClass="w-full py-3">

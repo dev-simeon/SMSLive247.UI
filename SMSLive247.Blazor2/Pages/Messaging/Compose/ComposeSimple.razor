@@ -15,7 +15,7 @@ else
             <!-- Recipients Card -->
             <Card HeaderText="Select Recipients">
                 <HeaderRight>
-                    <span class="bg-brand-50 rounded px-2.5 py-1 text-xs text-slate-500">
+                    <span class="rounded bg-brand-50 px-2.5 py-1 text-xs text-slate-500">
                         Total Recipients: @model.CountRecipients().ToString("N0")
                     </span>
                 </HeaderRight>
@@ -24,7 +24,7 @@ else
                                    OnClick="() => rawNumbersModal.Show(model.Numbers)">
                         <Button Text="Paste..."
                                 Icon="Icon.IconStyle.PenSquare"
-                                Style="Button.ButtonStyle.Secondary"
+                                Style="ColorStyle.Secondary"
                                 OnClick="() => rawNumbersModal.Show(model.Numbers)"
                                 CssClass="w-[160px]">
                         </Button>
@@ -37,7 +37,7 @@ else
                                    OnClick="() => contactsModal.Show(model.Contacts)">
                         <Button Text="Contacts..."
                                 Icon="Icon.IconStyle.Users"
-                                Style="Button.ButtonStyle.Secondary"
+                                Style="ColorStyle.Secondary"
                                 OnClick="() => contactsModal.Show(model.Contacts)"
                                 CssClass="w-[160px]">
                         </Button>
@@ -50,7 +50,7 @@ else
                                    OnClick="() => bulkfilesModal.Show(model.BatchFiles)">
                         <Button Text="Bulk Files..."
                                 Icon="Icon.IconStyle.FileText"
-                                Style="Button.ButtonStyle.Secondary"
+                                Style="ColorStyle.Secondary"
                                 OnClick="() => bulkfilesModal.Show(model.BatchFiles)"
                                 CssClass="w-[160px]">
                         </Button>
@@ -65,7 +65,7 @@ else
             <!-- Message Card -->
             <Card HeaderText="Type your Message here">
                 <HeaderRight>
-                    <span class="bg-brand-50 rounded px-2.5 py-1 text-xs text-slate-500">
+                    <span class="rounded bg-brand-50 px-2.5 py-1 text-xs text-slate-500">
                         @model.CounterText()
                     </span>
                 </HeaderRight>
@@ -73,7 +73,7 @@ else
                     <textarea @bind="model.MessageText" @bind:event="oninput" 
                               placeholder="Type your message here..."
                               maxlength="918" rows="8"
-                              class="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-brand-100 focus:ring-2">
+                              class="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
                     </textarea>
 
                     <div class="mt-1 flex items-center justify-between">

@@ -40,11 +40,11 @@
 
                     <FormRow Cols="2">
                         <FormSelect Label="Country Code"
-                                    Variant="FormSelect<int?>.SelectType.Country"
+                                    Variant="FormSelect<int?>.SelectVariant.Country"
                                     @bind-Value="updateModel.CountryCode" />
 
                         <FormSelect Label="Time Zone (GMT Offset)"
-                                    Variant="FormSelect<int?>.SelectType.TimeZone"
+                                    Variant="FormSelect<int?>.SelectVariant.TimeZone"
                                     @bind-Value="updateModel.TimeZone" />
                     </FormRow>
             </EditForm>
@@ -56,7 +56,7 @@
                     IsBusy="@isSubmitting" />
 
             <Button Text="Cancel"
-                    Style="Button.ButtonStyle.Secondary"
+                    Style="ColorStyle.Secondary"
                     IsDisabled="@isSubmitting"
                     OnClick="() => isVisible = false" />
         </Footer>
@@ -98,10 +98,10 @@ else
 
                     <FormRow Cols="2">
                         <FormSelect Label="Country Code"
-                                    Variant="FormSelect<int>.SelectType.Country"
+                                    Variant="FormSelect<int>.SelectVariant.Country"
                                     @bind-Value="createModel.CountryCode" />
                         <FormSelect Label="Time Zone (GMT Offset)"
-                                    Variant="FormSelect<int>.SelectType.TimeZone"
+                                    Variant="FormSelect<int>.SelectVariant.TimeZone"
                                     @bind-Value="createModel.TimeZone" />
                     </FormRow>
 
@@ -120,7 +120,7 @@ else
                     IsBusy="@isSubmitting" />
 
             <Button Text="Cancel"
-                    Style="Button.ButtonStyle.Secondary"
+                    Style="ColorStyle.Secondary"
                     IsDisabled="@isSubmitting"
                     OnClick="() => isVisible = false" />
         </Footer>

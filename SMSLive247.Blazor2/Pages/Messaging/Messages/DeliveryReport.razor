@@ -1,10 +1,10 @@
-@attribute [Route(Const.Routes.Messaging.MessageDetails)]
+﻿@attribute [Route(Const.Routes.Messaging.MessageDetails)]
 @layout MainLayout
 @inject NavigationManager nav
 
 <PageTitle>Delivery Report - SMSLive247</PageTitle>
 
-<div class="flex flex-col gap-6 max-w-7xl mx-auto pb-10">
+<div class="mx-auto flex max-w-7xl flex-col gap-6 pb-10">
     <!-- ── BACK NAV ──────────────────────────────────────────────────── -->
     <button @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)"
             class="self-start inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-brand-600 transition-colors">
@@ -14,27 +14,27 @@
 
     <!-- ── UNIFIED HEADER CARD ────────────────────────────────────────── -->
     <Card>
-        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+        <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <!-- Left: Title -->
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-50 flex items-center justify-center border border-brand-100 text-brand-600 shrink-0">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-600">
                     <Icon Style="Icon.IconStyle.Mail" CssClass="text-xl text-brand-600" />
                 </div>
                 <div>
-                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">
+                    <p class="text-xs font-bold tracking-widest text-slate-400 uppercase">
                         Message Delivery Report
                     </p>
-                    <h1 class="text-2xl font-black text-slate-900 leading-tight">
+                    <h1 class="text-2xl leading-tight font-black text-slate-900">
                         Batch #@(batch?.BatchID.ToString() ?? Id ?? "—")
                     </h1>
                 </div>
             </div>
 
             <!-- Right: Action Buttons -->
-            <div class="flex items-center gap-3 shrink-0">
+            <div class="flex shrink-0 items-center gap-3">
                 <Button Text="Refresh"
                         Icon="Icon.IconStyle.Refresh"
-                        Style="Button.ButtonStyle.Secondary"
+                        Style="ColorStyle.Secondary"
                         IsBusy="@isLoading"
                         OnClick="FetchData" />
             </div>
@@ -43,44 +43,44 @@
         <!-- Info chips row -->
         @if (batch != null)
         {
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6">
-                <div class="flex items-center gap-3.5 min-w-0 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                    <span class="shrink-0 w-10 h-10 rounded-lg bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+            <div class="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+                <div class="flex min-w-0 items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50 p-3.5">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-400 shadow-sm">
                         <Icon Style="Icon.IconStyle.Fingerprint" CssClass="text-xl text-slate-400" />
                     </span>
-                    <div class="min-w-0 flex flex-col justify-center">
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Sender ID</p>
-                        <p class="text-sm font-bold text-slate-700 truncate leading-none mt-1.5">@(batch.SenderID ?? "—")</p>
+                    <div class="flex min-w-0 flex-col justify-center">
+                        <p class="leading-none font-bold tracking-widest text-[10px] text-slate-400 uppercase">Sender ID</p>
+                        <p class="mt-1.5 truncate text-sm leading-none font-bold text-slate-700">@(batch.SenderID ?? "—")</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3.5 min-w-0 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                    <span class="shrink-0 w-10 h-10 rounded-lg bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                <div class="flex min-w-0 items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50 p-3.5">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-400 shadow-sm">
                         <Icon Style="Icon.IconStyle.Clock" CssClass="text-xl text-slate-400" />
                     </span>
-                    <div class="min-w-0 flex flex-col justify-center">
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Sent On</p>
-                        <p class="text-sm font-bold text-slate-700 truncate leading-none mt-1.5">@batch.DateSubmitted.ToString("MMM dd, yyyy · hh:mm tt")</p>
+                    <div class="flex min-w-0 flex-col justify-center">
+                        <p class="leading-none font-bold tracking-widest text-[10px] text-slate-400 uppercase">Sent On</p>
+                        <p class="mt-1.5 truncate text-sm leading-none font-bold text-slate-700">@batch.DateSubmitted.ToString("MMM dd, yyyy · hh:mm tt")</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3.5 min-w-0 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                    <span class="shrink-0 w-10 h-10 rounded-lg bg-white flex items-center justify-center text-blue-500 shadow-sm border border-slate-100">
+                <div class="flex min-w-0 items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50 p-3.5">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-white text-blue-500 shadow-sm">
                         <Icon Style="Icon.IconStyle.Coins" CssClass="text-xl text-blue-500" />
                     </span>
-                    <div class="min-w-0 flex flex-col justify-center">
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Credits Charged</p>
-                        <p class="text-sm font-bold text-slate-700 truncate leading-none mt-1.5">@batch.CreditsCharged.ToString("N2")</p>
+                    <div class="flex min-w-0 flex-col justify-center">
+                        <p class="leading-none font-bold tracking-widest text-[10px] text-slate-400 uppercase">Credits Charged</p>
+                        <p class="mt-1.5 truncate text-sm leading-none font-bold text-slate-700">@batch.CreditsCharged.ToString("N2")</p>
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3.5 min-w-0 p-3.5 bg-slate-50 rounded-xl border border-slate-100">
-                    <span class="shrink-0 w-10 h-10 rounded-lg bg-white flex items-center justify-center text-slate-400 shadow-sm border border-slate-100">
+                <div class="flex min-w-0 items-center gap-3.5 rounded-xl border border-slate-100 bg-slate-50 p-3.5">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-white text-slate-400 shadow-sm">
                         <Icon Style="Icon.IconStyle.Mail" CssClass="text-xl text-slate-400" />
                     </span>
-                    <div class="min-w-0 flex flex-col justify-center">
-                        <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 leading-none">Message Parts</p>
-                        <p class="text-sm font-bold text-slate-700 truncate leading-none mt-1.5">@batch.MessageParts</p>
+                    <div class="flex min-w-0 flex-col justify-center">
+                        <p class="leading-none font-bold tracking-widest text-[10px] text-slate-400 uppercase">Message Parts</p>
+                        <p class="mt-1.5 truncate text-sm leading-none font-bold text-slate-700">@batch.MessageParts</p>
                     </div>
                 </div>
             </div>
@@ -90,9 +90,9 @@
     <!-- ── CRITICAL ERROR BANNER (Only when batch itself fails) ─────────────────────────────────── -->
     @if (!string.IsNullOrEmpty(errorMessage))
     {
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-center justify-between shadow-sm">
+        <div class="flex items-center justify-between rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 shadow-sm">
             <div class="flex items-center gap-2">
-                <Icon Style="Icon.IconStyle.AlertCircle" CssClass="text-lg text-red-500 shrink-0" />
+                <Icon Style="Icon.IconStyle.AlertCircle" CssClass="shrink-0 text-lg text-red-500" />
                 <span>@errorMessage</span>
             </div>
             <button @onclick="FetchData" class="text-sm font-bold text-red-800 underline hover:no-underline">Retry</button>
@@ -102,84 +102,84 @@
     <!-- ── GRACEFUL PENDING REPORTS NOTICE ──────────────────────────────────── -->
     @if (!isLoading && string.IsNullOrEmpty(errorMessage) && allReports.Count == 0 && batch != null)
     {
-        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-blue-900 shadow-sm">
+        <div class="flex flex-col items-start justify-between gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-blue-900 shadow-sm sm:flex-row sm:items-center sm:p-5">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
                     <Icon Style="Icon.IconStyle.Clock" CssClass="text-lg text-blue-600" />
                 </div>
                 <div>
                     <p class="text-sm font-bold text-blue-900">Delivery Reports Pending</p>
-                    <p class="text-xs text-blue-700 mt-0.5">
+                    <p class="mt-0.5 text-xs text-blue-700">
                         Delivery reports for this batch have not arrived yet from network operators. Click <strong>Refresh</strong> to check for new updates.
                     </p>
                 </div>
             </div>
             <Button Text="Refresh Status"
                     Icon="Icon.IconStyle.Refresh"
-                    Style="Button.ButtonStyle.Secondary"
+                    Style="ColorStyle.Secondary"
                     IsBusy="@isLoading"
                     OnClick="FetchData" />
         </div>
     }
 
     <!-- ── DONUT + RECIPIENT TABLE GRID ───────────────────────────────────── -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+    <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-4">
         <!-- Donut / Delivery Breakdown Card -->
         <div class="lg:col-span-1">
             <Card HeaderText="Delivery Breakdown">
                 <HeaderRight>
-                    <span class="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                    <span class="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600">
                         @total.ToString("#,##0") Total
                     </span>
                 </HeaderRight>
                 <ChildContent>
                     <!-- Donut Graphic -->
                     <div class="flex items-center justify-center py-4">
-                        <div class="w-40 h-40 rounded-full relative" style="background: @GetDonutGradient();">
-                            <div class="absolute inset-3 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                        <div class="relative h-40 w-40 rounded-full" style="background: @GetDonutGradient();">
+                            <div class="absolute inset-3 flex flex-col items-center justify-center rounded-full bg-white shadow-inner">
                                 <span class="text-2xl font-black text-slate-900">@successRate%</span>
-                                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5">Success</span>
+                                <span class="mt-0.5 font-bold tracking-widest text-[10px] text-slate-400 uppercase">Success</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Legend List -->
                     <ul class="mt-3 divide-y divide-slate-100">
-                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <li class="flex items-center justify-between rounded-lg px-2 py-2.5 transition-colors hover:bg-slate-50">
                             <div class="flex items-center gap-2.5">
-                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-emerald-500"></span>
+                                <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500"></span>
                                 <span class="text-sm font-medium text-slate-700">Delivered</span>
                             </div>
                             <span class="text-sm font-bold text-slate-900">@delivered.ToString("#,##0")</span>
                         </li>
 
-                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <li class="flex items-center justify-between rounded-lg px-2 py-2.5 transition-colors hover:bg-slate-50">
                             <div class="flex items-center gap-2.5">
-                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-blue-500"></span>
+                                <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-blue-500"></span>
                                 <span class="text-sm font-medium text-slate-700">Accepted</span>
                             </div>
                             <span class="text-sm font-bold text-slate-900">@accepted.ToString("#,##0")</span>
                         </li>
 
-                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <li class="flex items-center justify-between rounded-lg px-2 py-2.5 transition-colors hover:bg-slate-50">
                             <div class="flex items-center gap-2.5">
-                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-amber-500"></span>
+                                <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500"></span>
                                 <span class="text-sm font-medium text-slate-700">Undeliverable</span>
                             </div>
                             <span class="text-sm font-bold text-slate-900">@undelivered.ToString("#,##0")</span>
                         </li>
 
-                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <li class="flex items-center justify-between rounded-lg px-2 py-2.5 transition-colors hover:bg-slate-50">
                             <div class="flex items-center gap-2.5">
-                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-red-500"></span>
+                                <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-red-500"></span>
                                 <span class="text-sm font-medium text-slate-700">Rejected</span>
                             </div>
                             <span class="text-sm font-bold text-slate-900">@rejected.ToString("#,##0")</span>
                         </li>
 
-                        <li class="flex items-center justify-between py-2.5 px-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <li class="flex items-center justify-between rounded-lg px-2 py-2.5 transition-colors hover:bg-slate-50">
                             <div class="flex items-center gap-2.5">
-                                <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-violet-500"></span>
+                                <span class="h-2.5 w-2.5 shrink-0 rounded-full bg-violet-500"></span>
                                 <span class="text-sm font-medium text-slate-700">Expired</span>
                             </div>
                             <span class="text-sm font-bold text-slate-900">@expired.ToString("#,##0")</span>
@@ -195,7 +195,7 @@
                 <HeaderLeft>
                     <div>
                         <h3 class="text-base font-bold text-slate-900">Delivery Reports Log</h3>
-                        <p class="text-xs text-slate-500 mt-0.5">Detailed breakdown of each recipient's status</p>
+                        <p class="mt-0.5 text-xs text-slate-500">Detailed breakdown of each recipient's status</p>
                     </div>
                 </HeaderLeft>
                 <HeaderRight>
@@ -205,11 +205,11 @@
                                    @bind="searchQuery"
                                    @bind:event="oninput"
                                    placeholder="Search phone / SMSC..."
-                                   class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-brand-500 transition-all" />
+                                   class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm transition-all focus:ring-1 focus:ring-brand-500 focus:outline-none" />
                         </div>
                         <Button Text="Export CSV"
                                 Icon="Icon.IconStyle.Download"
-                                Style="Button.ButtonStyle.Secondary"
+                                Style="ColorStyle.Secondary"
                                 IsDisabled="@(allReports.Count == 0)"
                                 OnClick="ExportCsv" />
                     </div>
@@ -217,7 +217,7 @@
                 <ChildContent>
                     @if (isLoading)
                     {
-                        <div class="flex justify-center items-center py-16">
+                        <div class="flex items-center justify-center py-16">
                             <Loading BoolCheck="false" />
                         </div>
                     }
@@ -248,7 +248,7 @@
                                     }
                                 </Column>
                                 <Column Header="SMSC Message ID">
-                                    <span class="text-sm text-slate-500 font-mono">
+                                    <span class="font-mono text-sm text-slate-500">
                                         @context.SmscID
                                     </span>
                                 </Column>
@@ -262,7 +262,7 @@
                     }
                 </ChildContent>
                 <FooterLeft>
-                    <span class="text-xs text-slate-500 font-medium">
+                    <span class="text-xs font-medium text-slate-500">
                         Showing @filteredReports.Count of @allReports.Count recipient report@(allReports.Count == 1 ? "" : "s")
                     </span>
                 </FooterLeft>

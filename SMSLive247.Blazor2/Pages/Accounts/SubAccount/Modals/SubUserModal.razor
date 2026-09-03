@@ -1,4 +1,6 @@
-﻿<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
+﻿@inject SubAccountClient subClient
+
+<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
         <EditForm id="f3" Model="@subUser" OnValidSubmit="HandleSubmit" class="space-y-6">
             @if (editMode == EditModeEnum.CREATE)
@@ -44,7 +46,7 @@
         }
         else
         {
-            <Button Text="Close" OnClick="() => isVisible = false" Style="Button.ButtonStyle.Secondary" />
+            <Button Text="Close" OnClick="() => isVisible = false" Style="ColorStyle.Secondary" />
         }
     </Footer>
 </Modal>

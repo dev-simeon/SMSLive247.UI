@@ -3,9 +3,6 @@
 @layout PublicLayout
 
 @inject Settings settings;
-@inject AlertService alert
-@inject ApiClient apiClient
-@inject NavigationManager nav
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -83,7 +80,7 @@
         <FormSelect 
             @bind-Value="model.CountryCode"  
             Label="Country" 
-            Variant="FormSelect<int>.SelectType.Country" 
+            Variant="FormSelect<int>.SelectVariant.Country" 
             IconStyle="Icon.IconStyle.Phone"
             Required="true" />
     </FormRow>
@@ -92,7 +89,7 @@
         <FormSelect 
             @bind-Value="model.TimeZone" 
             Label="Time Zone" 
-            Variant="FormSelect<int>.SelectType.TimeZone"
+            Variant="FormSelect<int>.SelectVariant.TimeZone"
             IconStyle="Icon.IconStyle.Phone"
             Required="true" />
     </FormRow>
@@ -109,7 +106,7 @@
 
     <div class="flex items-center">
         <InputCheckbox @bind-Value="termsAccepted" id="terms" style="accent-color: lime"
-                       class="bg-brand-500 h-4 w-4 rounded-lg border-slate-200 focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none" />
+                       class="h-4 w-4 rounded-lg border-slate-200 bg-brand-500 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/30 focus:outline-none" />
         
                        <label class="ml-2 block text-sm text-slate-600" for="terms">
             I have read and accepted the
@@ -129,7 +126,7 @@
 
 <p class="text-center text-sm text-slate-500">
     Already have an account?
-    <a href="@Const.Routes.Login" class="text-brand-500 font-semibold hover:text-brand-600">
+    <a href="@Const.Routes.Login" class="font-semibold text-brand-500 hover:text-brand-600">
         Sign In
     </a>
 </p>
@@ -138,14 +135,14 @@
     private bool isBusy = false;
     private bool termsAccepted = false;
     private string confirmPassword = "";
-
     private AccountCreateRequest model = new() { TimeZone = 99, CountryCode = 0 };
 
     private async Task RegisterAsync()
     {
-        isBusy = true;
         try
         {
+            isBusy = true;
+
             if (!termsAccepted)
                 throw new Exception("You must accept the agreement and privacy policy to register");
 

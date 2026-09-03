@@ -2,12 +2,16 @@
 
     <Body>
         <EditForm FormName="f1" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-4">
-            <FormInput @bind-Value="model.FirstName" Label="First Name" Required="true" />   
-            <FormInput @bind-Value="model.LastName" Label="Last Name" Required="true" />
-            <FormInput @bind-Value="model.Email" Label="Email Address" Disabled="true" />
-            <FormInput @bind-Value="model.Phone" Label="Phone Number" Disabled="true" />
-            <FormSelect @bind-Value="model.CountryCode" Label="Country" Variant="FormSelect<int?>.SelectType.Country" />
-            <FormSelect @bind-Value="model.TimeZone" Label="Time Zone" Variant="FormSelect<int?>.SelectType.TimeZone" />
+            <FormRow Cols="2">
+                <FormInput @bind-Value="model.FirstName" Label="First Name" Required="true" />
+                <FormInput @bind-Value="model.LastName" Label="Last Name" Required="true" />
+            </FormRow>
+            <FormRow Cols="2">
+                <FormInput @bind-Value="model.Email" Label="Email Address" Disabled="true" />
+                <FormInput @bind-Value="model.Phone" Label="Phone Number" Disabled="true" />
+            </FormRow>
+            <FormSelect @bind-Value="model.CountryCode" Label="Country" Variant="FormSelect<int?>.SelectVariant.Country" />
+            <FormSelect @bind-Value="model.TimeZone" Label="Time Zone" Variant="FormSelect<int?>.SelectVariant.TimeZone" />
         </EditForm>
     </Body>
 

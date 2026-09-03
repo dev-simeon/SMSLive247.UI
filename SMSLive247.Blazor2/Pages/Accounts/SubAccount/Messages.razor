@@ -1,4 +1,6 @@
-﻿<PageBody>
+﻿@inject SubAccountClient subClient
+
+<PageBody>
     <HeaderLeft>
         <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
             <DateRange DateRangeChanged="OnDateRangeChanged" />

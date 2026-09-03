@@ -1,4 +1,4 @@
-@page "/messaging/compose/customized"
+﻿@page "/messaging/compose/customized"
 @using System.Text
 @using System.Text.RegularExpressions
 @using SMSLive247.Blazor2.Pages.Messaging.Compose.Modals
@@ -27,15 +27,15 @@ else
                             </div>
 
                             <!-- File Selection Control (70% max-width, compact padding, clicking inside or button opens modal) -->
-                            <div class="space-y-2 w-full lg:max-w-[70%]">
+                            <div class="w-full space-y-2 lg:max-w-[70%]">
                                 <label class="block text-sm font-medium text-slate-700">Data Sheet</label>
-                                <div class="flex items-center rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm transition-all hover:border-brand-300 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20">
-                                    <div class="flex min-w-0 flex-1 items-center px-3 py-1 cursor-pointer" @onclick="OpenTemplateFiles">
+                                <div class="flex items-center rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm transition-all focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 hover:border-brand-300">
+                                    <div class="flex min-w-0 flex-1 cursor-pointer items-center px-3 py-1" @onclick="OpenTemplateFiles">
                                         <div class="min-w-0 flex-1">
                                             @if (hasDataSource)
                                             {
                                                 <p class="truncate text-sm font-semibold text-slate-900">@CurrentFileName</p>
-                                                <p class="text-[11px] text-slate-500 font-mono">
+                                                <p class="font-mono text-[11px] text-slate-500">
                                                     @CurrentFileRowCount.ToString("N0") records &bull; @headers.Count columns loaded
                                                 </p>
                                             }
@@ -48,18 +48,18 @@ else
                                     </div>
                                     <button type="button" 
                                             @onclick="OpenTemplateFiles" 
-                                            class="flex shrink-0 items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-600 transition-colors">
+                                            class="flex shrink-0 items-center gap-1.5 rounded-lg bg-brand-500 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-brand-600">
                                         <Icon Style="Icon.IconStyle.PlusCircle" CssClass="text-sm" />
                                         <span>Browse Sheets...</span>
                                     </button>
                                 </div>
-                                <p class="text-xs text-slate-400 px-1">
+                                <p class="px-1 text-xs text-slate-400">
                                     Supported formats: .CSV, .XLS, .XLSX, .XLX (Max 20 MB).
                                 </p>
                             </div>
 
                             <!-- Footer prompt to advance to Step 2 -->
-                            <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-slate-50 p-4">
+                            <div class="mt-8 flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-slate-50 p-4 sm:flex-row">
                                 <div class="flex items-center gap-2.5 text-sm text-slate-600">
                                     <Icon Style="@(hasDataSource ? Icon.IconStyle.CheckCircle : Icon.IconStyle.Info)" 
                                           CssClass="@(hasDataSource ? "text-emerald-500 text-lg shrink-0" : "text-slate-400 text-lg shrink-0")" />
@@ -67,7 +67,6 @@ else
                                 </div>
                                 <Button Text="Continue to Phone Column" 
                                         Icon="Icon.IconStyle.ChevronRight" 
-                                        Style="Button.ButtonStyle.Primary" 
                                         IsDisabled="@(!hasDataSource)" 
                                         OnClick="() => currentStep = 2" />
                             </div>
@@ -89,13 +88,13 @@ else
                         <div class="space-y-6">
                             <!-- Sheet summary info -->
                             <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3.5">
-                                <div class="flex items-center gap-3 min-w-0">
+                                <div class="flex min-w-0 items-center gap-3">
                                     <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
                                         <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-lg" />
                                     </div>
                                     <div class="min-w-0">
                                         <p class="truncate text-sm font-bold text-slate-900">@CurrentFileName</p>
-                                        <p class="text-xs text-slate-500 font-mono mt-0.5">
+                                        <p class="mt-0.5 font-mono text-xs text-slate-500">
                                             @CurrentFileRowCount.ToString("N0") rows &bull; @headers.Count columns &bull; showing first @previewRows.Count
                                         </p>
                                     </div>
@@ -103,9 +102,9 @@ else
                             </div>
 
                             <!-- Phone Column Active Indicator Banner -->
-                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50/80 px-4 py-2.5 text-xs text-brand-900">
+                            <div class="flex flex-col items-start justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50/80 px-4 py-2.5 text-xs text-brand-900 sm:flex-row sm:items-center">
                                 <div class="flex items-center gap-2 font-medium">
-                                    <Icon Style="Icon.IconStyle.Phone" CssClass="text-brand-600 text-sm shrink-0" />
+                                    <Icon Style="Icon.IconStyle.Phone" CssClass="shrink-0 text-sm text-brand-600" />
                                     <span>
                                         Recipient Phone Column: <strong class="font-bold text-slate-900">Column @GetColumnLetter(phoneColumn) &mdash; "@(phoneColumn.HasValue && phoneColumn >= 0 && phoneColumn < headers.Count ? headers[phoneColumn.Value] : "None")"</strong>
                                     </span>
@@ -119,22 +118,22 @@ else
                             @if (previewRows.Count > 0)
                             {
                                 <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
-                                    <table class="w-full text-left text-sm text-slate-600 border-collapse">
+                                    <table class="w-full border-collapse text-left text-sm text-slate-600">
                                         <thead>
                                             <!-- Letter row: A, B, C... -->
-                                            <tr class="bg-slate-100/80 text-[11px] font-mono text-slate-400 border-b border-slate-200">
-                                                <th class="w-12 px-3 py-1.5 text-center bg-slate-200/60 border-r border-slate-200">#</th>
+                                            <tr class="border-b border-slate-200 bg-slate-100/80 font-mono text-[11px] text-slate-400">
+                                                <th class="w-12 border-r border-slate-200 bg-slate-200/60 px-3 py-1.5 text-center">#</th>
                                                 @for (var i = 0; i < headers.Count; i++)
                                                 {
                                                     var isSelectedCol = phoneColumn == i;
-                                                    <th class="px-4 py-1.5 text-center font-bold border-r border-slate-200 last:border-r-0 @(isSelectedCol ? "bg-brand-100 text-brand-700" : "")">
+                                                    <th class="border-r border-slate-200 px-4 py-1.5 text-center font-bold last:border-r-0 @(isSelectedCol ? "bg-brand-100 text-brand-700" : "")">
                                                         @GetColumnLetter(i)
                                                     </th>
                                                 }
                                             </tr>
                                             <!-- Column names header row (Clickable) -->
-                                            <tr class="bg-slate-50 text-xs font-semibold text-slate-700 border-b border-slate-200">
-                                                <th class="w-12 px-3 py-2.5 text-center bg-slate-100 border-r border-slate-200 text-slate-400"></th>
+                                            <tr class="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700">
+                                                <th class="w-12 border-r border-slate-200 bg-slate-100 px-3 py-2.5 text-center text-slate-400"></th>
                                                 @for (var i = 0; i < headers.Count; i++)
                                                 {
                                                     var colIndex = i;
@@ -146,7 +145,7 @@ else
                                                             <span class="truncate">@headers[colIndex]</span>
                                                             @if (isSelectedCol)
                                                             {
-                                                                <span class="flex items-center gap-1 rounded bg-brand-500 px-1.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                                                                <span class="flex items-center gap-1 rounded bg-brand-500 px-1.5 py-0.5 font-bold tracking-wider text-[10px] text-white uppercase">
                                                                     <Icon Style="Icon.IconStyle.Phone" CssClass="text-[10px]" /> Recipient
                                                                 </span>
                                                             }
@@ -160,13 +159,13 @@ else
                                             {
                                                 var row = previewRows[r];
                                                 <tr class="hover:bg-slate-50/70">
-                                                    <td class="w-12 px-3 py-2 text-center text-xs font-mono text-slate-400 bg-slate-50/80 border-r border-slate-200">
+                                                    <td class="w-12 border-r border-slate-200 bg-slate-50/80 px-3 py-2 text-center font-mono text-xs text-slate-400">
                                                         @(r + 1)
                                                     </td>
                                                     @for (var i = 0; i < headers.Count; i++)
                                                     {
                                                         var isSelectedCol = phoneColumn == i;
-                                                        <td class="px-4 py-2 truncate max-w-[200px] border-r border-slate-100 last:border-r-0 @(isSelectedCol ? "bg-brand-50/30 font-medium text-slate-900" : "")"
+                                                        <td class="max-w-[200px] truncate border-r border-slate-100 px-4 py-2 last:border-r-0 @(isSelectedCol ? "bg-brand-50/30 font-medium text-slate-900" : "")"
                                                             title="@row.GetValueOrDefault(headers[i], "")">
                                                             @row.GetValueOrDefault(headers[i], "")
                                                         </td>
@@ -179,14 +178,13 @@ else
                             }
 
                             <!-- Footer prompt to advance to Step 3 -->
-                            <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-slate-50 p-4">
+                            <div class="mt-8 flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-slate-50 p-4 sm:flex-row">
                                 <div class="flex items-center gap-2.5 text-sm text-slate-600">
-                                    <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-emerald-500 text-lg shrink-0" />
+                                    <Icon Style="Icon.IconStyle.CheckCircle" CssClass="shrink-0 text-lg text-emerald-500" />
                                     <span class="font-medium">Phone column confirmed! Ready to compose and personalize your template message.</span>
                                 </div>
                                 <Button Text="Continue to Compose Message" 
                                         Icon="Icon.IconStyle.ChevronRight" 
-                                        Style="Button.ButtonStyle.Primary" 
                                         IsDisabled="@(!phoneColumn.HasValue)" 
                                         OnClick="() => currentStep = 3" />
                             </div>
@@ -210,18 +208,18 @@ else
                             @if (headers.Any())
                             {
                                 <div>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <span class="text-xs font-bold uppercase tracking-wider text-slate-600">Available Fields</span>
+                                    <div class="mb-1.5 flex items-center justify-between">
+                                        <span class="text-xs font-bold tracking-wider text-slate-600 uppercase">Available Fields</span>
                                         <span class="text-[11px] text-slate-400">Click a field below to insert it into your message</span>
                                     </div>
-                                    <div class="flex flex-wrap gap-2 items-center p-2.5 rounded-xl border border-slate-200 bg-slate-50">
+                                    <div class="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2.5">
                                         @foreach (var header in headers)
                                         {
                                             <button type="button" 
                                                     @onclick="() => AddPlaceholder(header)" 
                                                     class="inline-flex w-auto items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-mono font-medium text-slate-700 shadow-sm hover:border-brand-400 hover:bg-brand-50 hover:text-brand-700 transition-all">
                                                 <span>@Placeholder(header)</span>
-                                                <Icon Style="Icon.IconStyle.PlusCircle" CssClass="text-brand-500 text-xs" />
+                                                <Icon Style="Icon.IconStyle.PlusCircle" CssClass="text-xs text-brand-500" />
                                             </button>
                                         }
                                     </div>
@@ -252,21 +250,21 @@ else
                         else
                         {
                             <div class="overflow-x-auto">
-                                <table class="w-full text-left text-sm text-slate-600 border-collapse">
+                                <table class="w-full border-collapse text-left text-sm text-slate-600">
                                     <thead>
-                                        <tr class="text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                                            <th class="py-2.5 px-3 w-12 text-center">#</th>
-                                            <th class="py-2.5 px-3 w-48">Phone Number</th>
-                                            <th class="py-2.5 px-3">Message</th>
+                                        <tr class="border-b border-slate-100 font-bold tracking-wider text-[11px] text-slate-400 uppercase">
+                                            <th class="w-12 px-3 py-2.5 text-center">#</th>
+                                            <th class="w-48 px-3 py-2.5">Phone Number</th>
+                                            <th class="px-3 py-2.5">Message</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y-0 font-sans">
                                         @foreach (var row in previewRows.Take(3).Select((value, index) => new { value, index }))
                                         {
-                                            <tr class="hover:bg-slate-50/70 transition-colors">
-                                                <td class="py-2.5 px-3 font-semibold text-slate-400 text-center text-xs">@(row.index + 1)</td>
-                                                <td class="py-2.5 px-3 font-medium text-brand-600 text-xs font-mono">@PhoneFor(row.value)</td>
-                                                <td class="py-2.5 px-3 text-xs whitespace-pre-wrap text-slate-700 break-words">@ResolvePlaceholders(message, row.value)</td>
+                                            <tr class="transition-colors hover:bg-slate-50/70">
+                                                <td class="px-3 py-2.5 text-center text-xs font-semibold text-slate-400">@(row.index + 1)</td>
+                                                <td class="px-3 py-2.5 font-mono text-xs font-medium text-brand-600">@PhoneFor(row.value)</td>
+                                                <td class="px-3 py-2.5 text-xs break-words whitespace-pre-wrap text-slate-700">@ResolvePlaceholders(message, row.value)</td>
                                             </tr>
                                         }
                                     </tbody>

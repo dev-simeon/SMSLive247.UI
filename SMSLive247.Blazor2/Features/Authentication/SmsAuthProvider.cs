@@ -9,7 +9,7 @@ namespace SMSLive247.Authentication
         private readonly string storageKey = "UserSession";
         private readonly AuthenticationState anonymousState = new(new(new ClaimsIdentity()));
 
-        public class UserClaims(string email, string apiKey)
+        public class Member(string email, string apiKey)
         {
             public string Email { get; private set; } = email.ToLower();
             public string ApiKey { get; private set; } = apiKey;
@@ -25,7 +25,7 @@ namespace SMSLive247.Authentication
         {
             try
             {
-                var response = storage.Get<UserClaims>(storageKey);
+                var response = storage.Get<Member>(storageKey);
 
                 if (response == null)
                     return anonymousState;
@@ -39,7 +39,7 @@ namespace SMSLive247.Authentication
             
         }
 
-        public async Task SaveAuthenticationState(UserClaims member)
+        public async Task SaveAuthenticationState(Member member)
         {
             storage.Set(storageKey, member);
 
@@ -47,9 +47,9 @@ namespace SMSLive247.Authentication
             NotifyAuthenticationStateChanged(Task.FromResult(authenticatedState));
         }
 
-        public UserClaims? GetMember()
+        public Member? GetMember()
         {
-            return storage.Get<UserClaims>(storageKey);
+            return storage.Get<Member>(storageKey);
         }
 
         public async Task ClearAuthenticationState()
@@ -58,13 +58,13 @@ namespace SMSLive247.Authentication
             NotifyAuthenticationStateChanged(Task.FromResult(anonymousState));
         }
 
-        private static AuthenticationState CreateAuthenticationState(UserClaims member)
+        private static AuthenticationState CreateAuthenticationState(Member member)
         {
             var principal = GetClaimsPrincipal(member);
             return new AuthenticationState(principal);
         }
 
-        private static ClaimsPrincipal GetClaimsPrincipal(UserClaims member)
+        private static ClaimsPrincipal GetClaimsPrincipal(Member member)
         {
             List<Claim> claims = [
                 new(ClaimTypes.Email, member.Email),

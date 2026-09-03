@@ -8,7 +8,7 @@
     {
         @if (Icon.HasValue)
         {
-            <Icon Style="Icon.Value" CssStyle="font-weight: 300;" />
+            <Icon Style="Icon.Value" FontWeight="300" />
         }
         @Text
         @ChildContent
@@ -16,9 +16,7 @@
 </button>
 
 @code {
-    public enum ButtonStyle { Primary, Secondary }
-
-    [Parameter] public ButtonStyle Style { get; set; } = ButtonStyle.Primary;
+    [Parameter] public ColorStyle Style { get; set; } = ColorStyle.Primary;
     [Parameter] public Icon.IconStyle? Icon { get; set; }
     [Parameter] public string Text { get; set; } = "Submit";
     [Parameter] public bool IsDisabled { get; set; } = false;
@@ -35,8 +33,14 @@
     {
         return Style switch
         {
-            ButtonStyle.Primary => "bg-brand-500 hover:bg-brand-600 text-white border border-transparent shadow-sm focus:ring-brand-500",
-            ButtonStyle.Secondary => "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm focus:ring-slate-300",
+            ColorStyle.Primary => "bg-brand-500 hover:bg-brand-600 text-white border border-transparent shadow-sm focus:ring-brand-500",
+            ColorStyle.Secondary => "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm focus:ring-slate-300",
+            ColorStyle.Success => "bg-green-500 hover:bg-green-600 text-white border border-transparent shadow-sm focus:ring-green-500",
+            ColorStyle.Danger => "bg-red-500 hover:bg-red-600 text-white border border-transparent shadow-sm focus:ring-red-500",
+            ColorStyle.Warning => "bg-yellow-500 hover:bg-yellow-600 text-white border border-transparent shadow-sm focus:ring-yellow-500",
+            ColorStyle.Info => "bg-blue-500 hover:bg-blue-600 text-white border border-transparent shadow-sm focus:ring-blue-500",
+            ColorStyle.Light => "bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300 shadow-sm focus:ring-gray-300",
+            ColorStyle.Dark => "bg-gray-800 hover:bg-gray-900 text-white border border-transparent shadow-sm focus:ring-gray-500",
             _ => "bg-brand-500 hover:bg-brand-600 text-white border border-transparent shadow-sm focus:ring-brand-500"
         };
     }

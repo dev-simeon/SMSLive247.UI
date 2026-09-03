@@ -1,12 +1,12 @@
 ﻿@inject AlertService alert
 
-<Modal Title="@title" IsVisible="@isVisible" IsVisibleChanged="Cancel">
+<Modal Title="@title" IsVisible="@isVisible" Style="@color" IsVisibleChanged="Cancel">
     <Body>
-        <div class="px-4 py-4 text-sm text-gray-600">
+        <div class="flex justify-start px-4 py-4">
             <div>
-                <i class="text-4xl @icon text-@color"></i>
+                <Icon Style="@icon" CssClass="@iconColor" FontSize="4rem" FontWeight="500"></Icon>
             </div>
-            <div class="ml-3 my-auto">
+            <div class="my-auto ml-3">
                 @message
             </div>
         </div>
@@ -14,12 +14,12 @@
     <Footer>
         @if (isConfirmBox)
         {
-            <Button OnClick="Okay" Text="OK" />
-            <Button OnClick="Cancel" Text="Cancel" />
+            <Button OnClick="Okay" Text="OK" Style="@color" />
+            <Button OnClick="Cancel" Text="Cancel" Style="ColorStyle.Secondary" />
         }
         else
         {
-            <Button OnClick="Cancel" Text="OK" />
+            <Button OnClick="Cancel" Text="OK" Style="@color" />
         }
     </Footer>
 </Modal>
@@ -31,8 +31,21 @@
     private bool isConfirmBox = false;
     private bool isVisible = false;
     private RenderFragment? message;
-    private string? color;
-    private string? icon;
+    private Icon.IconStyle icon = Icon.IconStyle.Info;
+    private ColorStyle color = ColorStyle.Primary;
+
+    private string iconColor => color switch
+    {
+        ColorStyle.Primary  => "text-brand-500",
+        ColorStyle.Secondary => "text-slate-100",
+        ColorStyle.Success  => "text-green-500",
+        ColorStyle.Danger   => "text-red-500",
+        ColorStyle.Warning  => "text-yellow-500",
+        ColorStyle.Info     => "text-blue-500",
+        ColorStyle.Light    => "text-gray-100",
+        ColorStyle.Dark     => "text-gray-800",
+        _ => ""
+    };
 
     protected override void OnInitialized()
     {
@@ -44,17 +57,17 @@
 
     public Task Info(string message, string title)
     {
-        return Open("bg-yellow-300", "bi bi-info-circle-fill", message, title);
+        return Open(ColorStyle.Info, Icon.IconStyle.Info, message, title);
     }
 
     public Task Error(string message, string title)
     {
-        return Open("bg-red-300", "bi bi-sign-stop-fill", message, title);
+        return Open(ColorStyle.Danger, Icon.IconStyle.Close, message, title);
     }
 
     public Task Success(string message, string title)
     {
-        return Open("bg-green-300", "bi bi-check-circle-fill", message, title);
+        return Open(ColorStyle.Success, Icon.IconStyle.CheckCircle, message, title);
     }
 
     public Task<bool> Confirm(string message, string title)
@@ -64,7 +77,7 @@
     }
 
     [MemberNotNull(nameof(taskSource))]
-    private Task Open(string color, string icon, string message, string title, bool confirm = false)
+    private Task Open(ColorStyle color, Icon.IconStyle icon, string message, string title, bool confirm = false)
     {
         taskSource = new();
 

@@ -7,7 +7,7 @@
             </p>
 
             <textarea @bind="manualNumbers" tabindex="1"
-                      class="h-64 flex-1 overflow-y-scroll rounded-lg border border-slate-200 p-4 shadow-inner transition-all focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none"
+                      class="h-64 flex-1 overflow-y-scroll rounded-lg border border-slate-200 p-4 shadow-inner transition-all focus:border-brand-500 focus:ring-4 focus:ring-brand-500/30 focus:outline-none"
                       placeholder="Type or Paste phone numbers here (separated by comma or new line)..."></textarea>
 
             <div class="mt-3">
@@ -19,7 +19,7 @@
     </Body>
     <Footer>
         <Button Text="Confirm" Icon="Icon.IconStyle.PlusCircle" OnClick="Confirm" />
-        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="Close" />
+        <Button Text="Cancel" Style="ColorStyle.Secondary" OnClick="Close" />
     </Footer>
 </Modal>
 

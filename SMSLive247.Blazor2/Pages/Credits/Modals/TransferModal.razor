@@ -19,7 +19,7 @@
                         Credits
                     </label>
                     <InputNumber
-                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:ring-brand-500 focus:border-brand-500 focus:ring-2 focus:outline-none sm:text-sm"
+                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-none sm:text-sm"
                     min="50" @bind-Value="model.Credits" />
                     @if (model.Credits > 0 && model.Credits < 50)
                     {
@@ -40,7 +40,7 @@
                         Remarks
                     </label>
                     <textarea rows="3" @bind="model.Remarks"
-                              class="w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:ring-brand-500 focus:border-brand-500 focus:ring-2 focus:outline-none sm:text-sm"
+                              class="w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-none sm:text-sm"
                               placeholder="Optional note..."></textarea>
                 </div>
             </div>
@@ -69,7 +69,7 @@
     <Footer>
         <Button IsSubmit="true" Text="Transfer Credits" Icon="Icon.IconStyle.ChevronRight" IsBusy="@isSubmitting"
                 IsDisabled="@(!canSubmit)" form="wf3" />
-        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" IsDisabled="@isSubmitting" OnClick="Close" />
+        <Button Text="Cancel" Style="ColorStyle.Secondary" IsDisabled="@isSubmitting" OnClick="Close" />
     </Footer>
 </Modal>
 

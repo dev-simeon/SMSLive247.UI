@@ -1,4 +1,4 @@
-<Modal Title="@modalTitle" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+﻿<Modal Title="@modalTitle" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
     <Body>
         <EditForm id="GroupForm" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
             <FormInput Label="Group Name"
@@ -9,7 +9,7 @@
 
             <SearchBox InstantSearch="true" Placeholder="Find a contact..." @bind-SearchTerm="pickerSearch"></SearchBox>
 
-            <div class="overflow-x-hidden overflow-y-auto h-64 border border-slate-200 rounded-lg p-3 bg-slate-50 shadow-inner">
+            <div class="h-64 overflow-x-hidden overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-3 shadow-inner">
                 @{
                     var filteredContacts = AllContacts.Where(x => x.Visible);
                 }
@@ -20,7 +20,7 @@
                 }
                 else
                 {
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
                         @foreach (var contact in filteredContacts)
                         {
                             <div class="flex items-center gap-2">
@@ -28,7 +28,7 @@
                                        value="@contact.Key" checked="@contact.Selected"
                                        id="gc-@contact.Key" @onchange="e => OnContactSelect(e, contact)"
                                        class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                                <label class="text-sm text-slate-700 cursor-pointer select-none truncate" 
+                                <label class="cursor-pointer truncate text-sm text-slate-700 select-none" 
                                        for="gc-@contact.Key" title="@contact.Name (@contact.Key)">
                                     @contact.Name
                                 </label>
@@ -52,7 +52,7 @@
                 form="GroupForm" />
 
         <Button Text="Cancel"
-                Style="Button.ButtonStyle.Secondary"
+                Style="ColorStyle.Secondary"
                 IsDisabled="@isSubmitting"
                 OnClick="Close" />
     </Footer>

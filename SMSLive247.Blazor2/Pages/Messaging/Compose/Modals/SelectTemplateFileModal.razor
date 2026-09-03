@@ -1,18 +1,18 @@
-@using SMSLive247.Blazor2.Pages.ViewModels
+﻿@using SMSLive247.Blazor2.Pages.ViewModels
 @using SMSLive247.OpenApi
 
 <Modal Title="Select Data Sheet" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
     <Body>
         <div class="flex flex-col gap-4">
             <!-- Header actions: Search & Upload -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div class="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
                 <div class="flex-1">
                     <SearchBox InstantSearch="true" 
                                SearchTermChanged="OnSearchChanged" 
                                Placeholder="Search files..." />
                 </div>
                 <div>
-                    <label class="flex items-center justify-center gap-2 cursor-pointer rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-600 transition-colors w-full sm:w-auto @(isUploading ? "opacity-75 pointer-events-none" : "")">
+                    <label class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600 sm:w-auto @(isUploading ? "opacity-75 pointer-events-none" : "")">
                         @if (isUploading)
                         {
                             <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
@@ -36,13 +36,13 @@
                         <div class="py-12 text-center text-sm text-slate-400">
                             <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="mx-auto mb-2 text-3xl text-slate-300" />
                             <p>No sheets found.</p>
-                            <p class="text-xs text-slate-400 mt-1">Click "Upload CSV/Excel File..." above to upload one.</p>
+                            <p class="mt-1 text-xs text-slate-400">Click "Upload CSV/Excel File..." above to upload one.</p>
                         </div>
                     }
                     else
                     {
                         <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="sticky top-0 bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                            <thead class="sticky top-0 border-b border-slate-200 bg-slate-50 text-xs font-semibold tracking-wider text-slate-500 uppercase">
                                 <tr>
                                     <th class="w-10 px-4 py-3 text-center"></th>
                                     <th class="px-4 py-3">File Name</th>
@@ -71,19 +71,19 @@
                                                 <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
                                                     <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-base" />
                                                 </div>
-                                                <label for="tf-@f.BatchFileID" class="cursor-pointer truncate max-w-xs font-medium text-slate-900" title="@f.Description">
+                                                <label for="tf-@f.BatchFileID" class="max-w-xs cursor-pointer truncate font-medium text-slate-900" title="@f.Description">
                                                     @f.Description
                                                 </label>
                                             </div>
                                         </td>
-                                        <td class="px-4 py-3 text-slate-500 whitespace-nowrap">
+                                        <td class="px-4 py-3 whitespace-nowrap text-slate-500">
                                             <FormatDate DateTime="@f.DateCreated" />
                                         </td>
-                                        <td class="px-4 py-3 text-slate-700 whitespace-nowrap">
+                                        <td class="px-4 py-3 whitespace-nowrap text-slate-700">
                                             @f.TotalNumbers.ToString("N0") rows
                                         </td>
                                         <td class="px-4 py-3 text-right whitespace-nowrap">
-                                            <span class="rounded bg-slate-100 px-2 py-0.5 font-mono text-[11px] font-semibold text-slate-600 uppercase">
+                                            <span class="rounded bg-slate-100 px-2 py-0.5 font-mono font-semibold text-[11px] text-slate-600 uppercase">
                                                 @(string.IsNullOrWhiteSpace(f.FileType) ? "CSV" : f.FileType)
                                             </span>
                                         </td>
@@ -103,7 +103,7 @@
     </Body>
     <Footer>
         <Button Text="Select Sheet" Icon="Icon.IconStyle.PlusCircle" OnClick="Confirm" IsDisabled="@string.IsNullOrEmpty(selectedId)" />
-        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="Close" />
+        <Button Text="Cancel" Style="ColorStyle.Secondary" OnClick="Close" />
     </Footer>
 </Modal>
 

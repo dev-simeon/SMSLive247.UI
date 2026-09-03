@@ -1,35 +1,31 @@
 ﻿@if (IsVisible)
 {
     <div class="relative z-50">
-
         <Backdrop IsVisible="IsVisible" IsVisibleChanged="OnClose" />
-
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative w-full transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 @GetMaxWidthClass()">
-                    @* Header *@
-                    <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-                        <h3 class="text-lg leading-6 font-normal text-slate-900">
+                <div class="relative w-full @MaxWidthClass transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8">
+
+                    <header class="flex items-center justify-between px-4 @HeaderClasses py-3">
+                        <h3 class="text-lg leading-6 font-normal">
                             @Title
                         </h3>
                         <button type="button"
-                                class="text-slate-400 transition-colors hover:text-slate-900"
+                                class="text-slate-200 transition-colors hover:text-white"
                                 @onclick="OnClose">
                             <Icon Style="Icon.IconStyle.Close" />
                         </button>
-                    </div>
+                    </header>
 
-                    @* Content *@
-                    <div class="max-h-[70vh] overflow-y-auto px-4 py-4">
+                    <main class="max-h-[70vh] overflow-y-auto px-4 py-4">
                         @Body
-                    </div>
+                    </main>
 
-                    @* Footer *@
                     @if (Footer != null)
                     {
-                        <div class="flex flex-row-reverse gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3">
+                        <footer class="flex flex-row-reverse gap-3 border-t border-slate-200 bg-slate-100 px-4 py-3">
                             @Footer
-                        </div>
+                        </footer>
                     }
                 </div>
             </div>
@@ -38,14 +34,9 @@
 }
 
 @code {
-    public enum ModalSize
-    {
-        Small,
-        Medium,
-        Large,
-        ExtraLarge
-    }
+    public enum ModalSize { Small, Medium, Large, XLarge }
 
+    [Parameter] public ColorStyle Style { get; set; } = ColorStyle.Primary;
     [Parameter] public string? Title { get; set; }
     [Parameter] public RenderFragment? Body { get; set; }
     [Parameter] public RenderFragment? Footer { get; set; }
@@ -53,12 +44,25 @@
     [Parameter] public bool IsVisible { get; set; } = false;
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
 
-    public string GetMaxWidthClass() => Size switch
+    private string HeaderClasses => Style switch
+    {
+        ColorStyle.Primary      => "bg-brand-500 text-white",
+        ColorStyle.Secondary    => "bg-slate-100 text-slate-700",
+        ColorStyle.Success      => "bg-green-500 text-white",
+        ColorStyle.Danger       => "bg-red-500 text-white",
+        ColorStyle.Warning      => "bg-yellow-500 text-white",
+        ColorStyle.Info         => "bg-blue-500 text-white",
+        ColorStyle.Light        => "bg-gray-100 text-gray-800",
+        ColorStyle.Dark         => "bg-gray-800 text-white",
+        _                       => ""
+    };
+
+    private string MaxWidthClass => Size switch
     {
         ModalSize.Small     => "max-w-md",
         ModalSize.Medium    => "max-w-lg",
         ModalSize.Large     => "max-w-2xl",
-        ModalSize.ExtraLarge => "max-w-4xl",
+        ModalSize.XLarge    => "max-w-4xl",
         _                   => "max-w-lg"
     };
 

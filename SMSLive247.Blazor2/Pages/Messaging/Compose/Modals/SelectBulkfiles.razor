@@ -12,7 +12,7 @@
                 </div>
 
                 <div class="ml-4 flex items-center gap-2">
-                    <input id="bf-all" type="checkbox" @onchange="OnSelectAll" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
+                    <input id="bf-all" type="checkbox" @onchange="OnSelectAll" class="h-4 w-4 rounded border-slate-300 accent-brand-500" />
                     <label for="bf-all" class="cursor-pointer font-medium text-slate-700">Select All</label>
                 </div>
             </div>
@@ -55,7 +55,7 @@
     </Body>
     <Footer>
         <Button Text="Confirm" Icon="Icon.IconStyle.PlusCircle" OnClick="Confirm" />
-        <Button Text="Cancel" Style="Button.ButtonStyle.Secondary" OnClick="Close" />
+        <Button Text="Cancel" Style="ColorStyle.Secondary" OnClick="Close" />
     </Footer>
 </Modal>
 

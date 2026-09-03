@@ -1,11 +1,11 @@
-@typeparam TValue
+﻿@typeparam TValue
 @inherits InputBase<TValue?>
 
 <div>
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="block">
-            <span class="uppercase text-sm font-medium text-brand-400">@Label</span>
+            <span class="text-sm font-medium text-brand-400 uppercase">@Label</span>
             @if (Required)
             {
                 <span class="ml-2 text-red-500">*</span>
@@ -26,7 +26,7 @@
                 @attributes="AdditionalAttributes"
                 class="@GetCssClass()">
 
-            @if (Variant == SelectType.Country)
+            @if (Variant == SelectVariant.Country)
             {
                 <option value="">- select country -</option>
                 @foreach (var country in countries)
@@ -34,7 +34,7 @@
                     <option value="@country.Key">@country.Value</option>
                 }
             }
-            else if (Variant == SelectType.TimeZone)
+            else if (Variant == SelectVariant.TimeZone)
             {
                 <option value="">- select time zone -</option>
                 @foreach (var timeZone in timeZones)
@@ -72,15 +72,14 @@
 </div>
 
 @code {
-    public enum SelectType { None, Country, TimeZone }
+    public enum SelectVariant { None, Country, TimeZone }
 
     [Parameter] public string? Label { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public SelectType Variant { get; set; } = SelectType.None;
+    [Parameter] public SelectVariant Variant { get; set; } = SelectVariant.None;
     [Parameter] public Icon.IconStyle? IconStyle { get; set; }
     [Parameter] public bool IsEmbedded { get; set; } = false;
     [Parameter] public string? HelpText { get; set; }
-    [Parameter] public string? CssClass { get; set; }
 
     // additional validation parameters
     [Parameter] public bool Required { get; set; } = true;

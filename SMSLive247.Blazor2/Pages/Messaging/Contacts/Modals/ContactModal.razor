@@ -1,4 +1,4 @@
-<Modal Title="@modalTitle" Size="Modal.ModalSize.Medium" @bind-IsVisible="isVisible">
+﻿<Modal Title="@modalTitle" Size="Modal.ModalSize.Medium" @bind-IsVisible="isVisible">
     <Body>
         <EditForm id="ContactForm" Model="@editModel" OnValidSubmit="HandleSubmit" class="space-y-4">
             @if (!isEditMode)
@@ -46,7 +46,7 @@
             <div class="pt-1">
                 @if (AllGroups.Count > 0)
                 {
-                    <label class="font-medium text-slate-700 mb-2">
+                    <label class="mb-2 font-medium text-slate-700">
                         Assign to Groups <span class="font-xs text-slate-400 italic">(Optional)</span>
                     </label>
 
@@ -57,7 +57,7 @@
                                 <input type="checkbox"
                                        value="@group.Key" checked="@group.Selected"
                                        id="cg-@group.Key" @onchange="e => OnGroupSelect(e, group)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                                <label class="text-sm text-slate-700 cursor-pointer select-none truncate" for="cg-@group.Key" title="@group.Key">
+                                <label class="cursor-pointer truncate text-sm text-slate-700 select-none" for="cg-@group.Key" title="@group.Key">
                                     @group.Key
                                 </label>
                             </div>
@@ -75,7 +75,7 @@
                 form="ContactForm" />
 
         <Button Text="Cancel"
-                Style="Button.ButtonStyle.Secondary"
+                Style="ColorStyle.Secondary"
                 IsDisabled="@isSubmitting"
                 OnClick="Close" />
     </Footer>
