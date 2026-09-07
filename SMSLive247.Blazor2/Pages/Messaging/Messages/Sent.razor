@@ -5,7 +5,7 @@
         </SearchBox>
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="Export CSV" Icon="Icon.IconStyle.Download" />
+        <Button Text="Export Messages" Icon="Icon.IconStyle.Download" OnClick="HandleExport" />
     </HeaderRight>
 
     <ChildContent>
@@ -38,7 +38,7 @@
                 </Column>
                 <Column>
                     <Actions ViewLink="@Const.Routes.Messaging.MessageDetailsUrl(context.BatchID)"
-                             OnDelete="e => DeleteBatch(context.BatchID)">
+                             OnDelete="e => HandleDelete(context)">
                     </Actions>
                 </Column>
                 </Columns>
@@ -72,28 +72,42 @@
         await ds.LoadData(alert);
     }
 
-    private void OnDateRangeChanged((DateTime? From, DateTime? To) range)
-    {
-        filterFrom = range.From;
-        filterTo = range.To;
-    }
-    
-    private async Task DeleteBatch(long? batchId)
-    {
-        if (batchId == null) return;
-        
-        bool confirmed = await alert.Confirm("Are you sure you want to delete this batch?");
-        if (confirmed)
-        {
-            // await apiClient.SmsBatchDeleteAsync(batchId.Value);
-            await ReloadData();
-        }
-    }
-
     private async Task ReloadData()
     {
         ds.SetPage(new PageState(ds.PageState.PageSize, 1));
         await ds.LoadData(alert);
+    }
+
+    private async Task HandleExport()
+    {
+        try
+        {
+            var response = await apiClient.SmsBatchDownloadAsync(filterFrom, filterTo, searchQuery);
+            var fileName = $"sent-sms-{filterFrom:dd-MMM-yyyy}-to-{filterTo:dd-MMM-yyyy}.csv";
+
+            await js.DownloadFromStream(fileName, response.Stream);
+        }
+        catch (Exception)
+        {
+            await alert.Error("Failed to download file.");
+        }
+    }
+
+
+    private async Task HandleDelete(SmsBatchResponse batch)
+    {       
+        if (await alert.Confirm("Are you sure you want to delete this batch?", "Confirm Delete"))
+        {
+            await apiClient.SmsBatchDeleteAsync(batch.BatchID);
+            await alert.Success("Batch deleted successfully.");
+            await ReloadData();
+        }
+    }
+
+    private void OnDateRangeChanged((DateTime? From, DateTime? To) range)
+    {
+        filterFrom = range.From;
+        filterTo = range.To;
     }
 
     private async Task OnPageChange(int page)

@@ -31,8 +31,8 @@
                     <FormatDate DateTime="@context.DateCreated" />
                 </Column>
                 <Column>
-                    <Actions OnDownload="() => HandleDownload(context.BatchFileID)"
-                             OnDelete="() => HandleDelete(context.BatchFileID, context.Description)">
+                    <Actions OnDownload="() => HandleDownload(context)"
+                             OnDelete="() => HandleDelete(context)">
                     </Actions>
                 </Column>
             </Columns>
@@ -110,15 +110,11 @@
         uploadModal.Show();
     }
 
-    private async Task HandleDownload(string? fileId)
+    private async Task HandleDownload(BatchFileResponse file)
     {
-        if (string.IsNullOrEmpty(fileId)) return;
-
         try
         {
-            var fileResponse = await apiClient.BatchFileDownloadAsync(fileId);
-            // Download triggered via fileResponse stream
-            await alert.Success($"Downloading file {fileId}...", "Download");
+            await js.DownloadFromStream(file, apiClient);
         }
         catch (Exception)
         {
@@ -126,17 +122,15 @@
         }
     }
 
-    private async Task HandleDelete(string? fileId, string? description)
+    private async Task HandleDelete(BatchFileResponse file)
     {
-        if (string.IsNullOrEmpty(fileId)) return;
+        var desc = string.IsNullOrEmpty(file.Description) ? file.BatchFileID : file.Description;
 
-        var name = string.IsNullOrEmpty(description) ? fileId : description;
-        bool confirmed = await alert.Confirm($"Are you sure you want to delete file '{name}'?", "Confirm Delete");
-        if (confirmed)
+        if (await alert.Confirm($"Are you sure you want to delete file '{desc}'?", "Confirm Delete"))
         {
             try
             {
-                await apiClient.BatchFileDeleteAsync(fileId);
+                await apiClient.BatchFileDeleteAsync(file.BatchFileID);
                 await alert.Success("File deleted successfully.");
                 await FetchFiles();
             }

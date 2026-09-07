@@ -1,6 +1,4 @@
-@attribute [Route(Const.Routes.Register)]
-@inject NavigationManager nav
-@inject Settings settings
+﻿@attribute [Route(Const.Routes.Register)]
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -11,14 +9,14 @@
         </p>
         <div class="flex flex-col gap-4">
             <div class="flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-white text-xl shrink-0" />
+                <Icon Style="Icon.IconStyle.CheckCircle" CssClass="shrink-0 text-xl text-white" />
                 <div>
                     <p class="font-semibold">Robust API Integration</p>
                     <p class="mt-0.5 text-xs text-slate-100">Connect your enterprise workflows in minutes.</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                <Icon Style="Icon.IconStyle.Shield" CssClass="text-white text-xl shrink-0" />
+                <Icon Style="Icon.IconStyle.Shield" CssClass="shrink-0 text-xl text-white" />
                 <div>
                     <p class="font-semibold">Scalable Infrastructure</p>
                     <p class="mt-0.5 text-xs text-slate-100">High throughput for time-critical notifications.</p>
@@ -34,12 +32,11 @@
         <img src="smslive-logo-2.png" alt="SMSLive247" class="h-10 w-auto rounded-lg" />
     </div>
 
-
-    @if (step != 3)
+    @if (step < 3)
     {
         <div class="mb-8 flex items-center justify-between">
 
-            <div class="flex items-center gap-2.5 shrink-0">
+            <div class="flex shrink-0 items-center gap-2.5">
                 <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step > 1 ? "bg-brand-100 text-brand-700" : step == 1 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
                     @if (step > 1)
                     {
@@ -59,7 +56,7 @@
             <div class="mx-3 flex-1 transition-colors @(step > 1 ? "bg-brand-100" : "bg-slate-200")" style="height: 2px;"></div>
 
 
-            <div class="flex items-center gap-2.5 shrink-0">
+            <div class="flex shrink-0 items-center gap-2.5">
                 <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step == 2 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
                     <span>2</span>
                 </div>
@@ -70,10 +67,9 @@
         </div>
     }
 
-
     @if (step == 1)
     {
-        <div class="space-y-6 animate-in fade-in duration-300">
+        <div class="animate-in fade-in space-y-6 duration-300">
             <div class="text-center lg:text-left">
                 <h2 class="text-3xl font-bold text-slate-900">Create Account</h2>
                 <p class="mt-2 text-slate-500">Enter your email and mobile phone to receive a verification code.</p>
@@ -114,19 +110,17 @@
             </p>
         </div>
     }
-
-
-    @if (step == 2)
+    else if (step == 2)
     {
-        <div class="space-y-6 animate-in fade-in duration-300">
+        <div class="animate-in fade-in space-y-6 duration-300">
             <div class="text-center lg:text-left">
                 <h2 class="text-3xl font-bold text-slate-900">Verify &amp; Complete Profile</h2>
                 <p class="mt-2 text-slate-500">Enter the verification code sent to your email and finish setting up your account.</p>
             </div>
 
 
-            <div class="flex items-start gap-3 p-4 bg-brand-50 border border-brand-100 rounded-xl text-sm text-brand-700">
-                <Icon Style="Icon.IconStyle.Key" CssClass="text-lg shrink-0 mt-0.5" />
+            <div class="flex items-start gap-3 rounded-xl border border-brand-100 bg-brand-50 p-4 text-sm text-brand-700">
+                <Icon Style="Icon.IconStyle.Key" CssClass="mt-0.5 shrink-0 text-lg" />
                 <span>
                     A verification code was sent to <strong>@requestModel.Email</strong>. Enter it below to complete your registration.
                 </span>
@@ -186,7 +180,7 @@
 
                 @if (confirmModel.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
                 {
-                    <p class="text-xs text-red-500 font-medium">Passwords do not match.</p>
+                    <p class="text-xs font-medium text-red-500">Passwords do not match.</p>
                 }
 
 
@@ -196,9 +190,9 @@
                     <label class="ml-2 block text-sm text-slate-700" for="terms">
                         I have read and accepted the
                         <a href="@Const.Routes.Legal.Terms" target="_blank"
-                           class="font-medium text-brand-600 hover:text-brand-700 underline">Agreement</a> and
+                           class="font-medium text-brand-600 underline hover:text-brand-700">Agreement</a> and
                         <a href="@Const.Routes.Legal.Privacy" target="_blank"
-                           class="font-medium text-brand-600 hover:text-brand-700 underline">Privacy Policy</a>
+                           class="font-medium text-brand-600 underline hover:text-brand-700">Privacy Policy</a>
                     </label>
                 </div>
 
@@ -215,25 +209,23 @@
                 Didn't receive a verification code?
                 <button type="button"
                         @onclick="BackToStep1"
-                        class="font-semibold text-brand-500 hover:text-brand-600 underline decoration-brand-500/30 hover:decoration-brand-500 transition-all">
+                        class="font-semibold text-brand-500 underline decoration-brand-500/30 transition-all hover:text-brand-600 hover:decoration-brand-500">
                     Go back &amp; resend
                 </button>
             </p>
         </div>
     }
-
-
-    @if (step == 3)
+    else if (step == 3)
     {
-        <div class="text-center space-y-6 animate-in fade-in duration-500 py-4">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-50 text-emerald-500 mb-2 border border-emerald-100 shadow-sm">
+        <div class="animate-in fade-in space-y-6 py-4 text-center duration-500">
+            <div class="mb-2 inline-flex h-20 w-20 items-center justify-center rounded-full border border-emerald-100 bg-emerald-50 text-emerald-500 shadow-sm">
                 <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-4xl text-emerald-500" />
             </div>
             <div class="space-y-2">
                 <h2 class="text-3xl font-bold text-slate-900">
                     Account Created!
                 </h2>
-                <p class="text-slate-500 text-sm max-w-sm mx-auto">
+                <p class="mx-auto max-w-sm text-sm text-slate-500">
                     Your SMSLive247 account has been created successfully. You can now sign in with your credentials.
                 </p>
             </div>
@@ -264,10 +256,10 @@
 
             var response = await apiClient.RegisterRequestAsync(requestModel);
 
-            confirmModel.Email = requestModel.Email;
-            confirmModel.Phone = requestModel.Phone;
-            step = 2;
+            // confirmModel.Email = requestModel.Email;
+            // confirmModel.Phone = requestModel.Phone;
             await alert.Info("Verification code sent to your email!", "Verification Code");
+            step = 2;
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
@@ -301,8 +293,8 @@
             confirmModel.AccountName = $"{confirmModel.FirstName} {confirmModel.LastName}";
 
             var response = await apiClient.RegisterConfirmAsync(confirmModel);
+            await alert.Success("Account created successfully!", "Account Created");
             step = 3;
-            await alert.Info("Account created successfully!", "Account Created");
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {

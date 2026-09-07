@@ -1,4 +1,4 @@
-@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
+﻿@using SMSLive247.Blazor2.Pages.Messaging.Contacts.Modals
 
 <PageBody>
     <HeaderLeft>
@@ -27,18 +27,20 @@
                            class="hidden" />
 
                     <label for="g-@group.Key" 
-                           class="flex items-center py-1.5 px-3 rounded-lg border-1 border-brand-600 transition-colors cursor-pointer @selectedCss">
+                           class="flex cursor-pointer items-center rounded-lg border-1 border-brand-600 px-2 py-1.5 transition-colors @selectedCss">
                         @group.Name
-                        <span class="ml-2 flex py-0.5 px-2 rounded text-sm bg-yellow-500 text-white font-bold">
+                        <span class="ml-3 flex rounded bg-yellow-500 px-2 py-0.5 text-sm font-bold text-white">
                             @group.Count.ToString("#,##0")
                         </span>
                         @if (group.Selected)
                         {
-                            <div class="flex text-white pl-2 gap-1 leading-none">
-                                <span @onclick="() => groupModal.Show(group.Response)">
+                            <div class="flex gap-1 pl-4 leading-none text-white">
+                                <span @onclick="() => groupModal.Show(group.Response)" 
+                                      @onclick:stopPropagation="true" @onclick:preventDefault="true">
                                     <Icon Style="Icon.IconStyle.PenSquare" FontSize="1.5em" />
                                 </span>
-                                <span @onclick="() => groupModal.Show(group.Response)">
+                                <span @onclick="() => HandleDeleteGroup(group.Response.GroupName)"
+                                      @onclick:stopPropagation="true" @onclick:preventDefault="true">
                                     <Icon Style="Icon.IconStyle.Trash" FontSize="1.5em" />
                                 </span>
                             </div>
@@ -48,10 +50,10 @@
             </div>
             
             <!-- Multi-select toggle switch -->
-            <div class="flex items-center ml-4 shrink-0">
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" class="sr-only peer" @bind="multiSelectGroup" />
-                    <div class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
+            <div class="ml-4 flex shrink-0 items-center">
+                <label class="relative inline-flex cursor-pointer items-center">
+                    <input type="checkbox" class="peer sr-only" @bind="multiSelectGroup" />
+                    <div class="peer h-6 w-11 rounded-full bg-slate-300 peer-checked:bg-brand-500 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-slate-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full"></div>
                 </label>
             </div>
         </header>
@@ -81,17 +83,19 @@
                     
                         <div>
                             <div class="">@contact.Response.ContactName</div>
-                            <div class="flex text-slate-400 font-mono">
+                            <div class="flex justify-between font-mono text-slate-400">
                                 @contact.Response.PhoneNumber
                                 @if (contact.Selected)
                                 {
-                                    <div class="flex items-center gap-1 ml-2 leading-none">
-                                        <button type="button" @onclick="() => contactModal.Show(contact.Response)"
-                                                class="hover:text-brand-600">
+                                    <div class="ml-2 flex items-center gap-1 leading-none">
+                                        <button type="button" class="hover:text-brand-600" 
+                                                @onclick="() => contactModal.Show(contact.Response)"
+                                                @onclick:stopPropagation="true">
                                             <Icon Style="Icon.IconStyle.PenSquare" FontSize="1.3em" />
                                         </button>
-                                        <button type="button" @onclick="() => contactModal.Show(contact.Response)"
-                                                class="hover:text-brand-600">
+                                        <button type="button" class="hover:text-brand-600" 
+                                                @onclick="() => HandleDeleteContact(contact.Response.PhoneNumber)"
+                                                @onclick:stopPropagation="true">
                                             <Icon Style="Icon.IconStyle.Trash" FontSize="1.3em" />
                                         </button>
                                     </div>
@@ -99,7 +103,7 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap gap-1 mt-1">
+                        <div class="mt-1 flex flex-wrap gap-1">
                             @foreach (var group in (contact.Response.Groups ?? []))
                             {
                                 <span class="rounded bg-brand-600 px-2 py-0.5 text-xs font-bold text-white">
@@ -112,7 +116,6 @@
             }
         </div>
     </ChildContent>
-
     <FooterLeft>
     </FooterLeft>
 </PageBody>
@@ -209,135 +212,11 @@
         OnSearch();
     }
 
-}
-
-@* @code {
-    private string? searchQuery;
-
-    private List<ContactResponse> contacts = new();
-    private List<GroupResponse> groups = new();
-    private ContactModal contactModal = new();
-    private GroupModal groupModal = new();
-
-    private List<string> selectedGroups = new();
-    private bool multiSelectGroup = false;
-    private string? selectedContactPhone;
-
-    private bool MultiSelectGroup
-    {
-        get => multiSelectGroup;
-        set
-        {
-            multiSelectGroup = value;
-            if (!multiSelectGroup && selectedGroups.Count > 1)
-            {
-                // keep only the first one if turning off multi-select
-                var first = selectedGroups.First();
-                selectedGroups.Clear();
-                selectedGroups.Add(first);
-            }
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await FetchData();
-    }
-
-    private async Task FetchData()
-    {
-        try
-        {
-            var contactsTask = apiClient.ContactListAsync();
-            var groupsTask = apiClient.GroupListAsync();
-
-            await Task.WhenAll(contactsTask, groupsTask);
-
-            var contactsRes = await contactsTask;
-            var groupsRes = await groupsTask;
-
-            contacts = contactsRes.Result?.ToList() ?? new();
-            groups = groupsRes.Result?.ToList() ?? new();
-        }
-        catch (Exception)
-        {
-            await alert.Error("Failed to load contacts data.");
-        }
-    }
-
-    private List<ContactResponse> FilteredContacts
-    {
-        get
-        {
-            var result = contacts.AsEnumerable();
-
-            if (selectedGroups.Any())
-            {
-                foreach (var g in selectedGroups)
-                {
-                    result = result.Where(c => c.Groups != null && c.Groups.Contains(g, StringComparer.OrdinalIgnoreCase));
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchQuery))
-            {
-                var q = searchQuery.Trim().ToLowerInvariant();
-                result = result.Where(c =>
-                    (c.ContactName != null && c.ContactName.ToLowerInvariant().Contains(q)) ||
-                    (c.PhoneNumber != null && c.PhoneNumber.ToLowerInvariant().Contains(q))
-                );
-            }
-
-            return result.ToList();
-        }
-    }
-
-    private void ToggleGroup(string? groupName)
-    {
-        if (string.IsNullOrEmpty(groupName)) return;
-
-        if (selectedGroups.Contains(groupName))
-        {
-            selectedGroups.Remove(groupName);
-        }
-        else
-        {
-            if (!MultiSelectGroup)
-            {
-                selectedGroups.Clear();
-            }
-            selectedGroups.Add(groupName);
-        }
-    }
-
-    private void ToggleContact(string? phone)
-    {
-        if (string.IsNullOrEmpty(phone)) return;
-
-        if (selectedContactPhone == phone)
-            selectedContactPhone = null;
-        else
-            selectedContactPhone = phone;
-    }
-
-    private string GetInitials(string? name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            return "?";
-
-        var trimmed = name.Trim();
-        if (trimmed.Length == 1)
-            return trimmed.ToUpperInvariant();
-
-        return trimmed.Substring(0, 2).ToUpperInvariant();
-    }
-
-    private async Task HandleDeleteContact(string? phoneNo)
+    private async Task HandleDeleteContact(string phoneNo)
     {
         if (string.IsNullOrEmpty(phoneNo)) return;
 
-        bool confirmed = await alert.Confirm($"Are you sure you want to delete contact {phoneNo}?", "Confirm Delete");
-        if (confirmed)
+        if (await alert.Confirm($"Are you sure you want to delete contact {phoneNo}?", "Confirm Delete"))
         {
             try
             {
@@ -352,12 +231,11 @@
         }
     }
 
-    private async Task HandleDeleteGroup(string? groupId)
+    private async Task HandleDeleteGroup(string groupId)
     {
         if (string.IsNullOrEmpty(groupId)) return;
 
-        bool confirmed = await alert.Confirm($"Are you sure you want to delete group '{groupId}'?", "Confirm Delete");
-        if (confirmed)
+        if (await alert.Confirm($"Are you sure you want to delete group '{groupId}'?", "Confirm Delete"))
         {
             try
             {
@@ -372,4 +250,3 @@
         }
     }
 }
- *@

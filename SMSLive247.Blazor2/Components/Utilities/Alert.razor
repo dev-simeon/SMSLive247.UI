@@ -70,10 +70,10 @@
         return Open(ColorStyle.Success, Icon.IconStyle.CheckCircle, message, title);
     }
 
-    public Task<bool> Confirm(string message, string title)
+    public async Task<bool> Confirm(string message, string title)
     {
-        //return Open("warning", "bi bi-question-circle-fill", message, title, true);
-        return Task.FromResult(true);
+        await Open(ColorStyle.Warning, Icon.IconStyle.HelpCircle, message, title, true);
+        return await taskSource.Task;
     }
 
     [MemberNotNull(nameof(taskSource))]

@@ -157,11 +157,19 @@ else
 
             var request = model.CreateRequest();
             var result = await apiClient.SmsBatchCreateAsync(request);
+            var res = result.Result;
 
-            await alert.Success(deliveryTime.HasValue
+            var reply = deliveryTime.HasValue
                 ? "Your message has been scheduled."
-                : "Your message is being sent."
-                , "Message Created");
+                : $"{res.TotalProcessed} message/s was submitted for immediate delivery.";
+
+
+
+            //1 message/s was submitted for immediate delivery.
+            // ~
+            // Total SMS units charged: 3.40
+
+            await alert.Success(reply, "Message Created");
         }
         catch (Exception ex)
         {
