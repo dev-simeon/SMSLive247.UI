@@ -1,11 +1,11 @@
-﻿@typeparam TValue
+@typeparam TValue
 @inherits InputBase<TValue>
 
 <div>
     @if (!string.IsNullOrEmpty(Label))
     {
         <label class="block">
-            <span class="uppercase text-sm font-medium text-brand-400">@Label</span>
+            <span class="@(string.IsNullOrEmpty(LabelCssClass) ? "text-sm font-medium text-slate-700" : LabelCssClass)">@Label</span>
             @if (Required)
             {
                 <span class="ml-2 text-red-500">*</span>
@@ -13,7 +13,7 @@
             @if (HasError)
             {
                 <span class="ml-2 text-xs text-red-500">
-                    @* <Icon Style="Icon.IconStyle.Info" CssClass="mr-2 text-[2px] text-yellow-500" /> *@
+
                     <o>@ErrorMessage</o>
                 </span>
             }
@@ -85,7 +85,7 @@
     @if(!string.IsNullOrEmpty(HelpText))
     {
         <p class="mt-1 text-xs text-slate-500">
-            @* <Icon Style="Icon.IconStyle.Info" CssClass="" /> *@
+
             <span>@HelpText</span>
         </p>
     }
@@ -93,13 +93,14 @@
 
 @code {
     [Parameter] public string? Label { get; set; }
+    [Parameter] public string? LabelCssClass { get; set; }
     [Parameter] public string? PlaceHolder { get; set; }
-    [Parameter] public string? Type { get; set; } = "text"; //text, password, email, number, etc.
+    [Parameter] public string? Type { get; set; } = "text";
     [Parameter] public Icon.IconStyle? IconStyle { get; set; }
     [Parameter] public string? HelpText { get; set; }
     [Parameter] public int Multiline { get; set; } = 1;
 
-    // additional validation parameters
+    // validation parameters
     [Parameter] public bool Required { get; set; } = false;
     [Parameter] public TValue? Min { get; set; }
     [Parameter] public TValue? Max { get; set; }
@@ -111,7 +112,6 @@
     [Parameter] public EventCallback<bool> IsValidChanged { get; set; }
     [Parameter] public EventCallback<InputFileChangeEventArgs> OnFileChange { get; set; }
 
-    // public properties to expose validation state to parent components
     public bool HasError { get; private set; }
     public string? ErrorMessage { get; private set; }
 
@@ -200,30 +200,12 @@
             return (false, string.Format(RequiredMessage, Label ?? Type));
 
         if (isEmpty)
-            // Not required and empty — nothing further to check.
             return (true, null);
 
         if (Type == "email" && !System.Net.Mail.MailAddress.TryCreate(raw, out _))
             return (false, string.Format(InvalidMessage, Label ?? Type));
 
-        // if (!TryParse(raw, out _))
-        //     return (false, "Please enter a valid number.");
-
-        // var numeric = Convert.ToDouble(raw, CultureInfo.InvariantCulture);
-
-        // if (Min.HasValue && numeric < Min.Value)
-        //     return (false, string.Format(RangeMessageFormat, Min, Max));
-
-        // if (Max.HasValue && numeric > Max.Value)
-        //     return (false, string.Format(RangeMessageFormat, Min, Max));
-
         return (true, null);
     }
 
-    // private async Task<bool> ValidateNowAsync()
-    // {
-    //     hasBlurredOnce = true;
-    //     await ValidateAsync();
-    //     return !HasError;
-    // }
 }

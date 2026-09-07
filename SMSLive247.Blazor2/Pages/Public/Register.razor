@@ -1,4 +1,6 @@
-﻿@attribute [Route(Const.Routes.Register)]
+@attribute [Route(Const.Routes.Register)]
+@inject NavigationManager nav
+@inject Settings settings
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -9,19 +11,14 @@
         </p>
         <div class="flex flex-col gap-4">
             <div class="flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check-big shrink-0 text-white" aria-hidden="true">
-                    <path d="M21.801 10A10 10 0 1 1 17 3.335"></path>
-                    <path d="m9 11 3 3L22 4"></path>
-                </svg>
+                <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-white text-xl shrink-0" />
                 <div>
                     <p class="font-semibold">Robust API Integration</p>
                     <p class="mt-0.5 text-xs text-slate-100">Connect your enterprise workflows in minutes.</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-3 backdrop-blur-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield shrink-0 text-white" aria-hidden="true">
-                    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path>
-                </svg>
+                <Icon Style="Icon.IconStyle.Shield" CssClass="text-white text-xl shrink-0" />
                 <div>
                     <p class="font-semibold">Scalable Infrastructure</p>
                     <p class="mt-0.5 text-xs text-slate-100">High throughput for time-critical notifications.</p>
@@ -31,133 +28,246 @@
     </div>
 </SectionContent>
 
-<div class="text-center lg:text-left">
-    <div class="mb-8 flex items-center justify-center lg:hidden">
+<div>
+
+    <div class="mb-6 flex items-center justify-center lg:hidden">
         <img src="smslive-logo-2.png" alt="SMSLive247" class="h-10 w-auto rounded-lg" />
     </div>
-    <h2 class="text-3xl font-bold text-slate-900">Create Account</h2>
-    <p class="mt-2 text-slate-500">Join the SMSLive247 enterprise platform today.</p>
-</div>
 
-<EditForm Model="@model" OnValidSubmit="RegisterAsync" FormName="R1" class="space-y-5">
-    <FormRow Cols="2">
-        <FormInput 
-            @bind-Value="model.FirstName" 
-            Label="First Name" 
-            PlaceHolder="John"
-            IconStyle="Icon.IconStyle.User"
-            Required="true"/>
-        <FormInput 
-            @bind-Value="model.LastName" 
-            Label="Last Name" 
-            PlaceHolder="Doe" 
-            IconStyle="Icon.IconStyle.User" 
-            Required="true"/>
-    </FormRow>
 
-    <FormRow Cols="1">
-        <FormInput 
-            @bind-Value="model.Email" 
-            Type="email" 
-            Label="Email" 
-            PlaceHolder="john@company.com" 
-            IconStyle="Icon.IconStyle.Mail"
-            Required="true"/>
-    </FormRow>
-
-    <FormRow Cols="2">
-        <FormInput 
-            @bind-Value="model.Phone" 
-            Type="tel" 
-            Label="Phone Number" 
-            PlaceHolder="+234 800 000 0000" 
-            IconStyle="Icon.IconStyle.Phone" 
-            Required="true"/>
-        <FormSelect 
-            @bind-Value="model.CountryCode"  
-            Label="Country" 
-            Variant="FormSelect<int>.SelectVariant.Country" 
-            IconStyle="Icon.IconStyle.Phone"
-            Required="true" />
-    </FormRow>
-
-    <FormRow Cols="1" Visible="true">
-        <FormSelect 
-            @bind-Value="model.TimeZone" 
-            Label="Time Zone" 
-            Variant="FormSelect<int>.SelectVariant.TimeZone"
-            IconStyle="Icon.IconStyle.Phone"
-            Required="true" />
-    </FormRow>
-
-    <FormRow Cols="2">
-        <FormInput @bind-Value="model.Password" Type="password" Label="Password" Required="true" />
-        <FormInput @bind-Value="confirmPassword" Type="password" Label="Confirm Password" Required="true" />
-    </FormRow>
-
-    @if (model.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
+    @if (step != 3)
     {
-        <p class="mt-1 text-red-500">Passwords do not match.</p>
+        <div class="mb-8 flex items-center justify-between">
+
+            <div class="flex items-center gap-2.5 shrink-0">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step > 1 ? "bg-brand-100 text-brand-700" : step == 1 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
+                    @if (step > 1)
+                    {
+                        <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-sm" />
+                    }
+                    else
+                    {
+                        <span>1</span>
+                    }
+                </div>
+                <span class="text-xs font-medium transition-colors sm:text-sm @(step == 1 ? "font-semibold text-slate-900" : step > 1 ? "text-brand-700" : "text-slate-400")">
+                    Contact Details
+                </span>
+            </div>
+
+
+            <div class="mx-3 flex-1 transition-colors @(step > 1 ? "bg-brand-100" : "bg-slate-200")" style="height: 2px;"></div>
+
+
+            <div class="flex items-center gap-2.5 shrink-0">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step == 2 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
+                    <span>2</span>
+                </div>
+                <span class="text-xs font-medium transition-colors sm:text-sm @(step == 2 ? "font-semibold text-slate-900" : "text-slate-400")">
+                    Verify &amp; Profile
+                </span>
+            </div>
+        </div>
     }
 
-    <div class="flex items-center">
-        <InputCheckbox @bind-Value="termsAccepted" id="terms" style="accent-color: lime"
-                       class="h-4 w-4 rounded-lg border-slate-200 bg-brand-500 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/30 focus:outline-none" />
-        
-                       <label class="ml-2 block text-sm text-slate-600" for="terms">
-            I have read and accepted the
-            <a href="@Const.Routes.Legal.Terms" target="_blank"
-               class="text-brand-500 hover:text-brand-600">Agreement</a> and
-            <a href="@Const.Routes.Legal.Privacy" target="_blank"
-               class="text-brand-500 hover:text-brand-600">Privacy Policy</a>
-        </label>
-    </div>
 
-    <Button IsSubmit="true"
-            IsBusy="@isBusy"
-            IsDisabled="@(!termsAccepted)"
-            CssClass="w-full py-3"
-            Text="Create Account" />
-</EditForm>
+    @if (step == 1)
+    {
+        <div class="space-y-6 animate-in fade-in duration-300">
+            <div class="text-center lg:text-left">
+                <h2 class="text-3xl font-bold text-slate-900">Create Account</h2>
+                <p class="mt-2 text-slate-500">Enter your email and mobile phone to receive a verification code.</p>
+            </div>
 
-<p class="text-center text-sm text-slate-500">
-    Already have an account?
-    <a href="@Const.Routes.Login" class="font-semibold text-brand-500 hover:text-brand-600">
-        Sign In
-    </a>
-</p>
+            <EditForm Model="@requestModel" OnValidSubmit="RequestOtpAsync" FormName="regRequest" class="space-y-5">
+                <FormRow Cols="1">
+                    <FormInput @bind-Value="requestModel.Email"
+                               Type="email"
+                               Label="Email Address"
+                               PlaceHolder="john@company.com"
+                               IconStyle="Icon.IconStyle.Mail"
+                               Required="true" />
+                </FormRow>
+
+                <FormRow Cols="1">
+                    <FormInput @bind-Value="requestModel.Phone"
+                               Type="tel"
+                               Label="Mobile Phone Number"
+                               PlaceHolder="+234 800 000 0000"
+                               IconStyle="Icon.IconStyle.Phone"
+                               Required="true" />
+                </FormRow>
+
+                <div>
+                    <Button IsSubmit="true"
+                            IsBusy="@isBusy"
+                            CssClass="w-full py-3"
+                            Text="Send Verification Code >" />
+                </div>
+            </EditForm>
+
+            <p class="text-center text-sm text-slate-500">
+                Already have an account?
+                <a href="@Const.Routes.Login" class="font-semibold text-brand-500 hover:text-brand-600">
+                    Sign In
+                </a>
+            </p>
+        </div>
+    }
+
+
+    @if (step == 2)
+    {
+        <div class="space-y-6 animate-in fade-in duration-300">
+            <div class="text-center lg:text-left">
+                <h2 class="text-3xl font-bold text-slate-900">Verify &amp; Complete Profile</h2>
+                <p class="mt-2 text-slate-500">Enter the verification code sent to your email and finish setting up your account.</p>
+            </div>
+
+
+            <div class="flex items-start gap-3 p-4 bg-brand-50 border border-brand-100 rounded-xl text-sm text-brand-700">
+                <Icon Style="Icon.IconStyle.Key" CssClass="text-lg shrink-0 mt-0.5" />
+                <span>
+                    A verification code was sent to <strong>@requestModel.Email</strong>. Enter it below to complete your registration.
+                </span>
+            </div>
+
+            <EditForm Model="@confirmModel" OnValidSubmit="ConfirmRegisterAsync" FormName="regConfirm" class="space-y-5">
+
+                <FormRow Cols="1">
+                    <FormInput @bind-Value="confirmModel.VerifyCode"
+                               Label="Verification Code (OTP)"
+                               PlaceHolder="Enter the code sent to your email"
+                               IconStyle="Icon.IconStyle.Key"
+                               Required="true" />
+                </FormRow>
+
+
+                <FormRow Cols="2">
+                    <FormInput @bind-Value="confirmModel.FirstName"
+                               Label="First Name"
+                               PlaceHolder="John"
+                               IconStyle="Icon.IconStyle.User"
+                               Required="true" />
+                    <FormInput @bind-Value="confirmModel.LastName"
+                               Label="Last Name"
+                               PlaceHolder="Doe"
+                               IconStyle="Icon.IconStyle.User"
+                               Required="true" />
+                </FormRow>
+
+
+                <FormRow Cols="2">
+                    <FormSelect @bind-Value="confirmModel.CountryCode"
+                                Label="Country"
+                                Variant="FormSelect<int>.SelectVariant.Country"
+                                IconStyle="Icon.IconStyle.Phone"
+                                Required="true" />
+                    <FormSelect @bind-Value="confirmModel.TimeZone"
+                                Label="Time Zone"
+                                Variant="FormSelect<int>.SelectVariant.TimeZone"
+                                IconStyle="Icon.IconStyle.Clock"
+                                Required="true" />
+                </FormRow>
+
+
+                <FormRow Cols="2">
+                    <FormInput @bind-Value="confirmModel.Password"
+                               Type="password"
+                               Label="Password"
+                               Required="true"
+                               PlaceHolder="At least 6 characters" />
+                    <FormInput @bind-Value="confirmPassword"
+                               Type="password"
+                               Label="Confirm Password"
+                               Required="true"
+                               PlaceHolder="Re-enter your password" />
+                </FormRow>
+
+                @if (confirmModel.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
+                {
+                    <p class="text-xs text-red-500 font-medium">Passwords do not match.</p>
+                }
+
+
+                <div class="flex items-center">
+                    <InputCheckbox @bind-Value="termsAccepted" id="terms"
+                                   class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
+                    <label class="ml-2 block text-sm text-slate-700" for="terms">
+                        I have read and accepted the
+                        <a href="@Const.Routes.Legal.Terms" target="_blank"
+                           class="font-medium text-brand-600 hover:text-brand-700 underline">Agreement</a> and
+                        <a href="@Const.Routes.Legal.Privacy" target="_blank"
+                           class="font-medium text-brand-600 hover:text-brand-700 underline">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <div>
+                    <Button IsSubmit="true"
+                            IsBusy="@isBusy"
+                            IsDisabled="@(!termsAccepted)"
+                            CssClass="w-full py-3"
+                            Text="Complete Registration" />
+                </div>
+            </EditForm>
+
+            <p class="text-center text-sm text-slate-500">
+                Didn't receive a verification code?
+                <button type="button"
+                        @onclick="BackToStep1"
+                        class="font-semibold text-brand-500 hover:text-brand-600 underline decoration-brand-500/30 hover:decoration-brand-500 transition-all">
+                    Go back &amp; resend
+                </button>
+            </p>
+        </div>
+    }
+
+
+    @if (step == 3)
+    {
+        <div class="text-center space-y-6 animate-in fade-in duration-500 py-4">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-50 text-emerald-500 mb-2 border border-emerald-100 shadow-sm">
+                <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-4xl text-emerald-500" />
+            </div>
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold text-slate-900">
+                    Account Created!
+                </h2>
+                <p class="text-slate-500 text-sm max-w-sm mx-auto">
+                    Your SMSLive247 account has been created successfully. You can now sign in with your credentials.
+                </p>
+            </div>
+            <div>
+                <Button Text="Go to Sign In"
+                        CssClass="w-full py-3"
+                        OnClick="() => nav.NavigateTo(Const.Routes.Login)" />
+            </div>
+        </div>
+    }
+</div>
 
 @code {
+    private int step = 1;
     private bool isBusy = false;
     private bool termsAccepted = false;
     private string confirmPassword = "";
-    private RegisterConfirm model = new() { TimeZone = 99, CountryCode = 0 };
 
-    private async Task RegisterAsync()
+    private RegisterRequest requestModel = new();
+    private RegisterConfirm confirmModel = new() { TimeZone = 99, CountryCode = 0 };
+
+    private async Task RequestOtpAsync()
     {
         try
         {
             isBusy = true;
+            requestModel.ParentID = settings.ParentID;
 
-            if (!termsAccepted)
-                throw new Exception("You must accept the agreement and privacy policy to register");
+            var response = await apiClient.RegisterRequestAsync(requestModel);
 
-            if (model.Password != confirmPassword)
-                throw new Exception("Passwords do not match");
-
-            model.ParentID = settings.ParentID;
-            model.AccountName = $"{model.FirstName} {model.LastName}";
-            var response = await apiClient.RegisterConfirmAsync(model);
-
-            if (response.StatusCode == 200)
-            {
-                await alert.Success("Account created successfully!");
-                nav.NavigateTo($"{Const.Routes.Login}?email=" + model.Email);
-            }
-            else
-            {
-                throw new Exception("Registration failed. Please try again.");
-            }
+            confirmModel.Email = requestModel.Email;
+            confirmModel.Phone = requestModel.Phone;
+            step = 2;
+            await alert.Info("Verification code sent to your email!", "Verification Code");
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
@@ -171,5 +281,46 @@
         {
             isBusy = false;
         }
+    }
+
+    private async Task ConfirmRegisterAsync()
+    {
+        try
+        {
+            isBusy = true;
+
+            if (!termsAccepted)
+                throw new Exception("You must accept the agreement and privacy policy to register");
+
+            if (confirmModel.Password != confirmPassword)
+                throw new Exception("Passwords do not match");
+
+            confirmModel.Email = requestModel.Email;
+            confirmModel.Phone = requestModel.Phone;
+            confirmModel.ParentID = settings.ParentID;
+            confirmModel.AccountName = $"{confirmModel.FirstName} {confirmModel.LastName}";
+
+            var response = await apiClient.RegisterConfirmAsync(confirmModel);
+            step = 3;
+            await alert.Info("Account created successfully!", "Account Created");
+        }
+        catch (SMSLive247.OpenApi.ApiException ex)
+        {
+            await alert.Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message);
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private void BackToStep1()
+    {
+        confirmModel.VerifyCode = "";
+        step = 1;
     }
 }

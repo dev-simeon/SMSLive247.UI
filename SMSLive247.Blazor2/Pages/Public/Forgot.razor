@@ -1,4 +1,6 @@
-﻿@attribute [Route(Const.Routes.ForgotPassword)]
+@attribute [Route(Const.Routes.ForgotPassword)]
+@inject NavigationManager nav
+@inject Settings settings
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -11,58 +13,208 @@
     </div>
 </SectionContent>
 
-<div class="text-center lg:text-left">
-    <div class="mb-8 flex items-center justify-center lg:hidden">
+<div>
+
+    <div class="mb-6 flex items-center justify-center lg:hidden">
         <img src="smslive-logo-2.png"
              alt="SMSLive247"
-             class="h-10 w-auto" />
+             class="h-10 w-auto rounded-lg" />
     </div>
-    <h2 class="text-3xl font-bold text-slate-900 transition-colors">
-        Forgot Password?
-    </h2>
-    <p class="mt-2 text-slate-500">
-        Enter your account email address and we'll send you a reset code.
-    </p>
+
+
+    @if (step != 3)
+    {
+        <div class="mb-8 flex items-center justify-between">
+
+            <div class="flex items-center gap-2.5 shrink-0">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step > 1 ? "bg-brand-100 text-brand-700" : step == 1 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
+                    @if (step > 1)
+                    {
+                        <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-sm" />
+                    }
+                    else
+                    {
+                        <span>1</span>
+                    }
+                </div>
+                <span class="text-xs font-medium transition-colors sm:text-sm @(step == 1 ? "font-semibold text-slate-900" : step > 1 ? "text-brand-700" : "text-slate-400")">
+                    Verify Email
+                </span>
+            </div>
+
+
+            <div class="mx-3 flex-1 transition-colors @(step > 1 ? "bg-brand-100" : "bg-slate-200")" style="height: 2px;"></div>
+
+
+            <div class="flex items-center gap-2.5 shrink-0">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step == 2 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
+                    <span>2</span>
+                </div>
+                <span class="text-xs font-medium transition-colors sm:text-sm @(step == 2 ? "font-semibold text-slate-900" : "text-slate-400")">
+                    Reset Password
+                </span>
+            </div>
+        </div>
+    }
+
+
+    @if (step == 1)
+    {
+        <div class="space-y-6 animate-in fade-in duration-300">
+            <div class="text-center lg:text-left">
+                <h2 class="text-3xl font-bold text-slate-900 transition-colors">
+                    Forgot Password?
+                </h2>
+                <p class="mt-2 text-slate-500">
+                    Enter your account email address and we'll send you a reset code.
+                </p>
+            </div>
+
+            <EditForm Model="@requestModel" OnValidSubmit="RequestResetAsync" FormName="fRequest" class="space-y-6">
+                <FormRow>
+                    <FormInput @bind-Value="requestModel.Username"
+                               Type="email"
+                               Label="Email Address"
+                               Required="true"
+                               IconStyle="Icon.IconStyle.Mail"
+                               PlaceHolder="name@company.com"
+                               RequiredMessage="Please enter your email address." />
+                </FormRow>
+
+                <div>
+                    <Button IsSubmit="true"
+                            CssClass="w-full py-3"
+                            IsBusy="@isBusy"
+                            Text="Send Reset Code >" />
+                </div>
+            </EditForm>
+
+            <p class="text-center text-sm text-slate-500">
+                Wait, I remember my password!
+                <a href="@Const.Routes.Login"
+                   class="font-semibold text-brand-500 hover:text-brand-600 underline decoration-brand-500/30 hover:decoration-brand-500 transition-all">
+                    Sign In
+                </a>
+            </p>
+        </div>
+    }
+
+
+    @if (step == 2)
+    {
+        <div class="space-y-6 animate-in fade-in duration-300">
+            <div class="text-center lg:text-left">
+                <h2 class="text-3xl font-bold text-slate-900 transition-colors">
+                    Set New Password
+                </h2>
+                <p class="mt-2 text-slate-500">
+                    Enter the reset code sent to your account and choose a new password.
+                </p>
+            </div>
+
+
+            <div class="flex items-start gap-3 p-4 bg-brand-50 border border-brand-100 rounded-xl text-sm text-brand-700">
+                <Icon Style="Icon.IconStyle.Key" CssClass="text-lg shrink-0 mt-0.5" />
+                <span>
+                    A reset code has been dispatched. Check your registered email or SMS and enter it below.
+                </span>
+            </div>
+
+            <EditForm Model="@confirmModel" OnValidSubmit="ConfirmResetAsync" FormName="fConfirm" class="space-y-6">
+                <FormRow>
+                    <FormInput @bind-Value="confirmModel.ResetCode"
+                               Label="Reset Code"
+                               Required="true"
+                               IconStyle="Icon.IconStyle.Key"
+                               PlaceHolder="Enter the code you received"
+                               RequiredMessage="Reset code is required." />
+                </FormRow>
+
+                <FormRow>
+                    <FormInput @bind-Value="confirmModel.NewPassword"
+                               Type="password"
+                               Label="New Password"
+                               Required="true"
+                               PlaceHolder="At least 6 characters"
+                               RequiredMessage="New password is required." />
+                </FormRow>
+
+                <FormRow>
+                    <FormInput @bind-Value="confirmPassword"
+                               Type="password"
+                               Label="Confirm New Password"
+                               Required="true"
+                               PlaceHolder="Re-enter your new password"
+                               RequiredMessage="Please confirm your new password." />
+                </FormRow>
+
+                @if (!string.IsNullOrEmpty(confirmPassword) && confirmModel.NewPassword != confirmPassword)
+                {
+                    <p class="text-xs text-red-500 font-medium">Passwords do not match.</p>
+                }
+
+                <div>
+                    <Button IsSubmit="true"
+                            CssClass="w-full py-3"
+                            IsBusy="@isBusy"
+                            Text="Reset My Password" />
+                </div>
+            </EditForm>
+
+            <p class="text-center text-sm text-slate-500">
+                Didn't receive a code?
+                <button type="button"
+                        @onclick="BackToStep1"
+                        class="font-semibold text-brand-500 hover:text-brand-600 underline decoration-brand-500/30 hover:decoration-brand-500 transition-all">
+                    Go back &amp; resend
+                </button>
+            </p>
+        </div>
+    }
+
+
+    @if (step == 3)
+    {
+        <div class="text-center space-y-6 animate-in fade-in duration-500 py-4">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-50 text-emerald-500 mb-2 border border-emerald-100 shadow-sm">
+                <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-4xl text-emerald-500" />
+            </div>
+            <div class="space-y-2">
+                <h2 class="text-3xl font-bold text-slate-900">
+                    Password Reset!
+                </h2>
+                <p class="text-slate-500 text-sm max-w-sm mx-auto">
+                    Your password has been changed successfully. You can now sign in with your new credentials.
+                </p>
+            </div>
+            <div>
+                <Button Text="Go to Sign In"
+                        CssClass="w-full py-3"
+                        OnClick="() => nav.NavigateTo(Const.Routes.Login)" />
+            </div>
+        </div>
+    }
 </div>
 
-<EditForm Model="@model" OnValidSubmit="ForgotAsync" FormName="f1" class="space-y-6">
-    <FormRow>
-        <FormInput @bind-Value="model.Username"
-                   Type="email" Label="Email Address"
-                   IconStyle="Icon.IconStyle.Mail"
-                   PlaceHolder="Enter your email"
-                   ErrorMessage="Please enter a valid email address." />
-    </FormRow>
- 
-    <div>
-        <Button IsSubmit="true"
-                CssClass="w-full py-3"
-                IsBusy="@isBusy"
-                Text="Send Reset Code >" />
-    </div>
-</EditForm>
-
-<p class="text-center text-slate-500">
-    Wait, I remember my password! 
-    <a href="@Const.Routes.Login" class="font-semibold text-brand-500 decoration-brand-500/30
-        transition-all hover:text-brand-600 hover:decoration-brand-500" data-discover="true">
-        Sign In
-     </a>
-</p>
-
 @code {
+    private int step = 1;
     private bool isBusy = false;
-    private PasswordResetConfirm model = new();
+    private string confirmPassword = "";
 
-    private async Task ForgotAsync()
+    private PasswordResetRequest requestModel = new();
+    private PasswordResetConfirm confirmModel = new();
+
+    private async Task RequestResetAsync()
     {
         try
         {
             isBusy = true;
-            model.ParentID = settings.ParentID;
-            var response = await apiClient.PasswordResetConfirmAsync(model);
+            requestModel.ParentID = settings.ParentID;
+            var response = await apiClient.PasswordResetRequestAsync(requestModel);
 
-            //please complete this
+            confirmModel.Username = requestModel.Username;
+            step = 2;
+            await alert.Info("Reset code sent! Please check your email.", "Reset Code Sent");
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
@@ -76,5 +228,42 @@
         {
             isBusy = false;
         }
+    }
+
+    private async Task ConfirmResetAsync()
+    {
+        try
+        {
+            isBusy = true;
+
+            if (confirmModel.NewPassword != confirmPassword)
+                throw new Exception("Passwords do not match");
+
+            confirmModel.Username = requestModel.Username;
+            confirmModel.ParentID = settings.ParentID;
+
+            var response = await apiClient.PasswordResetConfirmAsync(confirmModel);
+            step = 3;
+        }
+        catch (SMSLive247.OpenApi.ApiException ex)
+        {
+            await alert.Error(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message);
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    private void BackToStep1()
+    {
+        confirmModel.ResetCode = "";
+        confirmModel.NewPassword = "";
+        confirmPassword = "";
+        step = 1;
     }
 }

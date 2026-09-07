@@ -1,7 +1,6 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 
 <div class="flex min-h-screen w-full font-sans">
-    @* Left Side - Branding *@
     <div class="bg-brand-500 relative hidden w-1/2 flex-col justify-between overflow-hidden p-12 text-white lg:flex">
         <div class="absolute inset-0 opacity-10">
             <svg class="h-full w-full"
@@ -37,20 +36,18 @@
         </div>
     </div>
 
-    @* Right Side *@
     <div class="relative flex w-full items-center justify-center overflow-y-auto bg-white p-8 lg:w-1/2 lg:p-16">
         <Alert />
         <div class="my-8 w-full max-w-md space-y-8">
             @Body
 
-            <p class="prose-slate mt-6 text-center text-xs text-slate-100">
+            <p class="mt-6 text-center text-xs text-slate-500">
                 By submitting the form, you agree to our
                 <a href="@Const.Routes.Legal.Terms" target="_blank"
-                       class="underline hover:text-slate-600 dark:hover:text-slate-300">Terms of Service</a>
+                   class="font-medium text-slate-700 underline transition-colors hover:text-brand-600">Terms of Service</a>
                 and
                 <a href="@Const.Routes.Legal.Privacy" target="_blank"
-                       class="underline hover:text-slate-600 dark:hover:text-slate-300">Privacy Policy</a>
-                .
+                   class="font-medium text-slate-700 underline transition-colors hover:text-brand-600">Privacy Policy</a>.
             </p>
         </div>
     </div>
