@@ -1,22 +1,17 @@
 @inherits LayoutComponentBase
 
 <div class="flex min-h-screen w-full font-sans">
+    @* Left Side - Branding *@
     <div class="bg-brand-500 relative hidden w-1/2 flex-col justify-between overflow-hidden p-12 text-white lg:flex">
         <div class="absolute inset-0 opacity-10">
-            <svg class="h-full w-full"
-                 preserveAspectRatio="none"
-                 viewBox="0 0 100 100">
+            <svg class="h-full w-full" preserveAspectRatio="none" viewBox="0 0 100 100">
                 <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path>
-                <path d="M0 0 C 50 100 80 100 100 0 Z"
-                      fill="white"
-                      opacity="0.5"></path>
+                <path d="M0 0 C 50 100 80 100 100 0 Z" fill="white" opacity="0.5"></path>
             </svg>
         </div>
 
         <div class="relative z-10 flex items-center">
-            <img src="smslive-logo-2.png"
-                 alt="SMSLive247"
-                 class="h-12 w-auto rounded-lg" />
+            <img src="smslive-logo-2.png" alt="SMSLive247" class="h-12 w-auto rounded-lg" />
         </div>
 
         <SectionOutlet SectionName="page-branding" />
@@ -24,18 +19,17 @@
         <div class="relative z-10 flex items-center justify-between text-sm text-slate-100">
             <p>© @DateTime.Now.Year SMSLive247 by iDevWorks Technologies Ltd.</p>
             <div class="flex gap-4">
-                <a href="@Const.Routes.Legal.Privacy" target="_blank"
-                       class="transition-colors hover:text-white">
+                <a href="@Const.Routes.Legal.Privacy" target="_blank" class="transition-colors hover:text-white">
                     Privacy
                 </a>
-                <a href="@Const.Routes.Legal.Terms" target="_blank"
-                       class="transition-colors hover:text-white">
+                <a href="@Const.Routes.Legal.Terms" target="_blank" class="transition-colors hover:text-white">
                     Terms
                 </a>
             </div>
         </div>
     </div>
 
+    @* Right Side *@
     <div class="relative flex w-full items-center justify-center overflow-y-auto bg-white p-8 lg:w-1/2 lg:p-16">
         <Alert />
         <div class="my-8 w-full max-w-md space-y-8">
@@ -44,11 +38,13 @@
             <p class="mt-6 text-center text-xs text-slate-500">
                 By submitting the form, you agree to our
                 <a href="@Const.Routes.Legal.Terms" target="_blank"
-                   class="font-medium text-slate-700 underline transition-colors hover:text-brand-600">Terms of Service</a>
-                and
-                <a href="@Const.Routes.Legal.Privacy" target="_blank"
-                   class="font-medium text-slate-700 underline transition-colors hover:text-brand-600">Privacy Policy</a>.
-            </p>
+                   class="font-medium text-slate-700 underline transition-colors hover:text-brand-600">Terms of
+                    Service</a>
+                    and
+                    <a href="@Const.Routes.Legal.Privacy" target="_blank"
+                       class="font-medium text-slate-700 underline transition-colors hover:text-brand-600">Privacy
+                        Policy</a>.
+                    </p>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
