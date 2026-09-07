@@ -1,5 +1,7 @@
-﻿<button @attributes="AdditionalAttributes" type="@buttonType" disabled="@(IsBusy || IsDisabled)" @onclick="HandleClick"
-        class="flex min-h-[37.6px] min-w-[120px] transform items-center justify-center gap-2 rounded-lg px-5 transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @GetVariantClasses() @CssClass">
+﻿<button @attributes="AdditionalAttributes" @onclick="HandleClick" 
+        type="@(IsSubmit ? "submit" : "button")"
+        disabled="@(IsBusy || IsDisabled)"
+        class="flex min-h-[37.6px] min-w-[120px] transform items-center justify-center gap-2 rounded-lg border border-transparent px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @colorCss @CssClass">
     @if (IsBusy)
     {
         <div class="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
@@ -27,21 +29,21 @@
     [Parameter] public string CssClass { get; set; } = "";
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private string buttonType => IsSubmit ? "submit" : "button";
+    private string colorCss => Style.ToTailwindCss() + " " + moreCss();
 
-    private string GetVariantClasses()
+    private string moreCss()
     {
         return Style switch
         {
-            ColorStyle.Primary => "bg-brand-500 hover:bg-brand-600 text-white border border-transparent shadow-sm focus:ring-brand-500",
-            ColorStyle.Secondary => "bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm focus:ring-slate-300",
-            ColorStyle.Success => "bg-green-500 hover:bg-green-600 text-white border border-transparent shadow-sm focus:ring-green-500",
-            ColorStyle.Danger => "bg-red-500 hover:bg-red-600 text-white border border-transparent shadow-sm focus:ring-red-500",
-            ColorStyle.Warning => "bg-yellow-500 hover:bg-yellow-600 text-white border border-transparent shadow-sm focus:ring-yellow-500",
-            ColorStyle.Info => "bg-blue-500 hover:bg-blue-600 text-white border border-transparent shadow-sm focus:ring-blue-500",
-            ColorStyle.Light => "bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300 shadow-sm focus:ring-gray-300",
-            ColorStyle.Dark => "bg-gray-800 hover:bg-gray-900 text-white border border-transparent shadow-sm focus:ring-gray-500",
-            _ => "bg-brand-500 hover:bg-brand-600 text-white border border-transparent shadow-sm focus:ring-brand-500"
+            ColorStyle.Primary      => "hover:bg-brand-600 focus:ring-brand-500",
+            ColorStyle.Secondary    => "hover:bg-slate-50  focus:ring-slate-300 border-slate-200",
+            ColorStyle.Success      => "hover:bg-green-600 focus:ring-green-500",
+            ColorStyle.Warning      => "hover:bg-amber-600 focus:ring-amber-500",
+            ColorStyle.Info         => "hover:bg-blue-600  focus:ring-blue-500",
+            ColorStyle.Danger       => "hover:bg-red-600   focus:ring-red-500",
+            ColorStyle.Light        => "hover:bg-gray-200  focus:ring-gray-300",
+            ColorStyle.Dark         => "hover:bg-gray-900  focus:ring-gray-500",
+            _ => ""
         };
     }
 

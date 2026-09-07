@@ -321,7 +321,7 @@ else
     {
         try
         {
-            var senderTask = apiClient.SenderIdListAsync(1, 500, null);
+            var senderTask = apiClient.SenderIdListAsync(1, 500);
             var batchTask = apiClient.BatchFileListAsync();
             await Task.WhenAll(senderTask, batchTask);
             

@@ -86,7 +86,7 @@
             if (Sub.Account != null)
             {
                 return await subClient.Impersonate(Sub.Account).AccountsListAsync(
-                    p.PageNumber, p.PageSize, null, searchQuery);
+                    p.PageNumber, p.PageSize, searchQuery);
             }
             return ds.EmptyResponse;
         });

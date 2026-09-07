@@ -1,53 +1,26 @@
-@* <span class="inline-flex items-center gap-1.5 rounded-full border-2 px-2 py-0.5 font-bold text-[100] @GetBadgeCss()">
+﻿@* <span class="inline-flex items-center gap-1.5 rounded-full border-2 px-2 py-0.5 font-bold text-[100] @GetBadgeCss()">
     @if (ShowDot)
     {
-        <span class="h-1.5 w-1.5 rounded-full @GetDotCss()"></span>
+        <span class="h-1.5 w-1.5 rounded-full @colorCss"></span>
     }
     @Value
 </span>
  *@
- <div hidden>
-    <span class="bg-green-500"></span>
-    <span class="bg-amber-500"></span>
-    <span class="bg-red-500"></span>
-    <span class="bg-blue-500"></span>
-    <span class="bg-slate-500"></span>
-</div>
-<span class="rounded-md px-2 py-1 text-xs font-bold text-white whitespace-nowrap @GetBadgeCss()">
+<span class="rounded-md px-2 py-1 text-xs font-bold whitespace-nowrap @colorCss">
     @Value
 </span>
 
 @code {
-    public enum BadgeStyle { Success, Pending, Danger, Info, Neutral, }
-    public enum StatusVariant { ActiveInactive, SenderIdRequest, BatchMessage, DeliveryReport, UseBadgeStyle }
+    public enum StatusVariant { ActiveInactive, SenderIdRequest, BatchMessage, DeliveryReport, None }
 
-    [Parameter] public StatusVariant Variant { get; set; } = StatusVariant.UseBadgeStyle;
-    [Parameter] public BadgeStyle Style { get; set; } = BadgeStyle.Neutral;
+    [Parameter] public StatusVariant Variant { get; set; } = StatusVariant.None;
+    [Parameter] public ColorStyle Style { get; set; } = ColorStyle.Primary;
     [Parameter] public string Value { get; set; } = string.Empty;
     [Parameter] public bool ShowDot { get; set; } = true;
 
-    private string GetBadgeCss()
-    {
-        var color = GetColorString();
-        return $"bg-{color}-500";
-        //return $"bg-{color}-500 text-{color}-700 border-{color}-300";
-    }
+    private string colorCss => GetColorStyleFromVariant().ToTailwindCss();
 
-    private string GetDotCss() => $"bg-{GetColorString()}-500";
-
-    private string GetColorString()
-    {
-        return GetBadgeStyleFromVariant() switch
-        {
-            BadgeStyle.Success  => "green",
-            BadgeStyle.Pending  => "amber",
-            BadgeStyle.Danger   => "red",
-            BadgeStyle.Info     => "blue",
-            _                   => "slate"
-        };
-    }
-
-    private BadgeStyle GetBadgeStyleFromVariant()
+    private ColorStyle GetColorStyleFromVariant()
     {
         return Variant switch
         {
@@ -59,52 +32,54 @@
         };
     }
 
-    private static BadgeStyle MapActiveInactiveStatus(string value)
+    private static ColorStyle MapActiveInactiveStatus(string value)
     {
         return value.ToUpperInvariant() switch
         {
-            "ACTIVE"    => BadgeStyle.Success,
-            "ENABLED"   => BadgeStyle.Success,
-            "INACTIVE"  => BadgeStyle.Danger,
-            "DISABLED"  => BadgeStyle.Danger,
-            _           => BadgeStyle.Neutral
+            "ACTIVE"    => ColorStyle.Success,
+            "ENABLED"   => ColorStyle.Success,
+            "INACTIVE"  => ColorStyle.Danger,
+            "DISABLED"  => ColorStyle.Danger,
+            _           => ColorStyle.Secondary
         };
     }
 
-    private static BadgeStyle MapBatchMessageStatus(string value)
+    private static ColorStyle MapBatchMessageStatus(string value)
     {
         return value.ToUpperInvariant() switch
         {
-            "COMPLETED"     => BadgeStyle.Success,
-            "RUNNING"       => BadgeStyle.Pending,
-            "PAUSED"        => BadgeStyle.Info,
-            "ABORTED"       => BadgeStyle.Danger,
-            _               => BadgeStyle.Neutral
+            "COMPLETED"     => ColorStyle.Success,
+            "RUNNING"       => ColorStyle.Warning,
+            "PAUSED"        => ColorStyle.Info,
+            "ABORTED"       => ColorStyle.Danger,
+            _               => ColorStyle.Secondary
         };
     }
 
-    private static BadgeStyle MapSenderIdRequestStatus(string value)
+    private static ColorStyle MapSenderIdRequestStatus(string value)
     {
         return value.ToUpperInvariant() switch
         {
-            "APPROVED"  => BadgeStyle.Success,
-            "PENDING"   => BadgeStyle.Pending,
-            "DELETED"   => BadgeStyle.Info,
-            "REJECTED"  => BadgeStyle.Danger,
-            _           => BadgeStyle.Neutral
+            "APPROVED"  => ColorStyle.Success,
+            "PENDING"   => ColorStyle.Warning,
+            "DELETED"   => ColorStyle.Info,
+            "REJECTED"  => ColorStyle.Danger,
+            _           => ColorStyle.Secondary
         };
     }
 
-    private static BadgeStyle MapDeliveryReportStatus(string value)
+    private static ColorStyle MapDeliveryReportStatus(string value)
     {
         return value.ToUpperInvariant() switch
         {
-            "DELIVRD" or "DELIVERED" or "COMPLETED" => BadgeStyle.Success,
-            "ACCEPTD" or "ACCEPTED" or "RUNNING" => BadgeStyle.Info,
-            "UNDELIV" or "UNDELIVERED" or "PENDING" => BadgeStyle.Pending,
-            "REJECTD" or "REJECTED" or "EXPIRED" or "ABORTED" => BadgeStyle.Danger,
-            _ => BadgeStyle.Neutral
+            "DELIVRD" => ColorStyle.Success,
+            "ACCEPTD" => ColorStyle.Info,
+            "ENROUTE" => ColorStyle.Info,
+            "UNKNOWN" => ColorStyle.Info,
+            "EXPIRED" => ColorStyle.Warning,
+            "UNDELIV" => ColorStyle.Danger,
+            "REJECTD" => ColorStyle.Danger,
+            _         => ColorStyle.Secondary
         };
     }
-
 }

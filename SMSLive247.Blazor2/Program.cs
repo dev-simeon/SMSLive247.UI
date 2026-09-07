@@ -20,7 +20,12 @@ public partial class Program
 
         builder.Services.AddAuthorization();
         builder.Services.AddAuthentication("Cookies")
-            .AddCookie(options => { options.LoginPath = "/"; });
+            .AddCookie(options => 
+            { 
+                options.LoginPath = Const.Routes.Login;
+                options.LogoutPath = Const.Routes.Logout;
+                options.AccessDeniedPath = Const.Routes.Login;
+            });
 
         builder.Services.AddSingleton<AlertService>();
         builder.Services.AddTransient<AuthDelegateHandler>();
@@ -30,16 +35,13 @@ public partial class Program
         builder.Services.AddHttpClient<ApiClient>(ConfigureUrl)
                         .AddHttpMessageHandler<AuthDelegateHandler>();
 
-        builder.Services.AddHttpClient<SubAccountClient>(ConfigureUrl);
-
-
         builder.Services.AddScoped<AuthenticationStateProvider, SmsAuthProvider>();
         builder.Services.AddMemoryCache();
 
         // ── Middleware ───────────────────────────────────────────────────────
         var app = builder.Build();
 
-        app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+        app.UseStatusCodePagesWithReExecute(Const.Routes.NotFound, createScopeForStatusCodePages: true);
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();

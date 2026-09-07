@@ -7,14 +7,15 @@ namespace SMSLive247.UI.Shared
     {
         public static class Routes
         {
-            // Auth
-            public const string Dashboard = "/dashboard";
+            // Public
             public const string Login = "/login";
-            public const string Logoff = "/logout";
+            public const string Logout = "/logoff";
             public const string Register = "/register";
             public const string ForgotPassword = "/forgot-password";
-
             public const string NotFound = "/not-found";
+
+            public const string Dashboard = "/";
+            //public const string Home = "/";  
 
             public static class Legal
             {

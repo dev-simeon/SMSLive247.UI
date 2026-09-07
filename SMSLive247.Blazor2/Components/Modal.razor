@@ -4,9 +4,9 @@
         <Backdrop IsVisible="IsVisible" IsVisibleChanged="OnClose" />
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative w-full @MaxWidthClass transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8">
+                <div class="relative w-full @maxWidthCss transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8">
 
-                    <header class="flex items-center justify-between px-4 @HeaderClasses py-3">
+                    <header class="flex items-center justify-between px-4 @colorCss py-3">
                         <h3 class="text-lg leading-6 font-normal">
                             @Title
                         </h3>
@@ -44,20 +44,8 @@
     [Parameter] public bool IsVisible { get; set; } = false;
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
 
-    private string HeaderClasses => Style switch
-    {
-        ColorStyle.Primary      => "bg-brand-500 text-white",
-        ColorStyle.Secondary    => "bg-slate-100 text-slate-700",
-        ColorStyle.Success      => "bg-green-500 text-white",
-        ColorStyle.Danger       => "bg-red-500 text-white",
-        ColorStyle.Warning      => "bg-yellow-500 text-white",
-        ColorStyle.Info         => "bg-blue-500 text-white",
-        ColorStyle.Light        => "bg-gray-100 text-gray-800",
-        ColorStyle.Dark         => "bg-gray-800 text-white",
-        _                       => ""
-    };
-
-    private string MaxWidthClass => Size switch
+    private string colorCss => Style.ToTailwindCss();
+    private string maxWidthCss => Size switch
     {
         ModalSize.Small     => "max-w-md",
         ModalSize.Medium    => "max-w-lg",

@@ -70,7 +70,7 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, filterFrom, filterTo, searchQuery);
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, filterFrom, filterTo, searchQuery);
         });
         ds.SetPage(new PageState(100, 1));
         await ds.LoadData(alert);

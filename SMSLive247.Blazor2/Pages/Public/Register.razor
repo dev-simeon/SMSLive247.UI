@@ -1,8 +1,4 @@
 ﻿@attribute [Route(Const.Routes.Register)]
-@attribute [AllowAnonymous]
-@layout PublicLayout
-
-@inject Settings settings;
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -135,7 +131,7 @@
     private bool isBusy = false;
     private bool termsAccepted = false;
     private string confirmPassword = "";
-    private AccountCreateRequest model = new() { TimeZone = 99, CountryCode = 0 };
+    private RegisterConfirm model = new() { TimeZone = 99, CountryCode = 0 };
 
     private async Task RegisterAsync()
     {
@@ -149,8 +145,9 @@
             if (model.Password != confirmPassword)
                 throw new Exception("Passwords do not match");
 
+            model.ParentID = settings.ParentID;
             model.AccountName = $"{model.FirstName} {model.LastName}";
-            var response = await apiClient.RegisterAsync(settings.ParentID, model);
+            var response = await apiClient.RegisterConfirmAsync(model);
 
             if (response.StatusCode == 200)
             {

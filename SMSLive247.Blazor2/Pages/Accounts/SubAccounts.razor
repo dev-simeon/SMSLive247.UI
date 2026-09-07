@@ -78,7 +78,7 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchQuery);
+            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, searchQuery);
         });
 
         ds.SetPage(new PageState(25, 1));

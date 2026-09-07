@@ -1,4 +1,4 @@
-@attribute [Route(Const.Routes.Developer.ApiKeys)]
+﻿@attribute [Route(Const.Routes.Developer.ApiKeys)]
 @layout MainLayout
 
 <PageTitle>SMSLive247 - API Keys</PageTitle>
@@ -20,11 +20,11 @@
                     <span class="font-medium text-slate-900">@context.AccountName</span>
                 </Column>
                 <Column Header="Type">
-                    <Badge Style="@(context.Phone == "main" ? Badge.BadgeStyle.Success : Badge.BadgeStyle.Neutral)" 
+                    <Badge Style="@(context.Phone == "main" ? ColorStyle.Warning : ColorStyle.Success)" 
                            Value="@(context.Phone == "main" ? "MAIN ACCOUNT" : "SUB ACCOUNT")" />
                 </Column>
                 <Column Header="API Key">
-                    <span class="font-mono text-base text-slate-700 tracking-wider whitespace-nowrap">
+                    <span class="font-mono text-base tracking-wider whitespace-nowrap text-slate-700">
                         @(IsKeyVisible(context) ? GetKeyString(context.Key) : "********-****-****-****-************")
                     </span>
                 </Column>
@@ -77,7 +77,7 @@
     private async Task ReloadData()
     {
         var t1 = apiClient.AccountGetAsync("self");
-        var t2 = apiClient.AccountsListAsync(1, 200, null, null);
+        var t2 = apiClient.AccountsListAsync(1, 200, null);
 
         await Task.WhenAll(t1, t2);
 

@@ -29,7 +29,7 @@
                     <FormatNumber Number="@context.Credits"></FormatNumber>
                 </Column>
                 <Column Header="Status">
-                    <Badge Style="Badge.BadgeStyle.Success" Value="TRANSFERRED" />
+                    <Badge Style="ColorStyle.Success" Value="TRANSFERRED" />
                 </Column>
             </Columns>
         </Table>
@@ -61,7 +61,7 @@
             if (Sub.Account != null)
             {
                 return await subClient.Impersonate(Sub.Account).TransferListAsync(
-                    p.PageNumber, p.PageSize, null, searchQuery);
+                    p.PageNumber, p.PageSize, searchQuery);
             }
             return ds.EmptyResponse;
         });

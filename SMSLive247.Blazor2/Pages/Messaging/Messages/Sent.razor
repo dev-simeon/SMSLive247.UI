@@ -1,4 +1,4 @@
-<PageBody>
+﻿<PageBody>
     <HeaderLeft>
         <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData">
             <DateRange DateRangeChanged="OnDateRangeChanged" />
@@ -24,11 +24,11 @@
                     <p class="max-w-md wrap-break-word">@context.MessageText</p>
                 </Column>
                 <Column Header="Delivery">
-                    <a href="@Const.Routes.Messaging.MessageDetailsUrl(context.BatchID)" target="_blank" class="block hover:opacity-75 transition-opacity">
-                        <div class="text-emerald-600 text-end font-mono text-xs text-nowrap uppercase" title="Total Processed">
+                    <a href="@Const.Routes.Messaging.MessageDetailsUrl(context.BatchID)" target="_blank" class="block transition-opacity hover:opacity-75">
+                        <div class="text-end font-mono text-xs text-nowrap text-emerald-600 uppercase" title="Total Processed">
                             @context.TotalProcessed.ToString("#,##0") PASS
                         </div>
-                        <div class="text-rose-600 text-end font-mono text-xs text-nowrap uppercase" title="Total Failed">
+                        <div class="text-end font-mono text-xs text-nowrap text-rose-600 uppercase" title="Total Failed">
                             @context.TotalFailed.ToString("#,##0") FAIL
                         </div>
                     </a>
@@ -65,7 +65,7 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, null, filterFrom, filterTo, searchQuery);
+            return apiClient.SmsBatchListAsync(p.PageNumber, p.PageSize, filterFrom, filterTo, searchQuery);
         });
 
         ds.SetPage(new PageState(100, 1));

@@ -76,7 +76,7 @@
             if (Sub.Account != null)
             {
                 return await subClient.Impersonate(Sub.Account).SmsBatchListAsync(
-                    p.PageNumber, p.PageSize, null, filterFrom, filterTo, searchQuery);
+                    p.PageNumber, p.PageSize, filterFrom, filterTo, searchQuery);
             }
             return ds.EmptyResponse;
         });

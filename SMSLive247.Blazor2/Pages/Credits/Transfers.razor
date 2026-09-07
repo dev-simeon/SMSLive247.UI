@@ -35,7 +35,7 @@
                     <FormatNumber Number="@context.Credits"></FormatNumber>
                 </Column>
                 <Column Header="Status">
-                    <Badge Style="Badge.BadgeStyle.Success" Value="TRANSFERRED" />
+                    <Badge Style="ColorStyle.Success" Value="TRANSFERRED" />
                 </Column>
             </Columns>
         </Table>
@@ -63,7 +63,7 @@
     {
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.TransferListAsync(p.PageNumber, p.PageSize, null, searchQuery);
+            return apiClient.TransferListAsync(p.PageNumber, p.PageSize, searchQuery);
         });
 
         ds.SetPage(new PageState(20, 1));

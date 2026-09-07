@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
-@inject NavigationManager nav
 @inject AuthenticationStateProvider auth;
+@inject NavigationManager nav
 
 <CascadingValue Value="@self" Name="MainAccount">
 
@@ -42,7 +42,7 @@
         catch (Exception ex)
         {
             await alert.Error(ex.Message);
-            nav.NavigateTo(Const.Routes.Logoff);
+            nav.NavigateTo(Const.Routes.Logout);
         }
     }
 

@@ -1,7 +1,6 @@
-﻿@attribute [Route("/")]
-@attribute [Route(Const.Routes.Dashboard)]
-@layout MainLayout
+﻿@attribute [Route(Const.Routes.Dashboard)]
 @inject NavigationManager nav
+@layout MainLayout
 
 <PageTitle>Dashboard</PageTitle>
 
@@ -52,18 +51,18 @@
                 <span class="text-4xl font-black text-slate-900 transition-colors group-hover:text-brand-600">
                     @FormatNumber(account?.Credits ?? 0)
                 </span>
-                <span class="text-brand-600 mt-4 flex items-center gap-2 text-sm font-bold tracking-wide uppercase transition-colors group-hover:text-brand-700">
+                <span class="mt-4 flex items-center gap-2 text-sm font-bold tracking-wide text-brand-600 uppercase transition-colors group-hover:text-brand-700">
                     Top Up Now
                     <Icon Style="Icon.IconStyle.PlusCircle" CssClass="inline-flex items-center justify-center leading-none text-[16px]" />
                 </span>
             </button>
         </div>
 
-        <div class="group border-brand-500/20 bg-brand-600 relative flex flex-col justify-center gap-6 overflow-hidden rounded-2xl border p-6 sm:p-8">
+        <div class="group relative flex flex-col justify-center gap-6 overflow-hidden rounded-2xl border border-brand-500/20 bg-brand-600 p-6 sm:p-8">
             <div class="absolute top-0 right-0 -mt-16 -mr-16 h-32 w-32 rounded-full bg-white/5 transition-transform duration-700 group-hover:scale-150"></div>
             <div class="relative z-10">
                 <h3 class="mb-1 text-lg font-bold text-white">Quick Action</h3>
-                <p class="text-brand-100 text-sm opacity-90">Start messaging instantly.</p>
+                <p class="text-sm text-brand-100 opacity-90">Start messaging instantly.</p>
             </div>
             <button type="button"
                     @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Compose)"
@@ -91,7 +90,7 @@
         <div class="space-y-4 xl:col-span-2">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <Icon Style="Icon.IconStyle.Refresh" CssClass="text-brand-600 inline-flex items-center justify-center leading-none text-[20px]" />
+                    <Icon Style="Icon.IconStyle.Refresh" CssClass="inline-flex items-center justify-center leading-none text-brand-600 text-[20px]" />
                     <h3 class="text-lg font-bold tracking-tight text-slate-800">Recent Messages</h3>
                 </div>
                 <button type="button"
@@ -138,7 +137,7 @@
                                 <tr class="group cursor-pointer transition-colors hover:bg-brand-50/40"
                                     @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)">
                                     <td class="px-6 py-4">
-                                        <span class="bg-brand-50 text-brand-600 inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-mono text-xs font-bold transition-colors group-hover:bg-brand-100">
+                                        <span class="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-1 font-mono text-xs font-bold text-brand-600 transition-colors group-hover:bg-brand-100">
                                             <Icon Style="Icon.IconStyle.Mail" CssClass="inline-flex items-center justify-center leading-none text-[12px]" />
                                             #@batch.BatchID
                                         </span>
@@ -258,8 +257,8 @@
         try
         {
             var accountTask = apiClient.AccountGetAsync("self");
-            var batchTask = apiClient.SmsBatchListAsync(1, 8, null, null, null, null);
-            var purchaseTask = apiClient.PurchaseListAsync(1, 5, null, null);
+            var batchTask = apiClient.SmsBatchListAsync(1, 8, null, null, null);
+            var purchaseTask = apiClient.PurchaseListAsync(1, 5, null);
 
             await Task.WhenAll(accountTask, batchTask, purchaseTask);
 

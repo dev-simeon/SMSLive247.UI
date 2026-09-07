@@ -1,8 +1,4 @@
 ﻿@attribute [Route(Const.Routes.ForgotPassword)]
-@attribute [AllowAnonymous]
-@layout PublicLayout
-
-@inject Settings settings;
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -56,7 +52,7 @@
 
 @code {
     private bool isBusy = false;
-    private LoginRequest model = new();
+    private PasswordResetConfirm model = new();
 
     private async Task ForgotAsync()
     {
@@ -64,7 +60,7 @@
         {
             isBusy = true;
             model.ParentID = settings.ParentID;
-            var response = await apiClient.ResetPasswordAsync(model);
+            var response = await apiClient.PasswordResetConfirmAsync(model);
 
             //please complete this
         }

@@ -101,7 +101,7 @@
     {
         try
         {
-            var response = await apiClient.SenderIdListAsync(1, 500, null);
+            var response = await apiClient.SenderIdListAsync(1, 500);
             items = response.Result.ToList();
             filteredItems = items;
         }

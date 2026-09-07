@@ -37,7 +37,7 @@
                 @foreach (var item in category.Items)
                 {
                     <NavLink href="@item.Url" Match="NavLinkMatch.Prefix" ActiveClass="active"
-                             class="group mb-1 flex cursor-pointer items-center gap-3 rounded-sm px-3 py-2 text-slate-600 transition-colors hover:text-brand-600 hover:bg-slate-50 [&.active]:bg-brand-50 [&.active]:text-brand-600 [&.active]:hover:bg-brand-50 [&.active]:hover:text-brand-600">
+                             class="group mb-1 flex cursor-pointer items-center gap-3 rounded-sm px-3 py-2 text-slate-600 transition-colors hover:bg-slate-50 hover:text-brand-600 [&.active]:bg-brand-50 [&.active]:text-brand-600 [&.active]:hover:bg-brand-50 [&.active]:hover:text-brand-600">
                         <Icon Style="@(item.Icon ?? Icon.IconStyle.Close)" CssStyle="font-weight: 300;" />
                         @item.Title
                     </NavLink>
@@ -52,7 +52,7 @@
                 class="flex items-center gap-3 w-full p-2 rounded-xl transition-all cursor-pointer 
                 @(isDropdownOpen ? "bg-slate-200 ring-1 ring-slate-300" : "hover:bg-slate-100")">
 
-            <div class="bg-brand-500 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-white font-bold text-white shadow-sm">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-white bg-brand-500 font-bold text-white shadow-sm">
                 @self?.Account?.Initials
             </div>
             <div class="min-w-0 flex-1 text-left">
@@ -80,7 +80,7 @@
 
             <div
                 class="animate-in fade-in slide-in-from-bottom-2 absolute right-4 bottom-[calc(100%+8px)] left-4 z-50 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl duration-200">
-                <div class="border-brand-300 bg-brand-100/50 border-b p-3">
+                <div class="border-b border-brand-300 bg-brand-100/50 p-3">
                     <p class="mb-1 font-bold tracking-wider text-[10px] text-slate-500 uppercase">
                         Signed in as
                     </p>
@@ -90,7 +90,7 @@
                 </div>
                 <div class="p-1">
                     <button @onclick="NavigateToProfile"
-                            class="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:text-brand-600 hover:bg-brand-50">
+                            class="flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-brand-50 hover:text-brand-600">
                         <Icon Style="Icon.IconStyle.User" />
                         <span>My Profile</span>
                     </button>
@@ -130,6 +130,6 @@
     private void SignOut()
     {
         isDropdownOpen = false;
-        nav.NavigateTo(Const.Routes.Logoff);
+        nav.NavigateTo(Const.Routes.Logout);
     }
 }

@@ -104,9 +104,9 @@
                 throw new Exception("DEBUG: Price should not be null");
 
             isProcessingPayment = true;
-            var request = new PurchaseRequest
+            var request = new InitPaymentRequest
             {
-                ProviderID = "PAYSTACK",
+                ProviderID = "PAYSTACK", 
                 Quantity = price.Quantity
             };
 
