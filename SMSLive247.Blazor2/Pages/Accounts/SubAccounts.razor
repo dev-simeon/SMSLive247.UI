@@ -27,14 +27,15 @@
                     </button>
                 </Column>
                 <Column Header="Balance" Align="right">
-                    <span class="">
-                        @context.Credits.ToString("#,##0.##")
-                    </span>
-                    <button @onclick="() => transferModal.Show(Main.Account, context)"
-                            class=""
-                            title="Transfer credits">
-                        <Icon Style="Icon.IconStyle.Refresh" />
-                    </button>
+                    <div class="inline-flex items-center justify-end gap-1.5">
+                        <span>@context.Credits.ToString("#,##0.##")</span>
+                        <button type="button"
+                                @onclick="() => transferModal.Show(Main.Account, context)"
+                                class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-brand-600 transition-colors cursor-pointer"
+                                title="Transfer credits">
+                            <Icon Style="Icon.IconStyle.Refresh" FontSize="1.3rem" />
+                        </button>
+                    </div>
                 </Column>
                 <Column Header="Status">
                     <Badge Variant="Badge.StatusVariant.ActiveInactive"
@@ -46,7 +47,7 @@
                 <Column Header="Account ID">
                     @context.AccountID
                 </Column>
-                <Column>
+                <Column Align="right">
                     <Actions EditLink="@Const.Routes.Account.SubAccountDetailsUrl(context.AccountID)"
                              OnDelete="e => DeleteSubAccount(context)" />
                 </Column>

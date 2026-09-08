@@ -1,4 +1,4 @@
-﻿@implements IDisposable
+@implements IDisposable
 @inject NavigationManager nav
 
 <div class="hidden items-center gap-2 text-slate-500 md:flex">
@@ -38,7 +38,9 @@
 
         match = Const.NavItems
             .SelectMany(c => c.Items.Select(i => (Parent: c, Child: i)))
-            .FirstOrDefault(x => path.StartsWith(x.Child.Url ?? "--"));
+            .Where(x => !string.IsNullOrEmpty(x.Child.Url))
+            .OrderByDescending(x => x.Child.Url!.Length)
+            .FirstOrDefault(x => x.Child.Url == "/" ? path == "/" : path.StartsWith(x.Child.Url!));
     }
 
     public void Dispose()

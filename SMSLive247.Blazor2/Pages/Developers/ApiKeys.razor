@@ -1,4 +1,4 @@
-﻿@attribute [Route(Const.Routes.Developer.ApiKeys)]
+@attribute [Route(Const.Routes.Developer.ApiKeys)]
 @layout MainLayout
 
 <PageTitle>SMSLive247 - API Keys</PageTitle>
@@ -24,24 +24,7 @@
                            Value="@(context.Phone == "main" ? "MAIN ACCOUNT" : "SUB ACCOUNT")" />
                 </Column>
                 <Column Header="API Key">
-                    <span class="font-mono text-base tracking-wider whitespace-nowrap text-slate-700">
-                        @(IsKeyVisible(context) ? GetKeyString(context.Key) : "********-****-****-****-************")
-                    </span>
-                </Column>
-                <Column Header="" Width="96px">
-                    <div class="flex items-center justify-start gap-2">
-                        <button @onclick="() => ToggleKeyVisibility(context)" class="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-md transition-colors" title="Toggle visibility">
-                            <Icon Style="@(IsKeyVisible(context) ? Icon.IconStyle.EyeOff : Icon.IconStyle.Eye)" CssClass="h-4 w-4" />
-                        </button>
-                        @if (IsKeyVisible(context))
-                        {
-                            <button @onclick="() => ResetApiKey(context)"
-                                    class="p-1.5 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded-md transition-all"
-                                    title="Reset API Key">
-                                <Icon Style="Icon.IconStyle.Refresh" CssClass="h-4 w-4" />
-                            </button>
-                        }
-                    </div>
+                    <ApiKeyDisplay Account="@context" OnReset="ReloadData" />
                 </Column>
                 <Column Header="Date Created" Width="160px">
                     <FormatDate DateTime="@context.DateCreated" />
@@ -56,18 +39,7 @@
 
 @code {
     private string? searchQuery;
-    private List<AccountResponse> accounts =[];
-    private HashSet<string> visibleKeys = new();
-
-    private void ToggleKeyVisibility(AccountResponse account)
-    {
-        if (visibleKeys.Contains(account.AccountID))
-            visibleKeys.Remove(account.AccountID);
-        else
-            visibleKeys.Add(account.AccountID);
-    }
-
-    private bool IsKeyVisible(AccountResponse account) => visibleKeys.Contains(account.AccountID);
+    private List<AccountResponse> accounts = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,35 +60,4 @@
 
         accounts.Insert(0, mainAccount);
     }
-
-    private static string GetKeyString(byte[]? key)
-    {
-        if (key == null || key.Length == 0) return "—";
-        try { return new Guid(key).ToString().ToUpperInvariant(); }
-        catch { return "—"; }
-    }
-
-    private async Task ResetApiKey(AccountResponse account)
-    {
-        try
-        {
-            bool confirmed = await alert.Confirm(
-                $"This will immediately invalidate the current API key for [{account.AccountName}]. " +
-                $"Any applications using it will stop authenticating. Continue?",
-                "Reset API Key");
-
-            if (!confirmed) return;
-
-            var response = await apiClient.AccountUpdateProviderKeyAsync(
-                account.AccountID, new AccountProviderKeyRequest());
-
-            await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
-            await ReloadData();
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message);
-        }
-    }
 }
-
