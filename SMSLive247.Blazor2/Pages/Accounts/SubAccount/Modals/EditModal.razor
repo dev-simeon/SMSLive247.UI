@@ -1,4 +1,4 @@
-﻿@namespace SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
+@namespace SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals
 
 @if (accountId != null)
 {
@@ -47,6 +47,34 @@
                                     Variant="FormSelect<int?>.SelectVariant.TimeZone"
                                     @bind-Value="updateModel.TimeZone" />
                     </FormRow>
+
+                    <!-- Status Toggle (Last item in form) -->
+                    <div class="rounded-lg border border-slate-200 bg-slate-50/60 p-3.5 flex items-center justify-between">
+                        <div>
+                            <div class="text-sm font-medium text-slate-800 flex items-center" style="gap: 0.5rem;">
+                                <span>Account Status:</span>
+                                <span class="inline-flex items-center text-xs font-semibold @(updateModel.Active == true ? "text-emerald-700" : "text-slate-500")">
+                                    <span style="display: inline-block; width: 0.45rem; height: 0.45rem; border-radius: 9999px; margin-right: 0.3rem; background-color: @(updateModel.Active == true ? "#10b981" : "#94a3b8");"></span>
+                                    @(updateModel.Active == true ? "Active" : "Inactive")
+                                </span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-0.5">
+                                @(updateModel.Active == true ? "This sub-account is enabled and can send messages." : "This sub-account is disabled and cannot perform operations.")
+                            </p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer select-none ml-4" title="Toggle status">
+                            <input type="checkbox"
+                                   class="sr-only"
+                                   checked="@(updateModel.Active == true)"
+                                   @onchange="(ChangeEventArgs e) => updateModel.Active = e.Value is bool b ? b : false" />
+                            <div class="relative flex items-center transition-colors duration-200"
+                                 style="width: 2.5rem; height: 1.35rem; border-radius: 9999px; padding: 2px; background-color: @(updateModel.Active == true ? "#0066f5" : "#cbd5e1");">
+                                <div class="bg-white rounded-full shadow-sm transition-transform duration-200"
+                                     style="width: 1.1rem; height: 1.1rem; border-radius: 9999px; background-color: #ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.25); transform: translateX(@(updateModel.Active == true ? "1.15rem" : "0.05rem"));">
+                                </div>
+                            </div>
+                        </label>
+                    </div>
             </EditForm>
         </Body>
         <Footer>
@@ -156,6 +184,7 @@ else
 
         updateModel = new AccountUpdateRequest
         {
+            Active = account.Active,
             FirstName = account.FirstName,
             LastName = account.LastName,
             Email = account.Email,

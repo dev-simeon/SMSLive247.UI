@@ -1,4 +1,4 @@
-﻿@inject NavigationManager nav
+@inject NavigationManager nav
 
 @if (IsOpen)
 {
@@ -36,7 +36,7 @@
 
                 @foreach (var item in category.Items)
                 {
-                    <NavLink href="@item.Url" Match="NavLinkMatch.Prefix" ActiveClass="active"
+                    <NavLink href="@item.Url" Match="@(item.Url == "/" || item.Url == Const.Routes.Dashboard ? NavLinkMatch.All : NavLinkMatch.Prefix)" ActiveClass="active"
                              class="group mb-1 flex cursor-pointer items-center gap-3 rounded-sm px-3 py-2 text-slate-600 transition-colors hover:bg-slate-50 hover:text-brand-600 [&.active]:bg-brand-50 [&.active]:text-brand-600 [&.active]:hover:bg-brand-50 [&.active]:hover:text-brand-600">
                         <Icon Style="@(item.Icon ?? Icon.IconStyle.Close)" CssStyle="font-weight: 300;" />
                         @item.Title

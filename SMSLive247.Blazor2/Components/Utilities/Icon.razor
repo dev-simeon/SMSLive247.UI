@@ -1,4 +1,4 @@
-<span class="@CssClass material-symbols-rounded"
+<span class="inline-flex items-center justify-center leading-none @CssClass material-symbols-rounded"
       style="@(string.IsNullOrWhiteSpace(FontSize) ? "" : $"font-size:{FontSize};") 
                 font-variation-settings: 'wght' @FontWeight; @CssStyle" 
       @attributes="AdditionalAttributes">@GetMaterialSymbolName()</span>
@@ -58,6 +58,7 @@
         FileSpreadsheet,
         FileText,
         Refresh,
+        Copy,
     }
 
     // public string GetBootstrapClass()
@@ -177,6 +178,7 @@
             IconStyle.FileSpreadsheet => "bi bi-file-earmark-spreadsheet",
             IconStyle.FileText => "bi bi-file-earmark-text",
             IconStyle.Refresh => "bi bi-arrow-counterclockwise",
+            IconStyle.Copy => "bi bi-clipboard",
             _ => throw new ArgumentOutOfRangeException("Unmapped IconStyle value.")
         };
     }
@@ -227,6 +229,7 @@
             IconStyle.FileSpreadsheet => "table_chart",
             IconStyle.FileText => "description",
             IconStyle.Refresh => "refresh",
+            IconStyle.Copy => "content_copy",
             _ => throw new ArgumentOutOfRangeException("Unmapped IconStyle value.")
         };
     }
