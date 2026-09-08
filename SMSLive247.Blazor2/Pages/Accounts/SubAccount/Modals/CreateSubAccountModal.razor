@@ -1,51 +1,44 @@
 <Modal Title="Add Sub-Account" @bind-IsVisible="isVisible">
     <Body>
         <EditForm id="CreateSubAccountForm" FormName="CreateSubAccount" Model="@request" OnValidSubmit="HandleSubmit" class="edit-form">
-            @* Account Name — full width *@
             <FormInput Label="Account Name"
-                       PlaceHolder="e.g. Marketing Dept"
+                       PlaceHolder="Marketing Dept"
                        @bind-Value="request.AccountName"
                        Required="true" />
 
-            @* First Name & Last Name — 2 columns *@
             <FormRow Cols="2">
                 <FormInput Label="First Name"
-                           PlaceHolder="First Name"
+                           PlaceHolder="John"
                            @bind-Value="request.FirstName"
                            Required="true" />
                 <FormInput Label="Last Name"
-                           PlaceHolder="Last Name"
+                           PlaceHolder="Doe"
                            @bind-Value="request.LastName"
                            Required="true" />
             </FormRow>
 
-            @* Email Address & Phone Number — 2 columns *@
             <FormRow Cols="2">
-                <FormInput Label="Email Address"
-                           Type="email"
+                <FormInput Label="Email Address" Type="email"
                            PlaceHolder="email@example.com"
                            @bind-Value="request.Email"
                            Required="true" />
-                <FormInput Label="Phone Number"
-                           Type="tel"
-                           PlaceHolder="e.g. 08030000000"
+                <FormInput Label="Phone Number" Type="tel"
+                           PlaceHolder="08030000000"
                            @bind-Value="request.Phone"
                            Required="true" />
             </FormRow>
 
-            @* Country Code & Time Zone — 2 columns *@
             <FormRow Cols="2">
                 <FormSelect Label="Country Code"
-                            Type="FormSelect.SelectType.Country"
-                            @bind-Value="CountryCodeString"
+                            Variant="FormSelect<int>.SelectVariant.Country"
+                            @bind-Value="request.CountryCode"
                             IsEmbedded="false" />
                 <FormSelect Label="Time Zone (GMT Offset)"
-                            Type="FormSelect.SelectType.TimeZone"
-                            @bind-Value="TimeZoneString"
+                            Variant="FormSelect<int>.SelectVariant.TimeZone"
+                            @bind-Value="request.TimeZone"
                             IsEmbedded="false" />
             </FormRow>
 
-            @* Password — full width *@
             <FormInput Label="Password"
                        Type="password"
                        PlaceHolder="••••••••"
@@ -66,17 +59,15 @@
 
     private bool isVisible = false;
     private bool isSubmitting = false;
-    private AccountCreateRequest request = new();
+    private AccountCreateRequest request = new() { CountryCode = 234, TimeZone = 1};
     private string password = string.Empty;
-    private string? CountryCodeString { get; set; } = "234";
-    private string? TimeZoneString { get; set; } = "0";
+    // private string? countryCodeString { get; set; } = "234";
+    // private string? timeZoneString { get; set; } = "1";
 
     public void Show()
     {
-        request = new();
+        request = new() { CountryCode = 234, TimeZone = 1 };
         password = string.Empty;
-        CountryCodeString = "234";
-        TimeZoneString = "0";
         isVisible = true;
         StateHasChanged();
     }
@@ -86,19 +77,6 @@
         try
         {
             isSubmitting = true;
-
-            if (!string.IsNullOrEmpty(CountryCodeString)
-                && int.TryParse(CountryCodeString.TrimStart('+'), out int countryCode))
-            {
-                request.CountryCode = countryCode;
-            }
-
-            if (!string.IsNullOrEmpty(TimeZoneString)
-                && int.TryParse(TimeZoneString, out int tz))
-            {
-                request.TimeZone = tz;
-            }
-
             request.Password = password;
 
             await apiClient.AccountCreateAsync(request);

@@ -11,12 +11,14 @@
 
 <PageBody>
     <HeaderLeft>
-        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="OnSearch">
-            <FormSelect @bind-Value="searchStatus" IsEmbedded="true">
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="OnSearch" InstantSearch="true">
+            <FormSelect ValueChanged="(e) => OnSearch(e)" 
+                        ValueExpression="@(() => searchStatus)"
+                        TValue="string" IsEmbedded="true">
                 <option value="">All Statuses</option>
-                <option value="Approved">Approved</option>
-                <option value="Pending">Pending</option>
-                <option value="Rejected">Rejected</option>
+                <option value="APPROVED">Approved</option>
+                <option value="PENDING">Pending</option>
+                <option value="REJECTED">Rejected</option>
             </FormSelect>
         </SearchBox>
     </HeaderLeft>
@@ -24,7 +26,7 @@
         <Button Icon="Icon.IconStyle.PlusCircle" Text="Request Sender ID" OnClick="() => requestModal.Show()" />
     </HeaderRight>
     <ChildContent>
-        <Table Items="filteredItems">
+        <Table Items="filteredItems" EmptyMessage="No Sender IDs Found">
             <Columns>
                 <Column Header="Sender ID">
                     @context.SenderID
@@ -80,23 +82,6 @@
         await FetchData();
     }
 
-    private async Task HandleDelete(SenderIdResponse item)
-    {
-        bool confirmed = await alert.Confirm($"Are you sure you want to delete Sender ID [{item.SenderID}]?", "Delete Sender ID");
-        if (!confirmed) return;
-
-        try
-        {
-            await apiClient.SenderIdDeleteAsync(item.SenderID);
-            await alert.Success("Sender ID deleted successfully.", "Deleted");
-            await FetchData();
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message);
-        }
-    }
-
     private async Task FetchData()
     {
         try
@@ -111,19 +96,42 @@
         }
     }
 
+    private void OnSearch(string status)
+    {
+        searchStatus = status;
+        OnSearch();
+    }
+
     private void OnSearch()
     {
+        var noCase = StringComparison.OrdinalIgnoreCase;
         filteredItems = items;
 
         if (!string.IsNullOrWhiteSpace(searchStatus))
         {
-            filteredItems = filteredItems?.Where(x => x.Status == searchStatus).ToList();
+            filteredItems = filteredItems?.Where(x => x.Status.Equals(searchStatus, noCase)).ToList();
         }
 
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
-            filteredItems = filteredItems?.Where(x => x.SenderID.Contains(
-                searchQuery, StringComparison.OrdinalIgnoreCase)).ToList();
+            filteredItems = filteredItems?.Where(x => x.SenderID.Contains(searchQuery, noCase)).ToList();
+        }
+    }
+
+    private async Task HandleDelete(SenderIdResponse item)
+    {
+        if (await alert.Confirm($"Are you sure you want to delete [{item.SenderID}]?", "Delete Sender ID"))
+        {
+            try
+            {
+                await apiClient.SenderIdDeleteAsync(item.SenderID);
+                await alert.Success("Sender ID deleted successfully.", "Deleted");
+                await FetchData();
+            }
+            catch (Exception ex)
+            {
+                await alert.Error(ex.Message);
+            }
         }
     }
 }

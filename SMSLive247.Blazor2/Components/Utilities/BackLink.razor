@@ -1,0 +1,18 @@
+﻿@if (!string.IsNullOrWhiteSpace(Location))
+{
+    <a class="group mb-8 inline-flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-brand-500"
+       href="@Location" data-discover="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             class="lucide lucide-arrow-left transition-transform group-hover:-translate-x-1" aria-hidden="true">
+            <path d="m12 19-7-7 7-7"></path>
+            <path d="M19 12H5"></path>
+        </svg>
+        @Title
+    </a>
+}
+
+@code {
+    [Parameter] public string Location { get; set; } = "/";
+    [Parameter] public string Title { get; set; } = "Go Back";
+}

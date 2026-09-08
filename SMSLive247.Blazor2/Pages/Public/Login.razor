@@ -43,14 +43,14 @@
                    Type="email" Label="Email"
                    IconStyle="Icon.IconStyle.Mail"
                    Required="true"
-                   PlaceHolder="Enter your email" />
+                   PlaceHolder="name@company.com" />
     </FormRow>
 
     <FormRow>
         <FormInput @bind-Value="model.Password" 
                    Type="password" Label="Password"
                    Required="true"
-                   PlaceHolder="Enter your password" />
+                   PlaceHolder="••••••••" />
     </FormRow>
  
     <div class="flex items-center justify-between">
@@ -73,7 +73,7 @@
 
     <div>
         <Button IsSubmit="true"
-                CssClass="w-full py-3"
+                CssClass="w-full py-3 text-base"
                 IsBusy="@isBusy"
                 Text="Sign in to Dashboard" />
     </div>

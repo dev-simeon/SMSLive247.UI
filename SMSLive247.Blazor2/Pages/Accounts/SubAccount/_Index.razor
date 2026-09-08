@@ -7,12 +7,16 @@
 
 @if (subAccount is not null)
 {
+    <BackLink Location="@Const.Routes.Account.SubAccounts"
+              Title="Back to Sub-Accounts">
+    </BackLink>
+
     <PageHeader Title="@subAccount.AccountName">
         <div class="mt-1 text-sm text-slate-500">
-            <strong>Sub-Account Details </strong>
-            <small>@subAccount.AccountID</small>
-            <Badge Variant="@Badge.StatusVariant.ActiveInactive" 
-                Value="@(subAccount.Active ? "ACTIVE" : "DISABLED")" />
+            @* <strong>Sub-Account Details </strong> *@
+            @* <small>@subAccount.AccountID</small> *@
+            @* <Badge Variant="@Badge.StatusVariant.ActiveInactive" 
+                Value="@(subAccount.Active ? "ACTIVE" : "DISABLED")" /> *@
         </div>
     </PageHeader>
 
@@ -24,11 +28,11 @@
             <TabPage Title="Sent Messages" Icon="Icon.IconStyle.Mail">
                 <Messages></Messages>
             </TabPage>
-            <TabPage Title="Sub-Users" Icon="Icon.IconStyle.Users">
-                <SubUsers></SubUsers>
-            </TabPage>
             <TabPage Title="Transfers" Icon="Icon.IconStyle.ArrowRightLeft">
                 <Transfers></Transfers>
+            </TabPage>
+            <TabPage Title="Sub-Users" Icon="Icon.IconStyle.Users">
+                <SubUsers></SubUsers>
             </TabPage>
         </Tabs>
     </CascadingValue>

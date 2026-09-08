@@ -1,4 +1,5 @@
-﻿@attribute [Route(Const.Routes.Register)]
+﻿@using SMSLive247.Blazor2.Pages.Public.Shared
+@attribute [Route(Const.Routes.Register)]
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -34,37 +35,7 @@
 
     @if (step < 3)
     {
-        <div class="mb-8 flex items-center justify-between">
-
-            <div class="flex shrink-0 items-center gap-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step > 1 ? "bg-brand-100 text-brand-700" : step == 1 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
-                    @if (step > 1)
-                    {
-                        <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-sm" />
-                    }
-                    else
-                    {
-                        <span>1</span>
-                    }
-                </div>
-                <span class="text-xs font-medium transition-colors sm:text-sm @(step == 1 ? "font-semibold text-slate-900" : step > 1 ? "text-brand-700" : "text-slate-400")">
-                    Contact Details
-                </span>
-            </div>
-
-
-            <div class="mx-3 flex-1 transition-colors @(step > 1 ? "bg-brand-100" : "bg-slate-200")" style="height: 2px;"></div>
-
-
-            <div class="flex shrink-0 items-center gap-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step == 2 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
-                    <span>2</span>
-                </div>
-                <span class="text-xs font-medium transition-colors sm:text-sm @(step == 2 ? "font-semibold text-slate-900" : "text-slate-400")">
-                    Verify &amp; Profile
-                </span>
-            </div>
-        </div>
+        <StepViewer Step="@step" StepNames="@(new[] { "Verify Email", "Create Account" })" />
     }
 
     @if (step == 1)
@@ -78,17 +49,15 @@
             <EditForm Model="@requestModel" OnValidSubmit="RequestOtpAsync" FormName="regRequest" class="space-y-5">
                 <FormRow Cols="1">
                     <FormInput @bind-Value="requestModel.Email"
-                               Type="email"
-                               Label="Email Address"
-                               PlaceHolder="john@company.com"
+                               Label="Email Address" Type="email"
+                               PlaceHolder="name@company.com"
                                IconStyle="Icon.IconStyle.Mail"
                                Required="true" />
                 </FormRow>
 
                 <FormRow Cols="1">
                     <FormInput @bind-Value="requestModel.Phone"
-                               Type="tel"
-                               Label="Mobile Phone Number"
+                               Label="Mobile Phone Number" Type="tel"
                                PlaceHolder="+234 800 000 0000"
                                IconStyle="Icon.IconStyle.Phone"
                                Required="true" />
@@ -97,8 +66,14 @@
                 <div>
                     <Button IsSubmit="true"
                             IsBusy="@isBusy"
-                            CssClass="w-full py-3"
-                            Text="Send Verification Code >" />
+                            CssClass="w-full py-3 text-base"
+                            Text="Send Verification Code">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                             class="lucide lucide-chevron-right" aria-hidden="true">
+                            <path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </Button>
                 </div>
             </EditForm>
 
@@ -127,7 +102,6 @@
             </div>
 
             <EditForm Model="@confirmModel" OnValidSubmit="ConfirmRegisterAsync" FormName="regConfirm" class="space-y-5">
-
                 <FormRow Cols="1">
                     <FormInput @bind-Value="confirmModel.VerifyCode"
                                Label="Verification Code (OTP)"
@@ -135,8 +109,6 @@
                                IconStyle="Icon.IconStyle.Key"
                                Required="true" />
                 </FormRow>
-
-
                 <FormRow Cols="2">
                     <FormInput @bind-Value="confirmModel.FirstName"
                                Label="First Name"
@@ -149,8 +121,6 @@
                                IconStyle="Icon.IconStyle.User"
                                Required="true" />
                 </FormRow>
-
-
                 <FormRow Cols="2">
                     <FormSelect @bind-Value="confirmModel.CountryCode"
                                 Label="Country"
@@ -163,8 +133,6 @@
                                 IconStyle="Icon.IconStyle.Clock"
                                 Required="true" />
                 </FormRow>
-
-
                 <FormRow Cols="2">
                     <FormInput @bind-Value="confirmModel.Password"
                                Type="password"
@@ -177,13 +145,10 @@
                                Required="true"
                                PlaceHolder="Re-enter your password" />
                 </FormRow>
-
                 @if (confirmModel.Password != confirmPassword && !string.IsNullOrEmpty(confirmPassword))
                 {
                     <p class="text-xs font-medium text-red-500">Passwords do not match.</p>
                 }
-
-
                 <div class="flex items-center">
                     <InputCheckbox @bind-Value="termsAccepted" id="terms"
                                    class="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500" />
@@ -195,12 +160,11 @@
                            class="font-medium text-brand-600 underline hover:text-brand-700">Privacy Policy</a>
                     </label>
                 </div>
-
                 <div>
                     <Button IsSubmit="true"
                             IsBusy="@isBusy"
                             IsDisabled="@(!termsAccepted)"
-                            CssClass="w-full py-3"
+                            CssClass="w-full py-3 text-base"
                             Text="Complete Registration" />
                 </div>
             </EditForm>
@@ -231,7 +195,7 @@
             </div>
             <div>
                 <Button Text="Go to Sign In"
-                        CssClass="w-full py-3"
+                        CssClass="w-full py-3 text-base"
                         OnClick="() => nav.NavigateTo(Const.Routes.Login)" />
             </div>
         </div>

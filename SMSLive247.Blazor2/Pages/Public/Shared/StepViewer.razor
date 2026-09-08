@@ -1,0 +1,74 @@
+﻿<BackLink Location="@Const.Routes.Login"
+          Title="Back to Sign In">
+</BackLink>
+
+<div class="mb-8 flex items-center gap-4" @onclick="() => Step += 1">
+    @for (int i = 1; i <= StepNames.Length; i++)
+    {
+        <div class="flex items-center gap-2">
+            @if (i > Step)
+            {
+                <div class="flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-400 transition-all">@i</div>
+                <span class="text-sm font-medium text-slate-400 transition-colors sm:inline">@StepNames[i - 1]</span>
+            }
+            else if (i < Step)
+            {
+                <div class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-200 text-xs font-bold text-white transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" 
+                    stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                </div>
+                <span class="text-sm font-medium text-slate-400 transition-colors sm:inline">@StepNames[i - 1]</span>
+            }
+            else
+            {
+                <div class="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500 text-xs font-bold text-white ring-4 ring-brand-500/20 transition-all">@i</div>
+                <span class="text-sm font-medium text-slate-900 transition-colors sm:inline">@StepNames[i - 1]</span>
+            }
+        </div>
+
+        if (i < StepNames.Length)
+        {
+            <div class="h-px flex-1 @(i == Step ? "bg-brand-100" : "bg-slate-200")"></div>
+        }
+    }
+</div>
+
+
+@* <div class="mb-8 flex items-center justify-between">
+
+    <div class="flex shrink-0 items-center gap-2.5">
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step > 1 ? "bg-brand-100 text-brand-700" : step == 1 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
+            @if (step > 1)
+            {
+                <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-sm" />
+            }
+            else
+            {
+                <span>1</span>
+            }
+        </div>
+        <span class="text-xs font-medium transition-colors sm:text-sm @(step == 1 ? "font-semibold text-slate-900" : step > 1 ? "text-brand-700" : "text-slate-400")">
+            Contact Details
+        </span>
+    </div>
+
+
+    <div class="mx-3 flex-1 transition-colors @(step > 1 ? "bg-brand-100" : "bg-slate-200")" style="height: 2px;"></div>
+
+
+    <div class="flex shrink-0 items-center gap-2.5">
+        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step == 2 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
+            <span>2</span>
+        </div>
+        <span class="text-xs font-medium transition-colors sm:text-sm @(step == 2 ? "font-semibold text-slate-900" : "text-slate-400")">
+            Verify &amp; Profile
+        </span>
+    </div>
+</div> *@
+
+@code {
+    [Parameter] public int Step { get; set; } = 1;
+    [Parameter] public string[] StepNames { get; set; } = ["Step 1", "Step 2", "Step 3"];
+}

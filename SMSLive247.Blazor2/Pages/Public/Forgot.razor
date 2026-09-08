@@ -1,4 +1,5 @@
-﻿@attribute [Route(Const.Routes.ForgotPassword)]
+﻿@using SMSLive247.Blazor2.Pages.Public.Shared
+@attribute [Route(Const.Routes.ForgotPassword)]
 
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
@@ -21,37 +22,7 @@
 
     @if (step < 3)
     {
-        <div class="mb-8 flex items-center justify-between">
-
-            <div class="flex shrink-0 items-center gap-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step > 1 ? "bg-brand-100 text-brand-700" : step == 1 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
-                    @if (step > 1)
-                    {
-                        <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-sm" />
-                    }
-                    else
-                    {
-                        <span>1</span>
-                    }
-                </div>
-                <span class="text-xs font-medium transition-colors sm:text-sm @(step == 1 ? "font-semibold text-slate-900" : step > 1 ? "text-brand-700" : "text-slate-400")">
-                    Verify Email
-                </span>
-            </div>
-
-
-            <div class="mx-3 flex-1 transition-colors @(step > 1 ? "bg-brand-100" : "bg-slate-200")" style="height: 2px;"></div>
-
-
-            <div class="flex shrink-0 items-center gap-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all @(step == 2 ? "bg-brand-500 text-white shadow-sm" : "bg-slate-100 text-slate-400")">
-                    <span>2</span>
-                </div>
-                <span class="text-xs font-medium transition-colors sm:text-sm @(step == 2 ? "font-semibold text-slate-900" : "text-slate-400")">
-                    Reset Password
-                </span>
-            </div>
-        </div>
+        <StepViewer Step="@step" StepNames="@(new[] { "Verify Email", "Reset Password" })" />
     }
 
     @if (step == 1)
@@ -79,9 +50,14 @@
 
                 <div>
                     <Button IsSubmit="true"
-                            CssClass="w-full py-3"
+                            CssClass="w-full py-3 text-base"
                             IsBusy="@isBusy"
-                            Text="Send Reset Code >" />
+                            Text="Send Reset Code">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" 
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-chevron-right" aria-hidden="true"><path d="m9 18 6-6-6-6"></path>
+                        </svg>
+                    </Button>
                 </div>
             </EditForm>
 
@@ -149,7 +125,7 @@
 
                 <div>
                     <Button IsSubmit="true"
-                            CssClass="w-full py-3"
+                            CssClass="w-full py-3 text-base"
                             IsBusy="@isBusy"
                             Text="Reset My Password" />
                 </div>
@@ -181,7 +157,7 @@
             </div>
             <div>
                 <Button Text="Go to Sign In"
-                        CssClass="w-full py-3"
+                        CssClass="w-full py-3 text-base"
                         OnClick="() => nav.NavigateTo(Const.Routes.Login)" />
             </div>
         </div>
