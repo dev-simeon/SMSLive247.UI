@@ -161,13 +161,7 @@ else
 
             var reply = deliveryTime.HasValue
                 ? "Your message has been scheduled."
-                : $"{res.TotalProcessed} message/s was submitted for immediate delivery.";
-
-
-
-            //1 message/s was submitted for immediate delivery.
-            // ~
-            // Total SMS units charged: 3.40
+                : GetMessageStatistics(res);
 
             await alert.Success(reply, "Message Created");
         }
@@ -179,5 +173,23 @@ else
         {
             model.IsBusy = false;
         }
+    }
+
+    public static string GetMessageStatistics(SmsBatchResponse res)
+    {
+        var message = "";
+
+        if (res.TotalProcessed > 0)
+            message += $"{res.TotalProcessed:0,00#} message/s was submitted for immediate delivery.";
+
+        if (res.TotalFailed > 0)
+            message += $"{res.TotalFailed:0,00#} message/s failed.";
+
+        message += "~";
+
+        message += $"Total SMS units charged: {res.CreditsCharged}";
+        //message += $"Current SMS balance: {res.CreditBalance}";
+     
+        return message;
     }
 }

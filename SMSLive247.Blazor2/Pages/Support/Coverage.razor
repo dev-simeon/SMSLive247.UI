@@ -15,7 +15,7 @@
     </HeaderRight>
 
     <ChildContent>
-        <Table Items="pagedItems" AllowSelect="false">
+        <Table Items="filteredItems" AllowSelect="false">
             <Columns>
                 <Column Header="Country">
                     <span class="text-sm font-medium text-slate-900">@context.CountryName</span>
@@ -28,23 +28,13 @@
     </ChildContent>
 
     <FooterLeft>
-        <Paging PageNumber="pageNumber"
-                PageSize="pageSize"
-                TotalRecords="filteredItems.Count"
-                PageNumberChanged="OnPageChange"
-                PageSizeChanged="OnPageSizeChange" />
     </FooterLeft>
 </PageBody>
 
 @code {
-    private const int DefaultPageSize = 20;
-
     private string searchText = "";
-    private List<CoverageResponse>? items;
+    private List<CoverageResponse> items = [];
     private List<CoverageResponse> filteredItems = [];
-    private List<CoverageResponse>? pagedItems;
-    private int pageNumber = 1;
-    private int pageSize = DefaultPageSize;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,13 +46,11 @@
             {
                 items = response.Result.ToList();
                 filteredItems = items;
-                SetPagedItems();
             }
         }
         catch (Exception ex)
         {
             await alert.Error(ex.Message);
-            pagedItems = [];
         }
     }
 
@@ -70,41 +58,14 @@
     {
         if (string.IsNullOrWhiteSpace(searchText))
         {
-            filteredItems = items ?? [];
+            filteredItems = items;
         }
         else
         {
-            filteredItems = items?.Where(x =>
-                (x.CountryName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
-                || (x.NetworkName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false))
-                .ToList() ?? [];
+            filteredItems = items.Where(x =>
+                   (x.CountryName.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                || (x.NetworkName.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
         }
-
-        pageNumber = 1;
-        SetPagedItems();
-    }
-
-    private void SetPagedItems()
-    {
-        pagedItems = filteredItems
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-    }
-
-    private Task OnPageChange(int page)
-    {
-        var totalPages = Math.Max(1, (int)Math.Ceiling((decimal)filteredItems.Count / pageSize));
-        pageNumber = Math.Clamp(page, 1, totalPages);
-        SetPagedItems();
-        return Task.CompletedTask;
-    }
-
-    private Task OnPageSizeChange(int size)
-    {
-        pageSize = size;
-        pageNumber = 1;
-        SetPagedItems();
-        return Task.CompletedTask;
     }
 }

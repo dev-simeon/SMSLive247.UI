@@ -1,6 +1,6 @@
 <Modal Title="Add Sub-Account" @bind-IsVisible="isVisible">
     <Body>
-        <EditForm id="CreateSubAccountForm" FormName="CreateSubAccount" Model="@request" OnValidSubmit="HandleSubmit" class="edit-form">
+        <EditForm id="ff3" FormName="CreateSubAccount" Model="@request" OnValidSubmit="HandleSubmit" class="edit-form">
             <FormInput Label="Account Name"
                        PlaceHolder="Marketing Dept"
                        @bind-Value="request.AccountName"
@@ -39,17 +39,16 @@
                             IsEmbedded="false" />
             </FormRow>
 
-            <FormInput Label="Password"
-                       Type="password"
+            <FormInput Label="Password" Type="password"
                        PlaceHolder="••••••••"
-                       @bind-Value="password"
+                       @bind-Value="request.Password"
                        Required="true"
                        HelpText="Must be at least 8 characters with numbers and symbols."
                        />
         </EditForm>
     </Body>
     <Footer>
-        <Button IsSubmit="true" Text="Create Sub-Account" form="CreateSubAccountForm" Icon="Icon.IconStyle.PlusCircle" IsBusy="@isSubmitting" />
+        <Button IsSubmit="true" Text="Create Sub-Account" form="ff3" Icon="Icon.IconStyle.PlusCircle" IsBusy="@isSubmitting" />
         <Button Text="Cancel" Style="ColorStyle.Secondary" IsDisabled="@isSubmitting" OnClick="() => isVisible = false" />
     </Footer>
 </Modal>
@@ -60,14 +59,10 @@
     private bool isVisible = false;
     private bool isSubmitting = false;
     private AccountCreateRequest request = new() { CountryCode = 234, TimeZone = 1};
-    private string password = string.Empty;
-    // private string? countryCodeString { get; set; } = "234";
-    // private string? timeZoneString { get; set; } = "1";
 
     public void Show()
     {
         request = new() { CountryCode = 234, TimeZone = 1 };
-        password = string.Empty;
         isVisible = true;
         StateHasChanged();
     }
@@ -77,8 +72,6 @@
         try
         {
             isSubmitting = true;
-            request.Password = password;
-
             await apiClient.AccountCreateAsync(request);
 
             await alert.Success("Sub-account created successfully.", "Success");
