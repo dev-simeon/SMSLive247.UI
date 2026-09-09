@@ -1,21 +1,19 @@
-﻿<button @attributes="AdditionalAttributes" @onclick="HandleClick" 
-        type="@(IsSubmit ? "submit" : "button")"
-        disabled="@(IsBusy || IsDisabled)"
-        class="flex min-h-[37.6px] min-w-[120px] transform items-center justify-center gap-2 rounded-lg border border-transparent px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @colorCss @CssClass">
-    @if (IsBusy)
-    {
-        <div class="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent"></div>
-    }
-    else
-    {
-        @if (Icon.HasValue)
-        {
-            <Icon Style="Icon.Value" FontWeight="300" />
-        }
-        @Text
-        @ChildContent
-    }
-</button>
+@if (IsSubmit)
+{
+    <button @attributes="AdditionalAttributes"
+            type="submit" disabled="@(IsBusy || IsDisabled)"
+            class="flex min-h-[37.6px] min-w-30 transform items-center justify-center gap-2 rounded-lg border border-transparent px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @colorCss @CssClass">
+        @ButtonContent
+    </button>
+}
+else
+{
+    <button @attributes="AdditionalAttributes" @onclick="HandleClick"
+            type="button" disabled="@(IsBusy || IsDisabled)"
+            class="flex min-h-[37.6px] min-w-30 transform items-center justify-center gap-2 rounded-lg border border-transparent px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @colorCss @CssClass">
+        @ButtonContent
+    </button>
+}
 
 @code {
     [Parameter] public ColorStyle Style { get; set; } = ColorStyle.Primary;
@@ -29,34 +27,50 @@
     [Parameter] public string CssClass { get; set; } = "";
     [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    private RenderFragment ButtonContent => __builder =>
+    {
+        if (IsBusy)
+        {
+            __builder.OpenElement(0, "div");
+            __builder.AddAttribute(1, "class", "h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent");
+            __builder.CloseElement();
+        }
+        else
+        {
+            if (Icon.HasValue)
+            {
+                __builder.OpenComponent<Icon>(2);
+                __builder.AddAttribute(3, "Style", Icon.Value);
+                __builder.AddAttribute(4, "FontWeight", 300);
+                __builder.CloseComponent();
+            }
+            __builder.AddContent(5, Text);
+            __builder.AddContent(6, ChildContent);
+        }
+    };
+
     private string colorCss => Style.ToTailwindCss() + " " + moreCss();
 
     private string moreCss()
     {
         return Style switch
         {
-            ColorStyle.Primary      => "hover:bg-brand-600 focus:ring-brand-500",
-            ColorStyle.Secondary    => "hover:bg-slate-50  focus:ring-slate-300 border-slate-200",
-            ColorStyle.Success      => "hover:bg-green-600 focus:ring-green-500",
-            ColorStyle.Warning      => "hover:bg-amber-600 focus:ring-amber-500",
-            ColorStyle.Info         => "hover:bg-blue-600  focus:ring-blue-500",
-            ColorStyle.Danger       => "hover:bg-red-600   focus:ring-red-500",
-            ColorStyle.Light        => "hover:bg-gray-200  focus:ring-gray-300",
-            ColorStyle.Dark         => "hover:bg-gray-900  focus:ring-gray-500",
+            ColorStyle.Primary => "hover:bg-brand-600 focus:ring-brand-500",
+            ColorStyle.Secondary => "hover:bg-slate-50  focus:ring-slate-300 border-slate-200",
+            ColorStyle.Success => "hover:bg-green-600 focus:ring-green-500",
+            ColorStyle.Warning => "hover:bg-amber-600 focus:ring-amber-500",
+            ColorStyle.Info => "hover:bg-blue-600  focus:ring-blue-500",
+            ColorStyle.Danger => "hover:bg-red-600   focus:ring-red-500",
+            ColorStyle.Light => "hover:bg-gray-200  focus:ring-gray-300",
+            ColorStyle.Dark => "hover:bg-gray-900  focus:ring-gray-500",
             _ => ""
         };
     }
 
     private async Task HandleClick(MouseEventArgs e)
     {
-        if (!OnClick.HasDelegate)
-            return; // No OnClick delegate
-
-        if (IsSubmit)
-            throw new InvalidOperationException("Button cannot be both submit and have an OnClick event.");
-
-        if (IsBusy)
-            throw new InvalidOperationException("Button is busy. Please wait until the current operation is complete.");
+        if (!OnClick.HasDelegate || IsBusy)
+            return;
 
         await OnClick.InvokeAsync(e);
     }
