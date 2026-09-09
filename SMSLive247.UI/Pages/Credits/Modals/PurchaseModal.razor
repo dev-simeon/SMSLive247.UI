@@ -99,7 +99,7 @@
             // Use Math.Round to handle potential floating point issues before casting.
             var totalAmountKobo = (long)Math.Round(totalAmount * 100M);
 
-            var request = new PurchaseRequest { ProviderID = "PAYSTACK", Quantity = quantity };
+            var request = new InitPaymentRequest { ProviderID = "PAYSTACK", Quantity = quantity };
             var response = await apiClient.PurchaseBeginAsync(request);
 
             if (response.StatusCode != 200)

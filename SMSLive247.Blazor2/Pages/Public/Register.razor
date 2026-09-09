@@ -227,7 +227,7 @@
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error(ex.FriendlyErrorMessage);
         }
         catch (Exception ex)
         {
@@ -262,7 +262,7 @@
         }
         catch (SMSLive247.OpenApi.ApiException ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error(ex.FriendlyErrorMessage);
         }
         catch (Exception ex)
         {

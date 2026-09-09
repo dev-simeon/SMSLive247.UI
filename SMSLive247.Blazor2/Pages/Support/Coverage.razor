@@ -3,7 +3,7 @@
 
 <PageTitle>SMSLive247 - Coverage</PageTitle>
 
-<PageHeader Title="Global Network Coverage Lookup"
+<PageHeader Title="Global Network Coverage"
             SubTitle="Search and view comprehensive network coverage and termination rates for supported countries." />
 
 <PageBody>
@@ -33,24 +33,29 @@
 
 @code {
     private string searchText = "";
-    private List<CoverageResponse> items = [];
-    private List<CoverageResponse> filteredItems = [];
+    private List<CoverageResponse>? items;
+    private List<CoverageResponse>? filteredItems;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var response = await apiClient.CoverageListAsync();
-
-            if (response.StatusCode == 200)
-            {
-                items = response.Result.ToList();
-                filteredItems = items;
-            }
+            items = []; // response.Result.ToList();
+        }
+        catch (ApiException ex)
+        {
+            items = [];
+            await alert.Error(ex.FriendlyErrorMessage);
         }
         catch (Exception ex)
         {
+            items = [];
             await alert.Error(ex.Message);
+        }
+        finally
+        {
+            filteredItems = items;
         }
     }
 
@@ -58,11 +63,11 @@
     {
         if (string.IsNullOrWhiteSpace(searchText))
         {
-            filteredItems = items;
+            filteredItems = items ?? [];
         }
         else
         {
-            filteredItems = items.Where(x =>
+            filteredItems = (items ?? []).Where(x =>
                    (x.CountryName.Contains(searchText, StringComparison.OrdinalIgnoreCase))
                 || (x.NetworkName.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
                 .ToList();

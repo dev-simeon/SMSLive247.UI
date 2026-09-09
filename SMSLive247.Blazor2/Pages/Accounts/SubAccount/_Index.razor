@@ -45,8 +45,10 @@ else
     </PageHeader>
 
     <p class="text-red-500">@errorMessage</p>
-    <br />
-    <a href="@Const.Routes.Account.SubAccounts" class="text-brand-600 hover:underline"> &lt; Go back</a>
+
+    <BackLink Location="@Const.Routes.Account.SubAccounts"
+              Title="Back to Sub-Accounts">
+    </BackLink>
 }
 
 @code {

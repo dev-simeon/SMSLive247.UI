@@ -119,7 +119,7 @@
             </div>
             @if (selectedPeriod == Period.Custom)
             {
-                <div class="d-flex align-items-center gap-2 ms-2">
+                <div class="d-flex align-items-center ms-2 gap-2">
                     <InputDate @bind-Value="customFrom" Type="InputDateType.Date" class="form-control form-control-sm"
                         style="width: auto;" />
                     <span class="text-muted">to</span>
@@ -205,7 +205,7 @@
     </div>
 
     <div class="row mt-5">
-        <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="col-lg-6 mb-lg-0 mb-4">
             <Card HeaderTitle="Delivery Status">
 
                 <Body>
@@ -215,12 +215,12 @@
                 </Body>
             </Card>
         </div>
-        <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="col-lg-6 mb-lg-0 mb-4">
             <Card HeaderTitle="Recent Messages">
 
                 <Body>
                     <div class="table-responsive" style="height:350px; overflow-y: auto;">
-                        <table class="table table-sm align-middle mb-0">
+                        <table class="table-sm mb-0 table align-middle">
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -264,7 +264,7 @@
 
                 <Body>
                     <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
+                        <table class="table-sm mb-0 table align-middle">
                             <thead>
                                 <tr>
                                     <th>Date</th>
@@ -375,7 +375,7 @@ new Transaction { Date = DateTimeOffset.Now.AddDays(-5), Description = "SMS Batc
     {
         try
         {
-            var response = await apiClient.SmsBatchListAsync(pageNumber: 1, pageSize: 8, cacheTag: null, dateFrom: null, dateTo:
+            var response = await apiClient.SmsBatchListAsync(pageNumber: 1, pageSize: 8, dateFrom: null, dateTo:
             null, searchText: null);
             recentMessages = (response.Result ?? []).OrderByDescending(m => m.DateSubmitted).ToList();
         }
@@ -389,7 +389,7 @@ new Transaction { Date = DateTimeOffset.Now.AddDays(-5), Description = "SMS Batc
     {
         try
         {
-            var response = await apiClient.SmsBatchListAsync(pageNumber: null, pageSize: null, cacheTag: null, dateFrom: periodFrom,
+            var response = await apiClient.SmsBatchListAsync(pageNumber: null, pageSize: null, dateFrom: periodFrom,
             dateTo: periodTo, searchText: null);
             periodBatches = (response.Result ?? []).OrderByDescending(m => m.DateSubmitted).ToList();
 

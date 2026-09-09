@@ -23,6 +23,7 @@
 @code {
     [Parameter] public bool IsBusy { get; set; }
     [Parameter] public EventCallback<bool> IsBusyChanged { get; set; }
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
     private IJSObjectReference? module;
 
@@ -55,27 +56,22 @@
         {
             var request = new OAuthRequest
             {
-                Credential = credential,
                 ServerID = "google",
+                Credential = credential,
             };
-           var result = await apiClient.LoginOauthAsync(request);
-           var response = result?.Result;
+            var response = await apiClient.LoginOauthAsync(request);
 
-            if (response?.AccessToken != null)
-            {
-                var userState = new SMSLive247.Authentication.SmsAuthProvider.Member(
-                    email: "unknown-email@unknown-user.com",
-                    apiKey: response.AccessToken.ToString());
+            await ((SMSLive247.Authentication.SmsAuthProvider)auth)
+                .SaveAuthenticationState(apiKey: response.Result.AccessToken);
 
-                 await ((SMSLive247.Authentication.SmsAuthProvider)auth)
-                    .SaveAuthenticationState(userState);
+            var destination = !string.IsNullOrWhiteSpace(ReturnUrl)
+                ? ReturnUrl : Const.Routes.Dashboard;
 
-                nav.NavigateTo(Const.Routes.Dashboard);
-            }
+            nav.NavigateTo(destination);
         }
         catch (ApiException ex)
         {
-            await alert.Error(ex.Message);// ex.FriendlyErrorMessage);
+            await alert.Error(ex.FriendlyErrorMessage);
         }
         catch (Exception ex)
         {

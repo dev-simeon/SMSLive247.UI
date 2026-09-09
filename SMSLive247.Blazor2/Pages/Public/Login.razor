@@ -103,8 +103,22 @@
 </p>
 
 @code {
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+
     private bool isBusy = false;
     private LoginRequest model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await ((Authentication.SmsAuthProvider)auth).GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            var destination = !string.IsNullOrWhiteSpace(ReturnUrl)
+                ? ReturnUrl : Const.Routes.Dashboard;
+
+            nav.NavigateTo(destination);
+        }
+    }
 
     private async Task LoginAsync()
     {
@@ -114,21 +128,17 @@
             model.ParentID = settings.ParentID;
             var response = await apiClient.LoginAsync(model);
 
-            if (response.StatusCode == 200)
-            {
-                var apiKey = response.Result.AccessToken.ToString();
-                var member = new Authentication.SmsAuthProvider.Member(model.Username, apiKey);
+            await ((Authentication.SmsAuthProvider)auth)
+                .SaveAuthenticationState(apiKey: response.Result.AccessToken);
 
-                await ((Authentication.SmsAuthProvider)auth)
-                    .SaveAuthenticationState(member);
+            var destination = !string.IsNullOrWhiteSpace(ReturnUrl)
+                ? ReturnUrl : Const.Routes.Dashboard;
 
-                nav.NavigateTo(Const.Routes.Dashboard);
-                return;
-            }
+            nav.NavigateTo(destination);
         }
-        catch (SMSLive247.OpenApi.ApiException ex)
+        catch (ApiException ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error(ex.FriendlyErrorMessage);
         }
         catch (Exception ex)
         {

@@ -8,9 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Connected Services\OpenAPIService\ConnectedService.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Connected Services\OpenAPIService\ConnectedService.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Blazor.LocalStorage" Version="10.1.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
-    <ProjectReference Include="..\SMSLive247.ApiClient\SMSLive247.ApiClient.csproj" />
   </ItemGroup>
 
 </Project>

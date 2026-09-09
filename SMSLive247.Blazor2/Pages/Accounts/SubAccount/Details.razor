@@ -1,84 +1,47 @@
-@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals;
+﻿@using SMSLive247.Blazor2.Pages.Accounts.SubAccount.Modals;
 @inject IJSRuntime js
 
 @if (Sub?.Account != null)
 {
-    <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex flex-col gap-4 rounded-xl bg-white p-5 shadow-sm">
         <!-- ── Top Row: Title + Balance Widget, Edit Profile far right ── -->
-        <div class="flex flex-wrap items-center justify-between" style="column-gap: 1rem; row-gap: 0.75rem;">
+        <div class="flex flex-wrap items-center justify-between">
             <!-- Left: Account Name + Balance/Transfer consolidated widget -->
-            <div class="flex flex-wrap items-center" style="column-gap: 0.85rem; row-gap: 0.5rem;">
+            <div class="flex flex-wrap items-center gap-4">
                 <h1 class="text-xl font-bold tracking-tight text-slate-900">
                     @Sub.Account.AccountName
                 </h1>
-
-                <!-- Balance & Transfer Button (consolidated, left side, exact same height as button) -->
-                <div class="inline-flex items-center rounded-lg border border-brand-500 bg-white shadow-sm overflow-hidden" style="height: 38px;">
-                    <div class="bg-brand-50/80 px-3 flex items-center h-full border-r border-brand-200 text-xs font-bold text-brand-700 select-all" title="Current Credit Balance">
-                        <span class="text-slate-500 font-normal mr-1 text-[11px]">Balance:</span>
-                        <span>₦ @Sub.Account.Credits.ToString("#,##0.00")</span>
-                    </div>
-                    <button type="button"
-                            @onclick="() => transferModal.Show(Main.Account, Sub.Account)"
-                            class="inline-flex items-center h-full px-3 text-xs font-semibold text-brand-600 hover:bg-brand-50 hover:text-brand-700 transition-colors cursor-pointer"
-                            style="gap: 0.35rem;"
-                            title="Add or Remove Credit">
-                        <Icon Style="Icon.IconStyle.ArrowRightLeft" CssClass="text-xs" />
-                        <span>Add/Remove</span>
-                    </button>
-                </div>
+                <Badge Variant="Badge.StatusVariant.ActiveInactive"
+                       Value="@(Sub.Account.Active ? "ACTIVE" : "INACTIVE")" />
             </div>
 
             <!-- Far Right: Edit Profile only -->
-            <div class="flex items-center ml-auto" style="margin-left: auto;">
-                <Button Style="ColorStyle.Primary"
-                        Text="Edit Profile"
+            <div class="ml-auto flex items-center gap-4">
+                <FormatCredit Credits="@Sub.Account.Credits" Title="Current Credit Balance" />
+
+                <Button Style="ColorStyle.Info"
+                        Text="Add Credits..."
+                        Icon="Icon.IconStyle.ArrowRightLeft"
+                        OnClick="() => transferModal.Show(Main.Account, Sub.Account)" />
+
+                <Button Style="ColorStyle.Warning"
+                        Text="Edit Profile..."
                         Icon="Icon.IconStyle.PenSquare"
-                        CssClass="text-xs px-3.5 h-[38px]"
                         OnClick="() => editModal.Show(Sub.Account)" />
             </div>
         </div>
 
         <!-- ── Bottom Row: Minimalist Inline Metadata Bar with Responsive Flow ── -->
-        <div class="mt-3.5 pt-3 border-t border-slate-100 flex flex-wrap items-center text-xs text-slate-500" style="column-gap: 1.5rem; row-gap: 0.5rem;">
-
-            <!-- Active status badge (read-only, edit via Edit Profile) -->
-            <div class="inline-flex items-center">
-                <span class="text-slate-400" style="margin-right: 0.4rem;">Status:</span>
-                <span class="inline-flex items-center text-xs font-semibold @(Sub.Account.Active ? "text-emerald-700" : "text-slate-500")">
-                    <span style="display: inline-block; width: 0.45rem; height: 0.45rem; border-radius: 9999px; margin-right: 0.3rem; background-color: @(Sub.Account.Active ? "#10b981" : "#94a3b8");"></span>
-                    @(Sub.Account.Active ? "Active" : "Inactive")
-                </span>
-            </div>
-
-            <div class="inline-flex items-center">
-                <span class="text-slate-400" style="margin-right: 0.4rem;">Phone:</span>
-                <span class="font-medium text-slate-700">@(string.IsNullOrWhiteSpace(Sub.Account.Phone) ? "—" : Sub.Account.Phone)</span>
-            </div>
-
-            <div class="inline-flex items-center">
-                <span class="text-slate-400" style="margin-right: 0.4rem;">Country:</span>
-                <span class="font-medium text-slate-700">+@Sub.Account.CountryCode</span>
-            </div>
-
-            <div class="inline-flex items-center">
-                <span class="text-slate-400" style="margin-right: 0.4rem;">Time Zone:</span>
-                <span class="font-medium text-slate-700">GMT @(Sub.Account.TimeZone >= 0 ? "+" : "")@Sub.Account.TimeZone</span>
-            </div>
-
-            <div class="inline-flex items-center">
-                <span class="text-slate-400" style="margin-right: 0.4rem;">Traffic:</span>
-                <span class="font-medium text-slate-700">@(string.IsNullOrWhiteSpace(Sub.Account.Traffic) ? "—" : Sub.Account.Traffic)</span>
-            </div>
-
-            <div class="inline-flex items-center">
-                <span class="text-slate-400" style="margin-right: 0.4rem;">Created:</span>
-                <span class="font-medium text-slate-700">@Sub.Account.DateCreated.ToString("MMM dd, yyyy")</span>
-            </div>
-
-            <!-- API Key: Aligns right on wide screens (xl:ml-auto); flows naturally on smaller screens -->
-            <div class="inline-flex items-center xl:ml-auto">
-                <span class="text-slate-400" style="margin-right: 0.4rem;">API Key:</span>
+        <div class="flex flex-wrap items-center gap-4 text-slate-500">
+            @foreach (var item in items)
+            {
+                <div class="inline-flex items-center gap-1 rounded bg-brand-50 px-2">
+                    <span class="mr-3 text-slate-400">@item.Key:</span>
+                    <span class="font-medium text-slate-700">@item.Value</span>
+                </div>
+            }
+            <div class="inline-flex items-center gap-1 rounded bg-brand-50 px-2">
+                <span class="mr-3 text-slate-400">API Key:</span>
                 <ApiKeyDisplay Account="@Sub.Account" OnReset="HandleModalCompleted" />
             </div>
         </div>
@@ -91,17 +54,28 @@ else
     </div>
 }
 
-<TransferModal @ref="transferModal" OnCompleted="HandleModalCompleted"></TransferModal>
-<EditModal @ref="editModal" OnCompleted="HandleModalCompleted"></EditModal>
+<TransferModal  @ref="transferModal"    OnCompleted="HandleModalCompleted"></TransferModal>
+<EditModal      @ref="editModal"        OnCompleted="HandleModalCompleted"></EditModal>
 
 @code {
-    [CascadingParameter(Name = "SubAccount")] public required AccountState Sub { get; set; }
+    [CascadingParameter(Name =  "SubAccount")] public required AccountState Sub  { get; set; }
     [CascadingParameter(Name = "MainAccount")] public required AccountState Main { get; set; }
     [Parameter] public EventCallback OnUpdated { get; set; }
 
+    private Dictionary<string,string> items = [];
     private TransferModal transferModal = new();
     private EditModal editModal = new();
 
+    protected override void OnParametersSet()
+    {
+        items.Clear();
+        items.Add("Created", Sub.Account.DateCreated.ToString("MMM dd, yyyy"));
+        items.Add("Traffic", Sub.Account.Traffic ?? "-");
+        items.Add("Country", $"+{Sub.Account.CountryCode}");
+        items.Add("Time Zone", $"GMT {Sub.Account.TimeZone:+#;-#;0}");
+        items.Add("Email", Sub.Account.Email);
+        //items.Add("Phone", Sub.Account.Phone);
+    }
     private async Task HandleModalCompleted()
     {
         Sub.Reload();

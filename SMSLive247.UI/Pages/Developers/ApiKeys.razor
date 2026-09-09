@@ -19,7 +19,7 @@
                 </LeftRight>
             </SearchArea>
 
-            <table class="table table-hover align-middle">
+            <table class="table-hover table align-middle">
                 <thead class="table-primary bg-primary-subtle">
                     <tr>
                         <th>Main Account</th>
@@ -88,7 +88,7 @@
 
         ds.Callback = new((PageState p, FilterState? f) =>
         {
-            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, null, searchBox.Text);
+            return apiClient.AccountsListAsync(p.PageNumber, p.PageSize, searchBox.Text);
         });
         mainAccount.Key = Guid.NewGuid().ToByteArray();
         await ds.LoadData(alert);

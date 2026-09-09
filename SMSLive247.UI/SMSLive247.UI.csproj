@@ -29,10 +29,6 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SMSLive247.ApiClient\SMSLive247.ApiClient.csproj" />
-  </ItemGroup>
-
    <ItemGroup>
     <UpToDateCheckInput Remove="Pages\Messaging\Messages\Modals\DeliveryReport.razor" />
   </ItemGroup>

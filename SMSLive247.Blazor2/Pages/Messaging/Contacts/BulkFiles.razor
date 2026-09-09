@@ -11,7 +11,7 @@
     </HeaderRight>
 
     <ChildContent>
-        <Table Items="PaginatedFiles" EmptyMessage="No files uploaded yet.">
+        <Table Items="paginatedFiles" EmptyMessage="No files uploaded yet.">
             <Columns>
                 <Column Header="File / Description">
                     <div class="flex items-center gap-3">
@@ -42,7 +42,7 @@
     <FooterLeft>
         <Paging @bind-PageNumber="pageNumber"
                 @bind-PageSize="pageSize"
-                TotalRecords="FilteredFiles.Count">
+                TotalRecords="filteredFiles?.Count">
         </Paging>
     </FooterLeft>
 </PageBody>
@@ -56,7 +56,7 @@
 
     private bool isLoading = false;
     private BulkFileModal uploadModal = new();
-    private List<BatchFileResponse> files = [];
+    private List<BatchFileResponse>? files;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,15 +65,15 @@
 
     private async Task FetchFiles()
     {
-        isLoading = true;
         try
         {
+            isLoading = true;
             var res = await apiClient.BatchFileListAsync();
-            var allFiles = res.Result?.ToList() ?? new();
-            files = allFiles.Where(f => string.Equals(f.FileType, "txt", StringComparison.OrdinalIgnoreCase)).ToList();
+            files = res.Result.Where(f => string.Equals(f.FileType, "txt", StringComparison.OrdinalIgnoreCase)).ToList();
         }
         catch (Exception)
         {
+            files = [];
             await alert.Error("Failed to load bulk text files.");
         }
         finally
@@ -82,10 +82,13 @@
         }
     }
 
-    private List<BatchFileResponse> FilteredFiles
+    private List<BatchFileResponse>? filteredFiles
     {
         get
         {
+            if (files is null)
+                return null;
+
             if (string.IsNullOrWhiteSpace(searchQuery))
                 return files;
 
@@ -94,11 +97,11 @@
         }
     }
 
-    private List<BatchFileResponse> PaginatedFiles
+    private List<BatchFileResponse>? paginatedFiles
     {
         get
         {
-            return FilteredFiles
+            return filteredFiles?
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();

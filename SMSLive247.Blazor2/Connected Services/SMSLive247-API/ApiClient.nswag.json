@@ -1,0 +1,3936 @@
+﻿{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "SMSLive247 API",
+    "version": "v5"
+  },
+  "servers": [
+    {
+      "url": "https://api.smslive247.com"
+    }
+  ],
+  "paths": {
+    "/api/v5/accounts": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "AccountsList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "AccountCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/accounts/{accountId}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "AccountGet",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "self"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "AccountUpdate",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "self"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "AccountDelete",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/accounts/{accountId}/password": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "AccountChangePassword",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "self"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPasswordRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/accounts/{accountId}/provider-key": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "AccountUpdateProviderKey",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "self"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountProviderKeyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountProviderKeyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountProviderKeyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/auth": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "Login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/auth/oauth": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "LoginOauth",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/auth/register/request": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "RegisterRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/auth/register/confirm": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "RegisterConfirm",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterConfirm"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterConfirm"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterConfirm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/auth/password-reset/request": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "PasswordResetRequest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/auth/password-reset/confirm": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "PasswordResetConfirm",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetConfirm"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetConfirm"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetConfirm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v5/auth/current": {
+      "delete": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "Logout",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v5/batch-files": {
+      "get": {
+        "tags": [
+          "Batch File"
+        ],
+        "operationId": "BatchFileList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BatchFileResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Batch File"
+        ],
+        "operationId": "BatchFileCreate",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "countryCode": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "countryCode": {
+                  "style": "form"
+                },
+                "file": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchFileResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/batch-files/{fileId}": {
+      "get": {
+        "tags": [
+          "Batch File"
+        ],
+        "operationId": "BatchFileDownload",
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Batch File"
+        ],
+        "operationId": "BatchFileUpdate",
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "countryCode": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              },
+              "encoding": {
+                "countryCode": {
+                  "style": "form"
+                },
+                "file": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchFileResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Batch File"
+        ],
+        "operationId": "BatchFileDelete",
+        "parameters": [
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BatchFileResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/batch": {
+      "post": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsBatchRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsBatchRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsBatchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmsBatchResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SmsBatchResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/batch/template": {
+      "post": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchCsvCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsBatchCsvRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsBatchCsvRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsBatchCsvRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmsBatchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/batch/download": {
+      "get": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchDownload",
+        "parameters": [
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/batch/{batchId}": {
+      "get": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchGet",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmsBatchResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchDelete",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v5/sms/batch/pending": {
+      "get": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchPendingList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SmsBatchResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/batch/pending/{batchId}": {
+      "delete": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchPendingAbort",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchPendingResume",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v5/sms/batch/{batchId}/reports": {
+      "get": {
+        "tags": [
+          "Batch Message"
+        ],
+        "operationId": "SmsBatchReportsList",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SmsMessageResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/pricing": {
+      "get": {
+        "tags": [
+          "Credit Pricing"
+        ],
+        "operationId": "PriceList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PriceSlotResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/pricing/calc": {
+      "get": {
+        "tags": [
+          "Credit Pricing"
+        ],
+        "operationId": "PriceCalculate",
+        "parameters": [
+          {
+            "name": "Amount",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "Quantity",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "FxCurrency",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceCalcResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/coverage": {
+      "get": {
+        "tags": [
+          "Credit Pricing"
+        ],
+        "operationId": "CoverageList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoverageResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/purchase": {
+      "get": {
+        "tags": [
+          "Credit Purchase"
+        ],
+        "operationId": "PurchaseList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PurchaseResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Credit Purchase"
+        ],
+        "operationId": "PurchaseBegin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitPaymentRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitPaymentRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitPaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InitPaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/purchase/complete/{transactionId}": {
+      "get": {
+        "tags": [
+          "Credit Purchase"
+        ],
+        "operationId": "PurchaseComplete",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/transfer": {
+      "get": {
+        "tags": [
+          "Credit Transfer"
+        ],
+        "operationId": "TransferList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransferResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Credit Transfer"
+        ],
+        "operationId": "TransferCredit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/tokens/sms": {
+      "post": {
+        "tags": [
+          "One Time Password"
+        ],
+        "operationId": "TokenCreateSms",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestSms"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestSms"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestSms"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/tokens/email": {
+      "post": {
+        "tags": [
+          "One Time Password"
+        ],
+        "operationId": "TokenCreateEmail",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestEmail"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestEmail"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestEmail"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/tokens/voice": {
+      "post": {
+        "tags": [
+          "One Time Password"
+        ],
+        "operationId": "TokenCreateVoice",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestVoice"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestVoice"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRequestVoice"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/tokens": {
+      "delete": {
+        "tags": [
+          "One Time Password"
+        ],
+        "operationId": "TokenVerify",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenVerifyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenVerifyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenVerifyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenVerifyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book": {
+      "get": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "ContactList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContactResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "ContactCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactCreateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactCreateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book/{phoneNo}": {
+      "put": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "ContactUpdate",
+        "parameters": [
+          {
+            "name": "phoneNo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUpdateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUpdateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "ContactDelete",
+        "parameters": [
+          {
+            "name": "phoneNo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book/groups": {
+      "get": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "GroupList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/phone-book/groups/{groupId}": {
+      "post": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "GroupCreate",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "GroupUpdate",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Phone Book"
+        ],
+        "operationId": "GroupDelete",
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/routes/{routeId}": {
+      "get": {
+        "tags": [
+          "Routing"
+        ],
+        "operationId": "RouteGet",
+        "parameters": [
+          {
+            "name": "routeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Route"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/routes/{phoneNumber}/{routeType}": {
+      "get": {
+        "tags": [
+          "Routing"
+        ],
+        "operationId": "RouteFind",
+        "parameters": [
+          {
+            "name": "phoneNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "routeType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Route"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/routes": {
+      "get": {
+        "tags": [
+          "Routing"
+        ],
+        "operationId": "RouteList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Route"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/networks/{networkId}": {
+      "get": {
+        "tags": [
+          "Routing"
+        ],
+        "operationId": "NetworkGet",
+        "parameters": [
+          {
+            "name": "networkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Network"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/networks": {
+      "get": {
+        "tags": [
+          "Routing"
+        ],
+        "operationId": "NetworkList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Network"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sender-ids": {
+      "get": {
+        "tags": [
+          "Sender ID"
+        ],
+        "operationId": "SenderIdList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SenderIdResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Sender ID"
+        ],
+        "operationId": "SenderIdCreate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenderIdRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenderIdRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenderIdRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SenderIdResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sender-ids/by-route": {
+      "post": {
+        "tags": [
+          "Sender ID"
+        ],
+        "operationId": "SenderIdCreate2",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "Purpose",
+                  "SampleText",
+                  "SenderID"
+                ],
+                "properties": {
+                  "RouteType": {
+                    "type": "string"
+                  },
+                  "SenderID": {
+                    "type": "string"
+                  },
+                  "Purpose": {
+                    "type": "string"
+                  },
+                  "SampleText": {
+                    "type": "string"
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "RouteType": {
+                  "style": "form"
+                },
+                "SenderID": {
+                  "style": "form"
+                },
+                "Purpose": {
+                  "style": "form"
+                },
+                "SampleText": {
+                  "style": "form"
+                },
+                "files": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SenderIdResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sender-ids/{senderId}": {
+      "delete": {
+        "tags": [
+          "Sender ID"
+        ],
+        "operationId": "SenderIdDelete",
+        "parameters": [
+          {
+            "name": "senderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SenderIdResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms": {
+      "post": {
+        "tags": [
+          "Simple Message"
+        ],
+        "operationId": "SmsMessageSend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsMessageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsMessageRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SmsMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmsMessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/download": {
+      "get": {
+        "tags": [
+          "Simple Message"
+        ],
+        "operationId": "SmsMessageDownload",
+        "parameters": [
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/sms/{messageId}": {
+      "get": {
+        "tags": [
+          "Simple Message"
+        ],
+        "operationId": "SmsMessageGet",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SmsMessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/calls": {
+      "post": {
+        "tags": [
+          "Voice Call"
+        ],
+        "operationId": "VoiceMessageSend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoiceRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoiceRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoiceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Voice Call"
+        ],
+        "operationId": "VoiceMessageList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VoiceResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/calls/download": {
+      "get": {
+        "tags": [
+          "Voice Call"
+        ],
+        "operationId": "VoiceMessageDownload",
+        "parameters": [
+          {
+            "name": "DateFrom",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "DateTo",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/calls/{messageId}": {
+      "get": {
+        "tags": [
+          "Voice Call"
+        ],
+        "operationId": "VoiceMessageGet",
+        "parameters": [
+          {
+            "name": "messageId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoiceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accountName",
+          "countryCode",
+          "email",
+          "firstName",
+          "lastName",
+          "password",
+          "phone",
+          "timeZone"
+        ],
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "password": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AccountPasswordRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "newPassword"
+        ],
+        "properties": {
+          "newPassword": {
+            "type": "string"
+          },
+          "oldPassword": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "AccountProviderKeyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "providerID",
+          "providerKey"
+        ],
+        "properties": {
+          "providerID": {
+            "type": "string"
+          },
+          "providerKey": {
+            "type": "string"
+          }
+        }
+      },
+      "AccountResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "rawRouteSettings": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "accountID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "accountName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "credits": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "timeZone": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "active": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "firstName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "lastName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "email": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "readOnly": true
+          },
+          "countryCode": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "traffic": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "senderID": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "readOnly": true,
+            "format": "byte",
+            "nullable": true
+          },
+          "loginCount": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "lastLogin": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "AccountUpdateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "timeZone": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "active": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "countryCode": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "BatchFileResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "batchFileID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fileType": {
+            "type": "string",
+            "readOnly": true
+          },
+          "totalNumbers": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          }
+        }
+      },
+      "ContactCreateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contactName",
+          "phoneNumber"
+        ],
+        "properties": {
+          "phoneNumber": {
+            "type": "string"
+          },
+          "contactName": {
+            "type": "string"
+          },
+          "groups": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ContactResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "contactName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "readOnly": true
+          },
+          "groups": {
+            "type": "array",
+            "readOnly": true,
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ContactUpdateRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
+          },
+          "contactName": {
+            "type": "string",
+            "nullable": true
+          },
+          "groups": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CoverageResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "countryID": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "networkID": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "countryName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "networkName": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "DeliveryReportResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "smscID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "phoneNumber": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "creditsCharged": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "reportDate": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "ETag": {
+        "type": "object",
+        "additionalProperties": false
+      },
+      "GroupResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "groupName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "members": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/ContactResponse"
+            }
+          }
+        }
+      },
+      "InitPaymentRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "providerID",
+          "quantity"
+        ],
+        "properties": {
+          "providerID": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "fxCurrency": {
+            "type": "string",
+            "nullable": true
+          },
+          "callbackUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "InitPaymentResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reference": {
+            "type": "string",
+            "readOnly": true
+          },
+          "accessCode": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "authorizationUrl": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "purchase": {
+            "$ref": "#/components/schemas/PurchaseResponse"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "parentID",
+          "password",
+          "username"
+        ],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "parentID": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tokenType": {
+            "type": "string",
+            "readOnly": true
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Network": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "partitionKey": {
+            "type": "string"
+          },
+          "rowKey": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "eTag": {
+            "$ref": "#/components/schemas/ETag"
+          },
+          "networkId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "networkCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "networkName": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "countryName": {
+            "type": "string"
+          },
+          "prefixes": {
+            "type": "string"
+          }
+        }
+      },
+      "OAuthRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "credential",
+          "serverID"
+        ],
+        "properties": {
+          "serverID": {
+            "type": "string"
+          },
+          "credential": {
+            "type": "string"
+          }
+        }
+      },
+      "PasswordResetConfirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "newPassword",
+          "parentID",
+          "resetCode",
+          "username"
+        ],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "resetCode": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          },
+          "parentID": {
+            "type": "string"
+          }
+        }
+      },
+      "PasswordResetRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "parentID",
+          "username"
+        ],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "parentID": {
+            "type": "string"
+          }
+        }
+      },
+      "PriceCalcResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "price": {
+            "type": "number",
+            "format": "double"
+          },
+          "quantity": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fee": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fxCurrency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fxRate": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          }
+        }
+      },
+      "PriceSlotResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minQuantity": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "maxQuantity": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "price": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fxCurrency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fxRate": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          }
+        }
+      },
+      "PurchaseResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "providerID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "quantity": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "price": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "amount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fee": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "fxCurrency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "fxRate": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "reference": {
+            "type": "string",
+            "readOnly": true
+          },
+          "isPaid": {
+            "type": "boolean",
+            "readOnly": true
+          },
+          "error": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          }
+        }
+      },
+      "RegisterConfirm": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "accountName",
+          "countryCode",
+          "email",
+          "firstName",
+          "lastName",
+          "parentID",
+          "password",
+          "phone",
+          "timeZone",
+          "verifyCode"
+        ],
+        "properties": {
+          "accountName": {
+            "type": "string"
+          },
+          "timeZone": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "password": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "verifyCode": {
+            "type": "string"
+          },
+          "parentID": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "email",
+          "parentID",
+          "phone"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "parentID": {
+            "type": "string"
+          }
+        }
+      },
+      "Route": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "partitionKey": {
+            "type": "string"
+          },
+          "rowKey": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "eTag": {
+            "$ref": "#/components/schemas/ETag"
+          },
+          "routeId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "routeName": {
+            "type": "string"
+          },
+          "entryDateUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "providerId": {
+            "type": "string"
+          },
+          "creditsCharged": {
+            "type": "number",
+            "format": "double"
+          },
+          "matchNetworkId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "matchKeyword": {
+            "type": "string"
+          },
+          "matchRouteType": {
+            "$ref": "#/components/schemas/RouteTypeEnum"
+          }
+        }
+      },
+      "RouteTypeEnum": {
+        "type": "integer",
+        "format": "int32",
+        "enum": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "SenderIdRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "purpose",
+          "sampleText",
+          "senderID"
+        ],
+        "properties": {
+          "routeType": {
+            "type": "string",
+            "nullable": true
+          },
+          "senderID": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "sampleText": {
+            "type": "string"
+          }
+        }
+      },
+      "SenderIdResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "dateRequested": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "dateDecided": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time",
+            "nullable": true
+          },
+          "senderID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "status": {
+            "type": "string",
+            "readOnly": true
+          },
+          "purpose": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "sampleText": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "remarks": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          },
+          "routeType": {
+            "type": "string",
+            "readOnly": true
+          },
+          "dateDeleted": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time",
+            "nullable": true
+          },
+          "files": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SmsBatchCsvRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "batchFileID",
+          "messageText",
+          "senderID"
+        ],
+        "properties": {
+          "senderID": {
+            "type": "string"
+          },
+          "messageText": {
+            "type": "string"
+          },
+          "deliveryEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "deliveryTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "routeID": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumberColumn": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "batchFileID": {
+            "type": "string"
+          }
+        }
+      },
+      "SmsBatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "messageText",
+          "senderID"
+        ],
+        "properties": {
+          "senderID": {
+            "type": "string"
+          },
+          "messageText": {
+            "type": "string"
+          },
+          "deliveryEmail": {
+            "type": "string",
+            "nullable": true
+          },
+          "deliveryTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "routeID": {
+            "type": "string",
+            "nullable": true
+          },
+          "rawNumbers": {
+            "type": "string",
+            "nullable": true
+          },
+          "phoneNumbers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "batchFileIDs": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SmsBatchResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "batchID": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "senderID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "messageText": {
+            "type": "string",
+            "readOnly": true
+          },
+          "messageParts": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "totalFailed": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "totalProcessed": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "creditsCharged": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "creditBalance": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double",
+            "nullable": true
+          },
+          "dateSubmitted": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "readOnly": true
+          },
+          "accountID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "reports": {
+            "type": "array",
+            "readOnly": true,
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DeliveryReportResponse"
+            }
+          }
+        }
+      },
+      "SmsMessageRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "messageText",
+          "phoneNumber",
+          "senderID"
+        ],
+        "properties": {
+          "senderID": {
+            "type": "string"
+          },
+          "messageText": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "deliveryTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "routeID": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "SmsMessageResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "batchID": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "messageID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "senderID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "messageText": {
+            "type": "string",
+            "readOnly": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "readOnly": true
+          },
+          "dateSubmitted": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "creditsCharged": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "creditBalance": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double",
+            "nullable": true
+          },
+          "reports": {
+            "type": "array",
+            "readOnly": true,
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/DeliveryReportResponse"
+            }
+          }
+        }
+      },
+      "TokenRequestEmail": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "displayName",
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true
+          },
+          "subject": {
+            "type": "string"
+          },
+          "tokenLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "TokenRequestSms": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "phoneNumber",
+          "senderID"
+        ],
+        "properties": {
+          "phoneNumber": {
+            "type": "string"
+          },
+          "senderID": {
+            "type": "string"
+          },
+          "templateText": {
+            "type": "string",
+            "nullable": true
+          },
+          "tokenLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "placeholder": {
+            "type": "string",
+            "nullable": true
+          },
+          "attempts": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "timeToLive": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "TokenRequestVoice": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "callerID",
+          "phoneNumber"
+        ],
+        "properties": {
+          "phoneNumber": {
+            "type": "string"
+          },
+          "callerID": {
+            "type": "string",
+            "nullable": true
+          },
+          "tokenLength": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          }
+        }
+      },
+      "TokenVerifyRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "to",
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          }
+        }
+      },
+      "TokenVerifyResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "isValid": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "TransferRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "credits",
+          "recipient"
+        ],
+        "properties": {
+          "recipient": {
+            "type": "string"
+          },
+          "credits": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "remarks": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "TransferResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "dateCreated": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
+          "senderID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "senderName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "recipientID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "recipientName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "credits": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "remarks": {
+            "type": "string",
+            "readOnly": true,
+            "nullable": true
+          }
+        }
+      },
+      "VerifyResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "verifyCode": {
+            "type": "string",
+            "readOnly": true
+          },
+          "expiresIn": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          }
+        }
+      },
+      "VoiceRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "callerID",
+          "destination"
+        ],
+        "properties": {
+          "callerID": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string"
+          },
+          "textToSpeech": {
+            "type": "string",
+            "nullable": true
+          },
+          "audioLength": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "audioFileID": {
+            "type": "string",
+            "nullable": true
+          },
+          "maxAttempts": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "VoiceResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "batchID": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "callerID": {
+            "type": "string"
+          },
+          "totalProcessed": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "totalFailed": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "creditsCharged": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "dateSubmitted": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "apiKey",
+        "description": "Enter your API Key in the format: Bearer {api-key}",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Account"
+    },
+    {
+      "name": "Authentication"
+    },
+    {
+      "name": "Batch File"
+    },
+    {
+      "name": "Batch Message"
+    },
+    {
+      "name": "Credit Pricing"
+    },
+    {
+      "name": "Credit Purchase"
+    },
+    {
+      "name": "Credit Transfer"
+    },
+    {
+      "name": "One Time Password"
+    },
+    {
+      "name": "Phone Book"
+    },
+    {
+      "name": "Routing"
+    },
+    {
+      "name": "Sender ID"
+    },
+    {
+      "name": "Simple Message"
+    },
+    {
+      "name": "Voice Call"
+    }
+  ]
+}

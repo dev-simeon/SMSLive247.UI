@@ -10,8 +10,8 @@
 <Alert />
 
 <main class="d-flex vh-100">
-    <aside class="col-12 col-md-6 col-lg-5 col-xl-4 p-5 shadow">
-        <header class="mb-3 fs-3">
+    <aside class="col-md-6 col-lg-5 col-xl-4 col-12 p-5 shadow">
+        <header class="fs-3 mb-3">
             SmsLive247
         </header>
         @if (!showSecondView)
@@ -286,7 +286,7 @@
                         <div class="text-danger">Passwords do not match.</div>
                     }
                 </div>
-                <div class="mb-3 form-check">
+                <div class="form-check mb-3">
                     <InputCheckbox @bind-Value="acceptTerms" class="form-check-input" id="a1" />
                     <label class="form-check-label" for="a1">
                         I have read and accepted the
@@ -311,7 +311,7 @@
     </aside>
 
     <aside class="col-md-6 col-lg-7 col-xl-8 d-none d-md-block bg-light">
-        @* <img class="img-fluid h-100 w-100 p-md-3 p-lg-4 p-xl-5"
+        @* <img class="img-fluid p-md-3 p-lg-4 p-xl-5 h-100 w-100"
         src="images/undraw_login_re_4vu2.svg" /> *@
     </aside>
 </main>
@@ -373,7 +373,7 @@
             if (secondViewModel.Password != confirmPassword)
                 throw new Exception("Passwords do not match");
 
-            var response = await apiClient.RegisterAsync("a044b5a7-1147-45cb-871a-76546896c4f3", secondViewModel);
+            var response = await apiClient.RegisterRequestAsync(null); //"a044b5a7-1147-45cb-871a-76546896c4f3", secondViewModel);
 
             if (response.StatusCode == 200)
             {

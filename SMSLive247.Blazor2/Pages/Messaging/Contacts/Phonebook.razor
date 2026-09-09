@@ -61,9 +61,15 @@
         <!-- Contacts Grid -->
         <div class="flex flex-wrap px-6 py-3">
             @{
-                var filteredContacts = contacts?.Where(x => x.Visible) ?? [];
+                var filteredContacts = contacts?.Where(x => x.Visible);
             }
-            @if (!filteredContacts.Any())
+            @if (filteredContacts is null)
+            {
+                <div class="w-full py-12 text-center text-slate-500">
+                    Loading...
+                </div>
+            }
+            else if (!filteredContacts.Any())
             {
                 <div class="w-full py-12 text-center text-slate-500">
                     No contacts found.
@@ -152,6 +158,8 @@
         }
         catch (Exception ex)
         {
+            groups = [];
+            contacts = [];
             await alert.Error(ex.Message, "Error");
         }
     }

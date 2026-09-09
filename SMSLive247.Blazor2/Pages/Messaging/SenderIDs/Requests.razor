@@ -61,10 +61,6 @@
         </Table>
     </ChildContent>
     <FooterLeft>
-          <Paging PageNumber="1" PageSize="25"
-                TotalRecords="filteredItems?.Count"
-                OnPageSizeChange="FetchData">
-        </Paging>
     </FooterLeft>
 </PageBody>
 
@@ -92,6 +88,8 @@
         }
         catch (Exception ex)
         {
+            items = [];
+            filteredItems = [];
             await alert.Error(ex.Message);
         }
     }
@@ -105,16 +103,16 @@
     private void OnSearch()
     {
         var noCase = StringComparison.OrdinalIgnoreCase;
-        filteredItems = items;
+        filteredItems = items ?? [];
 
         if (!string.IsNullOrWhiteSpace(searchStatus))
         {
-            filteredItems = filteredItems?.Where(x => x.Status.Equals(searchStatus, noCase)).ToList();
+            filteredItems = filteredItems.Where(x => x.Status.Equals(searchStatus, noCase)).ToList();
         }
 
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
-            filteredItems = filteredItems?.Where(x => x.SenderID.Contains(searchQuery, noCase)).ToList();
+            filteredItems = filteredItems.Where(x => x.SenderID.Contains(searchQuery, noCase)).ToList();
         }
     }
 
