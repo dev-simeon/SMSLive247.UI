@@ -28,12 +28,11 @@ public partial class Program
             });
 
         builder.Services.AddSingleton<AlertService>();
-        builder.Services.AddTransient<AuthDelegateHandler>();
+        //builder.Services.AddTransient<AuthDelegateHandler>();
         //builder.Services.AddTransient<CacheDelegateHandler>();
 
         builder.Services.AddHttpClient<SubAccountClient>(ConfigureUrl);
-        builder.Services.AddHttpClient<ApiClient>(ConfigureUrl)
-                        .AddHttpMessageHandler<AuthDelegateHandler>();
+        builder.Services.AddHttpClient<ApiClient>(ConfigureUrl);
 
         builder.Services.AddScoped<AuthenticationStateProvider, SmsAuthProvider>();
         builder.Services.AddMemoryCache();

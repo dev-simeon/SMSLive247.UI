@@ -1,72 +1,59 @@
-@namespace SMSLive247.Blazor2.Components.Formatting
+﻿@namespace SMSLive247.Blazor2.Components.Formatting
 
-<div class="inline-flex items-center font-mono text-xs @CssClass" style="column-gap: 0.35rem;">
-    <span class="text-slate-700 tracking-wider select-all" style="margin-right: 0.35rem;" title="@(isVisible ? keyString : "Hidden")">
-        @(isVisible ? keyString : MaskedPlaceholder)
+<div class="inline-flex items-center rounded-md bg-slate-100 font-mono leading-none" title="API Key">
+    <span class="px-2 text-sm tracking-wider text-slate-500 select-all">
+        @(isVisible ? keyString : placeholder)
     </span>
 
-    @if (HasValidKey)
+    <!-- Toggle Visibility Button -->
+    <button type="button"
+            @onclick="ToggleVisibility"
+            class="cursor-pointer rounded p-1 leading-none text-slate-400 transition-colors hover:bg-brand-50 hover:text-brand-600"
+            title="@(isVisible ? "Hide API Key" : "Show API Key")">
+        <Icon Style="@(isVisible ? Icon.IconStyle.EyeOff : Icon.IconStyle.Eye)" FontSize="1.2rem" />
+    </button>
+
+    <!-- Copy to Clipboard Button -->
+    <button type="button"
+            @onclick="CopyToClipboard"
+            class="cursor-pointer rounded p-1 leading-none text-slate-400 transition-colors hover:bg-brand-50 hover:text-brand-600"
+            title="Copy API Key">
+        <Icon Style="Icon.IconStyle.Copy" FontSize="1.2rem" />
+    </button>
+
+    <!-- Reset Button -->
+    @if (OnReset.HasDelegate)
     {
-        <!-- Toggle Visibility Button -->
         <button type="button"
-                @onclick="ToggleVisibility"
-                class="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors cursor-pointer"
-                title="@(isVisible ? "Hide API Key" : "Show API Key")">
-            <Icon Style="@(isVisible ? Icon.IconStyle.EyeOff : Icon.IconStyle.Eye)" CssClass="h-3.5 w-3.5" />
+                @onclick="ResetApiKeyAsync"
+                disabled="@isBusy"
+                class="cursor-pointer rounded p-1 leading-none text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                title="Reset API Key">
+            @if (isBusy)
+            {
+                <div class="h-3.5 w-3.5 animate-spin rounded-full border border-brand-500 border-t-transparent"></div>
+            }
+            else
+            {
+                <Icon Style="Icon.IconStyle.Refresh" FontSize="1.2rem" />
+            }
         </button>
-
-        <!-- Copy to Clipboard Button -->
-        <button type="button"
-                @onclick="CopyToClipboard"
-                class="p-1 text-slate-400 hover:text-brand-600 hover:bg-brand-50 rounded transition-colors cursor-pointer"
-                title="Copy API Key">
-            <Icon Style="Icon.IconStyle.Copy" CssClass="h-3.5 w-3.5" />
-        </button>
-
-        <!-- Reset Button -->
-        @if (ShowReset && (Account != null || !string.IsNullOrWhiteSpace(AccountId)))
-        {
-            <button type="button"
-                    @onclick="ResetApiKeyAsync"
-                    disabled="@isResetting"
-                    class="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors cursor-pointer disabled:opacity-50"
-                    title="Reset API Key">
-                @if (isResetting)
-                {
-                    <div class="h-3.5 w-3.5 animate-spin rounded-full border border-brand-500 border-t-transparent"></div>
-                }
-                else
-                {
-                    <Icon Style="Icon.IconStyle.Refresh" CssClass="h-3.5 w-3.5" />
-                }
-            </button>
-        }
     }
 </div>
 
 @code {
-    [Parameter] public byte[]? Key { get; set; }
-    [Parameter] public string? KeyString { get; set; }
     [Parameter] public AccountResponse? Account { get; set; }
-    [Parameter] public string? AccountId { get; set; }
-    [Parameter] public string? AccountName { get; set; }
-    [Parameter] public bool ShowReset { get; set; } = true;
-    [Parameter] public string CssClass { get; set; } = "";
     [Parameter] public EventCallback OnReset { get; set; }
 
+    private bool isBusy = false;
     private bool isVisible = false;
-    private bool isResetting = false;
-
-    private const string MaskedPlaceholder = "••••••••-••••-••••-••••-••••••••••••";
+    private const string placeholder = "••••••••••••••••••••••••••••••••••••";
 
     private string keyString
     {
         get
         {
-            if (!string.IsNullOrWhiteSpace(KeyString))
-                return KeyString;
-
-            var bytes = Key ?? Account?.Key;
+            var bytes = Account?.Key;
             if (bytes == null || bytes.Length == 0)
                 return "—";
 
@@ -81,8 +68,6 @@
         }
     }
 
-    private bool HasValidKey => keyString != "—" && !string.IsNullOrWhiteSpace(keyString);
-
     private void ToggleVisibility()
     {
         isVisible = !isVisible;
@@ -90,7 +75,6 @@
 
     private async Task CopyToClipboard()
     {
-        if (!HasValidKey) return;
         try
         {
             await js.InvokeVoidAsync("navigator.clipboard.writeText", keyString);
@@ -101,26 +85,26 @@
 
     private async Task ResetApiKeyAsync()
     {
-        string? targetId = AccountId ?? Account?.AccountID;
-        string targetName = AccountName ?? Account?.AccountName ?? "this account";
-
-        if (string.IsNullOrWhiteSpace(targetId) || isResetting)
+        if (Account is null || isBusy)
             return;
+
+        string accountId = Account.AccountID;
+        string accountName = Account.AccountName ?? "this account";
 
         try
         {
             bool confirmed = await alert.Confirm(
-                $"This will immediately invalidate the current API key for [{targetName}]. " +
+                $"This will immediately invalidate the current API key for [{accountName}]. " +
                 "Any applications using it will stop authenticating. Continue?",
                 "Reset API Key");
 
             if (!confirmed)
                 return;
 
-            isResetting = true;
+            isBusy = true;
             StateHasChanged();
 
-            await apiClient.AccountUpdateProviderKeyAsync(targetId, new AccountProviderKeyRequest());
+            await apiClient.AccountUpdateProviderKeyAsync(accountId, new AccountProviderKeyRequest());
             await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
 
             if (OnReset.HasDelegate)
@@ -134,7 +118,7 @@
         }
         finally
         {
-            isResetting = false;
+            isBusy = false;
             StateHasChanged();
         }
     }

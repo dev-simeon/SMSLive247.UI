@@ -216,7 +216,7 @@
         try
         {
             var t1 = apiClient.BatchFileListAsync();
-            var t2 = apiClient.SenderIdListAsync(1, 500, null);
+            var t2 = apiClient.SenderIdListAsync(1, 500);
 
             await Task.WhenAll(t1, t2);
             model = new(t2.Result.Result, t1.Result.Result);

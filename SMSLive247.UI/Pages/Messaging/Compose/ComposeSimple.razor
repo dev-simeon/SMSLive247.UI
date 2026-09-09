@@ -10,7 +10,7 @@
 
             <div class="col-lg-8">
 
-                <div class="card shadow-sm mb-4">
+                <div class="card mb-4 shadow-sm">
                     <div class="card-body">
                         <label for="senderId" class="form-label fw-bold">From (Sender ID)</label>
                         <div class="input-group">
@@ -39,7 +39,7 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm mb-4">
+                <div class="card mb-4 shadow-sm">
                     <div class="card-body">
                         <h4 class="card-title">To (Recipients)</h4>
 
@@ -98,7 +98,7 @@
             <div class="col-lg-4">
                 <div class="sticky-top" style="top: 2rem;">
 
-                    <div class="card shadow-sm mb-4">
+                    <div class="card mb-4 shadow-sm">
                         <div class="card-body">
                             <label class="form-label fw-bold">When (Schedule)</label>
                             <InputRadioGroup @bind-Value="model.SendOption" class="mt-2">
@@ -142,7 +142,7 @@
                                 </button>
                             }
 
-                            <div class="text-center text-muted mt-2">
+                            <div class="text-muted mt-2 text-center">
                                 <strong>Total Recipients: @model.TotalRecipientCount</strong>
                             </div>
                         </div>
@@ -170,7 +170,7 @@
     {
         try
         {
-            var t1 = apiClient.SenderIdListAsync(1, 500, null);
+            var t1 = apiClient.SenderIdListAsync(1, 500);
             var t2 = apiClient.BatchFileListAsync();
             var t3 = apiClient.ContactListAsync();
 

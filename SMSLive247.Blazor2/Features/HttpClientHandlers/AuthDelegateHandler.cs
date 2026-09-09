@@ -8,11 +8,10 @@ namespace SMSLive247.UI.Services
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var apiKey = ((Authentication.SmsAuthProvider)auth).GetMember()?.ApiKey;
-                //?? "35F0F673-B828-4F31-AAF3-09ABB9285A2A";
+            var apiKey = ((Authentication.SmsAuthProvider)auth).GetApiKey();
 
             if (apiKey != null)
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey.ToString());
 
             return await base.SendAsync(request, cancellationToken);
         }

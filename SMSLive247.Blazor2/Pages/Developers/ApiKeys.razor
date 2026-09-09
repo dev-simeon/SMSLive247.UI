@@ -20,8 +20,14 @@
                     <span class="font-medium text-slate-900">@context.AccountName</span>
                 </Column>
                 <Column Header="Type">
-                    <Badge Style="@(context.Phone == "main" ? ColorStyle.Warning : ColorStyle.Success)" 
-                           Value="@(context.Phone == "main" ? "MAIN ACCOUNT" : "SUB ACCOUNT")" />
+                    @if (context.Phone == "main")
+                    {
+                        <Badge Style="ColorStyle.Danger" Value="MAIN ACCOUNT" />
+                    }
+                    else
+                    {
+                        <Badge Style="ColorStyle.Info" Value="SUB ACCOUNT" />
+                    }
                 </Column>
                 <Column Header="API Key">
                     <ApiKeyDisplay Account="@context" OnReset="ReloadData" />
@@ -39,7 +45,7 @@
 
 @code {
     private string? searchQuery;
-    private List<AccountResponse> accounts = [];
+    private List<AccountResponse>? accounts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,16 +54,29 @@
 
     private async Task ReloadData()
     {
-        var t1 = apiClient.AccountGetAsync("self");
-        var t2 = apiClient.AccountsListAsync(1, 200, null);
+        try
+        {
+            var t1 = apiClient.AccountGetAsync("self");
+            var t2 = apiClient.AccountsListAsync(1, 200, null);
 
-        await Task.WhenAll(t1, t2);
+            await Task.WhenAll(t1, t2);
 
-        var mainAccount = t1.Result.Result;
-        accounts = t2.Result.Result.ToList();
+            var mainAccount = t1.Result.Result;
+            accounts = t2.Result.Result.ToList();
 
-        mainAccount.Phone = "main"; // hack to identify main acct
+            mainAccount.Phone = "main"; // hack to identify main acct
 
-        accounts.Insert(0, mainAccount);
+            accounts.Insert(0, mainAccount);
+        }
+        catch (ApiException ex)
+        {
+            accounts = [];
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
+        catch (Exception ex)
+        {
+            accounts = [];
+            await alert.Error(ex.Message);
+        }
     }
 }

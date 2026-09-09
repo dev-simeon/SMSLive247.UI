@@ -9,7 +9,7 @@
     </HeaderRight>
 
     <ChildContent>
-        <Table Items="PaginatedFiles" EmptyMessage="No files uploaded yet.">
+        <Table Items="paginatedFiles" EmptyMessage="No files uploaded yet.">
             <Columns>
                 <Column Header="File / Description">
                     <div class="flex items-center gap-3">
@@ -39,7 +39,9 @@
         </ChildContent>
 
         <FooterLeft>
-            <Paging @bind-PageNumber="pageNumber" @bind-PageSize="pageSize" TotalRecords="FilteredFiles.Count">
+            <Paging @bind-PageNumber="pageNumber" 
+                    @bind-PageSize="pageSize" 
+                    TotalRecords="filteredFiles?.Count">
             </Paging>
         </FooterLeft>
     </PageBody>
@@ -51,9 +53,9 @@
     private int pageNumber = 1;
     private int pageSize = 25;
 
-    private List<BatchFileResponse> files = new();
     private bool isLoading = false;
     private BulkFileModal uploadModal = new();
+    private List<BatchFileResponse>? files;
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,19 +64,20 @@
 
     private async Task FetchFiles()
     {
-        isLoading = true;
         try
         {
+            isLoading = true;
             var res = await apiClient.BatchFileListAsync();
-            var allFiles = res.Result?.ToList() ?? new();
-            files = allFiles.Where(f =>
+
+            files = res.Result.Where(f =>
             {
-                var type = f.FileType?.ToLowerInvariant();
+                var type = f.FileType.ToLowerInvariant();
                 return type == "csv" || type == "xls" || type == "xlsx" || type == "xlx";
             }).ToList();
         }
         catch (Exception)
         {
+            files = [];
             await alert.Error("Failed to load CSV/Excel files.");
         }
         finally
@@ -83,10 +86,13 @@
         }
     }
 
-    private List<BatchFileResponse> FilteredFiles
+    private List<BatchFileResponse>? filteredFiles
     {
         get
         {
+            if (files is null)
+                return null;
+
             if (string.IsNullOrWhiteSpace(searchQuery))
                 return files;
 
@@ -95,11 +101,11 @@
         }
     }
 
-    private List<BatchFileResponse> PaginatedFiles
+    private List<BatchFileResponse>? paginatedFiles
     {
         get
         {
-            return FilteredFiles
+            return filteredFiles?
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
