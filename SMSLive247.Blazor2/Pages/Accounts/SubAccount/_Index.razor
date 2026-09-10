@@ -33,10 +33,7 @@ else if (errorMessage is null)
                 SubTitle="Wait while the account details are fetched...">
     </PageHeader>
 
-    <div class="flex items-center gap-3 py-12 text-slate-500">
-        <div class="h-6 w-6 animate-spin rounded-full border-2 border-brand-500 border-t-transparent"></div>
-        <span>Loading account details...</span>
-    </div>
+    <Loading BoolCheck="false" Message="Loading account details..." />
 }
 else
 {

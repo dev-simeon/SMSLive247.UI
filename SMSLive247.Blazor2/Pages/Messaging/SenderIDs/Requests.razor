@@ -86,11 +86,15 @@
             items = response.Result.ToList();
             filteredItems = items;
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
             items = [];
             filteredItems = [];
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while fetching sender IDs. {ex.Message}");
         }
     }
 
@@ -126,9 +130,13 @@
                 await alert.Success("Sender ID deleted successfully.", "Deleted");
                 await FetchData();
             }
+            catch (ApiException ex)
+            {
+                await alert.Error(ex.FriendlyErrorMessage);
+            }
             catch (Exception ex)
             {
-                await alert.Error(ex.Message);
+                await alert.Error($"An error occurred while deleting the sender ID. {ex.Message}");
             }
         }
     }

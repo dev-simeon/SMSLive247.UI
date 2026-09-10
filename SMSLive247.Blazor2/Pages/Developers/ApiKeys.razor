@@ -76,7 +76,7 @@
         catch (Exception ex)
         {
             accounts = [];
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while fetching API keys. {ex.Message}");
         }
     }
 }

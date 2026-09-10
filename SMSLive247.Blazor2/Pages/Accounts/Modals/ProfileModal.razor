@@ -58,9 +58,13 @@
             await alert.Success("Profile updated successfully.");
             await OnCompleted.InvokeAsync();
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while updating your profile. {ex.Message}");
         }
         finally
         {

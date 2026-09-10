@@ -231,7 +231,7 @@
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while requesting the verification code. {ex.Message}");
         }
         finally
         {
@@ -266,7 +266,7 @@
         }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while confirming the registration. {ex.Message}");
         }
         finally
         {

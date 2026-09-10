@@ -1,4 +1,4 @@
-﻿@attribute [Route(Const.Routes.Messaging.MessageDetails)]
+@attribute [Route(Const.Routes.Messaging.MessageDetails)]
 @layout MainLayout
 @inject NavigationManager nav
 
@@ -215,14 +215,7 @@
                     </div>
                 </HeaderRight>
                 <ChildContent>
-                    @if (isLoading)
-                    {
-                        <div class="flex items-center justify-center py-16">
-                            <Loading BoolCheck="false" />
-                        </div>
-                    }
-                    else
-                    {
+                    <Loading BoolCheck="!isLoading" Message="Loading delivery reports...">
                         <Table Items="@filteredReports" AllowSelect="false" EmptyMessage="No delivery reports have arrived for this batch yet.">
                             <Columns>
                                 <Column Header="Phone Number">
@@ -259,7 +252,7 @@
                                 </Column>
                             </Columns>
                         </Table>
-                    }
+                    </Loading>
                 </ChildContent>
                 <FooterLeft>
                     <span class="text-xs font-medium text-slate-500">

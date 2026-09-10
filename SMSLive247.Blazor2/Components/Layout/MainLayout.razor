@@ -33,22 +33,24 @@
     private bool sidebarOpen = false;
     private AccountState? self;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+       try
         {
-            try
-            {
-                var response = await apiClient.AccountGetAsync("self");
-                self = new(response.Result);
-            }
-            catch (Exception ex)
-            {
-                await alert.Error(ex.Message);
-                //nav.NavigateTo(Const.Routes.Logout);
-            }
+            var response = await apiClient.AccountGetAsync("self");
+            self = new(response.Result);
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"Error fetching account information. {ex.Message}");
+            nav.NavigateTo(Const.Routes.Logout);
         }
     }
+
 
     private void setSidebarOpen(bool value)
     {

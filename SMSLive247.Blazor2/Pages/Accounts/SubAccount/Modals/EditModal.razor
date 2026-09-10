@@ -217,9 +217,13 @@ else
             await OnCompleted.InvokeAsync();
             isVisible = false;
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while {(accountId != null ? "updating" : "creating")} the sub-account. {ex.Message}");
         }
         finally
         {

@@ -1,34 +1,49 @@
-﻿@if (NullCheckObject != null || BoolCheck == true)
+@if (IsReady)
 {
     @ChildContent
 }
 else
 {
-    <div class="progress" style="height: 7px">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: @value%"></div>
+    <div class="flex items-center justify-center py-6 @CssClass">
+        <div class="flex flex-col items-center gap-2.5">
+            <div class="relative @SpinnerDimensions">
+                <div class="absolute inset-0 @SpinnerDimensions animate-ping rounded-full border border-brand-100 opacity-25"></div>
+                <div class="@SpinnerDimensions animate-spin rounded-full @BorderWidth border-brand-100 border-t-brand-500"></div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Message))
+            {
+                <p class="animate-pulse text-xs font-medium text-slate-500">
+                    @Message
+                </p>
+            }
+        </div>
     </div>
-    <p>Loading...</p>
 }
 
 @code {
     [Parameter] public bool BoolCheck { get; set; } = false;
-    [Parameter, MemberNotNull] public object NullCheckObject { get; set; } 
+    [Parameter] public object? NullCheckObject { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
-    [Parameter] public RenderFragment? AltView { get; set; }
+    [Parameter] public string Message { get; set; } = "Loading...";
+    [Parameter] public string CssClass { get; set; } = "";
+    [Parameter] public string Size { get; set; } = "sm";
 
-    private int value;
-    private double intervalMs = 100;
-    private System.Timers.Timer? timer;
+    private bool IsReady => BoolCheck || NullCheckObject != null;
 
-    protected override void OnInitialized()
+    private string SpinnerDimensions => Size switch
     {
-        timer = new System.Timers.Timer(intervalMs);
-        timer.Elapsed += async (s, e) =>
-        {
-            value += 1; 
-            if (value >= 100) value = 0;
-            await InvokeAsync(StateHasChanged);
-        };
-        timer.Enabled = true;
-    }
+        "xs" => "h-5 w-5",
+        "md" => "h-9 w-9",
+        "lg" => "h-12 w-12",
+        _ => "h-7 w-7"
+    };
+
+    private string BorderWidth => Size switch
+    {
+        "xs" => "border",
+        "md" => "border-4",
+        "lg" => "border-4",
+        _ => "border-2"
+    };
 }

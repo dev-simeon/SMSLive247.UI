@@ -1,5 +1,5 @@
 (function () {
-    window.smsliveLoadTawk = function (propertyId) {
+    window.LoadTawk = function (propertyId) {
         if (!propertyId || document.getElementById("tawk-script")) {
             return;
         }
@@ -8,14 +8,14 @@
         window.Tawk_LoadStart = new Date();
 
         window.Tawk_API.onLoad = function () {
-            if (typeof window.Tawk_API.hideWidget === "function") {
-                window.Tawk_API.hideWidget();
+            if (typeof window.Tawk_API.showWidget === "function") {
+                window.Tawk_API.showWidget();
             }
         };
 
         window.Tawk_API.onChatMinimized = function () {
-            if (typeof window.Tawk_API.hideWidget === "function") {
-                window.Tawk_API.hideWidget();
+            if (typeof window.Tawk_API.showWidget === "function") {
+                window.Tawk_API.showWidget();
             }
         };
 
