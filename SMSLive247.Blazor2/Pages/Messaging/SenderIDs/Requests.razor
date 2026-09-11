@@ -35,6 +35,12 @@
                     <div class="flex flex-col">
                         <div class="mb-0.5 text-sm font-medium text-slate-900">@context.Purpose</div>
                         <div class="max-w-md truncate text-xs text-slate-500">@context.SampleText</div>
+                        @if (IsRejected(context) && !string.IsNullOrWhiteSpace(context.Remarks))
+                        {
+                            <div class="leading-relaxed text-red-700" title="@context.Remarks">
+                                @GetSenderIdRejectionReason(context.Remarks)
+                            </div>
+                        }
                     </div>
                 </Column>
                 <Column Header="Date Requested">
@@ -111,13 +117,48 @@
 
         if (!string.IsNullOrWhiteSpace(searchStatus))
         {
-            filteredItems = filteredItems.Where(x => x.Status.Equals(searchStatus, noCase)).ToList();
+            filteredItems = filteredItems.Where(x => string.Equals(x.Status, searchStatus, noCase)).ToList();
         }
 
         if (!string.IsNullOrWhiteSpace(searchQuery))
         {
-            filteredItems = filteredItems.Where(x => x.SenderID.Contains(searchQuery, noCase)).ToList();
+            filteredItems = filteredItems.Where(x =>
+                (x.SenderID?.Contains(searchQuery, noCase) ?? false) ||
+                (x.Purpose?.Contains(searchQuery, noCase) ?? false) ||
+                (x.SampleText?.Contains(searchQuery, noCase) ?? false) ||
+                (x.Remarks?.Contains(searchQuery, noCase) ?? false)).ToList();
         }
+    }
+
+    private static bool IsRejected(SenderIdResponse item) =>
+        string.Equals(item.Status, "REJECTED", StringComparison.OrdinalIgnoreCase);
+
+
+    public static string GetSenderIdRejectionReason(string value)
+    {
+        return value switch
+        {
+            "SAMPLE_TOO_BRIEF" =>
+                "The sender ID was rejected because the submitted sample message is too brief to adequately verify the sender ID.",
+
+            "GENERIC_SENDERID" =>
+                "The sender ID was rejected because it is too generic and does not clearly identify the business, organization, or service using it.",
+
+            "OTP_NOT_ALLOWED" =>
+                "The sender ID was rejected because OTP messages are not allowed for promotional sender IDs.",
+
+            "WELL_KNOWN_BRAND" =>
+                "The sender ID was rejected because it appears to represent a well-known brand. Additional verification or authorization may be required.",
+
+            "GOVERNMENT_AGENCY" =>
+                "The sender ID was rejected because it appears to represent a government agency. Appropriate authorization or verification may be required.",
+
+            "TRANSACTIONAL" =>
+                "The sender ID was rejected because it is intended for transactional messages, which are not allowed under the current sender ID requirements.",
+
+            _ =>
+                "The sender ID was rejected because it does not meet the sender ID requirements."
+        };
     }
 
     private async Task HandleDelete(SenderIdResponse item)
