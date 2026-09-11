@@ -7,18 +7,16 @@
 
 @if (status == "loading")
 {
-    <div class="flex-1 flex items-center justify-center p-8 min-h-[500px]">
-        <div class="flex flex-col items-center gap-3 text-slate-400">
-            <div class="w-10 h-10 border-4 border-slate-200 border-t-brand-500 rounded-full animate-spin"></div>
-            <p class="text-sm font-medium">Verifying payment…</p>
-        </div>
+    <div class="flex-1 flex items-center justify-center p-8 min-h-125">
+        <Loading BoolCheck="false" Message="Verifying payment…" />
     </div>
 }
 else if (status == "cancelled")
 {
-    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-[500px]">
+    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-125">
         <div class="max-w-xl w-full mx-auto text-center space-y-6">
-            <div class="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center mx-auto ring-8 ring-amber-50/50">
+            <div
+                class="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center mx-auto ring-8 ring-amber-50/50">
                 <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-10 h-10 text-amber-400" />
             </div>
             <div>
@@ -38,7 +36,7 @@ else if (status == "cancelled")
 }
 else if (status == "failed")
 {
-    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-[500px]">
+    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-125">
         <div class="max-w-xl w-full mx-auto text-center space-y-6">
             <div class="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto ring-8 ring-red-50/50">
                 <Icon Style="Icon.IconStyle.AlertCircle" CssClass="w-10 h-10 text-red-400" />
@@ -46,7 +44,8 @@ else if (status == "failed")
             <div>
                 <h1 class="text-2xl font-bold text-slate-900 mb-2">Payment Verification Failed</h1>
                 <p class="text-slate-500">
-                    We could not verify your transaction. If you were charged, please contact support with your payment reference.
+                    We could not verify your transaction. If you were charged, please contact support with your payment
+                    reference.
                 </p>
                 @if (!string.IsNullOrEmpty(transactionId))
                 {
@@ -66,7 +65,7 @@ else if (status == "failed")
 }
 else if (status == "success" && purchase != null)
 {
-    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-[500px]">
+    <div class="flex-1 flex items-center justify-center p-6 md:p-8 min-h-125">
         <div class="max-w-xl w-full mx-auto space-y-6">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden relative">
                 <div aria-hidden class="absolute inset-0 pointer-events-none opacity-[0.07]"
@@ -74,7 +73,8 @@ else if (status == "success" && purchase != null)
                 </div>
 
                 <div class="relative p-8 flex flex-col items-center text-center">
-                    <div class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-6 ring-8 ring-emerald-50">
+                    <div
+                        class="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mb-6 ring-8 ring-emerald-50">
                         <Icon Style="Icon.IconStyle.CheckCircle" CssClass="w-11 h-11 text-emerald-500" />
                     </div>
 
@@ -88,7 +88,8 @@ else if (status == "success" && purchase != null)
                         <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-slate-500">Transaction ID</span>
-                                <span class="font-mono font-medium text-slate-900 text-xs break-all text-right max-w-[220px]">
+                                <span
+                                    class="font-mono font-medium text-slate-900 text-xs break-all text-right max-w-[220px]">
                                     @(purchase.Reference ?? transactionId ?? "—")
                                 </span>
                             </div>

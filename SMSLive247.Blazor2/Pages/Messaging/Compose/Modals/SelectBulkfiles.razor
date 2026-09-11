@@ -1,4 +1,4 @@
-﻿<Modal Title="Select Bulk File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
+<Modal Title="Select Bulk File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
     <Body>
         <div class="flex h-[400px] flex-1 flex-col">
             <p class="mb-4 text-slate-500">Choose from your previously uploaded TXT files.</p>
@@ -21,7 +21,7 @@
             <div tabindex="0" class="h-64 flex-1 overflow-y-scroll rounded-lg border border-slate-300 p-4 shadow-inner">
                 @if (isLoading)
                 {
-                    <p class="text-sm text-slate-500 italic">Loading files...</p>
+                    <Loading BoolCheck="false" Message="Loading files..." />
                 }
                 else if (items.Count == 0)
                 {

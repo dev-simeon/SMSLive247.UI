@@ -107,9 +107,13 @@
             var response = await apiClient.AccountGetAsync("self");
             currentBalance = response.Result.Credits;
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while fetching account data. {ex.Message}");
         }
     }
 
@@ -126,9 +130,13 @@
             await alert.Success($"Your transfer of {model.Credits:#,##0} to {model.Recipient} was successful.");
             await OnCompleted.InvokeAsync();
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while transferring credits. {ex.Message}");
         }
         finally
         {

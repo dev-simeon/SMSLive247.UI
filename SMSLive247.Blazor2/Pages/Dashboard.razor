@@ -1,4 +1,4 @@
-﻿@attribute [Route(Const.Routes.Dashboard)]
+@attribute [Route(Const.Routes.Dashboard)]
 @inject NavigationManager nav
 @layout MainLayout
 
@@ -73,7 +73,7 @@
         </div>
     </div>
 
-    @if (LowBalance)
+@*     @if (LowBalance)
     {
         <div class="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
             <Icon Style="Icon.IconStyle.AlertCircle" CssClass="inline-flex items-center justify-center leading-none text-[20px] text-amber-600" />
@@ -84,7 +84,7 @@
                 </p>
             </div>
         </div>
-    }
+    } *@
 
     <div class="grid grid-cols-1 gap-8 xl:grid-cols-3">
         <div class="space-y-4 xl:col-span-2">
@@ -113,14 +113,11 @@
                     <tbody class="divide-y divide-slate-100">
                         @if (isLoading)
                         {
-                            @for (var i = 0; i < 5; i++)
-                            {
-                                <tr>
-                                    <td colspan="4" class="px-6 py-4">
-                                        <div class="h-4 w-full max-w-50 animate-pulse rounded bg-slate-100"></div>
-                                    </td>
-                                </tr>
-                            }
+                            <tr>
+                                <td colspan="4" class="px-6 py-8">
+                                    <Loading BoolCheck="false" Message="Loading messages..." />
+                                </td>
+                            </tr>
                         }
                         else if (batches.Count == 0)
                         {
@@ -168,17 +165,9 @@
                 <div class="flex-1 space-y-4">
                     @if (isLoading)
                     {
-                        @for (var i = 0; i < 3; i++)
-                        {
-                            <div class="flex items-center gap-3">
-                                <div class="h-8 w-8 shrink-0 animate-pulse rounded-lg bg-slate-100"></div>
-                                <div class="min-w-0 flex-1 space-y-2">
-                                    <div class="h-3 w-24 animate-pulse rounded bg-slate-100"></div>
-                                    <div class="h-2 w-16 animate-pulse rounded bg-slate-50"></div>
-                                </div>
-                                <div class="h-4 w-12 animate-pulse rounded bg-emerald-50"></div>
-                            </div>
-                        }
+                        <div class="py-6">
+                            <Loading BoolCheck="false" Message="Loading transactions..." />
+                        </div>
                     }
                     else if (purchases.Count == 0)
                     {

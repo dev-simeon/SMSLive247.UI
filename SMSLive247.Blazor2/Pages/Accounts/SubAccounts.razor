@@ -102,9 +102,13 @@
             await alert.Success("Sub-account deleted successfully.", "Deleted");
             await ReloadData();
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while deleting the sub-account. {ex.Message}");
         }
     }
 

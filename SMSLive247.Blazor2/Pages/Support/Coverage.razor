@@ -51,7 +51,7 @@
         catch (Exception ex)
         {
             items = [];
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while fetching coverage information. {ex.Message}");
         }
         finally
         {

@@ -1,12 +1,7 @@
-﻿@using SMSLive247.Blazor.Pages.Messaging.Compose.Modals
+@using SMSLive247.Blazor.Pages.Messaging.Compose.Modals
 @using SMSLive247.Blazor.Pages.Messaging.Compose.Common
 
-@if (model is null)
-{
-    <div class="rounded-xl border border-slate-200 bg-white p-8 text-sm text-slate-500">Loading compose options...</div>
-}
-else
-{
+<Loading NullCheckObject="model" Message="Loading compose options...">
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
         <!-- Main Column (col-lg-8) -->
@@ -99,7 +94,7 @@ else
             </div>                
         </div>
     </div>
-}
+</Loading>
 
 <SelectContacts     @ref="contactsModal"    OnSelected="(items) => model?.UpdateContacts(items)" />
 <SelectRawNumbers   @ref="rawNumbersModal"  OnSelected="(items) => model?.UpdateNumbers(items)" CountryCode="234" />
@@ -123,9 +118,13 @@ else
 
             model = new(t1.Result.Result, t3.Result.Result, t2.Result.Result);
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while initializing the compose page. {ex.Message}");
         }
     }
 

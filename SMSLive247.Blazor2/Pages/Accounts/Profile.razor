@@ -8,7 +8,8 @@
             SubTitle="Manage your personal information and account security.">
 </PageHeader>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<Loading NullCheckObject="account" Message="Loading profile...">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <!-- ── Left: Personal Information ──────────────────────────────────── -->
     <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
         <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
@@ -161,7 +162,8 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
+</Loading>
 
 @if (account != null)
 {
@@ -186,9 +188,13 @@
             var response = await apiClient.AccountGetAsync("self");
             account = response.Result;
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message);
+            await alert.Error($"An error occurred while fetching account data. {ex.Message}");
         }
     }
 }

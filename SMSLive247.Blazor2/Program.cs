@@ -27,7 +27,7 @@ public partial class Program
                 options.AccessDeniedPath = Const.Routes.Login;
             });
 
-        builder.Services.AddSingleton<AlertService>();
+        builder.Services.AddScoped<AlertService>();
         //builder.Services.AddTransient<AuthDelegateHandler>();
         //builder.Services.AddTransient<CacheDelegateHandler>();
 
