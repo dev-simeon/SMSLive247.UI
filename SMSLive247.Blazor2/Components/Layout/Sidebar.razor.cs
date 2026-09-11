@@ -1,7 +1,7 @@
-//using SMSLive247.Blazor2.Components.Utilities;
+//using SMSLive247.Blazor.Components.Utilities;
 //using Rt = SMSLive247.UI.Shared.Const.Routes;
 
-namespace SMSLive247.Blazor2.Components.Layout;
+namespace SMSLive247.Blazor.Components.Layout;
 
 public partial class Sidebar
 {

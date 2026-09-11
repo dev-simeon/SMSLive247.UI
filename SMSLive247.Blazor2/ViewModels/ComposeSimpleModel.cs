@@ -7,7 +7,7 @@ using System.Globalization;
 using SMSLive247.UI.Services;
 using SMSLive247.OpenApi;
 
-namespace SMSLive247.Blazor2.Pages.ViewModels
+namespace SMSLive247.Blazor.Pages.ViewModels
 {
     public abstract class BaseComposeModel
     {

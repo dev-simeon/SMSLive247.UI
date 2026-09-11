@@ -108,7 +108,7 @@
     private bool isBusy = false;
     private LoginRequest model = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         var authState = await ((Authentication.SmsAuthProvider)auth).GetAuthenticationStateAsync();
         if (authState.User.Identity?.IsAuthenticated == true)
@@ -119,6 +119,17 @@
             nav.NavigateTo(destination);
         }
     }
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     var authState = await ((Authentication.SmsAuthProvider)auth).GetAuthenticationStateAsync();
+    //     if (authState.User.Identity?.IsAuthenticated == true)
+    //     {
+    //         var destination = !string.IsNullOrWhiteSpace(ReturnUrl)
+    //             ? ReturnUrl : Const.Routes.Dashboard;
+
+    //         nav.NavigateTo(destination);
+    //     }
+    // }
 
     private async Task LoginAsync()
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using SMSLive247.OpenApi;
 
-namespace SMSLive247.Blazor2
+namespace SMSLive247.Blazor
 {
     public static class Extensions
     {

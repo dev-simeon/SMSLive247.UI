@@ -1,6 +1,6 @@
 ﻿using SMSLive247.OpenApi;
 
-namespace SMSLive247.Blazor2.Pages.ViewModels
+namespace SMSLive247.Blazor.Pages.ViewModels
 {
     public record class ContactModel
     {

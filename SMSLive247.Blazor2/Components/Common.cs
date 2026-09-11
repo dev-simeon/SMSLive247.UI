@@ -1,4 +1,4 @@
-﻿namespace SMSLive247.Blazor2.Components
+﻿namespace SMSLive247.Blazor.Components
 {
     public enum ColorStyle { Primary, Secondary, Success, Warning, Info, Danger, Light, Dark }
 

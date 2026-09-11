@@ -2,7 +2,7 @@
 @inherits InputBase<TValue?>
 
 <div>
-    @if (!string.IsNullOrEmpty(Label))
+    @if (!string.IsNullOrWhiteSpace(Label))
     {
         <label class="block">
             <span
@@ -20,9 +20,9 @@
             }
         </label>
     }
-    <div class="relative mt-1 flex">
+    <div class="relative flex p-0">
         <select value="@CurrentValueAsString" @onchange="OnChange" @attributes="AdditionalAttributes"
-                class="@GetCssClass()">
+                class="@GetCssClass() w-full appearance-none bg-white text-slate-900 border-slate-200 transition-all">
 
             @if (Variant == SelectVariant.Country)
             {
@@ -122,9 +122,8 @@
     private string GetCssClass()
     {
         var css = IsEmbedded
-            // ? "h-9 px-3 border-l border-slate-200 text-slate-700 focus:outline-none cursor-pointer"
-            ? "pl-3 pr-8 h-10 border-l border-slate-200 text-slate-600 focus:outline-none w-full appearance-none bg-white hover:bg-slate-50 transition-colors"
-            : "appearance-none block w-full px-3 py-2.5 border rounded-lg bg-white text-slate-900 transition-all border-slate-200";
+            ? "pl-3 pr-8 h-10 border-0 rounded-lg focus:outline-none hover:bg-slate-50"
+            : "px-3 py-2.5 border block rounded-lg  focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none";
 
         if (!string.IsNullOrWhiteSpace(CssClass))
             css += $" {CssClass}";
