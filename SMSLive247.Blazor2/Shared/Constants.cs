@@ -1,5 +1,5 @@
-using SMSLive247.Blazor2.Components.Utilities;
-using SMSLive247.Blazor2.Pages.Accounts;
+using SMSLive247.Blazor.Components.Utilities;
+using SMSLive247.Blazor.Pages.Accounts;
 
 namespace SMSLive247.UI.Shared
 {

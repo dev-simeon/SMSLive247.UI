@@ -3,7 +3,7 @@ using SMSLive247.UI.Services;
 using SMSLive247.UI.Shared;
 using SMSLive247.OpenApi;
 using SMSLive247.Authentication;
-using SMSLive247.Blazor2.Components;
+using SMSLive247.Blazor.Components;
 
 public partial class Program
 {
