@@ -1,19 +1,21 @@
 <Card HeaderText="From">
-    <div class="flex">
-        <div class="flex w-10 shrink-0 items-center justify-center rounded-l-lg border-y border-l border-slate-200 bg-slate-50 text-slate-400">
+    <div class="flex rounded-lg border border-slate-300
+        bg-white shadow-sm focus-within:border-brand-500 focus-within:ring-brand-500/30 focus-within:ring-4">
+        <div class="flex rounded-l-lg w-10 items-center justify-center bg-slate-50 text-slate-400">
             <Icon Style="Icon.IconStyle.User" CssClass="text-lg" />
         </div>
-        <div class="w-full sm:max-w-xs">
+        <div class="w-full sm:max-w-xs rounded-r-lg">
             @{
                 var senderIds = Model?.SenderIds ?? [];
                 var approved = senderIds.Where(x => x.Status == "APPROVED").ToList();
                 var others = senderIds.Where(x => x.Status != "APPROVED").ToList();
             }
             <FormSelect TValue="string" 
-                        Required="true"
+                        Required="true" 
+                        IsEmbedded="true"
                         @bind-Value="Model.SenderID" 
                         @bind-Value:after="HandleChange"
-                        IconStyle="Icon.IconStyle.ChevronDown" CssClass="rounded-l-none">
+                        IconStyle="Icon.IconStyle.ChevronDown" >
                 <option value="">-Select Sender ID-</option>
                 @if (approved.Count > 0)
                 {
