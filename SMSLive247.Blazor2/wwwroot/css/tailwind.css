@@ -26,7 +26,6 @@
     --color-amber-900: oklch(41.4% 0.112 45.904);
     --color-yellow-500: oklch(79.5% 0.184 86.047);
     --color-yellow-600: oklch(68.1% 0.162 75.834);
-    --color-yellow-700: oklch(55.4% 0.135 66.442);
     --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-700: oklch(52.7% 0.154 150.069);
@@ -1282,9 +1281,6 @@
   .bg-amber-50 {
     background-color: var(--color-amber-50);
   }
-  .bg-amber-200 {
-    background-color: var(--color-amber-200);
-  }
   .bg-amber-500 {
     background-color: var(--color-amber-500);
   }
@@ -1903,9 +1899,6 @@
   .text-yellow-600 {
     color: var(--color-yellow-600);
   }
-  .text-yellow-700 {
-    color: var(--color-yellow-700);
-  }
   .uppercase {
     text-transform: uppercase;
   }
@@ -2046,9 +2039,6 @@
   .outline {
     outline-style: var(--tw-outline-style);
     outline-width: 1px;
-  }
-  .filter {
-    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
   .backdrop-blur-md {
     --tw-backdrop-blur: blur(var(--blur-md));
@@ -2312,6 +2302,12 @@
     }
   }
   @media (hover: hover) {
+    .hover\:rotate-12:hover {
+      rotate: 12deg;
+    }
+    .hover\:rotate-45:hover {
+      rotate: 45deg;
+    }
     .hover\:border-brand-300:hover {
       border-color: var(--color-brand-300);
     }
@@ -2390,6 +2386,10 @@
     .hover\:bg-slate-100:hover {
       background-color: var(--color-slate-100);
     }
+    .hover\:font-medium:hover {
+      --tw-font-weight: var(--font-weight-medium);
+      font-weight: var(--font-weight-medium);
+    }
     .hover\:text-brand-500:hover {
       color: var(--color-brand-500);
     }
@@ -2398,6 +2398,9 @@
     }
     .hover\:text-brand-700:hover {
       color: var(--color-brand-700);
+    }
+    .hover\:text-green-600:hover {
+      color: var(--color-green-600);
     }
     .hover\:text-red-600:hover {
       color: var(--color-red-600);
@@ -2701,26 +2704,17 @@
   .dark\:hidden:where(.dark, .dark *) {
     display: none;
   }
-  :where(.dark\:divide-slate-500:where(.dark, .dark *) > :not(:last-child)) {
-    border-color: var(--color-slate-500);
-  }
   :where(.dark\:divide-slate-700:where(.dark, .dark *) > :not(:last-child)) {
     border-color: var(--color-slate-700);
-  }
-  :where(.dark\:divide-slate-800:where(.dark, .dark *) > :not(:last-child)) {
-    border-color: var(--color-slate-800);
   }
   .dark\:border-brand-100:where(.dark, .dark *) {
     border-color: var(--color-brand-100);
   }
-  .dark\:border-brand-200:where(.dark, .dark *) {
-    border-color: var(--color-brand-200);
-  }
   .dark\:border-brand-300:where(.dark, .dark *) {
     border-color: var(--color-brand-300);
   }
-  .dark\:border-brand-700:where(.dark, .dark *) {
-    border-color: var(--color-brand-700);
+  .dark\:border-slate-400:where(.dark, .dark *) {
+    border-color: var(--color-slate-400);
   }
   .dark\:border-slate-600:where(.dark, .dark *) {
     border-color: var(--color-slate-600);
@@ -2737,24 +2731,35 @@
   .dark\:bg-gray-900:where(.dark, .dark *) {
     background-color: var(--color-gray-900);
   }
+  .dark\:bg-slate-800:where(.dark, .dark *) {
+    background-color: var(--color-slate-800);
+  }
+  .dark\:bg-slate-900:where(.dark, .dark *) {
+    background-color: var(--color-slate-900);
+  }
   .dark\:text-brand-100:where(.dark, .dark *) {
     color: var(--color-brand-100);
+  }
+  .dark\:text-brand-200:where(.dark, .dark *) {
+    color: var(--color-brand-200);
   }
   .dark\:text-brand-300:where(.dark, .dark *) {
     color: var(--color-brand-300);
   }
+  .dark\:text-slate-100:where(.dark, .dark *) {
+    color: var(--color-slate-100);
+  }
   .dark\:text-slate-200:where(.dark, .dark *) {
     color: var(--color-slate-200);
+  }
+  .dark\:text-slate-300:where(.dark, .dark *) {
+    color: var(--color-slate-300);
   }
   .dark\:text-slate-400:where(.dark, .dark *) {
     color: var(--color-slate-400);
   }
   .dark\:text-slate-500:where(.dark, .dark *) {
     color: var(--color-slate-500);
-  }
-  .dark\:invert:where(.dark, .dark *) {
-    --tw-invert: invert(100%);
-    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
   @media (hover: hover) {
     .dark\:hover\:bg-slate-800:where(.dark, .dark *):hover {
@@ -2776,25 +2781,19 @@
   .\[\&\.active\]\:text-brand-600.active {
     color: var(--color-brand-600);
   }
-  .dark\:\[\&\.active\]\:bg-brand-800:where(.dark, .dark *).active {
-    background-color: var(--color-brand-800);
-  }
   .dark\:\[\&\.active\]\:bg-brand-900:where(.dark, .dark *).active {
     background-color: var(--color-brand-900);
   }
   .dark\:\[\&\.active\]\:text-brand-200:where(.dark, .dark *).active {
     color: var(--color-brand-200);
   }
-  .dark\:\[\&\.active\]\:text-brand-400:where(.dark, .dark *).active {
-    color: var(--color-brand-400);
-  }
-  .dark\:\[\&\.active\]\:text-brand-500:where(.dark, .dark *).active {
-    color: var(--color-brand-500);
-  }
 }
 body {
   font-size: 95%;
   -webkit-font-smoothing: antialiased;
+}
+.dark input, .dark select, .dark textarea, .dark input {
+  back9ground-color: aquamarine;
 }
 h1:focus, h2:focus, h3:focus, h4:focus, h5:focus, h6:focus {
   outline: none;
@@ -2953,59 +2952,6 @@ button, [role="button"], select, input[type="submit"] {
   inherits: false;
   initial-value: solid;
 }
-@property --tw-blur {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-brightness {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-contrast {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-grayscale {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-hue-rotate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-invert {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-opacity {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-saturate {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-sepia {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-drop-shadow {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-drop-shadow-color {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-drop-shadow-alpha {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 100%;
-}
-@property --tw-drop-shadow-size {
-  syntax: "*";
-  inherits: false;
-}
 @property --tw-backdrop-blur {
   syntax: "*";
   inherits: false;
@@ -3129,19 +3075,6 @@ button, [role="button"], select, input[type="submit"] {
       --tw-ring-offset-color: #fff;
       --tw-ring-offset-shadow: 0 0 #0000;
       --tw-outline-style: solid;
-      --tw-blur: initial;
-      --tw-brightness: initial;
-      --tw-contrast: initial;
-      --tw-grayscale: initial;
-      --tw-hue-rotate: initial;
-      --tw-invert: initial;
-      --tw-opacity: initial;
-      --tw-saturate: initial;
-      --tw-sepia: initial;
-      --tw-drop-shadow: initial;
-      --tw-drop-shadow-color: initial;
-      --tw-drop-shadow-alpha: 100%;
-      --tw-drop-shadow-size: initial;
       --tw-backdrop-blur: initial;
       --tw-backdrop-brightness: initial;
       --tw-backdrop-contrast: initial;

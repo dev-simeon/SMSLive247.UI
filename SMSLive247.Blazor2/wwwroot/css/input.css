@@ -91,6 +91,10 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+.dark input, .dark select, .dark textarea, .dark input {
+    back9ground-color: aquamarine;
+}
+
 h1:focus, h2:focus, h3:focus, h4:focus, h5:focus, h6:focus {
     outline: none;
 }

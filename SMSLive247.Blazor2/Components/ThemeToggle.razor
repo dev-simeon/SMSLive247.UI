@@ -39,7 +39,13 @@
 
     public async ValueTask DisposeAsync()
     {
-        _dotNetRef?.Dispose();
-        if (_module != null) await _module.DisposeAsync();
+        try
+        {
+            _dotNetRef?.Dispose();
+            if (_module != null) await _module.DisposeAsync();
+        }
+        catch
+        {
+        }
     }
 }

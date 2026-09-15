@@ -22,7 +22,7 @@
     }
     <div class="relative flex p-0">
         <select value="@CurrentValueAsString" @onchange="OnChange" @attributes="AdditionalAttributes"
-                class="@GetCssClass() w-full appearance-none bg-white text-slate-900 border-slate-200 transition-all">
+                class="@GetCssClass() w-full appearance-none border-slate-200 transition-all">
 
             @if (Variant == SelectVariant.Country)
             {
@@ -122,8 +122,8 @@
     private string GetCssClass()
     {
         var css = IsEmbedded
-            ? "pl-3 pr-8 h-10 border-0 rounded-lg focus:outline-none hover:bg-slate-50"
-            : "px-3 py-2.5 border block rounded-lg  focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none";
+            ? "pl-3 pr-8 h-10 border-0 rounded-sm focus:outline-none bg-white dark:bg-black"
+            : "px-3 py-2.5 border block rounded-sm focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none";
 
         if (!string.IsNullOrWhiteSpace(CssClass))
             css += $" {CssClass}";
