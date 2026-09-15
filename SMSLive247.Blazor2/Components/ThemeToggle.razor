@@ -1,0 +1,45 @@
+﻿@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<select @onchange="OnThemeChanged" value="@_currentTheme" class="p-2 text-slate-400">
+    <option value="system">System</option>
+    <option value="light" >Light </option>
+    <option value="dark"  >Dark  </option>
+</select>
+
+@code {
+    private IJSObjectReference? _module;
+    private string _currentTheme = "system";
+    private DotNetObjectReference<ThemeToggle>? _dotNetRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/theme.js");
+            _currentTheme = await _module.InvokeAsync<string>("getTheme");
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await _module.InvokeVoidAsync("watchSystemTheme", _dotNetRef);
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnThemeChanged(ChangeEventArgs e)
+    {
+        _currentTheme = e.Value?.ToString() ?? "system";
+        if (_module != null)
+            await _module.InvokeVoidAsync("setTheme", _currentTheme);
+    }
+
+    [JSInvokable]
+    public void OnSystemThemeChanged(bool isDark)
+    {
+        StateHasChanged(); // re-render if you show a live indicator
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _dotNetRef?.Dispose();
+        if (_module != null) await _module.DisposeAsync();
+    }
+}

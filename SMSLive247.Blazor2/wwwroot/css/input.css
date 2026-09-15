@@ -1,18 +1,5 @@
 @import "tailwindcss";
-
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
     --font-sans: "Ubuntu", sans-serif;
@@ -101,9 +88,6 @@
 /* Global HTML Overrides */
 body {
     font-size: 95%;
-    font-family: var(--font-sans);
-    background-color: #f8fafc; /* bg-slate-50 */
-    color: #0f172a; /* text-slate-900 */
     -webkit-font-smoothing: antialiased;
 }
 
@@ -113,4 +97,21 @@ h1:focus, h2:focus, h3:focus, h4:focus, h5:focus, h6:focus {
 
 button, [role="button"], select, input[type="submit"] {
     cursor: pointer;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-slate-300); 
+    border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background-color: var(--color-slate-700); 
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
 }

@@ -9,7 +9,7 @@
     <HeaderRight>
         @if (Sub.Account != null)
         {
-            <Button Text="Add/Remove Credit" OnClick="() => transferModal.Show(Main.Account, Sub.Account)" />
+            <Button Text="Transfer Credits..." OnClick="() => transferModal.Show(Main.Account, Sub.Account)" />
         }
     </HeaderRight>
 
@@ -20,10 +20,10 @@
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column Header="Sender">
-                    <span class="font-medium text-slate-900">@context.SenderName</span>
+                    @context.SenderName
                 </Column>
                 <Column Header="Recipient">
-                    <span class="font-medium text-slate-900">@context.RecipientName</span>
+                    @context.RecipientName
                 </Column>
                 <Column Header="Credits">
                     <FormatNumber Number="@context.Credits"></FormatNumber>

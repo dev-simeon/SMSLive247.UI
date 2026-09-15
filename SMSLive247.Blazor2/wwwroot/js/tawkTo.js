@@ -46,4 +46,8 @@
         alert("Live chat is still initializing. Please wait a moment and try again.");
         return false;
     };
+
+    window.LoadTawk(window.tawkToPropertyId);
 })();
+
+

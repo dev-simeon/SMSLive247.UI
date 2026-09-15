@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "tw:watch": "npx @tailwindcss/cli -i ./SMSLive247.Blazor2/wwwroot/css/app.css -o ./SMSLive247.Blazor2/wwwroot/css/tailwind.css --watch",
-    "tw:build": "npx @tailwindcss/cli -i ./SMSLive247.Blazor2/wwwroot/css/app.css -o ./SMSLive247.Blazor2/wwwroot/css/tailwind.css --minify"
+    "tw:watch": "npx @tailwindcss/cli -i ./SMSLive247.Blazor2/wwwroot/css/input.css -o ./SMSLive247.Blazor2/wwwroot/css/tailwind.css --watch",
+    "tw:build": "npx @tailwindcss/cli -i ./SMSLive247.Blazor2/wwwroot/css/input.css -o ./SMSLive247.Blazor2/wwwroot/css/tailwind.css --minify"
   },
   "repository": {
     "type": "git",

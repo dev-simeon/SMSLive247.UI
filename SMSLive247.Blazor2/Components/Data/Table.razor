@@ -8,19 +8,19 @@
 else
 {
     <div>
-        <table class="w-full min-w-full border-collapse text-left">
+        <table class="w-full min-w-full border-collapse text-left text-slate-600 dark:text-slate-400">
             <thead>
-                <tr class="bg-brand-100 border-brand-300 border-b-2">
+                <tr class="border-b-2 border-brand-300 bg-brand-100 dark:border-brand-100 dark:bg-brand-800">
                     <CascadingValue Name="IsHeaderRow" Value="true" IsFixed="true">
                         @Columns(default)
                     </CascadingValue>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 bg-white">
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                 @if (IsLoading())
                 {
                     <tr class="transition-colors duration-150 ease-in-out hover:bg-slate-50/50">
-                        <td colspan="20" class="px-4 py-12 text-center text-slate-500">
+                        <td colspan="20" class="px-4 py-12 text-center">
                             <Loading BoolCheck="false"></Loading>
                         </td>
                     </tr>
@@ -37,7 +37,7 @@ else
                 {
                     <tr>
                         <td colspan="20" class="px-4 py-12 text-center">
-                            <span class="text-yellow-700">@EmptyMessage</span>
+                            <span class="text-yellow-500">@EmptyMessage</span>
                         </td>
                     </tr>
                 }
@@ -47,7 +47,8 @@ else
                     {
                         <ErrorBoundary>
                             <ChildContent>
-                                <tr @key="item" class="h-[60px] hover:bg-slate-100 @GetSelectedCss(item)" @onclick="e => ToggleRow(item)">
+                                <tr @key="item" class="h-[60px] hover:bg-slate-100 dark:hover:bg-slate-800 @GetSelectedCss(item)"
+                                    @onclick="e => ToggleRow(item)">
                                     <CascadingValue Value="item">
                                         @Columns(item)
                                     </CascadingValue>

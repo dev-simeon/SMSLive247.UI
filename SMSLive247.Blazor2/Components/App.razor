@@ -8,6 +8,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <script title="Bootstrap Script. Must be loaded before CSS files">
+            (function() {
+                const stored = localStorage.getItem('theme'); // 'light' | 'dark' | 'system'
+                const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = stored === 'dark' || (stored !== 'light' && systemDark);
+                document.documentElement.classList.toggle('dark', isDark);
+            })();
+
+            window.tawkToPropertyId = "@settings.TawkToID";
+    </script>
     <ResourcePreloader />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;600;700&display=swap" />
@@ -24,23 +34,9 @@
     <Alert />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script src="js/contentEditor.js"></script>
-    <script src="js/tawk.js"></script>
-    <script>
-            window.downloadFileFromStream = async (fileName,contentStreamReference) =>
-            {
-                const arrayBuffer = await contentStreamReference.arrayBuffer();
-                const blob = new Blob([arrayBuffer]);
-                const url = URL.createObjectURL(blob);
-                const anchorElement = document.createElement("a");
-                anchorElement.href = url;
-                anchorElement.download = fileName ?? "";
-                anchorElement.click();
-                anchorElement.remove();
-                URL.revokeObjectURL(url);
-            };
-
-            window.LoadTawk("@((MarkupString)settings.TawkToID)");
-    </script>
+    <script src="js/appHelper.js"></script>
+    <script src="js/tawkTo.js"></script>
+    <script src="js/theme.js"></script>
 </body>
 
 </html>

@@ -4,11 +4,9 @@
 
 <CascadingValue Value="@self" Name="MainAccount">
 
-    <div class="flex h-screen flex-col overflow-hidden bg-slate-50">
-
+    <div class="flex h-screen flex-col overflow-hidden bg-gray-100 dark:bg-gray-900">
         <div class="flex flex-1 overflow-hidden">
             <Sidebar @bind-IsOpen="sidebarOpen"></Sidebar>
-
             <div class="flex min-w-0 flex-1 flex-col overflow-hidden transition-all duration-300">
                 <Header OnMenuClick="() => setSidebarOpen(true)" 
                     AvailableCredits="@self?.Account?.Credits"></Header>

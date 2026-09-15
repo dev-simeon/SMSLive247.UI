@@ -17,7 +17,7 @@
         <Table Items="accounts">
             <Columns>
                 <Column Header="Account" Width="25%">
-                    <span class="font-medium text-slate-900">@context.AccountName</span>
+                    @context.AccountName
                 </Column>
                 <Column Header="Type">
                     @if (context.Phone == "main")

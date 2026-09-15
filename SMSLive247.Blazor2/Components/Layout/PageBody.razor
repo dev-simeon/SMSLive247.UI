@@ -1,87 +1,31 @@
-﻿<div class="flex w-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-    @* Table Toolbar *@
-    <div
-        class="flex flex-col justify-between gap-4 border-b border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:p-6">
+﻿<div class="flex w-full flex-col overflow-hidden rounded-xl shadow-sm
+    border border-slate-200 dark:border-slate-700 bg-white dark:bg-black">
+    <header
+        class="flex flex-col justify-between gap-4 border-b border-inherit p-4 sm:flex-row sm:items-center sm:p-6">
         <div class="flex gap-3">
             @HeaderLeft
         </div>
         <div class="flex gap-3">
             @HeaderRight
         </div>
-    </div>
+    </header>
 
     @* Table Content *@
-    <div class="">
+    <main class="">
         @ChildContent
-    </div>
+    </main>
 
     @* Footer *@
-    <div class="flex items-center justify-between border-t border-slate-200 bg-white px-6 py-4">
+    <footer class="flex items-center justify-between border-t border-inherit px-6 py-4">
         <div class="flex-1">
             @FooterLeft
         </div>
         <div class="flex-none">
             @FooterRight
         </div>
-    </div>
+    </footer>
 </div>
 
-@* <style>
-    .unified-table-wrapper table {
-        width: 100%;
-        min-width: 100%;
-        text-align: left;
-        border-collapse: collapse;
-    }
-
-    .unified-table-wrapper table thead tr {
-        background-color: var(--color-brand-50);
-        border-bottom: 1px solid red;
-        border-bottom-color: var(--color-blue-500);
-        /* border-blue-100 */
-    }
-
-    .unified-table-wrapper table thead th {
-        color: var(--color-brand-500);
-        font-weight: 400;
-        font-size: 0.80rem;
-        text-transform: uppercase;
-    }
-
-    .unified-table-wrapper table tbody {
-        background-color: #ffffff;
-        /* bg-white */
-    }
-
-    .unified-table-wrapper table tbody tr {
-        transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        transition-duration: 150ms;
-    }
-
-    .unified-table-wrapper table tbody tr:not(:first-child) {
-        border-top: 1px solid #f1f5f9;
-        /* divide-y divide-slate-100 */
-    }
-
-    .unified-table-wrapper table tbody tr:hover {
-        background-color: rgba(241, 245, 249, 0.5);
-        /* hover:bg-slate-50/50 */
-    }
-
-    .unified-table-wrapper table tbody td {
-        font-size: 0.875rem;
-        color: #334155;
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-        vertical-align: middle;
-    }
-
-    .table-select-row td {
-        background-color: #f1f5f9 !important;
-    }
-</style>
- *@
 @code {
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public RenderFragment? HeaderLeft { get; set; }
