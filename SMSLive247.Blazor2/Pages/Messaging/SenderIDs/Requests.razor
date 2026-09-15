@@ -37,7 +37,7 @@
                         <div class="max-w-md truncate text-xs text-slate-500">@context.SampleText</div>
                         @if (IsRejected(context) && !string.IsNullOrWhiteSpace(context.Remarks))
                         {
-                            <div class="leading-relaxed text-red-700" title="@context.Remarks">
+                            <div class="font-mono text-sm text-red-700" title="@context.Remarks">
                                 @GetSenderIdRejectionReason(context.Remarks)
                             </div>
                         }
