@@ -9,17 +9,17 @@
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
     <div class="space-y-6">
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full">
-            <div class="p-6 border-b border-slate-100">
-                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden h-full dark:border-slate-700 dark:bg-black">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2 dark:text-slate-200">
                     <Icon Style="Icon.IconStyle.CheckCircle" CssClass="text-brand-500 w-5 h-5" />
                     Official Communication Channels
                 </h3>
             </div>
-            <div class="divide-y divide-slate-100">
+            <div class="divide-y divide-slate-100 dark:divide-slate-700">
                 <a href="mailto:info@smslive247.com"
-                   class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left">
-                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0">
+                   class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left dark:hover:bg-slate-800">
+                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0 dark:bg-gray-900 dark:text-slate-400">
                         <Icon Style="Icon.IconStyle.Mail" CssClass="w-6 h-6" />
                     </div>
                     <div class="flex-1 min-w-0">
@@ -29,15 +29,15 @@
                         <span class="text-base font-medium text-brand-600 group-hover:underline truncate block">
                             info@smslive247.com
                         </span>
-                        <p class="text-sm text-slate-500 mt-1">
+                        <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">
                             For general inquiries and partnership proposals.
                         </p>
                     </div>
                 </a>
 
                 <a href="tel:+2348099999247"
-                   class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left">
-                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0">
+                   class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left dark:hover:bg-slate-800">
+                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0 dark:bg-gray-900 dark:text-slate-400">
                         <Icon Style="Icon.IconStyle.Phone" CssClass="w-6 h-6" />
                     </div>
                     <div class="flex-1 min-w-0">
@@ -45,14 +45,14 @@
                             Call Center
                         </p>
                         <div class="space-y-1">
-                            <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block">
+                            <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block dark:text-slate-200">
                                 +234-809-9999-247
                             </span>
-                            <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block">
+                            <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block dark:text-slate-200">
                                 +234-704-7332-240
                             </span>
                         </div>
-                        <p class="text-sm text-slate-500 mt-1">
+                        <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">
                             Mondays - Fridays : 8AM - 5PM
                         </p>
                     </div>
@@ -60,18 +60,18 @@
 
                 <button type="button"
                         @onclick="OpenChat"
-                        class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left">
-                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0">
+                        class="p-6 flex items-start gap-4 hover:bg-slate-50 transition-colors group cursor-pointer w-full text-left dark:hover:bg-slate-800">
+                    <div class="bg-slate-100 p-3 rounded-xl text-slate-500 group-hover:text-brand-600 group-hover:bg-brand-50 transition-colors shrink-0 dark:bg-gray-900 dark:text-slate-400">
                         <Icon Style="Icon.IconStyle.HelpCircle" CssClass="w-6 h-6" />
                     </div>
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">
                             Live Chat
                         </p>
-                        <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block">
+                        <span class="text-base font-medium text-slate-900 group-hover:text-brand-600 transition-colors block dark:text-slate-200">
                             Start a conversation
                         </span>
-                        <p class="text-sm text-slate-500 mt-1">
+                        <p class="text-sm text-slate-500 mt-1 dark:text-slate-400">
                             Available 24/7 for quick questions.
                         </p>
                     </div>
@@ -81,31 +81,33 @@
     </div>
 
     <div class="space-y-6">
-        <div class="bg-blue-50 rounded-xl border border-blue-100 p-6 flex items-start gap-4">
-            <div class="bg-blue-100 p-2.5 rounded-lg shrink-0 text-brand-600">
-                <Icon Style="Icon.IconStyle.Clock" CssClass="w-5 h-5" />
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 dark:border-slate-700 dark:bg-black">
+            <div class="flex items-start gap-4">
+            <div class="bg-slate-100 p-3 rounded-xl text-slate-500 dark:bg-gray-900 dark:text-slate-400">
+                <Icon Style="Icon.IconStyle.Clock" CssClass="w-6 h-6" />
             </div>
-            <div>
-                <h3 class="text-base font-semibold text-slate-900">
+            <div class="flex-1">
+                <h3 class="text-lg font-bold text-slate-900 mb-2 dark:text-slate-200">
                     Estimated Response Time
                 </h3>
-                <p class="text-sm text-slate-600 mt-1">
+                <p class="text-sm text-slate-600 leading-relaxed dark:text-slate-400">
                     We typically respond to inquiries within
                     <span class="font-bold text-brand-600">2 hours</span> during business days.
                 </p>
             </div>
+            </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 dark:border-slate-700 dark:bg-black">
             <div class="flex items-start gap-4">
-                <div class="bg-slate-100 p-3 rounded-xl text-slate-500">
+                <div class="bg-slate-100 p-3 rounded-xl text-slate-500 dark:bg-gray-900 dark:text-slate-400">
                     <Icon Style="Icon.IconStyle.Globe" CssClass="w-6 h-6" />
                 </div>
                 <div class="flex-1">
-                    <h3 class="text-lg font-bold text-slate-900 mb-2">
+                    <h3 class="text-lg font-bold text-slate-900 mb-2 dark:text-slate-200">
                         Visit Our Office
                     </h3>
-                    <p class="text-sm text-slate-600 leading-relaxed">
+                    <p class="text-sm text-slate-600 leading-relaxed dark:text-slate-400">
                         6 Oremeta Street, Oregun,<br />
                         Ikeja, Lagos State,<br />
                         Nigeria.

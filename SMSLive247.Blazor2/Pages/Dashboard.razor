@@ -12,12 +12,12 @@
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex-row lg:col-span-2">
-            <div class="flex flex-1 flex-col justify-between border-b border-slate-100 p-6 sm:border-r sm:border-b-0 sm:p-8">
+        <div class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-black sm:flex-row lg:col-span-2">
+            <div class="flex flex-1 flex-col justify-between border-b border-slate-100 p-6 dark:border-slate-700 sm:border-r sm:border-b-0 sm:p-8">
                 <div>
                     <div class="mb-4 flex items-center gap-3">
                         <div>
-                            <h3 class="text-xl leading-tight font-bold text-slate-900">
+                            <h3 class="text-xl leading-tight font-bold text-slate-900 dark:text-slate-200">
                                 @DisplayName
                             </h3>
                             <div class="mt-1 flex items-center gap-2">
@@ -32,7 +32,7 @@
                         <p class="font-bold tracking-widest text-[10px] text-slate-400 uppercase">
                             Account ID
                         </p>
-                        <p class="inline-block rounded-md bg-slate-50 px-2 py-1 font-mono text-sm text-slate-700">
+                        <p class="inline-block rounded-md bg-slate-50 px-2 py-1 font-mono text-sm text-slate-700 dark:bg-gray-900 dark:text-slate-400">
                             @CleanAccountId
                         </p>
                     </div>
@@ -41,11 +41,11 @@
 
             <button type="button"
                     @onclick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)"
-                    class="group flex w-full flex-col items-center justify-center bg-slate-50/50 p-6 text-center transition-colors hover:bg-slate-100 sm:w-64 sm:p-8">
+                    class="group flex w-full flex-col items-center justify-center bg-slate-50/50 p-6 text-center transition-colors hover:bg-slate-100 dark:bg-gray-900 dark:hover:bg-slate-800 sm:w-64 sm:p-8">
                 <p class="mb-2 text-xs font-bold tracking-widest text-slate-400 uppercase">
                     Available Credits
                 </p>
-                <span class="text-4xl font-black text-slate-900 transition-colors group-hover:text-brand-600">
+                <span class="text-4xl font-black text-slate-900 transition-colors group-hover:text-brand-600 dark:text-slate-200">
                     @FormatNumber(account?.Credits ?? 0)
                 </span>
                 <span class="mt-4 flex items-center gap-2 text-sm font-bold tracking-wide text-brand-600 uppercase transition-colors group-hover:text-brand-700">
@@ -88,7 +88,7 @@
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <Icon Style="Icon.IconStyle.Refresh" CssClass="inline-flex items-center justify-center leading-none text-brand-600 text-[20px]" />
-                    <h3 class="text-lg font-bold tracking-tight text-slate-800">Recent Messages</h3>
+                    <h3 class="text-lg font-bold tracking-tight text-slate-800 dark:text-slate-200">Recent Messages</h3>
                 </div>
                 <button type="button"
                         @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)"
@@ -97,9 +97,9 @@
                 </button>
             </div>
 
-            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-black">
                 <table class="w-full text-left text-sm">
-                    <thead class="border-b border-slate-100 bg-slate-50/80">
+                    <thead class="border-b border-slate-100 bg-slate-50/80 dark:border-slate-700 dark:bg-gray-900">
                         <tr>
                             <th class="px-6 py-4 font-bold tracking-widest text-[10px] text-slate-400 uppercase">ID</th>
                             <th class="px-6 py-4 font-bold tracking-widest text-[10px] text-slate-400 uppercase">Sender ID</th>
@@ -107,7 +107,7 @@
                             <th class="px-6 py-4 text-right font-bold tracking-widest text-[10px] text-slate-400 uppercase">Date</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                         @if (isLoading)
                         {
                             <tr>
@@ -128,7 +128,7 @@
                         {
                             @foreach (var batch in batches.Take(5))
                             {
-                                <tr class="group cursor-pointer transition-colors hover:bg-brand-50/40"
+                                <tr class="group cursor-pointer transition-colors hover:bg-brand-50/40 dark:hover:bg-slate-800"
                                     @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)">
                                     <td class="px-6 py-4">
                                         <span class="inline-flex items-center gap-1.5 rounded-md bg-brand-50 px-2 py-1 font-mono text-xs font-bold text-brand-600 transition-colors group-hover:bg-brand-100">
@@ -136,13 +136,13 @@
                                             #@batch.BatchID
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 font-bold text-slate-700">
+                                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">
                                         @(string.IsNullOrWhiteSpace(batch.SenderID) ? "-" : batch.SenderID)
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@batch.Status" ShowDot="true" />
                                     </td>
-                                    <td class="px-6 py-4 text-right text-xs font-medium whitespace-nowrap text-slate-500">
+                                    <td class="px-6 py-4 text-right text-xs font-medium whitespace-nowrap text-slate-500 dark:text-slate-400">
                                         @FormatDate(batch.DateSubmitted)
                                     </td>
                                 </tr>
@@ -154,8 +154,8 @@
         </div>
 
         <div class="h-full">
-            <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div class="mb-6 flex items-center justify-between text-slate-800">
+            <div class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-black">
+                <div class="mb-6 flex items-center justify-between text-slate-800 dark:text-slate-200">
                     <h3 class="text-sm font-bold tracking-wide uppercase">Recent Transactions</h3>
                 </div>
 
@@ -181,7 +181,7 @@
                                     <Icon Style="@GetPurchaseIcon(purchase)" CssClass="inline-flex items-center justify-center leading-none text-[16px]" />
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <p class="truncate text-xs leading-tight font-bold text-slate-800">Credits Purchase</p>
+                                    <p class="truncate text-xs leading-tight font-bold text-slate-800 dark:text-slate-200">Credits Purchase</p>
                                     <p class="font-medium text-[10px] text-slate-400">
                                         @FormatDate(purchase.DateCreated)
                                     </p>
