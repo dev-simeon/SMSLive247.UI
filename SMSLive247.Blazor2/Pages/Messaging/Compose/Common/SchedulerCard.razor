@@ -3,7 +3,7 @@
 <Card HeaderText="When to send">
     <div class="flex flex-col gap-3">
         <label class="group flex cursor-pointer items-center gap-3">
-            <input type="radio" name="scheduleOption"
+            <input type="radio" name="@scheduleRadioGroup"
                    class="h-4 w-4 border-slate-300 text-brand-600 focus:ring-brand-500"
                    checked="@(!deliveryTime.HasValue)" @onchange="() => { deliveryTime = null; }" />
             <span class="text-slate-700 group-hover:text-brand-600">
@@ -11,7 +11,7 @@
             </span>
         </label>
         <label class="group flex cursor-pointer items-center gap-3">
-            <input type="radio" name="scheduleOption"
+            <input type="radio" name="@scheduleRadioGroup"
                    class="h-4 w-4 border-slate-300 text-brand-600 focus:ring-brand-500"
                    checked="@deliveryTime.HasValue" @onchange="() => deliveryTime = DateTime.Now" />
             <span class="text-slate-700 group-hover:text-brand-600">
@@ -45,17 +45,9 @@
 <Card>
     <div class="flex flex-col gap-3">
         <div class="mt-2 text-left text-sm text-red-500">
-            @if (totalRecipients == 0)
+            @foreach (var message in validationMessages)
             {
-                <p>Please select at least one recipient</p>
-            }
-            @if (string.IsNullOrWhiteSpace(Model?.SenderID))
-            {
-                <p>Please select a sender ID</p>
-            }
-            @if (string.IsNullOrWhiteSpace(Model?.MessageText))
-            {
-                <p>Please enter a message</p>
+                <p>@message</p>
             }
         </div>
 
@@ -89,13 +81,27 @@
 @code {
     [Parameter] public bool IsSending { get; set; }
     [Parameter] public BaseComposeModel? Model { get; set; }
+    [Parameter] public long? TotalRecipients { get; set; }
+    [Parameter] public IReadOnlyList<string>? ValidationMessages { get; set; }
     [Parameter] public EventCallback<DateTimeOffset?> OnSubmit { get; set; }
 
     private DateTime? deliveryTime;
-    private long totalRecipients => Model?.CountRecipients() ?? 0;
-    private bool allowSend => totalRecipients > 0   && 
-        !string.IsNullOrWhiteSpace(Model?.SenderID) && 
-        !string.IsNullOrWhiteSpace(Model?.MessageText);
+    private readonly string scheduleRadioGroup = $"scheduleOption-{Guid.NewGuid():N}";
+    private long totalRecipients => TotalRecipients ?? Model?.CountRecipients() ?? 0;
+    private IReadOnlyList<string> validationMessages => ValidationMessages ?? GetModelValidationMessages();
+    private bool allowSend => totalRecipients > 0 && validationMessages.Count == 0;
+
+    private IReadOnlyList<string> GetModelValidationMessages()
+    {
+        var messages = new List<string>();
+        if (totalRecipients == 0)
+            messages.Add("Please select at least one recipient");
+        if (string.IsNullOrWhiteSpace(Model?.SenderID))
+            messages.Add("Please select a sender ID");
+        if (string.IsNullOrWhiteSpace(Model?.MessageText))
+            messages.Add("Please enter a message");
+        return messages;
+    }
 
     private Task ImmediateSubmit(MouseEventArgs e)
     {

@@ -278,7 +278,10 @@
                 <SenderIdCard Model="@model" @ref="senderIdCard"></SenderIdCard>
                 
                 <!-- Schedule Card -->
-                <SchedulerCard Model="@model" IsSending="isSending" OnSubmit="SendMessageCore"></SchedulerCard>
+                <SchedulerCard TotalRecipients="@SchedulerRecipientCount"
+                               ValidationMessages="@SchedulerValidationMessages"
+                               IsSending="isSending"
+                               OnSubmit="SendMessageCore" />
             </div>
         </div>
     </div>
@@ -311,6 +314,27 @@
 
     private string CurrentFileName => selectedExistingFile?.Description ?? "Selected Sheet";
     private long CurrentFileRowCount => selectedExistingFile?.TotalNumbers ?? (long)previewRows.Count;
+    private long SchedulerRecipientCount => hasDataSource && phoneColumn.HasValue
+        ? (CurrentFileRowCount > 0 ? CurrentFileRowCount : previewRows.Count)
+        : 0;
+    private IReadOnlyList<string> SchedulerValidationMessages
+    {
+        get
+        {
+            var messages = new List<string>();
+            if (!hasDataSource)
+                messages.Add("Please select a data source");
+            if (!phoneColumn.HasValue)
+                messages.Add("Please select a recipient phone column");
+            if (SchedulerRecipientCount == 0)
+                messages.Add("Please select at least one recipient");
+            if (string.IsNullOrWhiteSpace(model?.SenderID))
+                messages.Add("Please select a sender ID");
+            if (string.IsNullOrWhiteSpace(message))
+                messages.Add("Please enter a message");
+            return messages;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

@@ -90,7 +90,10 @@
                 <!-- Sender ID Card -->
                 <SenderIdCard Model="@model" SenderIDChanged="SenderIdChanged"></SenderIdCard>
                 <!-- Schedule Card -->
-                <SchedulerCard Model="@model" OnSubmit="SendMessageCore"></SchedulerCard>
+                <SchedulerCard TotalRecipients="@(model?.CountRecipients() ?? 0)"
+                               ValidationMessages="@SchedulerValidationMessages"
+                               IsSending="@(model?.IsBusy ?? false)"
+                               OnSubmit="SendMessageCore" />
             </div>                
         </div>
     </div>
@@ -131,6 +134,21 @@
     private async Task SenderIdChanged(string senderId)
     {
         StateHasChanged();
+    }
+
+    private IReadOnlyList<string> SchedulerValidationMessages
+    {
+        get
+        {
+            var messages = new List<string>();
+            if (model?.CountRecipients() is not > 0)
+                messages.Add("Please select at least one recipient");
+            if (string.IsNullOrWhiteSpace(model?.SenderID))
+                messages.Add("Please select a sender ID");
+            if (string.IsNullOrWhiteSpace(model?.MessageText))
+                messages.Add("Please enter a message");
+            return messages;
+        }
     }
 
     private async Task SendMessageCore(DateTimeOffset? deliveryTime)

@@ -7,8 +7,8 @@
 }
 else
 {
-    <div>
-        <table class="w-full min-w-full border-collapse text-left text-slate-600 dark:text-slate-400">
+    <div class="w-full overflow-x-auto">
+        <table class="w-full min-w-190 border-collapse text-left text-slate-600 dark:text-slate-400">
             <thead>
                 <tr class="border-b-2 border-brand-300 bg-brand-100 dark:border-brand-100 dark:bg-brand-800">
                     <CascadingValue Name="IsHeaderRow" Value="true" IsFixed="true">
@@ -55,7 +55,9 @@ else
                                 </tr>
                             </ChildContent>
                             <ErrorContent>
-                                <tr><td colspan="20">Couldn't render this row.</td></tr>
+                                <tr>
+                                    <td colspan="20">Couldn't render this row.</td>
+                                </tr>
                             </ErrorContent>
                         </ErrorBoundary>
                     }
@@ -80,7 +82,7 @@ else
     protected override void OnParametersSet()
     {
         // if (DataSource == null && Items == null)
-        //     throw new InvalidOperationException("Please set either DataSource or Items properties");
+        // throw new InvalidOperationException("Please set either DataSource or Items properties");
 
         if (DataSource != null && Items != null)
             throw new InvalidOperationException("You should set only one of DataSource and Items properties");
