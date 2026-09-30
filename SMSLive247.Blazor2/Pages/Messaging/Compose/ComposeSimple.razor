@@ -173,6 +173,7 @@
                 throw new Exception("Add recipients");
 
             var request = model.CreateRequest();
+            request.DeliveryTime = deliveryTime;
             var result = await apiClient.SmsBatchCreateAsync(request);
             var res = result.Result;
 
