@@ -4,7 +4,8 @@
         <Backdrop IsVisible="IsVisible" IsVisibleChanged="OnClose" />
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative w-full @maxWidthCss transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8">
+                <div class="relative w-full @maxWidthCss transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8"
+                     style="@panelStyle">
 
                     <header class="flex items-center justify-between px-4 @colorCss py-3">
                         <h3 class="text-lg leading-6 font-normal">
@@ -17,7 +18,7 @@
                         </button>
                     </header>
 
-                    <main class="@bodyHeightCss overflow-y-auto px-4 py-4">
+                    <main class="@bodyHeightCss overflow-y-auto px-4 py-4" style="@bodyStyle">
                         @Body
                     </main>
 
@@ -51,10 +52,14 @@
         ModalSize.Medium    => "max-w-lg",
         ModalSize.Large     => "max-w-2xl",
         ModalSize.XLarge    => "max-w-4xl",
-        ModalSize.Full      => "max-w-[96vw]",
+        ModalSize.Full      => "",
         _                   => "max-w-lg"
     };
-    private string bodyHeightCss => Size == ModalSize.Full ? "max-h-[85vh]" : "max-h-[70vh]";
+    private string panelStyle => Size == ModalSize.Full
+        ? "width:70vw;max-width:calc(100vw - 2rem);height:70vh;display:flex;flex-direction:column;"
+        : "";
+    private string bodyStyle => Size == ModalSize.Full ? "min-height:0;flex:1;" : "";
+    private string bodyHeightCss => Size == ModalSize.Full ? "" : "max-h-[70vh]";
 
     private async Task OnClose()
     {
