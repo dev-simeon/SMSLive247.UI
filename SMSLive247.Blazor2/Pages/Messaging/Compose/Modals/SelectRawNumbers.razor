@@ -45,14 +45,22 @@
 
     public async Task Confirm()
     {
-        var items = manualNumbers
+        try
+        {
+            var items = manualNumbers
             .ConvertRawUploadToList(CountryCode)
             .Select(number => new ContactModel(number))
             .ToList();
 
-        await OnSelected.InvokeAsync(items);
-        isVisible = false;
-        StateHasChanged();
+            await OnSelected.InvokeAsync(items);
+            isVisible = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in Confirm: {ex.Message}");
+        }
+        
     }
 
 }

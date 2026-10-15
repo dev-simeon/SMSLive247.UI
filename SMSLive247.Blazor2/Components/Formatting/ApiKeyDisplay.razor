@@ -105,8 +105,9 @@
             isBusy = true;
             StateHasChanged();
 
-            await apiClient.AccountUpdateProviderKeyAsync(accountId, new AccountProviderKeyRequest());
-            await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
+           await alert.Info("Resetting API key coming soon...");
+            // await apiClient.AccountUpdateProviderKeyAsync(accountId, new AccountProviderKeyRequest());
+            // await alert.Success("API key reset successfully. Please update your integrations.", "Key Regenerated");
 
             if (OnReset.HasDelegate)
             {

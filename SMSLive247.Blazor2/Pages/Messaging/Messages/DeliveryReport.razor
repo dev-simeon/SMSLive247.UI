@@ -1,16 +1,9 @@
-@attribute [Route(Const.Routes.Messaging.MessageDetails)]
-@layout MainLayout
-@inject NavigationManager nav
-
-<PageTitle>Delivery Report - SMSLive247</PageTitle>
-
-<div class="mx-auto flex max-w-7xl flex-col gap-6 pb-10">
-    <!-- ── BACK NAV ──────────────────────────────────────────────────── -->
-    <button @onclick="() => nav.NavigateTo(Const.Routes.Messaging.Messages)"
-            class="self-start inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-brand-600 transition-colors">
-        <Icon Style="Icon.IconStyle.ChevronLeft" CssClass="text-base" />
-        <span>Back to Messages</span>
-    </button>
+<Modal Title="@ModalTitle"
+       Size="Modal.ModalSize.Full"
+       IsVisible="isVisible"
+       IsVisibleChanged="OnVisibilityChanged">
+    <Body>
+<div class="flex min-w-0 flex-col gap-6 pb-2">
 
     <!-- ── UNIFIED HEADER CARD ────────────────────────────────────────── -->
     <Card>
@@ -263,10 +256,14 @@
         </div>
     </div>
 </div>
+    </Body>
+</Modal>
 
 @code {
     [Parameter] public string? Id { get; set; }
 
+    private bool isVisible;
+    private string ModalTitle => $"Delivery Report - Batch {batch?.BatchID.ToString() ?? Id ?? "—"}";
     private SmsBatchResponse? batch;
     private List<RecipientRow> allReports = [];
     private bool isLoading = true;
@@ -300,9 +297,22 @@
 
     private string successRate => total > 0 ? $"{(double)delivered / total * 100:F1}" : "0.0";
 
-    protected override async Task OnInitializedAsync()
+    public async Task Show(long batchId)
     {
+        Id = batchId.ToString();
+        batch = null;
+        allReports = [];
+        searchQuery = "";
+        errorMessage = null;
+        isVisible = true;
+        await InvokeAsync(StateHasChanged);
         await FetchData();
+    }
+
+    private Task OnVisibilityChanged(bool visible)
+    {
+        isVisible = visible;
+        return Task.CompletedTask;
     }
 
     private async Task FetchData()

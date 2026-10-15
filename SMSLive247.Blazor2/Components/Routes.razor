@@ -1,6 +1,30 @@
-<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.Public.NotFound)">
-    <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="routeData" Selector="h1" />
-    </Found>
-</Router>
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.Public.NotFound)">
+        <Found Context="routeData">
+            @if (IsAnonymousPage(routeData.PageType))
+            {
+                <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+            }
+            else
+            {
+                <AuthorizeView>
+                    <Authorizing>
+                        <Loading CssClass="min-h-screen" Size="lg" />
+                    </Authorizing>
+                    <Authorized>
+                        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+                        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+                    </Authorized>
+                    <NotAuthorized>
+                        <RedirectToLogin />
+                    </NotAuthorized>
+                </AuthorizeView>
+            }
+        </Found>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    private static bool IsAnonymousPage(Type pageType) =>
+        Attribute.IsDefined(pageType, typeof(AllowAnonymousAttribute), inherit: true);
+}

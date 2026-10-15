@@ -275,7 +275,7 @@
         <div class="lg:col-span-1">
             <div class="sticky top-6 flex flex-col gap-6">
                 <!-- Sender ID Card -->
-                <SenderIdCard Model="@model" @ref="senderIdCard"></SenderIdCard>
+                <SenderIdCard Model="@model" SenderIDChanged="SenderIdChanged"></SenderIdCard>
                 
                 <!-- Schedule Card -->
                 <SchedulerCard TotalRecipients="@SchedulerRecipientCount"
@@ -299,15 +299,14 @@
     private bool isLoading = true;
     private bool isSending;
     private int currentStep = 1;
-    
+
     private ComposeTemplateModel? model;
-    
+
     private string message = "";
     private int? phoneColumn;
     private BatchFileResponse? selectedExistingFile;
     private SelectTemplateFileModal templateFilesModal = new();
     private MessageTemplateEditor templateEditor;
-    private SenderIdCard? senderIdCard;
 
     private bool hasDataSource => selectedExistingFile is not null;
     private int messageParts => string.IsNullOrEmpty(message) ? 0 : message.Length <= 160 ? 1 : (int)Math.Ceiling(message.Length / 153d);
@@ -336,6 +335,11 @@
         }
     }
 
+    private Task SenderIdChanged(string _)
+    {
+        return InvokeAsync(StateHasChanged);
+    }
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -343,13 +347,17 @@
             var senderTask = apiClient.SenderIdListAsync(1, 500);
             var batchTask = apiClient.BatchFileListAsync();
             await Task.WhenAll(senderTask, batchTask);
-            
+
             var senders = senderTask.Result.Result.Where(x => string.Equals(x.Status, "Approved", StringComparison.OrdinalIgnoreCase)).ToList();
             model = new ComposeTemplateModel(senders, batchTask.Result.Result);
         }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
-            await alert.Error(ex.Message, "Compose Message");
+            await alert.Error($"An error occurred while initializing the compose page. {ex.Message}");
         }
         finally
         {
@@ -441,9 +449,9 @@
             await templateEditor.InsertPlaceholderAsync(header.Replace(" ", ""));
         }
     }
-    
+
     private string Placeholder(string header) => $"{{{Regex.Replace(header, @"\s+", "")}}}";
-    
+
     private string PhoneFor(Dictionary<string, string> row) => phoneColumn is int index && index >= 0 && index < headers.Count && row.TryGetValue(headers[index], out var number) ? number : "No phone number";
 
     private string ResolvePlaceholders(string value, Dictionary<string, string> row)
@@ -462,20 +470,29 @@
             return;
         }
 
+        var phoneNumberColumnIndex = phoneColumn.Value;
+        if (phoneNumberColumnIndex < 0 || phoneNumberColumnIndex >= headers.Count)
+        {
+            await alert.Error("The selected phone number column is no longer available in this file. Select the column again.", "Invalid Phone Column");
+            return;
+        }
+
         isSending = true;
         try
         {
             var fileId = selectedExistingFile?.BatchFileID;
             if (string.IsNullOrWhiteSpace(fileId)) throw new InvalidOperationException("The selected file could not be prepared.");
 
-            await apiClient.SmsBatchCsvCreateAsync(new SmsBatchCsvRequest
-            {
-                SenderID = senderId,
-                MessageText = message.Trim(),
-                BatchFileID = fileId,
-                PhoneNumberColumn = phoneColumn.Value,
-                DeliveryTime = scheduledDeliveryTime
-            });
+            var request = new SmsBatchCsvRequest
+                {
+                    SenderID = senderId,
+                    MessageText = message.Trim(),
+                    BatchFileID = fileId,
+                    PhoneNumberColumn = phoneNumberColumnIndex,
+                    DeliveryTime = scheduledDeliveryTime
+                };
+
+            await apiClient.SmsBatchCsvCreateAsync(request);
             await alert.Success(scheduledDeliveryTime.HasValue ? "Your personalized messages have been scheduled." : "Your personalized messages are being processed.", "Message Created");
             
             // Reset

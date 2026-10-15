@@ -1,5 +1,11 @@
 ﻿@attribute [Route(Const.Routes.Login)]
 
+@if (isCheckingSession)
+{
+    <Loading CssClass="min-h-[60vh]" Size="lg" Message="Checking your session..." />
+}
+else
+{
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
         <h1 class="mb-6 text-4xl leading-tight font-bold">
@@ -101,11 +107,13 @@
         Sign up now
     </a>
 </p>
+}
 
 @code {
     [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
 
     private bool isBusy = false;
+    private bool isCheckingSession = true;
     private LoginRequest model = new();
 
     protected override async Task OnParametersSetAsync()
@@ -117,7 +125,10 @@
                 ? ReturnUrl : Const.Routes.Dashboard;
 
             nav.NavigateTo(destination);
+            return;
         }
+
+        isCheckingSession = false;
     }
     // protected override async Task OnInitializedAsync()
     // {

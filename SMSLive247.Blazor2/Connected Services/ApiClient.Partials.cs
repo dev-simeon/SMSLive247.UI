@@ -38,6 +38,11 @@ namespace SMSLive247.OpenApi
         public string FullName => $"{FirstName} {LastName}";
     }
 
+    //public partial class SmsBatchCsvRequest
+    //{
+    //    //public int PhoneNumberColumn { get; set; }
+    //}
+
     public partial class FileParameter
     {
         public FileParameter(IBrowserFile file)

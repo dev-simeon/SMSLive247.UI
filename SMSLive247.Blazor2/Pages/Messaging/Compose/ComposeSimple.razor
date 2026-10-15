@@ -198,14 +198,14 @@
         var message = "";
 
         if (res.TotalProcessed > 0)
-            message += $"{res.TotalProcessed:0,00#} message/s was submitted for immediate delivery.";
+            message += $"{res.TotalProcessed:#,##0} message/s was submitted for immediate delivery. <br>";
 
         if (res.TotalFailed > 0)
-            message += $"{res.TotalFailed:0,00#} message/s failed.";
+            message += $"{res.TotalFailed:#,##0} message/s failed. <br>";
 
-        message += "~";
+        message += "<br>";
 
-        message += $"Total SMS units charged: {res.CreditsCharged}";
+        message += $"Total SMS units charged: {res.CreditsCharged:#,##0} <br>";
         //message += $"Current SMS balance: {res.CreditBalance}";
      
         return message;

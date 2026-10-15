@@ -1,6 +1,6 @@
 ﻿@if (IsVisible)
 {
-    <div class="relative z-20">
+    <div class="fixed inset-0 z-50">
         <Backdrop IsVisible="IsVisible" IsVisibleChanged="OnClose" />
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
@@ -17,7 +17,7 @@
                         </button>
                     </header>
 
-                    <main class="max-h-[70vh] overflow-y-auto px-4 py-4">
+                    <main class="@bodyHeightCss overflow-y-auto px-4 py-4">
                         @Body
                     </main>
 
@@ -34,7 +34,7 @@
 }
 
 @code {
-    public enum ModalSize { Small, Medium, Large, XLarge }
+    public enum ModalSize { Small, Medium, Large, XLarge, Full }
 
     [Parameter] public ColorStyle Style { get; set; } = ColorStyle.Primary;
     [Parameter] public string? Title { get; set; }
@@ -51,8 +51,10 @@
         ModalSize.Medium    => "max-w-lg",
         ModalSize.Large     => "max-w-2xl",
         ModalSize.XLarge    => "max-w-4xl",
+        ModalSize.Full      => "max-w-[96vw]",
         _                   => "max-w-lg"
     };
+    private string bodyHeightCss => Size == ModalSize.Full ? "max-h-[85vh]" : "max-h-[70vh]";
 
     private async Task OnClose()
     {

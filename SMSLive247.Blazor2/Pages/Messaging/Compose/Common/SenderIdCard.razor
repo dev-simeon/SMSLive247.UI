@@ -8,7 +8,7 @@
             @{
                 var senderIds = Model?.SenderIds ?? [];
                 var approved = senderIds.Where(x => x.Status == "APPROVED").ToList();
-                var others = senderIds.Where(x => x.Status != "APPROVED").ToList();
+                var others = senderIds.Where(x => x.Status != "APPROVED").ToList() ?? [];
             }
             <FormSelect TValue="string" 
                         Required="true" 

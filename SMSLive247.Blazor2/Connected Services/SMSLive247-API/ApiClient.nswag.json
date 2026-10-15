@@ -256,56 +256,6 @@
         }
       }
     },
-    "/api/v5/accounts/{accountId}/provider-key": {
-      "post": {
-        "tags": [
-          "Account"
-        ],
-        "operationId": "AccountUpdateProviderKey",
-        "parameters": [
-          {
-            "name": "accountId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "default": "self"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AccountProviderKeyRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AccountProviderKeyRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/AccountProviderKeyRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AccountResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v5/auth": {
       "post": {
         "tags": [
@@ -1278,7 +1228,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -2542,22 +2493,6 @@
           }
         }
       },
-      "AccountProviderKeyRequest": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "providerID",
-          "providerKey"
-        ],
-        "properties": {
-          "providerID": {
-            "type": "string"
-          },
-          "providerKey": {
-            "type": "string"
-          }
-        }
-      },
       "AccountResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -3386,6 +3321,7 @@
         "required": [
           "batchFileID",
           "messageText",
+          "phoneNumberColumn",
           "senderID"
         ],
         "properties": {
