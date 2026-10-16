@@ -12,7 +12,11 @@ public partial class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
+            .AddInteractiveServerComponents()
+            .AddHubOptions(options =>
+            {
+                options.MaximumReceiveMessageSize = 1024 * 1024; // 1 MiB
+            });
 
         var settings = new Settings();
         builder.Configuration.Bind(settings);

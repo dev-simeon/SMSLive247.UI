@@ -97,14 +97,20 @@
     private void Cancel()
     {
         isVisible = false;
-        taskSource?.SetResult(false);
+        if (taskSource is not null && !taskSource.Task.IsCompleted)
+        {
+            taskSource.SetResult(false);
+        }
         StateHasChanged();
     }
 
     private void Okay()
     {
         isVisible = false;
-        taskSource?.SetResult(true);
+        if (taskSource is not null && !taskSource.Task.IsCompleted)
+        {
+            taskSource.SetResult(true);
+        }
         StateHasChanged();
     }
 
