@@ -16,22 +16,22 @@
                         @bind-Value="Model.SenderID" 
                         @bind-Value:after="HandleChange"
                         IconStyle="Icon.IconStyle.ChevronDown" >
-                <option value="">-Select Sender ID-</option>
+                <option value="" class="bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100">-Select Sender ID-</option>
                 @if (approved.Count > 0)
                 {
-                    <optgroup label="Approved">
+                    <optgroup label="Approved" class="bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100">
                         @foreach (var item in approved)
                         {
-                            <option value="@item.SenderID">@item.SenderID</option>
+                            <option value="@item.SenderID" class="bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100">@item.SenderID</option>
                         }
                     </optgroup>
                 }
                 @if (others.Count > 0)
                 {
-                    <optgroup label="Pending/Rejected">
+                    <optgroup label="Pending/Rejected" class="bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100">
                         @foreach (var item in others)
                         {
-                            <option value="@item.SenderID" disabled>@item.SenderID</option>
+                            <option value="@item.SenderID" disabled class="bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100">@item.SenderID</option>
                         }
                     </optgroup>
                 }
