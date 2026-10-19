@@ -1,76 +1,171 @@
-﻿@inject NavigationManager nav
+@inject NavigationManager nav
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 
-<Modal Title="Confirm Purchase" @bind-IsVisible="isVisible" Size="Modal.ModalSize.Medium">
+<Modal Title="@(showBankAccount ? "Bank transfer details" : "Review your purchase")"
+       @bind-IsVisible="isVisible" Size="Modal.ModalSize.Medium"
+       CssClass="dark:border dark:border-slate-700 dark:bg-gray-900"
+       BodyCssClass="dark:bg-gray-900"
+       FooterCssClass="dark:border-slate-700 dark:bg-gray-900">
     <Body>
-        <div class="space-y-6">
-            @if (price != null)
-            {
-                <div class="rounded-xl border border-slate-100 bg-slate-50 p-5">
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between border-b border-slate-200/60 pb-3">
-                            <span class="text-sm font-medium text-slate-500">
-                                SMS Quantity
-                            </span>
-                            <span class="text-base font-bold text-slate-900">
-                                @price.Quantity.ToString("#,##0") Credits
+        @if (price != null && !showBankAccount)
+        {
+            <div class="space-y-6">
+                <section class="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-gray-900">
+                    <div class="mb-4 flex items-center justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
+                        <div>
+                            <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">SMS credits</p>
+                            <p class="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100">@price.Quantity.ToString("#,##0")</p>
+                        </div>
+                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">Purchase summary</span>
+                    </div>
+                    <dl class="space-y-3 text-sm">
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Credit price</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Price)</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Purchase amount</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Amount)</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Transaction fee</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Fee)</dd></div>
+                    </dl>
+                    <div class="mt-4 flex items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
+                        <span class="font-bold text-slate-900 dark:text-slate-100">Total amount</span>
+                        <span class="text-xl font-bold text-brand-600">@formatCurrency(price.Amount + price.Fee)</span>
+                    </div>
+                </section>
+
+                <section>
+                    <div class="mb-3">
+                        <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Choose a payment method</h4>
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Select how you want to fund this purchase.</p>
+                    </div>
+                    <div class="space-y-3" role="radiogroup" aria-label="Payment method">
+                        @foreach (var method in paymentMethods)
+                        {
+                            var selected = selectedMethod == method.Id;
+                            <button type="button" role="radio" aria-checked="@selected"
+                                    disabled="@(isProcessingPayment || isLoadingBankAccount)"
+                                    @onclick="() => SelectMethod(method.Id)"
+                                    class="flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60 @(selected ? "border-brand-500 bg-blue-50 ring-2 ring-brand-500/20 dark:bg-gray-900" : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-black dark:hover:border-slate-500")">
+                                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg @(selected ? "bg-blue-100 text-brand-600 dark:bg-blue-900" : "bg-slate-100 text-slate-500 dark:bg-gray-800 dark:text-slate-300")">
+                                    <Icon Style="@method.Icon" CssClass="text-xl" />
+                                </span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">@method.Title</span>
+                                    <span class="mt-0.5 block text-xs leading-5 text-slate-500 dark:text-slate-400">@method.Description</span>
+                                </span>
+                                <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border @(selected ? "border-brand-600" : "border-slate-300 dark:border-slate-600")">
+                                    @if (selected) { <span class="h-2.5 w-2.5 rounded-full bg-brand-600"></span> }
+                                </span>
+                            </button>
+                        }
+                    </div>
+                </section>
+
+                <div class="flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/50">
+                    <Icon Style="Icon.IconStyle.Info" CssClass="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
+                    <p class="text-xs leading-relaxed text-blue-800 dark:text-blue-200">SMS credits are added after the payment is confirmed by the payment provider.</p>
+                </div>
+            </div>
+        }
+        else if (showBankAccount && bankAccount != null)
+        {
+            <div class="space-y-5">
+                @if (!string.IsNullOrWhiteSpace(bankAccount.AccountNumber))
+                {
+                    <div class="flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-slate-700 dark:bg-gray-900">
+                        <Icon Style="Icon.IconStyle.Info" CssClass="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
+                        <div>
+                            <p class="text-sm font-semibold text-blue-900 dark:text-slate-100">Fund your SMSLive247 wallet by bank transfer</p>
+                            <p class="mt-1 text-sm leading-6 text-blue-800 dark:text-slate-300">This dedicated account is assigned to your customer profile. Once a transfer is confirmed, the received amount is credited to your SMS wallet automatically.</p>
+                        </div>
+                    </div>
+
+                    <section class="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-black">
+                        <div class="grid gap-5 sm:grid-cols-2">
+                            <div>
+                                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Bank</p>
+                                <p class="mt-1 font-semibold text-slate-900 dark:text-slate-100">@bankAccount.BankName</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Account name</p>
+                                <p class="mt-1 font-semibold text-slate-900 dark:text-slate-100">@bankAccount.AccountName</p>
+                            </div>
+                        </div>
+                        <div class="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-gray-900">
+                            <div class="flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Account number</p>
+                                    <p class="mt-1 whitespace-nowrap font-mono text-2xl font-bold tracking-wider text-slate-900 dark:text-slate-100">@bankAccount.AccountNumber</p>
+                                </div>
+                                <Button Text="@(accountCopied ? "Copied" : "Copy account number")"
+                                        Icon="@(accountCopied ? Icon.IconStyle.CheckCircle : Icon.IconStyle.Copy)"
+                                        Style="ColorStyle.Secondary" OnClick="CopyAccountNumber"
+                                        CssClass="dark:border-slate-700 dark:bg-gray-900 dark:text-slate-100" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="rounded-lg border border-slate-200 p-5 dark:border-slate-700">
+                        <div class="flex items-center justify-between gap-3">
+                            <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Transfer instructions</h4>
+                            <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                                <span class="h-2 w-2 rounded-full bg-amber-500"></span> Ready for transfer
                             </span>
                         </div>
-
-                        <div class="space-y-3 pt-1">
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-slate-500">Credit Price</span>
-                                <span class="font-medium whitespace-nowrap text-slate-700">
-                                    @formatCurrency(price.Price)
-                                </span>
-                            </div>
-
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-slate-500">Purchase Amount</span>
-                                <span class="font-medium text-slate-700">
-                                    @formatCurrency(price.Amount)
-                                </span>
-                            </div>
-
-                            <div class="flex items-center justify-between text-sm">
-                                <span class="text-slate-500">Transaction Fee</span>
-                                <span class="font-medium text-slate-700">
-                                    @formatCurrency(price.Fee)
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="border-t border-slate-200 pt-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-base font-bold text-slate-900">
-                                    Total Amount
-                                </span>
-                                <span class="text-xl font-black text-brand-600">
-                                    @formatCurrency(price.Amount + price.Fee)
-                                </span>
+                        <ol class="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                            <li class="flex items-start gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-gray-900 dark:text-slate-100">1</span><span>Open your banking app and choose the bank shown above as the destination.</span></li>
+                            <li class="flex items-start gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-gray-900 dark:text-slate-100">2</span><span>Enter the 10-digit account number and confirm the displayed account name before proceeding.</span></li>
+                            <li class="flex items-start gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-gray-900 dark:text-slate-100">3</span><span>Enter the amount you want to add to your SMS wallet and complete the transfer.</span></li>
+                            <li class="flex items-start gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-gray-900 dark:text-slate-100">4</span><span>Your wallet will be credited automatically after the transfer is confirmed.</span></li>
+                        </ol>
+                        <p class="mt-4 text-xs leading-5 text-slate-500 dark:text-slate-400">Save this dedicated account for future wallet top-ups. No new purchase needs to be initiated for each transfer.</p>
+                    </section>
+                }
+                else
+                {
+                    <div class="rounded-lg border border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-950/40">
+                        <div class="flex items-start gap-3">
+                            <Icon Style="Icon.IconStyle.Clock" CssClass="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />
+                            <div>
+                                <h4 class="font-semibold text-slate-900 dark:text-slate-100">Your account is being prepared</h4>
+                                <p class="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">We’ll show the bank details here as soon as the account is ready. You can check again shortly.</p>
                             </div>
                         </div>
                     </div>
+                }
+            </div>
+        }
+        else if (isLoadingBankAccount)
+        {
+            <div class="flex min-h-64 flex-col items-center justify-center gap-4 text-center">
+                <div class="h-9 w-9 animate-spin rounded-full border-4 border-brand-500 border-t-transparent"></div>
+                <div>
+                    <p class="font-semibold text-slate-900 dark:text-slate-100">Preparing your bank account</p>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Checking for your dedicated account, then creating one if needed.</p>
                 </div>
-
-                <div class="flex items-start gap-3 rounded-lg border border-blue-100/50 bg-blue-50/50 p-4">
-                    <div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100">
-                        <span class="font-mono text-xs font-bold text-blue-600">i</span>
-                    </div>
-                    <p class="text-xs leading-relaxed text-blue-700">
-                        You will be redirected to Paystack to complete your payment
-                        securely. Once successful, your credits will be added to your
-                        account instantly.
-                    </p>
-                </div>
-            }
-        </div>
+            </div>
+        }
     </Body>
     <Footer>
-        <div class="flex w-full justify-end gap-3">
-            <Button Text="Cancel" Style="ColorStyle.Secondary" IsDisabled="@isProcessingPayment"
-                    OnClick="Close" CssClass="border border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50" />
-            <Button Text="Pay with Paystack" Icon="Icon.IconStyle.CreditCard" IsBusy="@isProcessingPayment"
-                    OnClick="BeginPayment" CssClass="px-6" />
+        <div class="flex w-full flex-wrap justify-between gap-3">
+            @if (showBankAccount)
+            {
+                <Button Text="Back to payment methods" Icon="Icon.IconStyle.ArrowLeft" Style="ColorStyle.Secondary"
+                        IsDisabled="@isProcessingPayment" OnClick="BackToPaymentMethods"
+                        CssClass="dark:border-slate-700 dark:bg-gray-900 dark:text-slate-100" />
+                @if (string.IsNullOrWhiteSpace(bankAccount?.AccountNumber))
+                {
+                    <Button Text="Check account status" Icon="Icon.IconStyle.Refresh" IsBusy="@isLoadingBankAccount"
+                            OnClick="LoadDedicatedAccount" />
+                }
+                else
+                {
+                    <Button Text="Done" OnClick="Close" />
+                }
+            }
+            else
+            {
+                <Button Text="Cancel" Style="ColorStyle.Secondary" IsDisabled="@isProcessingPayment"
+                        OnClick="Close" CssClass="dark:border-slate-700 dark:bg-gray-900 dark:text-slate-100" />
+                <Button Text="@ActionText" Icon="@ActionIcon" IsBusy="@isProcessingPayment"
+                        OnClick="ContinuePayment" CssClass="px-6" />
+            }
         </div>
     </Footer>
 </Modal>
@@ -80,43 +175,81 @@
 
     private bool isVisible;
     private bool isProcessingPayment;
+    private bool isLoadingBankAccount;
+    private bool showBankAccount;
+    private bool accountCopied;
     private PriceCalcResponse? price;
+    private DedicatedAccountResponse? bankAccount;
+    private string selectedMethod = "PAYSTACK";
+
+    private static readonly PaymentMethod[] paymentMethods =
+    [
+        new("PAYSTACK", "Paystack", "Pay securely through Paystack checkout.", Icon.IconStyle.CreditCard),
+        new("OPAY", "OPay", "Continue to the OPay checkout.", Icon.IconStyle.Coins),
+        new("BANK_TRANSFER", "Bank transfer", "Transfer to your dedicated account; details appear next.", Icon.IconStyle.ArrowRightLeft)
+    ];
+
+    private string ActionText => selectedMethod switch
+    {
+        "OPAY" => "Continue with OPay",
+        "BANK_TRANSFER" => "Show bank details",
+        _ => "Pay with Paystack"
+    };
+
+    private Icon.IconStyle ActionIcon => selectedMethod switch
+    {
+        "BANK_TRANSFER" => Icon.IconStyle.ArrowRightLeft,
+        "OPAY" => Icon.IconStyle.ChevronRight,
+        _ => Icon.IconStyle.CreditCard
+    };
 
     private static string formatCurrency(double amount) => $"₦ {amount:#,##0.00}";
 
     public void Show(PriceCalcResponse priceDetails)
     {
         price = priceDetails;
+        selectedMethod = "PAYSTACK";
+        showBankAccount = false;
+        bankAccount = null;
+        accountCopied = false;
         isVisible = true;
         StateHasChanged();
     }
 
-    private void Close()
+    private void SelectMethod(string method) => selectedMethod = method;
+
+    private async Task ContinuePayment()
     {
-        isVisible = false;
+        if (selectedMethod == "BANK_TRANSFER")
+        {
+            await LoadDedicatedAccount();
+            return;
+        }
+
+        await BeginCheckout(selectedMethod);
     }
 
-    private async Task BeginPayment()
+    private async Task BeginCheckout(string provider)
     {
+        if (price == null)
+        {
+            await alert.Error("Purchase details are not available. Please try again.");
+            return;
+        }
+
+        var checkoutStarted = false;
         try
         {
-            if (price == null)
-                throw new Exception("DEBUG: Price should not be null");
-
             isProcessingPayment = true;
-            var request = new InitPaymentRequest
-            {
-                ProviderID = "PAYSTACK", 
-                Quantity = price.Quantity
-            };
-
-            var response = await apiClient.PurchaseBeginAsync(request);
-            var authorizationUrl = response.Result?.AuthorizationUrl;
+            var request = new InitPaymentRequest { ProviderID = provider, Quantity = price.Quantity };
+            var response = (await apiClient.PurchaseBeginAsync(request)).Result;
+            var authorizationUrl = response?.AuthorizationUrl;
 
             if (string.IsNullOrWhiteSpace(authorizationUrl))
-                throw new Exception("No authorization URL received from server.");
+                throw new InvalidOperationException("The payment provider did not return a checkout link.");
 
             await OnCompleted.InvokeAsync();
+            checkoutStarted = true;
             nav.NavigateTo(authorizationUrl, forceLoad: true);
         }
         catch (ApiException ex)
@@ -125,13 +258,115 @@
         }
         catch (Exception ex)
         {
-            await alert.Error($"An error occurred while processing the payment. {ex.Message}");
+            await alert.Error($"Unable to start the payment. {ex.Message}");
         }
         finally
         {
-            isVisible = false;
             isProcessingPayment = false;
+            if (checkoutStarted)
+                isVisible = false;
             StateHasChanged();
         }
     }
+
+    private async Task LoadDedicatedAccount()
+    {
+        if (ShouldShowSampleAccount())
+        {
+            SetSampleBankAccount();
+            return;
+        }
+
+        try
+        {
+            isLoadingBankAccount = true;
+            StateHasChanged();
+
+            bankAccount = await apiClient.DedicatedAccountEnsureAsync();
+            if (bankAccount == null)
+                throw new InvalidOperationException("The bank account response was empty.");
+            showBankAccount = true;
+        }
+        catch (ApiException ex)
+        {
+            if (HostEnvironment.IsDevelopment() && ex.StatusCode == 404)
+            {
+                SetSampleBankAccount();
+                return;
+            }
+
+            var message = ex.FriendlyErrorMessage;
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                message = ex.StatusCode == 404
+                    ? "Dedicated bank transfers are not available yet. The account setup service is not configured on the server."
+                    : $"Unable to load your dedicated bank account (HTTP {ex.StatusCode}). Please try again later.";
+            }
+
+            await alert.Error(message);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"Unable to load your dedicated bank account. {ex.Message}");
+        }
+        finally
+        {
+            isLoadingBankAccount = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task CopyAccountNumber()
+    {
+        if (bankAccount == null) return;
+
+        try
+        {
+            await js.InvokeVoidAsync("navigator.clipboard.writeText", bankAccount.AccountNumber);
+            accountCopied = true;
+        }
+        catch (Exception)
+        {
+            await alert.Error("Could not copy the account number. Please select and copy it manually.");
+        }
+    }
+
+    private bool ShouldShowSampleAccount()
+    {
+        if (!HostEnvironment.IsDevelopment())
+            return false;
+
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(new Uri(nav.Uri).Query);
+        return query.TryGetValue("previewBankAccount", out var value)
+            && string.Equals(value.ToString(), "true", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void SetSampleBankAccount()
+    {
+        bankAccount = new DedicatedAccountResponse
+        {
+            AccountNumber = "0000000000",
+            AccountName = "SMSLive247",
+            BankName = "Demo Bank",
+            Currency = "NGN",
+            Status = "PREVIEW"
+        };
+        showBankAccount = true;
+        StateHasChanged();
+    }
+
+    private void BackToPaymentMethods()
+    {
+        showBankAccount = false;
+        selectedMethod = "BANK_TRANSFER";
+        accountCopied = false;
+    }
+
+    private void Close()
+    {
+        isVisible = false;
+        showBankAccount = false;
+    }
+
+    private sealed record PaymentMethod(string Id, string Title, string Description, Icon.IconStyle Icon);
 }
