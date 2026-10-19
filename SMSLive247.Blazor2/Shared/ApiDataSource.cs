@@ -26,11 +26,17 @@ namespace SMSLive247.UI.Shared
                 Items = response.ToPagedList();
                 PageState = Items.PageState;
             }
+            catch (ApiException ex)
+            {
+                Items = null;
+                ErrorMessage = ex.FriendlyErrorMessage;
+                await alert.Error(ex.FriendlyErrorMessage);
+            }
             catch (Exception ex)
             {
                 Items = null;
                 ErrorMessage = ex.Message;
-                await alert.Confirm(ex.Message);
+                await alert.Error(ex.Message);
             }
             finally
             {

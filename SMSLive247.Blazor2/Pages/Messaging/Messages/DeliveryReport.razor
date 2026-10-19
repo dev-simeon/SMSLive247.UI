@@ -335,9 +335,16 @@
                 var batchResponse = await apiClient.SmsBatchGetAsync(numericBatchId);
                 batch = batchResponse.Result;
             }
+            catch (ApiException ex)
+            {
+                errorMessage = ex.FriendlyErrorMessage;
+                await alert.Error(ex.FriendlyErrorMessage);
+                return;
+            }
             catch (Exception ex)
             {
                 errorMessage = ex.Message;
+                await alert.Error($"An error occurred while fetching the message batch. {ex.Message}");
                 return;
             }
 
@@ -354,14 +361,16 @@
                     allReports = [];
                 }
             }
-            catch (ApiException)
+            catch (ApiException ex)
             {
                 // Network reports not yet generated on backend
                 allReports = [];
+                await alert.Error(ex.FriendlyErrorMessage);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 allReports = [];
+                await alert.Error($"An error occurred while fetching delivery reports. {ex.Message}");
             }
         }
         catch (Exception ex)

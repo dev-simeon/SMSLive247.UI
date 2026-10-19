@@ -33,11 +33,11 @@
                 </Column>
                 <Column Header="Purpose / Sample Message" Width="40%">
                     <div class="flex flex-col">
-                        <div class="mb-0.5 text-sm font-medium text-slate-900">@context.Purpose</div>
-                        <div class="max-w-md truncate text-xs text-slate-500">@context.SampleText</div>
+                        <div class="mb-0.5 text-sm font-medium text-slate-900 dark:text-slate-100">@context.Purpose</div>
+                        <div class="max-w-md truncate text-xs text-slate-500 dark:text-slate-400">@context.SampleText</div>
                         @if (IsRejected(context) && !string.IsNullOrWhiteSpace(context.Remarks))
                         {
-                            <div class="font-mono text-sm text-red-700" title="@context.Remarks">
+                            <div class="font-mono text-sm text-red-700 dark:text-slate-100" title="@context.Remarks">
                                 @GetSenderIdRejectionReason(context.Remarks)
                             </div>
                         }
