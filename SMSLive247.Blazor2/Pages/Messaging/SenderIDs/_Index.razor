@@ -1,0 +1,42 @@
+@attribute [Route(Const.Routes.Messaging.SenderIds)]
+@layout MainLayout
+
+<PageTitle>Sender IDs</PageTitle>
+
+<PageHeader Title="Sender IDs"
+            SubTitle="Manage promotional and transactional sender ID requests.">
+</PageHeader>
+
+<Tabs>
+    <TabPage Title="Promotional" Icon="Icon.IconStyle.Tag">
+        <Promotional Items="items" OnRefresh="FetchData" />
+    </TabPage>
+    <TabPage Title="Transactional" Icon="Icon.IconStyle.Fingerprint">
+        <Transactional Items="items" OnRefresh="FetchData" />
+    </TabPage>
+</Tabs>
+
+@code {
+    private List<SenderIdResponse> items = [];
+
+    protected override async Task OnInitializedAsync() => await FetchData();
+
+    private async Task FetchData()
+    {
+        try
+        {
+            var response = await apiClient.SenderIdListAsync(1, 500);
+            items = response.Result?.ToList() ?? [];
+        }
+        catch (ApiException ex)
+        {
+            items = [];
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
+        catch (Exception ex)
+        {
+            items = [];
+            await alert.Error($"An error occurred while fetching sender IDs. {ex.Message}");
+        }
+    }
+}

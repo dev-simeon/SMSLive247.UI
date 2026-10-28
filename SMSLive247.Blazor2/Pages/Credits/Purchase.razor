@@ -34,13 +34,13 @@
 
                 <div class="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-gray-900">
                     <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500 dark:text-slate-400">Credit Price</span>
+                        <span class="text-slate-500 dark:text-slate-400">Unit Price</span>
                         <span class="font-bold text-slate-800 dark:text-slate-200">
                             ₦ @(CurrentTier?.Price.ToString("0.00") ?? "0.00")
                         </span>
                     </div>
                     <div class="flex items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
-                        <span class="font-medium text-slate-500 dark:text-slate-400">
+                        <span class="font-normal text-slate-500 dark:text-slate-400">
                             Total Amount
                         </span>
                         <span class="text-xl font-bold text-brand-600">
@@ -49,13 +49,13 @@
                     </div>
                 </div>
 
-                <div class="flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-[11px] text-blue-700">
-                    <Icon Style="Icon.IconStyle.Info" CssClass="shrink-0 text-base leading-none" />
-                    <p class="m-0 leading-none">Transaction charges would be added at checkout.</p>
+                <div class="flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm font-normal text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
+                    <Icon Style="Icon.IconStyle.Info" CssClass="shrink-0 text-base" />
+                    <p class="m-0 leading-5">Transaction charges would be added at checkout.</p>
                 </div>
 
                 <button @onclick="HandleProceedPayment"
-                        class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-600 active:scale-95">
+                        class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 font-sans text-sm font-normal text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-600 active:scale-95">
                     <span class="leading-none">
                         Proceed to Payment
                     </span>

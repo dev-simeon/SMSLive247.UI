@@ -11,16 +11,10 @@
         {
             <div class="space-y-6">
                 <section class="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-gray-900">
-                    <div class="mb-4 flex items-center justify-between border-b border-slate-200 pb-3 dark:border-slate-700">
-                        <div>
-                            <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">SMS credits</p>
-                            <p class="mt-1 text-lg font-bold text-slate-900 dark:text-slate-100">@price.Quantity.ToString("#,##0")</p>
-                        </div>
-                        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-950 dark:text-blue-300">Purchase summary</span>
-                    </div>
                     <dl class="space-y-3 text-sm">
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Quantity</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@price.Quantity.ToString("#,##0") credits</dd></div>
                         <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Credit price</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Price)</dd></div>
-                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Purchase amount</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Amount)</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Amount</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Amount)</dd></div>
                         <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Transaction fee</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Fee)</dd></div>
                     </dl>
                     <div class="mt-4 flex items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
@@ -68,53 +62,32 @@
             <div class="space-y-5">
                 @if (!string.IsNullOrWhiteSpace(bankAccount.AccountNumber))
                 {
-                    <div class="flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-slate-700 dark:bg-gray-900">
-                        <Icon Style="Icon.IconStyle.Info" CssClass="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
-                        <div>
-                            <p class="text-sm font-semibold text-blue-900 dark:text-slate-100">Fund your SMSLive247 wallet by bank transfer</p>
-                            <p class="mt-1 text-sm leading-6 text-blue-800 dark:text-slate-300">This dedicated account is assigned to your customer profile. Once a transfer is confirmed, the received amount is credited to your SMS wallet automatically.</p>
-                        </div>
+                    <div class="flex items-start gap-3 px-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                        <Icon Style="Icon.IconStyle.Info" CssClass="mt-1 shrink-0 text-blue-600 dark:text-blue-300" />
+                        <p>Your SMS units will be credited automatically after the transfer is confirmed. Save this dedicated account for future wallet top-ups.</p>
                     </div>
 
                     <section class="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-black">
-                        <div class="grid gap-5 sm:grid-cols-2">
-                            <div>
-                                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Bank</p>
-                                <p class="mt-1 font-semibold text-slate-900 dark:text-slate-100">@bankAccount.BankName</p>
+                        <dl>
+                            <div class="flex items-center justify-between gap-4 border-b border-slate-100 py-3 first:pt-0 dark:border-slate-700/60">
+                                <dt class="text-sm text-slate-500 dark:text-slate-400">Bank</dt>
+                                <dd class="text-right text-sm font-semibold text-blue-700 dark:text-blue-300">@bankAccount.BankName</dd>
                             </div>
-                            <div>
-                                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Account name</p>
-                                <p class="mt-1 font-semibold text-slate-900 dark:text-slate-100">@bankAccount.AccountName</p>
+                            <div class="flex items-center justify-between gap-4 border-b border-slate-100 py-3 dark:border-slate-700/60">
+                                <dt class="text-sm text-slate-500 dark:text-slate-400">Account name</dt>
+                                <dd class="text-right text-sm font-semibold text-blue-700 dark:text-blue-300">@bankAccount.AccountName</dd>
                             </div>
-                        </div>
-                        <div class="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-gray-900">
-                            <div class="flex flex-wrap items-center justify-between gap-3">
-                                <div>
-                                    <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">Account number</p>
-                                    <p class="mt-1 whitespace-nowrap font-mono text-2xl font-bold tracking-wider text-slate-900 dark:text-slate-100">@bankAccount.AccountNumber</p>
-                                </div>
-                                <Button Text="@(accountCopied ? "Copied" : "Copy account number")"
-                                        Icon="@(accountCopied ? Icon.IconStyle.CheckCircle : Icon.IconStyle.Copy)"
-                                        Style="ColorStyle.Secondary" OnClick="CopyAccountNumber"
-                                        CssClass="dark:border-slate-700 dark:bg-gray-900 dark:text-slate-100" />
+                            <div class="flex items-center justify-between gap-4 py-3 last:pb-0">
+                                <dt class="text-sm text-slate-500 dark:text-slate-400">Account number</dt>
+                                <dd class="flex items-center gap-2 text-right font-mono text-lg font-bold tracking-wider text-blue-700 dark:text-blue-300">
+                                    <span>@bankAccount.AccountNumber</span>
+                                    <button type="button" aria-label="Copy account number" title="Copy account number" @onclick="CopyAccountNumber"
+                                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-brand-600 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-blue-300 dark:hover:bg-slate-800">
+                                        <Icon Style="@(accountCopied ? Icon.IconStyle.CheckCircle : Icon.IconStyle.Copy)" CssClass="text-lg" />
+                                    </button>
+                                </dd>
                             </div>
-                        </div>
-                    </section>
-
-                    <section class="rounded-lg border border-slate-200 p-5 dark:border-slate-700">
-                        <div class="flex items-center justify-between gap-3">
-                            <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Transfer instructions</h4>
-                            <span class="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-200">
-                                <span class="h-2 w-2 rounded-full bg-amber-500"></span> Ready for transfer
-                            </span>
-                        </div>
-                        <ol class="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                            <li class="flex items-start gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-gray-900 dark:text-slate-100">1</span><span>Open your banking app and choose the bank shown above as the destination.</span></li>
-                            <li class="flex items-start gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-gray-900 dark:text-slate-100">2</span><span>Enter the 10-digit account number and confirm the displayed account name before proceeding.</span></li>
-                            <li class="flex items-start gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-gray-900 dark:text-slate-100">3</span><span>Enter the amount you want to add to your SMS wallet and complete the transfer.</span></li>
-                            <li class="flex items-start gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-gray-900 dark:text-slate-100">4</span><span>Your wallet will be credited automatically after the transfer is confirmed.</span></li>
-                        </ol>
-                        <p class="mt-4 text-xs leading-5 text-slate-500 dark:text-slate-400">Save this dedicated account for future wallet top-ups. No new purchase needs to be initiated for each transfer.</p>
+                        </dl>
                     </section>
                 }
                 else
@@ -180,13 +153,12 @@
     private bool accountCopied;
     private PriceCalcResponse? price;
     private DedicatedAccountResponse? bankAccount;
-    private string selectedMethod = "PAYSTACK";
+    private string selectedMethod = "BANK_TRANSFER";
 
     private static readonly PaymentMethod[] paymentMethods =
     [
-        new("PAYSTACK", "Paystack", "Pay securely through Paystack checkout.", Icon.IconStyle.CreditCard),
-        new("OPAY", "OPay", "Continue to the OPay checkout.", Icon.IconStyle.Coins),
-        new("BANK_TRANSFER", "Bank transfer", "Transfer to your dedicated account; details appear next.", Icon.IconStyle.ArrowRightLeft)
+        new("BANK_TRANSFER", "Bank Transfer (Reusable)", "Your own permanent account for future top-ups.", Icon.IconStyle.ArrowRightLeft),
+        new("PAYSTACK", "Paystack", "Card, USSD and bank transfer.", Icon.IconStyle.CreditCard)
     ];
 
     private string ActionText => selectedMethod switch
@@ -208,7 +180,7 @@
     public void Show(PriceCalcResponse priceDetails)
     {
         price = priceDetails;
-        selectedMethod = "PAYSTACK";
+        selectedMethod = "BANK_TRANSFER";
         showBankAccount = false;
         bankAccount = null;
         accountCopied = false;

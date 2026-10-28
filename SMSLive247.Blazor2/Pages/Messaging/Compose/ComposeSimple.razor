@@ -93,6 +93,7 @@
                 <SchedulerCard TotalRecipients="@(model?.CountRecipients() ?? 0)"
                                ValidationMessages="@SchedulerValidationMessages"
                                IsSending="@(model?.IsBusy ?? false)"
+                               ResetKey="@sendResetKey"
                                OnSubmit="SendMessageCore" />
             </div>                
         </div>
@@ -108,6 +109,9 @@
     private SelectBulkfiles bulkfilesModal = new();
     private SelectRawNumbers rawNumbersModal = new();
     private ComposeSimpleModel? model;
+    private int sendResetKey;
+
+    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -162,6 +166,7 @@
         try
         {
             model.IsBusy = true;
+            await InvokeAsync(StateHasChanged);
 
             if (string.IsNullOrWhiteSpace(model.SenderID))
                 throw new Exception("Choose an approved sender ID.");
@@ -177,11 +182,24 @@
             var result = await apiClient.SmsBatchCreateAsync(request);
             var res = result.Result;
 
+            model.Numbers.Clear();
+            model.Contacts.ForEach(contact => contact.Selected = false);
+            model.BatchFiles.ForEach(file => file.Selected = false);
+            model.MessageText = string.Empty;
+            model.SenderID = string.Empty;
+            model.DeliveryTime = null;
+            sendResetKey++;
+            await RefreshBalanceAsync(res.CreditBalance);
+
             var reply = deliveryTime.HasValue
                 ? "Your message has been scheduled."
                 : GetMessageStatistics(res);
 
             await alert.Success(reply, "Message Created");
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage, "Unable to Send Message");
         }
         catch (Exception ex)
         {
@@ -190,6 +208,33 @@
         finally
         {
             model.IsBusy = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task RefreshBalanceAsync(double? creditBalance)
+    {
+        if (MainAccount is null)
+            return;
+
+        if (creditBalance.HasValue)
+        {
+            MainAccount.UpdateCredits(creditBalance.Value);
+            return;
+        }
+
+        try
+        {
+            var account = await apiClient.AccountGetAsync("self");
+            MainAccount.UpdateCredits(account.Result.Credits);
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error($"The message was submitted, but the balance could not be refreshed. {ex.FriendlyErrorMessage}", "Balance not refreshed");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"The message was submitted, but the balance could not be refreshed. {ex.Message}", "Balance not refreshed");
         }
     }
 

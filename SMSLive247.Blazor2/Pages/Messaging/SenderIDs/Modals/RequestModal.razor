@@ -1,26 +1,36 @@
 ﻿@namespace SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
 
 <EditForm Model="@request" OnValidSubmit="HandleSubmit">
-    <Modal Title="Request New Sender ID" @bind-IsVisible="isVisible">
+    <Modal Title="Request New Sender ID"
+           CssClass="dark:border dark:border-slate-700 dark:bg-gray-900"
+           BodyCssClass="dark:bg-gray-900 dark:text-slate-200"
+           FooterCssClass="dark:border-slate-700 dark:bg-gray-900"
+           @bind-IsVisible="isVisible">
         <Body>
-            <p class="pb-5 text-sm">
+            <p class="pb-5 text-sm text-slate-600 dark:text-slate-300">
                 Sender IDs must be relevant to your organization. Generic names 
                 (e.g. "Alert", "Info") will be rejected by network operators.
             </p>
 
             <div class="space-y-4">
                 <FormInput Label="Sender ID"
+                           LabelCssClass="text-sm font-medium text-slate-700 dark:text-slate-200"
                            PlaceHolder="Max 11 characters, no spaces"
+                           class="dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-400"
                            @bind-Value="request.SenderID"
                            Required="true" />
 
                 <FormInput Label="Purpose"
+                           LabelCssClass="text-sm font-medium text-slate-700 dark:text-slate-200"
                            PlaceHolder="Explain what this Sender ID will be used for."
+                           class="dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-400"
                            @bind-Value="request.Purpose"
                            Required="true" />
 
                 <FormInput Label="Sample Message" Multiline="3"
+                           LabelCssClass="text-sm font-medium text-slate-700 dark:text-slate-200"
                            PlaceHolder="Provide a realistic sample of the content you intend to send."
+                           class="dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-400"
                            @bind-Value="request.SampleText"
                            Required="true" />
             </div>
@@ -32,6 +42,7 @@
                     IsBusy="@isSubmitting" />
 
             <Button Text="Cancel"
+                    CssClass="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700"
                     Style="ColorStyle.Secondary"
                     IsDisabled="@isSubmitting"
                     OnClick="() => isVisible = false" />

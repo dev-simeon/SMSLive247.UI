@@ -1,0 +1,111 @@
+@using SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
+
+<section class="mb-5 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm leading-6 text-blue-900 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-200" aria-label="Promotional sender ID information">
+    <Icon Style="Icon.IconStyle.Info" CssClass="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
+    <p class="m-0 font-normal">Promotional sender IDs are for opted-in campaigns, offers, product announcements and marketing. Do not use them for OTPs, payment receipts, account alerts or service updates; those belong on the Transactional tab. Choose a name that identifies your organization. Network operators review each request, and approval is not guaranteed.</p>
+</section>
+
+<PageBody>
+    <HeaderLeft>
+        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ApplyFilters" InstantSearch="true">
+            <FormSelect TValue="string" @bind-Value="searchStatus" @bind-Value:after="OnStatusChanged" IsEmbedded="true">
+                <option value="">All Statuses</option>
+                <option value="APPROVED">Approved</option>
+                <option value="PENDING">Pending</option>
+                <option value="REJECTED">Rejected</option>
+            </FormSelect>
+        </SearchBox>
+    </HeaderLeft>
+    <HeaderRight>
+        <Button Icon="Icon.IconStyle.PlusCircle" Text="Add Promotional Sender ID" OnClick="() => requestModal.Show()" />
+    </HeaderRight>
+    <ChildContent>
+        <Table Items="filteredItems" EmptyMessage="No promotional sender ID requests found">
+            <Columns>
+                <Column Header="Sender ID">@context.SenderID</Column>
+                <Column Header="Purpose / Sample Message" Width="40%">
+                    <div class="flex flex-col">
+                        <div class="mb-0.5 text-sm font-medium text-slate-900 dark:text-slate-100">@context.Purpose</div>
+                        <div class="max-w-md truncate text-xs text-slate-500 dark:text-slate-400">@context.SampleText</div>
+                        @if (IsRejected(context) && !string.IsNullOrWhiteSpace(context.Remarks))
+                        {
+                            <div class="font-mono text-sm text-red-700 dark:text-red-400" title="@context.Remarks">@GetSenderIdRejectionReason(context.Remarks)</div>
+                        }
+                    </div>
+                </Column>
+                <Column Header="Date Requested"><FormatDate DateTime="@context.DateRequested"></FormatDate></Column>
+                <Column Header="Date Approved">
+                    @if (context.DateDecided.HasValue) { <FormatDate DateTime="context.DateDecided.Value.DateTime"></FormatDate> }
+                    else { <span class="text-slate-400">Pending Approval</span> }
+                </Column>
+                <Column Header="Status"><Badge Variant="Badge.StatusVariant.SenderIdRequest" Value="@(context.Status ?? "rejected")" /></Column>
+                <Column><Actions OnDelete="() => HandleDelete(context)" /></Column>
+            </Columns>
+        </Table>
+    </ChildContent>
+</PageBody>
+
+<RequestModal @ref="requestModal" OnCompleted="OnRefresh" />
+
+@code {
+    [Parameter] public IReadOnlyList<SenderIdResponse> Items { get; set; } = Array.Empty<SenderIdResponse>();
+    [Parameter] public EventCallback OnRefresh { get; set; }
+
+    private string? searchStatus;
+    private string? searchQuery;
+    private List<SenderIdResponse> filteredItems = [];
+    private RequestModal requestModal = new();
+
+    protected override void OnParametersSet() => ApplyFilters();
+
+    private void ApplyFilters()
+    {
+        IEnumerable<SenderIdResponse> filtered = Items.Where(x => !IsTransactional(x));
+        if (!string.IsNullOrWhiteSpace(searchStatus))
+            filtered = filtered.Where(x => string.Equals(x.Status, searchStatus, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(searchQuery))
+            filtered = filtered.Where(x =>
+                (x.SenderID?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (x.Purpose?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (x.SampleText?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (x.Remarks?.Contains(searchQuery, StringComparison.OrdinalIgnoreCase) ?? false));
+        filteredItems = filtered.ToList();
+    }
+
+    private Task OnStatusChanged()
+    {
+        ApplyFilters();
+        return Task.CompletedTask;
+    }
+
+    private static bool IsTransactional(SenderIdResponse item) =>
+        string.Equals(item.RouteType, "CORPORATE", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(item.Purpose, "Transactional", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsRejected(SenderIdResponse item) => string.Equals(item.Status, "REJECTED", StringComparison.OrdinalIgnoreCase);
+
+    private static string GetSenderIdRejectionReason(string value) => value switch
+    {
+        "SAMPLE_TOO_BRIEF" => "The sender ID was rejected because the submitted sample message is too brief to adequately verify the sender ID.",
+        "GENERIC_SENDERID" => "The sender ID was rejected because it is too generic and does not clearly identify the business, organization, or service using it.",
+        "OTP_NOT_ALLOWED" => "The sender ID was rejected because OTP messages are not allowed for promotional sender IDs.",
+        "WELL_KNOWN_BRAND" => "The sender ID was rejected because it appears to represent a well-known brand. Additional verification or authorization may be required.",
+        "GOVERNMENT_AGENCY" => "The sender ID was rejected because it appears to represent a government agency. Appropriate authorization or verification may be required.",
+        "TRANSACTIONAL" => "The sender ID was rejected because it is intended for transactional messages, which are not allowed under the current sender ID requirements.",
+        _ => "The sender ID was rejected because it does not meet the sender ID requirements."
+    };
+
+    private async Task HandleDelete(SenderIdResponse item)
+    {
+        if (!await alert.Confirm($"Are you sure you want to delete [{item.SenderID}]?", "Delete Sender ID"))
+            return;
+        try
+        {
+            await apiClient.SenderIdDeleteAsync(item.SenderID);
+            await alert.Success("Sender ID deleted successfully.", "Deleted");
+            await OnRefresh.InvokeAsync();
+        }
+        catch (ApiException ex) { await alert.Error(ex.FriendlyErrorMessage); }
+        catch (Exception ex) { await alert.Error($"An error occurred while deleting the sender ID. {ex.Message}"); }
+    }
+}

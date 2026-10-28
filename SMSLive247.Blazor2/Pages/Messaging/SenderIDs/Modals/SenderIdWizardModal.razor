@@ -1,0 +1,78 @@
+@namespace SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
+
+<Modal Title="@Title"
+       CssClass="dark:border dark:border-slate-700 dark:bg-gray-900"
+       BodyCssClass="dark:bg-gray-900 dark:text-slate-200"
+       FooterCssClass="dark:border-slate-700 dark:bg-gray-900"
+       IsVisible="IsVisible"
+       IsVisibleChanged="IsVisibleChanged">
+    <Body>
+        <div class="space-y-4 text-slate-700 dark:text-slate-200">
+            <p class="text-sm leading-6 text-slate-600 dark:text-slate-300">@Description</p>
+
+            <ol class="m-0 mb-2 flex w-full list-none items-center p-0" aria-label="Registration progress">
+                @for (var index = 0; index < Steps.Count; index++)
+                {
+                    var stepNumber = index + 1;
+                    var isCurrent = stepNumber == CurrentStep;
+                    var isComplete = stepNumber < CurrentStep;
+                    <li class="flex min-w-0 flex-1 items-center" aria-current="@(isCurrent ? "step" : null)">
+                        <div class="flex min-w-0 shrink-0 items-center gap-2 text-xs font-semibold sm:gap-3 sm:text-sm @(isCurrent || isComplete ? "text-brand-700 dark:text-blue-300" : "text-slate-400 dark:text-slate-500")">
+                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full @(isComplete || isCurrent ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400")">
+                                @if (isComplete)
+                                {
+                                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                                        <path d="m4 10 4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                }
+                                else
+                                {
+                                    @stepNumber
+                                }
+                            </span>
+                            <span class="truncate">@Steps[index]</span>
+                        </div>
+                        @if (stepNumber < Steps.Count)
+                        {
+                            <span class="mx-2 h-px min-w-3 flex-1 sm:mx-3 @(isComplete ? "bg-brand-500" : "bg-slate-200 dark:bg-slate-700")"></span>
+                        }
+                    </li>
+                }
+            </ol>
+
+            @ChildContent
+        </div>
+    </Body>
+    <Footer>
+        <div class="flex w-full items-center justify-between gap-3">
+            @if (CurrentStep == 1)
+            {
+                <Button Text="Cancel" Style="ColorStyle.Secondary" CssClass="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700" IsDisabled="IsBusy" OnClick="OnCancel" />
+            }
+            else
+            {
+                <Button Text="Back" Style="ColorStyle.Secondary" CssClass="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700" Icon="Icon.IconStyle.ArrowLeft" IsDisabled="IsBusy" OnClick="OnBack" />
+            }
+            <div class="flex items-center gap-3">
+                <Button Text="@PrimaryText" Icon="@PrimaryIcon" IsBusy="IsBusy" IsDisabled="IsPrimaryDisabled" OnClick="OnPrimary" />
+            </div>
+        </div>
+    </Footer>
+</Modal>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Description { get; set; } = "";
+    [Parameter] public IReadOnlyList<string> Steps { get; set; } = Array.Empty<string>();
+    [Parameter] public int CurrentStep { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public bool IsBusy { get; set; }
+    [Parameter] public bool IsPrimaryDisabled { get; set; }
+    [Parameter] public string PrimaryText { get; set; } = "Continue";
+    [Parameter] public Icon.IconStyle PrimaryIcon { get; set; } = Icon.IconStyle.ChevronRight;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnCancel { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnBack { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnPrimary { get; set; }
+}

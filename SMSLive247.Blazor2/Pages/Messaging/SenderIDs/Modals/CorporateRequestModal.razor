@@ -1,0 +1,406 @@
+@namespace SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
+
+<SenderIdWizardModal Title="Register Transactional Sender ID"
+                     Description="@(currentStep == 1 ? "This is the name your recipients will see · 3–11 characters." : string.Empty)"
+                     Steps="wizardSteps"
+                     CurrentStep="currentStep"
+                     IsVisible="isVisible"
+                     IsVisibleChanged="OnVisibilityChanged"
+                     IsBusy="isSubmitting"
+                     IsPrimaryDisabled="@(!CanContinue)"
+                     PrimaryText="@(currentStep == 3 ? "Submit request" : "Continue")"
+                     PrimaryIcon="@(currentStep == 3 ? Icon.IconStyle.CheckCircle : Icon.IconStyle.ChevronRight)"
+                     OnCancel="Close"
+                     OnBack="PreviousStep"
+                     OnPrimary="Continue">
+    @if (currentStep == 1)
+    {
+        <section class="mt-6 space-y-4" aria-labelledby="transaction-sender-id-title">
+            <div>
+                <h3 id="transaction-sender-id-title" class="text-lg font-semibold text-slate-900 dark:text-slate-100">Choose your sender ID</h3>
+            </div>
+
+            <div>
+                <label for="transactional-sender-id" class="mb-1 flex flex-wrap items-baseline gap-x-1 text-sm font-medium text-slate-700 dark:text-slate-200">
+                    <span>Sender ID</span><span class="text-red-500">*</span>
+                    @if (showValidation && !SenderIdIsValid)
+                    {
+                        <span id="transactional-sender-id-error" class="ml-1 text-xs font-normal text-red-500" role="alert">@SenderIdError</span>
+                    }
+                </label>
+                <input id="transactional-sender-id"
+                       type="text"
+                       maxlength="11"
+                       autocomplete="off"
+                       placeholder="e.g. AcmeMFB"
+                       @bind="senderId"
+                       @bind:event="oninput"
+                       @onblur="ValidateSenderId"
+                       aria-invalid="@(showValidation && !SenderIdIsValid)"
+                       aria-describedby="transactional-sender-id-help transactional-sender-id-rules @(showValidation && !SenderIdIsValid ? "transactional-sender-id-error" : null)"
+                       class="block w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition-all focus:border-brand-500 focus:outline-none focus:ring-4 focus:ring-brand-500/30 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-400 @(showValidation && !SenderIdIsValid ? "border-red-500 bg-red-50 focus:border-red-500 focus:ring-red-500/20 dark:border-red-500 dark:bg-red-950/20" : string.Empty)" />
+                <p id="transactional-sender-id-help" class="mt-1 text-xs text-slate-500 dark:text-slate-400">Enter a sender ID that identifies your organization or service.</p>
+                <ul id="transactional-sender-id-rules" class="mt-3 space-y-1 text-sm font-normal leading-5 text-slate-600 dark:text-slate-400">
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0">•</span><span>Between 3 and 11 characters</span></li>
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0">•</span><span>Must contain at least one letter</span></li>
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0">•</span><span>Letters, numbers and spaces allowed</span></li>
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0">•</span><span>Must not start with a digit</span></li>
+                </ul>
+            </div>
+        </section>
+    }
+    else if (currentStep == 2)
+    {
+        <section class="mt-6 space-y-4" aria-labelledby="transaction-documents-title">
+            <div>
+                <h3 id="transaction-documents-title" class="text-lg font-semibold text-slate-900 dark:text-slate-100">Required documents</h3>
+                <ul class="mt-2 space-y-1 text-sm font-normal leading-6 text-slate-600 dark:text-slate-400">
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0 text-brand-600 dark:text-blue-400">•</span><span>Download the authorization letter for each network.</span></li>
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0 text-brand-600 dark:text-blue-400">•</span><span>Complete each letter on your organization's letterhead.</span></li>
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0 text-brand-600 dark:text-blue-400">•</span><span>Have each letter signed and stamped by an authorized representative.</span></li>
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0 text-brand-600 dark:text-blue-400">•</span><span>Scan and upload the completed letters as PDF files.</span></li>
+                    <li class="flex gap-2"><span aria-hidden="true" class="shrink-0 text-brand-600 dark:text-blue-400">•</span><span>Upload your Certificate of Incorporation and Operating Licence from the relevant regulatory agency.</span></li>
+                </ul>
+            </div>
+
+            <div class="space-y-2">
+                <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Download authorization letter</h4>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var network in Networks)
+                    {
+                        <Button Text="@network" Style="ColorStyle.Secondary" CssClass="min-h-9 min-w-0 px-3 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700" Icon="Icon.IconStyle.Download" OnClick="() => DownloadAuthorizationTemplate(network)" />
+                    }
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <section aria-labelledby="authorization-uploads-title">
+                    <h4 id="authorization-uploads-title" class="mb-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">Upload completed authorization letters <span class="text-red-500">*</span></h4>
+                    <p class="mb-2 text-xs text-slate-500 dark:text-slate-400">Each upload accepts two completed authorization-letter PDFs.</p>
+                    <div class="space-y-4">
+                        <div class="min-w-0">
+                            <InputFile id="loa-first-pair" accept=".pdf,application/pdf" multiple aria-label="Upload two authorization letter PDFs" OnChange="@(e => SelectLoaPair(e, 0))" class="peer sr-only" />
+                            <label for="loa-first-pair" class="flex min-h-14 w-full cursor-pointer items-stretch rounded-lg border border-slate-300 bg-white text-sm text-slate-700 transition hover:border-brand-500 hover:bg-blue-50 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900">
+                                <span class="flex flex-1 items-center justify-center px-4 py-3">First PDF</span>
+                                <span class="w-px self-stretch bg-slate-300 dark:bg-slate-700" aria-hidden="true"></span>
+                                <span class="flex flex-1 items-center justify-center px-4 py-3">Second PDF</span>
+                                <span class="m-2 flex shrink-0 items-center rounded-md bg-blue-50 px-3 font-semibold text-brand-700 dark:bg-slate-800 dark:text-blue-300">Browse</span>
+                            </label>
+                            @foreach (var network in Networks.Take(2))
+                            {
+                                if (loaFiles.TryGetValue(network, out var file)) { <p class="mt-1 truncate text-xs text-slate-500 dark:text-slate-400" title="@file.Name">@network: @file.Name</p> }
+                            }
+                        </div>
+                        <div class="min-w-0 border-t-2 border-slate-300 pt-4 dark:border-slate-600">
+                            <InputFile id="loa-second-pair" accept=".pdf,application/pdf" multiple aria-label="Upload two authorization letter PDFs" OnChange="@(e => SelectLoaPair(e, 2))" class="peer sr-only" />
+                            <label for="loa-second-pair" class="flex min-h-14 w-full cursor-pointer items-stretch rounded-lg border border-slate-300 bg-white text-sm text-slate-700 transition hover:border-brand-500 hover:bg-blue-50 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900">
+                                <span class="flex flex-1 items-center justify-center px-4 py-3">First PDF</span>
+                                <span class="w-px self-stretch bg-slate-300 dark:bg-slate-700" aria-hidden="true"></span>
+                                <span class="flex flex-1 items-center justify-center px-4 py-3">Second PDF</span>
+                                <span class="m-2 flex shrink-0 items-center rounded-md bg-blue-50 px-3 font-semibold text-brand-700 dark:bg-slate-800 dark:text-blue-300">Browse</span>
+                            </label>
+                            @foreach (var network in Networks.Skip(2))
+                            {
+                                if (loaFiles.TryGetValue(network, out var file)) { <p class="mt-1 truncate text-xs text-slate-500 dark:text-slate-400" title="@file.Name">@network: @file.Name</p> }
+                            }
+                        </div>
+                    </div>
+                </section>
+
+                <section class="border-t border-slate-200 pt-4 dark:border-slate-700" aria-labelledby="business-documents-title">
+                    <h4 id="business-documents-title" class="mb-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">Business documents <span class="text-red-500">*</span></h4>
+                    <p class="mb-2 text-xs text-slate-500 dark:text-slate-400">Please submit your Certificate of Incorporation and Operating Licence.</p>
+                    <InputFile id="business-documents" accept=".pdf,application/pdf" multiple aria-label="Upload Certificate of Incorporation and Operating Licence PDFs" OnChange="SelectBusinessFiles" class="peer sr-only" />
+                    <label for="business-documents" class="flex min-h-14 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 transition hover:border-brand-500 hover:bg-blue-50 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-900">
+                        <span class="font-medium">Choose two PDF files</span><span class="shrink-0 rounded-md bg-blue-50 px-3 py-1.5 font-semibold text-brand-700 dark:bg-slate-800 dark:text-blue-300">Browse</span>
+                    </label>
+                    @if (businessFiles.Count > 0)
+                    {
+                        <ul class="mt-2 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                            @for (var index = 0; index < businessFiles.Count; index++)
+                            {
+                                var file = businessFiles[index];
+                                <li class="truncate" title="@file.Name">@(index == 0 ? "Certificate of Incorporation" : "Operating Licence"): @file.Name</li>
+                            }
+                        </ul>
+                    }
+                </section>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="mt-6 space-y-5" aria-labelledby="transaction-review-title">
+            <div class="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900 dark:bg-emerald-950/30">
+                <Icon Style="Icon.IconStyle.CheckCircle" CssClass="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-300" />
+                <div>
+                    <h3 id="transaction-review-title" class="font-semibold text-emerald-900 dark:text-emerald-200">Ready to submit</h3>
+                    <p class="mt-1 text-sm leading-6 text-emerald-800 dark:text-emerald-300">Review the sender ID and the six documents below. Network operators make the final approval decision, and processing times may vary.</p>
+                </div>
+            </div>
+
+            <dl class="grid gap-3 sm:grid-cols-2">
+                <div class="rounded-lg border border-slate-200 p-4 dark:border-slate-700">
+                    <dt class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Sender ID</dt>
+                    <dd class="mt-1 break-all font-mono text-lg font-semibold text-slate-900 dark:text-slate-100">@senderId.Trim()</dd>
+                </div>
+                <div class="rounded-lg border border-slate-200 p-4 dark:border-slate-700">
+                    <dt class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Message route</dt>
+                    <dd class="mt-1 font-semibold text-slate-900 dark:text-slate-100">Transactional</dd>
+                    <dd class="mt-1 text-sm text-slate-500 dark:text-slate-400">Service and customer-initiated messages</dd>
+                </div>
+            </dl>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <section class="rounded-lg border border-slate-200 p-4 dark:border-slate-700" aria-label="Network authorization letters">
+                    <div class="mb-3 flex items-center justify-between gap-2">
+                        <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Network authorization letters</h4>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">4 files</span>
+                    </div>
+                    <ul class="space-y-2">
+                        @foreach (var network in Networks)
+                        {
+                            var file = loaFiles[network];
+                            <li class="flex min-w-0 items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                                <Icon Style="Icon.IconStyle.CheckCircle" CssClass="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                                <span class="w-14 shrink-0 font-medium">@network</span>
+                                <span class="truncate" title="@file.Name">@file.Name</span>
+                            </li>
+                        }
+                    </ul>
+                </section>
+                <section class="rounded-lg border border-slate-200 p-4 dark:border-slate-700" aria-label="Business documents">
+                    <div class="mb-3 flex items-center justify-between gap-2">
+                        <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Business documents</h4>
+                        <span class="text-xs text-slate-500 dark:text-slate-400">2 files</span>
+                    </div>
+                    <ul class="space-y-2">
+                        <li class="flex min-w-0 items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                            <span class="shrink-0 font-medium">Incorporation</span>
+                            <span class="truncate" title="@businessFiles[0].Name">@businessFiles[0].Name</span>
+                        </li>
+                        <li class="flex min-w-0 items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                            <Icon Style="Icon.IconStyle.CheckCircle" CssClass="shrink-0 text-emerald-600 dark:text-emerald-400" />
+                            <span class="shrink-0 font-medium">Operating licence</span>
+                            <span class="truncate" title="@businessFiles[1].Name">@businessFiles[1].Name</span>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </section>
+    }
+</SenderIdWizardModal>
+
+@code {
+    private const long MaxFileBytes = 15 * 1024 * 1024;
+    private static readonly string[] Networks = ["MTN", "Airtel", "Glo", "9mobile"];
+    private readonly string[] wizardSteps = ["Sender ID", "Documents", "Review"];
+    private readonly Dictionary<string, IBrowserFile> loaFiles = new(StringComparer.OrdinalIgnoreCase);
+    private bool isVisible;
+    private bool isSubmitting;
+    private bool showValidation;
+    private int currentStep = 1;
+    private string senderId = string.Empty;
+    private readonly List<IBrowserFile> businessFiles = [];
+
+    [Parameter] public EventCallback OnCompleted { get; set; }
+
+    private bool SenderIdIsValid
+    {
+        get
+        {
+            var value = senderId.Trim();
+            return value.Length is >= 3 and <= 11
+                && char.IsLetter(value[0])
+                && value.Any(char.IsLetter)
+                && value.All(c => char.IsLetterOrDigit(c) || c == ' ');
+        }
+    }
+
+    private string SenderIdError
+    {
+        get
+        {
+            var value = senderId.Trim();
+            if (value.Length == 0) return "Enter a sender ID.";
+            if (value.Length < 3 || value.Length > 11) return "Sender ID must be between 3 and 11 characters.";
+            if (!char.IsLetter(value[0])) return "Sender ID must start with a letter.";
+            return "Use letters, numbers and spaces only.";
+        }
+    }
+
+    private bool DocumentsValid => Networks.All(loaFiles.ContainsKey)
+        && businessFiles.Count == 2;
+
+    private bool CanContinue => currentStep switch
+    {
+        1 => SenderIdIsValid,
+        2 => DocumentsValid,
+        _ => !isSubmitting
+    };
+
+    public void Show()
+    {
+        Reset();
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    private void Reset()
+    {
+        currentStep = 1;
+        senderId = string.Empty;
+        showValidation = false;
+        businessFiles.Clear();
+        loaFiles.Clear();
+        isSubmitting = false;
+    }
+
+    private void ValidateSenderId(FocusEventArgs _) => showValidation = true;
+
+    private async Task SelectLoaPair(InputFileChangeEventArgs args, int startIndex)
+    {
+        var networks = Networks.Skip(startIndex).Take(2).ToArray();
+        foreach (var network in networks)
+            loaFiles.Remove(network);
+
+        var files = args.GetMultipleFiles(2);
+        if (files.Count != networks.Length || files.Any(file => !IsPdf(file)))
+        {
+            await alert.Error("Select exactly two authorization letter PDFs for the networks shown.", "PDF files required");
+            return;
+        }
+
+        for (var index = 0; index < networks.Length; index++)
+            loaFiles[networks[index]] = files[index];
+    }
+
+    private async Task SelectBusinessFiles(InputFileChangeEventArgs args)
+    {
+        businessFiles.Clear();
+        var files = args.GetMultipleFiles();
+        if (files.Count != 2 || files.Any(file => !IsPdf(file)))
+        {
+            await alert.Error("Select exactly two business document PDFs: Certificate of Incorporation first, then Operating Licence.", "Two PDF files required");
+            return;
+        }
+
+        businessFiles.AddRange(files);
+    }
+
+    private static bool IsPdf(IBrowserFile file) => Path.GetExtension(file.Name).Equals(".pdf", StringComparison.OrdinalIgnoreCase);
+
+    private async Task Continue(MouseEventArgs _)
+    {
+        if (currentStep == 1 && !SenderIdIsValid)
+        {
+            showValidation = true;
+            return;
+        }
+        if (currentStep == 2 && !DocumentsValid)
+        {
+            await alert.Error("Upload all four network authorization letters and both business documents before continuing.", "Documents required");
+            return;
+        }
+        if (currentStep < 3)
+        {
+            currentStep++;
+            return;
+        }
+        await Submit();
+    }
+
+    private void PreviousStep(MouseEventArgs _) => currentStep = Math.Max(1, currentStep - 1);
+
+    private Task OnVisibilityChanged(bool visible)
+    {
+        isVisible = visible;
+        return Task.CompletedTask;
+    }
+
+    private async Task DownloadAuthorizationTemplate(string network)
+    {
+        var document = BuildAuthorizationTemplate(network);
+        await using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(document));
+        using var streamReference = new DotNetStreamReference(stream);
+        await js.InvokeVoidAsync("downloadFileFromStream", $"{network}-Whitelist-Authorization-Template.doc", streamReference);
+    }
+
+    private static string BuildAuthorizationTemplate(string network) => $"""
+        <!doctype html>
+        <html>
+        <head><meta charset="utf-8"><title>{network} Sender ID Whitelisting Authorization</title></head>
+        <body style="font-family:Arial,sans-serif;line-height:1.6;margin:2.5cm;color:#111">
+          <p style="text-align:center"><strong>[PRINT ON YOUR ORGANIZATION'S LETTERHEAD]</strong></p>
+          <p>[Date]</p>
+          <p>The Management<br>{network}<br>Nigeria</p>
+          <p><strong>Subject: Authorization to whitelist sender ID [SENDER ID]</strong></p>
+          <p>We, <strong>[REGISTERED BUSINESS NAME]</strong> (RC/Registration No. [REGISTRATION NUMBER]), authorize the whitelisting of sender ID <strong>[SENDER ID]</strong> on the {network} network for transactional messages relating to our organization's services.</p>
+          <p>The sender ID will be used only for service communications such as account notifications, transaction updates and other messages initiated in connection with our customers' use of our services. It will not be used for unsolicited promotional or marketing messages.</p>
+          <p>We confirm that we own or are authorized to use this sender ID and accept responsibility for messages sent using it. Please contact us using the details below if further verification is required.</p>
+          <p>Yours faithfully,</p>
+          <p style="margin-top:2.5cm">______________________________<br>[AUTHORIZED SIGNATORY NAME]<br>[TITLE / POSITION]<br>[PHONE NUMBER] · [EMAIL ADDRESS]</p>
+          <p><strong>Organization stamp</strong></p>
+        </body>
+        </html>
+        """;
+
+    private async Task Submit()
+    {
+        var streams = new List<MemoryStream>();
+        try
+        {
+            isSubmitting = true;
+            foreach (var network in Networks)
+                streams.Add(await ToMemoryStream(loaFiles[network]));
+            foreach (var file in businessFiles)
+                streams.Add(await ToMemoryStream(file));
+
+            var files = new List<FileParameter>();
+            var streamIndex = 0;
+            for (var index = 0; index < Networks.Length; index++)
+            {
+                var network = Networks[index];
+                var file = loaFiles[network];
+                files.Add(new FileParameter(streams[streamIndex++], $"{network}_LoA_{Path.GetFileName(file.Name)}", "application/pdf"));
+            }
+            files.Add(new FileParameter(streams[streamIndex++], $"CertificateOfIncorporation_{Path.GetFileName(businessFiles[0].Name)}", "application/pdf"));
+            files.Add(new FileParameter(streams[streamIndex], $"OperatingLicence_{Path.GetFileName(businessFiles[1].Name)}", "application/pdf"));
+
+            await apiClient.SenderIdCreate2Async("CORPORATE", senderId.Trim(), "Transactional", "Transactional service notification", files);
+            await alert.Success("Your transactional sender ID request has been submitted.", "Request submitted");
+            isVisible = false;
+            await OnCompleted.InvokeAsync();
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage, "Unable to submit request");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"The transactional sender ID request could not be submitted. {ex.Message}", "Unable to submit request");
+        }
+        finally
+        {
+            foreach (var stream in streams)
+                await stream.DisposeAsync();
+            isSubmitting = false;
+        }
+    }
+
+    private static async Task<MemoryStream> ToMemoryStream(IBrowserFile file)
+    {
+        var stream = new MemoryStream();
+        await using var source = file.OpenReadStream(MaxFileBytes);
+        await source.CopyToAsync(stream);
+        stream.Position = 0;
+        return stream;
+    }
+
+    private void Close(MouseEventArgs _) 
+    {
+        if (!isSubmitting)
+            isVisible = false;
+    }
+}

@@ -80,16 +80,27 @@
 
 @code {
     [Parameter] public bool IsSending { get; set; }
+    [Parameter] public int ResetKey { get; set; }
     [Parameter] public BaseComposeModel? Model { get; set; }
     [Parameter] public long? TotalRecipients { get; set; }
     [Parameter] public IReadOnlyList<string>? ValidationMessages { get; set; }
     [Parameter] public EventCallback<DateTimeOffset?> OnSubmit { get; set; }
 
     private DateTime? deliveryTime;
+    private int lastResetKey;
     private readonly string scheduleRadioGroup = $"scheduleOption-{Guid.NewGuid():N}";
     private long totalRecipients => TotalRecipients ?? Model?.CountRecipients() ?? 0;
     private IReadOnlyList<string> validationMessages => ValidationMessages ?? GetModelValidationMessages();
     private bool allowSend => totalRecipients > 0 && validationMessages.Count == 0;
+
+    protected override void OnParametersSet()
+    {
+        if (ResetKey != lastResetKey)
+        {
+            deliveryTime = null;
+            lastResetKey = ResetKey;
+        }
+    }
 
     private IReadOnlyList<string> GetModelValidationMessages()
     {
