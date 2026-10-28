@@ -1247,6 +1247,39 @@
         }
       }
     },
+    "/api/v5/credits/dedicated-account/ensure": {
+      "post": {
+        "tags": [
+          "Credit Purchase"
+        ],
+        "operationId": "GetDedicatedAccount",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DedicatedAccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/purchase/webhook": {
+      "post": {
+        "tags": [
+          "Credit Purchase"
+        ],
+        "operationId": "Webhook",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v5/credits/transfer": {
       "get": {
         "tags": [
@@ -2734,6 +2767,28 @@
             "readOnly": true
           },
           "networkName": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
+      "DedicatedAccountResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "accountID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "bankName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "accountName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "accountNumber": {
             "type": "string",
             "readOnly": true
           }

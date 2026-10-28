@@ -254,7 +254,7 @@
             isLoadingBankAccount = true;
             StateHasChanged();
 
-            bankAccount = await apiClient.DedicatedAccountEnsureAsync();
+            bankAccount = (await apiClient.GetDedicatedAccountAsync()).Result;
             if (bankAccount == null)
                 throw new InvalidOperationException("The bank account response was empty.");
             showBankAccount = true;
@@ -319,9 +319,7 @@
         {
             AccountNumber = "0000000000",
             AccountName = "SMSLive247",
-            BankName = "Demo Bank",
-            Currency = "NGN",
-            Status = "PREVIEW"
+            BankName = "Demo Bank"
         };
         showBankAccount = true;
         StateHasChanged();
