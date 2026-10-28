@@ -136,7 +136,9 @@
             {
                 <Button Text="Cancel" Style="ColorStyle.Secondary" IsDisabled="@isProcessingPayment"
                         OnClick="Close" CssClass="dark:border-slate-700 dark:bg-gray-900 dark:text-slate-100" />
-                <Button Text="@ActionText" Icon="@ActionIcon" IsBusy="@isProcessingPayment"
+                <Button Text="@ActionText" Icon="@ActionIcon"
+                        IsBusy="@(isProcessingPayment || isLoadingBankAccount)"
+                        IsDisabled="@(isProcessingPayment || isLoadingBankAccount)"
                         OnClick="ContinuePayment" CssClass="px-6" />
             }
         </div>
