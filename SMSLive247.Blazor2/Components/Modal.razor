@@ -4,7 +4,7 @@
         <Backdrop IsVisible="IsVisible" IsVisibleChanged="OnClose" />
         <div class="fixed inset-0 z-10 overflow-y-auto">
             <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative w-full @maxWidthCss transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 @CssClass"
+                <div class="relative w-full @maxWidthCss transform overflow-hidden rounded-lg bg-white text-left shadow-2xl transition-all sm:my-8 dark:border dark:border-slate-700 dark:bg-gray-900"
                      style="@panelStyle">
 
                     <header class="flex items-center justify-between px-4 @colorCss py-3">
@@ -18,13 +18,13 @@
                         </button>
                     </header>
 
-                    <main class="@bodyHeightCss overflow-y-auto px-4 py-4 @BodyCssClass" style="@bodyStyle">
+                    <main class="@bodyHeightCss overflow-y-auto px-4 py-4 dark:bg-grey-900 text-slate-500 dark:text-slate-200" style="@bodyStyle">
                         @Body
                     </main>
 
                     @if (Footer != null)
                     {
-                        <footer class="flex flex-row-reverse gap-3 border-t border-slate-200 bg-slate-100 px-4 py-3 @FooterCssClass">
+                        <footer class="flex flex-row-reverse gap-3 border-t border-slate-200 bg-slate-100 px-4 py-3 dark:border-slate-700 dark:bg-gray-900">
                             @Footer
                         </footer>
                     }
@@ -42,9 +42,9 @@
     [Parameter] public RenderFragment? Body { get; set; }
     [Parameter] public RenderFragment? Footer { get; set; }
     [Parameter] public ModalSize Size { get; set; } = ModalSize.Medium;
-    [Parameter] public string CssClass { get; set; } = "";
-    [Parameter] public string BodyCssClass { get; set; } = "";
-    [Parameter] public string FooterCssClass { get; set; } = "";
+    // [Parameter] public string CssClass { get; set; } = "";
+    // [Parameter] public string BodyCssClass { get; set; } = "";
+    // [Parameter] public string FooterCssClass { get; set; } = "";
     [Parameter] public int OverlayZIndex { get; set; } = 2147483000;
     [Parameter] public bool IsVisible { get; set; } = false;
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }

@@ -5,12 +5,8 @@
     <Modal Title="Edit Sub-Account" @bind-IsVisible="isVisible">
         <Body>
             <EditForm id="updateForm" Model="@updateModel" OnValidSubmit="HandleSubmit" class="space-y-6">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700">Account Name</label>
-                        <div class="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
-                            @accountName
-                        </div>
-                    </div>
+                <FormInput Label="Account Name"
+                           @bind-Value="accountName" disabled />
 
                     <FormRow Cols="2">
                         <FormInput Label="First Name"

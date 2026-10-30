@@ -84,7 +84,7 @@ namespace SMSLive247.UI.Shared
                     new NavItem { Title = "Compose", Url = Routes.Messaging.Compose, Icon = Icon.IconStyle.PenSquare },
                     new NavItem { Title = "Messages", Url = Routes.Messaging.Messages, Icon = Icon.IconStyle.Mail },
                     new NavItem { Title = "Contacts", Url = Routes.Messaging.Contacts, Icon = Icon.IconStyle.Users },
-                    new NavItem { Title = "Sender IDs", Url = Routes.Messaging.SenderIds, Icon = Icon.IconStyle.Fingerprint }
+                    new NavItem { Title = "Sender IDs", Url = Routes.Messaging.SenderIds, Icon = Icon.IconStyle.Verified }
                 ]
             },
             new NavItem

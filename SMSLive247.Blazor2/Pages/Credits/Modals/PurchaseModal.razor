@@ -2,10 +2,7 @@
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 
 <Modal Title="@(showBankAccount ? "Bank transfer details" : "Review your purchase")"
-       @bind-IsVisible="isVisible" Size="Modal.ModalSize.Medium"
-       CssClass="dark:border dark:border-slate-700 dark:bg-gray-900"
-       BodyCssClass="dark:bg-gray-900"
-       FooterCssClass="dark:border-slate-700 dark:bg-gray-900">
+       @bind-IsVisible="isVisible" Size="Modal.ModalSize.Medium">
     <Body>
         @if (price != null && !showBankAccount)
         {
@@ -139,7 +136,7 @@
                 <Button Text="@ActionText" Icon="@ActionIcon"
                         IsBusy="@(isProcessingPayment || isLoadingBankAccount)"
                         IsDisabled="@(isProcessingPayment || isLoadingBankAccount)"
-                        OnClick="ContinuePayment" CssClass="px-6" />
+                        OnClick="ContinuePayment" CssClass="w-56 shrink-0 px-6" />
             }
         </div>
     </Footer>
@@ -245,12 +242,6 @@
 
     private async Task LoadDedicatedAccount()
     {
-        if (ShouldShowSampleAccount())
-        {
-            SetSampleBankAccount();
-            return;
-        }
-
         try
         {
             isLoadingBankAccount = true;
@@ -263,19 +254,7 @@
         }
         catch (ApiException ex)
         {
-            if (HostEnvironment.IsDevelopment() && ex.StatusCode == 404)
-            {
-                SetSampleBankAccount();
-                return;
-            }
-
             var message = ex.FriendlyErrorMessage;
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                message = ex.StatusCode == 404
-                    ? "Dedicated bank transfers are not available yet. The account setup service is not configured on the server."
-                    : $"Unable to load your dedicated bank account (HTTP {ex.StatusCode}). Please try again later.";
-            }
 
             await alert.Error(message);
         }
@@ -303,28 +282,6 @@
         {
             await alert.Error("Could not copy the account number. Please select and copy it manually.");
         }
-    }
-
-    private bool ShouldShowSampleAccount()
-    {
-        if (!HostEnvironment.IsDevelopment())
-            return false;
-
-        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(new Uri(nav.Uri).Query);
-        return query.TryGetValue("previewBankAccount", out var value)
-            && string.Equals(value.ToString(), "true", StringComparison.OrdinalIgnoreCase);
-    }
-
-    private void SetSampleBankAccount()
-    {
-        bankAccount = new DedicatedAccountResponse
-        {
-            AccountNumber = "0000000000",
-            AccountName = "SMSLive247",
-            BankName = "Demo Bank"
-        };
-        showBankAccount = true;
-        StateHasChanged();
     }
 
     private void BackToPaymentMethods()

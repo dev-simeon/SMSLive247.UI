@@ -1247,8 +1247,8 @@
         }
       }
     },
-    "/api/v5/credits/dedicated-account/ensure": {
-      "post": {
+    "/api/v5/credits/purchase/dedicated": {
+      "get": {
         "tags": [
           "Credit Purchase"
         ],
@@ -1263,19 +1263,6 @@
                 }
               }
             }
-          }
-        }
-      }
-    },
-    "/api/v5/credits/purchase/webhook": {
-      "post": {
-        "tags": [
-          "Credit Purchase"
-        ],
-        "operationId": "Webhook",
-        "responses": {
-          "200": {
-            "description": "OK"
           }
         }
       }

@@ -14,35 +14,30 @@
                 <FormInput Label="Recipient Email" PlaceHolder="user@example.com" Type="email"
                            IconStyle="Icon.IconStyle.Mail" @bind-Value="model.Recipient" Required="true" />
 
-                <div class="space-y-1.5">
-                    <label class="block text-sm font-medium text-slate-700">
-                        Credits
-                    </label>
-                    <InputNumber
-                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-none sm:text-sm"
-                    min="50" @bind-Value="model.Credits" />
-                    @if (model.Credits > 0 && model.Credits < 50)
-                    {
-                        <p class="mt-1 text-xs font-semibold text-red-500">
-                            Amount must be at least 50 credits.
-                        </p>
-                    }
-                    @if (model.Credits > currentBalance)
-                    {
-                        <p class="mt-1 text-xs font-semibold text-red-500">
-                            Insufficient balance to transfer this amount.
-                        </p>
-                    }
-                </div>
+                <FormInput Type="number"
+                           Label="Credits"
+                           PlaceHolder="Enter amount to transfer"
+                           Required="true"
+                           min="50"
+                           @bind-Value="model.Credits" />
+                @if (model.Credits > 0 && model.Credits < 50)
+                {
+                    <p class="mt-1 text-xs font-semibold text-red-500">
+                        Amount must be at least 50 credits.
+                    </p>
+                }
+                @if (model.Credits > currentBalance)
+                {
+                    <p class="mt-1 text-xs font-semibold text-red-500">
+                        Insufficient balance to transfer this amount.
+                    </p>
+                }
 
-                <div class="space-y-1.5">
-                    <label class="block text-sm font-medium text-slate-700">
-                        Remarks
-                    </label>
-                    <textarea rows="3" @bind="model.Remarks"
-                              class="w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-none sm:text-sm"
-                              placeholder="Optional note..."></textarea>
-                </div>
+
+                <FormInput Multiline="3"
+                           Label="Remarks"
+                           @bind-Value="model.Remarks"
+                           PlaceHolder="Optional note..." />
             </div>
 
             <div class="grid grid-cols-2 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">

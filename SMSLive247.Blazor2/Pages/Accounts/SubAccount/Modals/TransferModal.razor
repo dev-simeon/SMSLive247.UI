@@ -20,15 +20,17 @@
                 </InputRadioGroup>
             </div>
 
+
+            
             <div>
-                <label class="mb-1 block text-sm font-medium text-slate-700">Credits</label>
-                <InputNumber
-                class="block w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 focus:ring-brand-500 focus:ring-1 focus:outline-none"
-                    @bind-Value="request.Credits" 
-                    @oninput="OnCreditChanged"
-                    min="50"
-                    required 
-                    placeholder="Enter amount to transfer" />
+                <FormInput 
+                           Type="number"
+                           Label="Credits"
+                           PlaceHolder="Enter amount to transfer"
+                           Required="true"
+                           min="50"
+                           @bind-Value="request.Credits"
+                           @oninput="OnCreditChanged" />
             </div>
 
             <FormRow Cols="2">
@@ -38,13 +40,19 @@
                         @senderOldBalance.ToString("#,##0.##")
                     </div>
                 </div>
+
                 <div>
                     <label class="block text-sm font-medium text-slate-700">Sender New Balance</label>
                     <div class="mt-1 block w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm @(senderNewBalance < 0 ? "text-red-600" : "text-slate-700")">
                         @senderNewBalance.ToString("#,##0.##")
                     </div>
                 </div>
+                
             </FormRow>
+
+            <FormRow Cols="2">
+                
+                </FormRow>
         </EditForm>
     </Body>
     <Footer>
@@ -59,10 +67,12 @@
     private AccountResponse? parentAccount;
     private AccountResponse? childAccount;
     private TransferRequest request = new();
+    private string? err  = "hello";
 
     private bool parentToChild = true;
     private double senderOldBalance => parentToChild ? parentAccount?.Credits ?? 0 : childAccount?.Credits ?? 0;
     private double senderNewBalance => senderOldBalance - request.Credits;
+
 
     public void Show(AccountResponse parent, AccountResponse child)
     {
@@ -77,6 +87,11 @@
 
         isVisible = true;
         StateHasChanged();
+    }
+
+    private void See(string? para)
+    {
+        
     }
 
     private async Task BeginTransfer()
