@@ -9,15 +9,16 @@
 
 <Tabs>
     <TabPage Title="Promotional" Icon="Icon.IconStyle.Campaign">
-        <Promotional Items="items" OnRefresh="FetchData" />
+        <Promotional Items="promotional" OnRefresh="FetchData" />
     </TabPage>
     <TabPage Title="Transactional" Icon="Icon.IconStyle.Verified">
-        <Transactional Items="items" OnRefresh="FetchData" />
+        <Transactional Items="transactional" OnRefresh="FetchData" />
     </TabPage>
 </Tabs>
 
 @code {
-    private List<SenderIdResponse> items = [];
+    private List<SenderIdResponse> promotional = [];
+    private List<SenderIdResponse> transactional = [];
 
     protected override async Task OnInitializedAsync() => await FetchData();
 
@@ -26,17 +27,24 @@
         try
         {
             var response = await apiClient.SenderIdListAsync(1, 500);
-            items = response.Result?.ToList() ?? [];
+            var items = response.Result?.ToList() ?? [];
+
+            transactional = items.Where(x => IsTransactional(x)).ToList();
+            promotional = items.Where(x => !IsTransactional(x)).ToList();
+
+
         }
         catch (ApiException ex)
         {
-            items = [];
             await alert.Error(ex.FriendlyErrorMessage);
         }
         catch (Exception ex)
         {
-            items = [];
             await alert.Error($"An error occurred while fetching sender IDs. {ex.Message}");
         }
     }
+
+    private static bool IsTransactional(SenderIdResponse item) =>
+       string.Equals(item.RouteType, "CORPORATE", StringComparison.OrdinalIgnoreCase) ||
+       string.Equals(item.Purpose, "Transactional", StringComparison.OrdinalIgnoreCase);
 }

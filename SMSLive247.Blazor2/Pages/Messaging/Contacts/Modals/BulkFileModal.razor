@@ -1,29 +1,18 @@
 ﻿<Modal Title="@modalTitle" @bind-IsVisible="isVisible">
     <Body>
         <div class="space-y-5">
-            <div>
-                <label class="mb-1 block text-sm font-medium text-slate-700">Select File</label>
-                <InputFile class="block w-full cursor-pointer rounded-lg
-                                  border border-slate-200 bg-white
-                                  px-2 py-1.5
-                                  text-sm text-slate-700
-                                  file:mr-4 file:cursor-pointer
-                                  file:rounded-lg file:border-0
-                                  file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 focus:outline-none hover:file:bg-brand-100"
-                           accept="@acceptedFileTypes" 
-                           OnChange="FileSelected" />
-                <p class="mt-1 text-xs text-slate-400">@supportedFormatsText</p>
-            </div>
+            <FormInput Type="file"
+                       HelpText="@supportedFormatsText"
+                       Label="Select File"
+                       accept="@acceptedFileTypes"
+                       OnFileChange="FileSelected"
+                       @bind-Value="selectedFile" />
 
             @if (ForCSV)
             {
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-slate-700">File Name</label>
-                    <input type="text"
-                           class="block w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
-                           placeholder="e.g. July Campaign"
-                           @bind="newFileName" @bind:event="oninput" />
-                </div>
+                <FormInput Label="File Name"
+                           PlaceHolder="e.g. July Campaign"
+                           @bind-Value="newFileName" />
             }
             else  
             {
@@ -49,27 +38,22 @@
 
                 @if (!isMergeMode)
                 {
-                    <div>
-                        <label class="mb-1 block text-sm font-medium text-slate-700">New File Name</label>
-                        <input type="text"
-                               class="block w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
-                               placeholder="e.g New Customers"
-                               @bind="newFileName" @bind:event="oninput" />
-                    </div>
+
+                    <FormInput Label="New File Name"
+                               PlaceHolder="e.g New Customers"
+                               @bind-Value="newFileName" />
                 }
                 else 
                 {
-                    <div>
-                        <label class="mb-1 block text-sm font-medium text-slate-700">Select Existing File</label>
-                        <select class="block w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 focus:outline-none"
-                                @bind="mergeFileId">
+                    <FormSelect 
+                        Label="Select Existing File"
+                        @bind-Value="mergeFileId">
                             <option value="">— Choose a file to merge into —</option>
                             @foreach (var f in ExistingFiles)
                             {
                                 <option value="@f.BatchFileID">@f.Description (@f.TotalNumbers.ToString("N0") records)</option>
                             }
-                        </select>
-                    </div>
+                    </FormSelect>
                 }
             }
 

@@ -15,7 +15,7 @@
         </SearchBox>
     </HeaderLeft>
     <HeaderRight>
-        <Button Icon="Icon.IconStyle.PlusCircle" Text="Add Transaction Sender ID" OnClick="() => requestModal.Show()" />
+        <Button Icon="Icon.IconStyle.PlusCircle" hidden Text="Add Transaction Sender ID" OnClick="() => requestModal.Show()" />
     </HeaderRight>
     <ChildContent>
         <Table Items="filteredItems" EmptyMessage="No transactional sender ID requests found">
@@ -65,7 +65,7 @@
 
     private void ApplyFilters()
     {
-        IEnumerable<SenderIdResponse> filtered = Items.Where(IsTransactional);
+        IEnumerable<SenderIdResponse> filtered = Items;
         if (!string.IsNullOrWhiteSpace(searchStatus))
             filtered = filtered.Where(x => string.Equals(x.Status, searchStatus, StringComparison.OrdinalIgnoreCase));
         if (!string.IsNullOrWhiteSpace(searchQuery))
@@ -78,10 +78,6 @@
         ApplyFilters();
         return Task.CompletedTask;
     }
-
-    private static bool IsTransactional(SenderIdResponse item) =>
-        string.Equals(item.RouteType, "CORPORATE", StringComparison.OrdinalIgnoreCase) ||
-        string.Equals(item.Purpose, "Transactional", StringComparison.OrdinalIgnoreCase);
 
     private static bool TryGetDownloadUrl(string? file, out string url)
     {

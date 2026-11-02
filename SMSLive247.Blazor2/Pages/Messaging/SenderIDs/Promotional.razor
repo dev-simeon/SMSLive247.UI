@@ -58,7 +58,7 @@
 
     private void ApplyFilters()
     {
-        IEnumerable<SenderIdResponse> filtered = Items.Where(x => !IsTransactional(x));
+        IEnumerable<SenderIdResponse> filtered = Items;
         if (!string.IsNullOrWhiteSpace(searchStatus))
             filtered = filtered.Where(x => string.Equals(x.Status, searchStatus, StringComparison.OrdinalIgnoreCase));
         if (!string.IsNullOrWhiteSpace(searchQuery))
@@ -75,10 +75,6 @@
         ApplyFilters();
         return Task.CompletedTask;
     }
-
-    private static bool IsTransactional(SenderIdResponse item) =>
-        string.Equals(item.RouteType, "CORPORATE", StringComparison.OrdinalIgnoreCase) ||
-        string.Equals(item.Purpose, "Transactional", StringComparison.OrdinalIgnoreCase);
 
     private static bool IsRejected(SenderIdResponse item) => string.Equals(item.Status, "REJECTED", StringComparison.OrdinalIgnoreCase);
 

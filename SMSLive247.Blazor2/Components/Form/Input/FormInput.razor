@@ -57,7 +57,7 @@
 
         @if (Type == "password")
         {
-            <div class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-400 dark:bg-black transition-colors hover:text-slate-600"
+            <div class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-slate-400 transition-colors hover:text-slate-600"
                  @onclick="TogglePasswordType">
                 @if (inputType == "password")
                 {
@@ -141,10 +141,20 @@
         [MaybeNullWhen(false)] out TValue result,
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
-        result = value is null ? default : (TValue)(object)value;
+        try
+        {
+            result = value is null ? default : (TValue)(object)value;
 
-        validationErrorMessage = null;
-        return true;
+            validationErrorMessage = null;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            result = default!;
+            validationErrorMessage = ex.Message;
+            return false;
+        }
+
     }
 
     private async Task OnBlur(FocusEventArgs e)

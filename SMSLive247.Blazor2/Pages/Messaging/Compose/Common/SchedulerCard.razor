@@ -6,7 +6,7 @@
             <input type="radio" name="@scheduleRadioGroup"
                    class="h-4 w-4 border-slate-300 text-brand-600 focus:ring-brand-500"
                    checked="@(!deliveryTime.HasValue)" @onchange="() => { deliveryTime = null; }" />
-            <span class="text-slate-700 group-hover:text-brand-600">
+            <span class="text-slate-500 group-hover:text-brand-600">
                 Send Immediately
             </span>
         </label>
@@ -14,7 +14,7 @@
             <input type="radio" name="@scheduleRadioGroup"
                    class="h-4 w-4 border-slate-300 text-brand-600 focus:ring-brand-500"
                    checked="@deliveryTime.HasValue" @onchange="() => deliveryTime = DateTime.Now" />
-            <span class="text-slate-700 group-hover:text-brand-600">
+            <span class="text-slate-500 group-hover:text-brand-600">
                 Schedule for Later
             </span>
         </label>

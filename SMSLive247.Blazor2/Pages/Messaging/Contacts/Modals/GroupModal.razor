@@ -9,7 +9,7 @@
 
             <SearchBox InstantSearch="true" Placeholder="Find a contact..." @bind-SearchTerm="pickerSearch"></SearchBox>
 
-            <div class="h-64 overflow-x-hidden overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-3 shadow-inner">
+            <div class="h-64 overflow-x-hidden overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 dark:bg-black p-3 shadow-inner">
                 @{
                     var filteredContacts = AllContacts.Where(x => x.Visible);
                 }
@@ -28,7 +28,7 @@
                                        value="@contact.Key" checked="@contact.Selected"
                                        id="gc-@contact.Key" @onchange="e => OnContactSelect(e, contact)"
                                        class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                                <label class="cursor-pointer truncate text-sm text-slate-700 select-none" 
+                                <label class="cursor-pointer truncate text-sm text-slate-500 select-none" 
                                        for="gc-@contact.Key" title="@contact.Name (@contact.Key)">
                                     @contact.Name
                                 </label>
@@ -38,7 +38,7 @@
                 }
             </div>
 
-            <label class="text-slate-400">
+            <label class="text-slate-500">
                 @AllContacts.Where(x => x.Selected).Count() Members Selected
             </label>
 

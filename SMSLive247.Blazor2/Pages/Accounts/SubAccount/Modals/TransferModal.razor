@@ -1,7 +1,7 @@
 ﻿<Modal Title="Transfer SMS Credits" @bind-IsVisible="isVisible">
 
     <Body>
-        <EditForm id="Transfer" Model="request" OnValidSubmit="BeginTransfer" class="space-y-6">
+        <EditForm id="Transfer" Model="model" OnValidSubmit="BeginTransfer" class="space-y-6">
             <div>
                 <label class="mb-2 block text-sm font-medium text-slate-700">Transfer Direction</label>
                 <InputRadioGroup @bind-Value="parentToChild" class="flex flex-col gap-2">
@@ -20,39 +20,16 @@
                 </InputRadioGroup>
             </div>
 
+            <FormInput Type="number"
+                       Label="Credits"
+                       PlaceHolder="Enter amount to transfer"
+                       Required="true"
+                       min="50"
+                       @bind-Value="model.Credits"
+                       @oninput="OnCreditChanged" />
 
             
-            <div>
-                <FormInput 
-                           Type="number"
-                           Label="Credits"
-                           PlaceHolder="Enter amount to transfer"
-                           Required="true"
-                           min="50"
-                           @bind-Value="request.Credits"
-                           @oninput="OnCreditChanged" />
-            </div>
-
-            <FormRow Cols="2">
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Sender Current Balance</label>
-                    <div class="mt-1 block w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700">
-                        @senderOldBalance.ToString("#,##0.##")
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-slate-700">Sender New Balance</label>
-                    <div class="mt-1 block w-full appearance-none rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm @(senderNewBalance < 0 ? "text-red-600" : "text-slate-700")">
-                        @senderNewBalance.ToString("#,##0.##")
-                    </div>
-                </div>
-                
-            </FormRow>
-
-            <FormRow Cols="2">
-                
-                </FormRow>
+            <BalanceDisplay OldBalance="@senderOldBalance" NewBalance="@senderNewBalance" />
         </EditForm>
     </Body>
     <Footer>
@@ -66,24 +43,20 @@
     private bool isVisible = false;
     private AccountResponse? parentAccount;
     private AccountResponse? childAccount;
-    private TransferRequest request = new();
-    private string? err  = "hello";
+    private TransferRequest model = new() { Credits = 50 };
 
     private bool parentToChild = true;
     private double senderOldBalance => parentToChild ? parentAccount?.Credits ?? 0 : childAccount?.Credits ?? 0;
-    private double senderNewBalance => senderOldBalance - request.Credits;
+    private double senderNewBalance => senderOldBalance - model.Credits;
 
 
     public void Show(AccountResponse parent, AccountResponse child)
     {
         parentAccount = parent;
         childAccount = child;
-        request = new TransferRequest()
-            {
-                Credits = 50,
-                Recipient = childAccount.AccountID,
-                Remarks = $"Transfer from A to B"
-            };
+        model.Credits = 50;
+        model.Recipient = childAccount.AccountID;
+        model.Remarks = $"Transfer from {parentAccount.AccountName} to {childAccount.AccountName}";
 
         isVisible = true;
         StateHasChanged();
@@ -98,16 +71,16 @@
     {
         try
         {
-            if (request.Credits < 50)
+            if (model.Credits < 50)
                 throw new Exception("Minimum SMS credit quantity to transfer is 50.");
 
-            if (request.Credits > senderOldBalance)
+            if (model.Credits > senderOldBalance)
                 throw new Exception("Insufficient balance for this transfer.");
 
             if (!parentToChild)
-                request.Credits = -request.Credits;
+                model.Credits = -model.Credits;
 
-            await apiClient.TransferCreditAsync(request);
+            await apiClient.TransferCreditAsync(model);
             await alert.Success("Credits transferred successfully.");
             await OnCompleted.InvokeAsync();
         }
@@ -130,7 +103,7 @@
     {
         if (int.TryParse(e.Value?.ToString(), out int credits))
         {
-            request.Credits = credits;
+            model.Credits = credits;
         }
     }
 }

@@ -65,11 +65,11 @@
                     </span>
                 </HeaderRight>
                 <ChildContent>
-                    <textarea @bind="model.MessageText" @bind:event="oninput" 
-                              placeholder="Type your message here..."
-                              maxlength="918" rows="8"
-                              class="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
-                    </textarea>
+                    <FormInput Multiline="8"
+                               TValue="string"
+                               PlaceHolder="Type your message here..."
+                               maxlength="918"
+                               @bind-Value="model.MessageText" />
 
                     <div class="mt-1 flex items-center justify-between">
                         <span class="text-sm text-slate-500">Messages longer than 160 characters are charged per page.</span>
