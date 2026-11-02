@@ -15,16 +15,31 @@
     </HeaderRight>
 
     <ChildContent>
-        <Table Items="filteredItems" AllowSelect="false">
-            <Columns>
-                <Column Header="Country">
-                    <span class="text-sm font-medium text-slate-900">@context.CountryName</span>
-                </Column>
-                <Column Header="Network Operator">
-                    <span class="text-sm font-medium text-slate-600">@context.NetworkName</span>
-                </Column>
-            </Columns>
-        </Table>
+        @if (!hasSearched)
+        {
+            <div class="flex min-h-48 items-center justify-center px-4 text-center">
+                <p class="text-sm text-slate-500 dark:text-slate-400">Search for a country or network to see coverage results.</p>
+            </div>
+        }
+        else if (filteredItems is { Count: > 0 })
+        {
+            <Table Items="filteredItems" AllowSelect="false">
+                <Columns>
+                    <Column Header="Country">
+                        <span class="text-sm font-medium text-slate-900 dark:text-slate-100">@context.CountryName</span>
+                    </Column>
+                    <Column Header="Network Operator">
+                        <span class="text-sm font-medium text-slate-600 dark:text-slate-300">@context.NetworkName</span>
+                    </Column>
+                </Columns>
+            </Table>
+        }
+        else
+        {
+            <div class="flex min-h-48 items-center justify-center px-4 text-center">
+                <p class="text-sm text-slate-500 dark:text-slate-400">No coverage results found. Try another country or network.</p>
+            </div>
+        }
     </ChildContent>
 
     <FooterLeft>
@@ -35,13 +50,14 @@
     private string searchText = "";
     private List<CoverageResponse>? items;
     private List<CoverageResponse>? filteredItems;
+    private bool hasSearched;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var response = await apiClient.CoverageListAsync();
-            items = []; // response.Result.ToList();
+            items = response.Result?.ToList() ?? [];
         }
         catch (ApiException ex)
         {
@@ -55,21 +71,22 @@
         }
         finally
         {
-            filteredItems = items;
+            filteredItems = [];
         }
     }
 
     private void ApplySearch()
     {
+        hasSearched = !string.IsNullOrWhiteSpace(searchText);
         if (string.IsNullOrWhiteSpace(searchText))
         {
-            filteredItems = items ?? [];
+            filteredItems = [];
         }
         else
         {
             filteredItems = (items ?? []).Where(x =>
-                   (x.CountryName.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                || (x.NetworkName.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+                   (x.CountryName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (x.NetworkName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false))
                 .ToList();
         }
     }

@@ -14,10 +14,10 @@
                     <Icon Style="Icon.IconStyle.Mail" CssClass="text-xl text-brand-600" />
                 </div>
                 <div>
-                    <p class="text-xs font-bold tracking-widest text-slate-400 uppercase">
+                    <p class="text-xs font-bold tracking-widest text-slate-500 uppercase">
                         Message Delivery Report
                     </p>
-                    <h1 class="text-2xl leading-tight font-black text-slate-900">
+                    <h1 class="text-2xl leading-tight font-black text-slate-500">
                         Batch #@(batch?.BatchID.ToString() ?? Id ?? "—")
                     </h1>
                 </div>
@@ -187,19 +187,15 @@
             <PageBody>
                 <HeaderLeft>
                     <div>
-                        <h3 class="text-base font-bold text-slate-900">Delivery Reports Log</h3>
+                        <h3 class="text-base font-bold text-slate-500">Delivery Reports Log</h3>
                         <p class="mt-0.5 text-xs text-slate-500">Detailed breakdown of each recipient's status</p>
                     </div>
                 </HeaderLeft>
                 <HeaderRight>
                     <div class="flex items-center gap-3">
-                        <div class="relative min-w-[200px]">
-                            <input type="text"
-                                   @bind="searchQuery"
-                                   @bind:event="oninput"
-                                   placeholder="Search phone / SMSC..."
-                                   class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm transition-all focus:ring-1 focus:ring-brand-500 focus:outline-none" />
-                        </div>
+                                <SearchBox @bind-SearchTerm="searchQuery" InstantSearch="true">
+                                </SearchBox>
+
                         <Button Text="Export CSV"
                                 Icon="Icon.IconStyle.Download"
                                 Style="ColorStyle.Secondary"
@@ -212,7 +208,7 @@
                         <Table Items="@filteredReports" AllowSelect="false" EmptyMessage="No delivery reports have arrived for this batch yet.">
                             <Columns>
                                 <Column Header="Phone Number">
-                                    <span class="font-mono text-sm font-semibold text-slate-800">
+                                    <span>
                                         @context.PhoneNumber
                                     </span>
                                 </Column>

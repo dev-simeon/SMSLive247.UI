@@ -1,11 +1,20 @@
 ﻿@inject IJSRuntime JS
 @implements IAsyncDisposable
 
-<select @onchange="OnThemeChanged" value="@_currentTheme" class="p-2 text-slate-400">
+@if(_currentTheme == "dark")
+{
+    <Icon CssClass="cursor-pointer text-slate-500" Style="Icon.IconStyle.LightMode" @onclick='() => SetTheme("light")'></Icon>
+}
+@if (_currentTheme == "light")
+{
+    <Icon CssClass="cursor-pointer text-slate-500" Style="Icon.IconStyle.DarkMode" @onclick='() => SetTheme("dark")'></Icon>
+}
+
+@* <select @onchange="OnThemeChanged" value="@_currentTheme" class="p-2 text-slate-400">
     <option value="system">System</option>
     <option value="light" >Light </option>
     <option value="dark"  >Dark  </option>
-</select>
+</select> *@
 
 @code {
     private IJSObjectReference? _module;
@@ -35,6 +44,13 @@
     public void OnSystemThemeChanged(bool isDark)
     {
         StateHasChanged(); // re-render if you show a live indicator
+    }
+
+    public async Task SetTheme(string theme)
+    {
+        _currentTheme = theme;
+        if (_module != null)
+            await _module.InvokeVoidAsync("setTheme", _currentTheme);
     }
 
     public async ValueTask DisposeAsync()

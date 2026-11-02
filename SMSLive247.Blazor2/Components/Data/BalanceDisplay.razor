@@ -1,0 +1,43 @@
+﻿@* <div class="grid grid-cols-2 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <div>
+        <span class="block text-xs font-semibold tracking-wide text-slate-500 uppercase">
+            Old Balance
+        </span>
+        <span class="mt-1 block font-mono text-lg font-bold text-slate-700">
+            @OldBalance.ToString("#,##0.##")
+        </span>
+    </div>
+    <div class="text-right">
+        <span class="block text-xs font-semibold tracking-wide text-slate-500 uppercase">
+            New Balance
+        </span>
+        <span class="mt-1 block font-mono text-lg font-bold @(NewBalance < 0 ? "text-red-600" : "text-brand-600")">
+            @NewBalance.ToString("#,##0.##")
+        </span>
+    </div>
+</div> *@
+
+<FormRow Cols="2">
+    <div>
+        <label class="text-sm font-medium text-slate-700">Sender Current Balance</label>
+
+        <div class="block w-full appearance-none rounded-lg border border-slate-200 py-2.5 px-3 text-slate-900 bg-slate-100 dark:text-slate-400 dark:bg-slate-900 transition-all">
+            @OldBalance.ToString("#,##0.##")
+        </div>
+    </div>
+
+    <div>
+        <label class="text-sm font-medium text-slate-700">Sender New Balance</label>
+        <div class="block w-full appearance-none rounded-lg border border-slate-200 py-2.5 px-3 text-slate-900 bg-slate-100 dark:text-slate-400 dark:bg-slate-900 transition-all @(NewBalance < 0 ? "text-red-600" : "text-slate-700")">
+            @NewBalance.ToString("#,##0.##")
+        </div>
+    </div>
+
+</FormRow>
+
+
+@code {
+    [Parameter] public double OldBalance { get; set; }
+
+    [Parameter] public double NewBalance { get; set; }
+}

@@ -15,17 +15,17 @@
             <Columns>
                 <Column Header="File / Description">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                             <Icon Style="Icon.IconStyle.FileText" CssClass="h-5 w-5" />
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-slate-900">@(string.IsNullOrEmpty(context.Description) ? "—" : context.Description)</p>
+                            <p>@(string.IsNullOrEmpty(context.Description) ? "—" : context.Description)</p>
                             <p class="font-mono text-xs text-slate-400 uppercase">@context.FileType</p>
                         </div>
                     </div>
                 </Column>
                 <Column Header="Records">
-                    <span class="text-sm font-semibold text-slate-900">@context.TotalNumbers.ToString("#,##0")</span>
+                    <span>@context.TotalNumbers.ToString("#,##0")</span>
                 </Column>
                 <Column Header="Date Uploaded">
                     <FormatDate DateTime="@context.DateCreated" />

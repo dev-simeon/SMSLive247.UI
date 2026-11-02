@@ -204,7 +204,7 @@ namespace SMSLive247.Blazor.Pages.ViewModels
         public static string CountSmsMessages(this string? strSmsText, int smsMaxParts)
         {
             if (string.IsNullOrWhiteSpace(strSmsText))
-                return string.Empty;
+                return "0 / 160 (1 page)";
 
             int intSmsLength = strSmsText.GetValidGsmTextLength();
             int intSmsParts = GetMessageParts(intSmsLength);

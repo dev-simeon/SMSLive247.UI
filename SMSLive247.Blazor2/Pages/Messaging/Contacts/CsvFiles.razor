@@ -13,18 +13,17 @@
             <Columns>
                 <Column Header="File / Description">
                     <div class="flex items-center gap-3">
-                        <div class="@GetFileTypeBubbleStyle(context.FileType)">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                             <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="h-5 w-5" />
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-slate-900">@(string.IsNullOrEmpty(context.Description) ?
-                                                                                                                                                                                                                                                                                       "—" : context.Description)</p>
-                                <p class="font-mono text-xs text-slate-400 uppercase">@context.FileType</p>
-                            </div>
+                            <p>@(string.IsNullOrEmpty(context.Description) ? "—" : context.Description)</p>
+                            <p class="font-mono text-xs text-slate-400 uppercase">@context.FileType</p>
                         </div>
+                    </div>
                     </Column>
                     <Column Header="Records">
-                        <span class="text-sm font-semibold text-slate-900">@context.TotalNumbers.ToString("#,##0")</span>
+                        <span>@context.TotalNumbers.ToString("#,##0")</span>
                     </Column>
                     <Column Header="Date Uploaded">
                         <FormatDate DateTime="@context.DateCreated" />
@@ -110,14 +109,6 @@
                 .Take(pageSize)
                 .ToList();
         }
-    }
-
-    private string GetFileTypeBubbleStyle(string? fileType)
-    {
-        var isCsv = string.Equals(fileType, "csv", StringComparison.OrdinalIgnoreCase);
-        return isCsv
-            ? "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-emerald-50 text-emerald-600"
-            : "w-10 h-10 rounded-lg flex items-center justify-center shrink-0 bg-slate-100 text-slate-600";
     }
 
     private void HandleUpload()

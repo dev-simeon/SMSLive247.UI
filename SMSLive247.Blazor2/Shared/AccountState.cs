@@ -9,8 +9,13 @@ namespace SMSLive247.UI.Shared
 
         public void Reload()
         {
-            //SortColumn = column;
             OnChange?.Invoke();
+        }
+
+        public void UpdateCredits(double credits)
+        {
+            Account.Credits = credits;
+            Reload();
         }
     }
 }

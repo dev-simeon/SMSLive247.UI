@@ -9,13 +9,13 @@
             return colorStyle switch
             {
                 ColorStyle.Primary      => "bg-brand-500  text-white",
-                ColorStyle.Secondary    => "bg-slate-100  text-slate-700",
+                ColorStyle.Secondary    => "bg-slate-100  text-slate-700 dark:bg-slate-700  dark:text-slate-100",
                 ColorStyle.Success      => "bg-green-500  text-white",
                 ColorStyle.Danger       => "bg-red-500    text-white",
                 ColorStyle.Warning      => "bg-amber-500  text-white",
                 ColorStyle.Info         => "bg-blue-500   text-white",
-                ColorStyle.Light        => "bg-gray-100   text-gray-800",
-                ColorStyle.Dark         => "bg-gray-800   text-gray-100",
+                ColorStyle.Light        => "bg-gray-100   text-gray-800 dark:bg-gray-800  dark:text-gray-100",
+                ColorStyle.Dark         => "bg-gray-800   text-gray-100 dark:bg-gray-100  dark:text-gray-800",
                 _ => throw new ArgumentOutOfRangeException(nameof(colorStyle), colorStyle, null)
             };
         }

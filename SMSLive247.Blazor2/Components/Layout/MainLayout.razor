@@ -2,6 +2,8 @@
 @inject AuthenticationStateProvider auth;
 @inject NavigationManager nav
 
+@implements IDisposable
+
 <CascadingValue Value="@self" Name="MainAccount">
 
     <div class="flex h-screen flex-col overflow-hidden bg-gray-100 dark:bg-gray-900">
@@ -37,6 +39,7 @@
         {
             var response = await apiClient.AccountGetAsync("self");
             self = new(response.Result);
+            self.OnChange += HandleAccountStateChanged;
         }
         catch (ApiException ex)
         {
@@ -49,6 +52,14 @@
         }
     }
 
+
+    private void HandleAccountStateChanged() => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        if (self is not null)
+            self.OnChange -= HandleAccountStateChanged;
+    }
 
     private void setSidebarOpen(bool value)
     {

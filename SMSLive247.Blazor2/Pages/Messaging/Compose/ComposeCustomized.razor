@@ -281,6 +281,7 @@
                 <SchedulerCard TotalRecipients="@SchedulerRecipientCount"
                                ValidationMessages="@SchedulerValidationMessages"
                                IsSending="isSending"
+                               ResetKey="@sendResetKey"
                                OnSubmit="SendMessageCore" />
             </div>
         </div>
@@ -298,6 +299,7 @@
     private readonly List<Dictionary<string, string>> previewRows = [];
     private bool isLoading = true;
     private bool isSending;
+    private int sendResetKey;
     private int currentStep = 1;
 
     private ComposeTemplateModel? model;
@@ -307,6 +309,8 @@
     private BatchFileResponse? selectedExistingFile;
     private SelectTemplateFileModal templateFilesModal = new();
     private MessageTemplateEditor templateEditor;
+
+    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
 
     private bool hasDataSource => selectedExistingFile is not null;
     private int messageParts => string.IsNullOrEmpty(message) ? 0 : message.Length <= 160 ? 1 : (int)Math.Ceiling(message.Length / 153d);
@@ -478,6 +482,7 @@
         }
 
         isSending = true;
+        await InvokeAsync(StateHasChanged);
         try
         {
             var fileId = selectedExistingFile?.BatchFileID;
@@ -492,16 +497,24 @@
                     DeliveryTime = scheduledDeliveryTime
                 };
 
-            await apiClient.SmsBatchCsvCreateAsync(request);
-            await alert.Success(scheduledDeliveryTime.HasValue ? "Your personalized messages have been scheduled." : "Your personalized messages are being processed.", "Message Created");
+            var response = (await apiClient.SmsBatchCsvCreateAsync(request)).Result;
             
             // Reset
             message = "";
+            if (model is not null)
+                model.SenderID = string.Empty;
             selectedExistingFile = null;
             headers.Clear();
             previewRows.Clear();
             phoneColumn = null;
             currentStep = 1;
+            sendResetKey++;
+            await RefreshBalanceAsync(response?.CreditBalance);
+            await alert.Success(scheduledDeliveryTime.HasValue ? "Your personalized messages have been scheduled." : "Your personalized messages are being processed.", "Message Created");
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage, "Unable to Send Message");
         }
         catch (Exception ex)
         {
@@ -510,6 +523,33 @@
         finally
         {
             isSending = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task RefreshBalanceAsync(double? creditBalance)
+    {
+        if (MainAccount is null)
+            return;
+
+        if (creditBalance.HasValue)
+        {
+            MainAccount.UpdateCredits(creditBalance.Value);
+            return;
+        }
+
+        try
+        {
+            var account = await apiClient.AccountGetAsync("self");
+            MainAccount.UpdateCredits(account.Result.Credits);
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error($"The message was submitted, but the balance could not be refreshed. {ex.FriendlyErrorMessage}", "Balance not refreshed");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"The message was submitted, but the balance could not be refreshed. {ex.Message}", "Balance not refreshed");
         }
     }
 

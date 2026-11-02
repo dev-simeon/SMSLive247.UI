@@ -1,7 +1,7 @@
 <Modal Title="Select Bulk File" Size="Modal.ModalSize.Large" @bind-IsVisible="isVisible">
     <Body>
         <div class="flex h-[400px] flex-1 flex-col">
-            <p class="mb-4 text-slate-500">Choose from your previously uploaded TXT files.</p>
+            <p class="mb-4">Choose from your previously uploaded TXT files.</p>
 
             <!-- Header area (search + select all) -->
             <div class="mb-4">
@@ -13,7 +13,7 @@
 
                 <div class="ml-4 flex items-center gap-2">
                     <input id="bf-all" type="checkbox" @onchange="OnSelectAll" class="h-4 w-4 rounded border-slate-300 accent-brand-500" />
-                    <label for="bf-all" class="cursor-pointer font-medium text-slate-700">Select All</label>
+                    <label for="bf-all" class="cursor-pointer font-medium">Select All</label>
                 </div>
             </div>
 
@@ -36,7 +36,7 @@
                                 <input type="checkbox"
                                     value="@f.Key" checked="@f.Selected"
                                     id="bf-@f.Key" @onchange="e => OnSelect(f, e)" class="accent-brand-500 h-4 w-4 rounded border-slate-300" />
-                                <label class="cursor-pointer truncate text-slate-700 select-none" for="bf-@f.Key">
+                                <label class="cursor-pointer truncate select-none" for="bf-@f.Key">
                                     @f.Name <span class="ml-1 text-sm text-slate-400">(@f.Count.ToString("N0") numbers)</span>
                                 </label>
                             </div>
