@@ -3,11 +3,19 @@
 
 @if(_currentTheme == "dark")
 {
-    <Icon CssClass="cursor-pointer text-slate-500" Style="Icon.IconStyle.LightMode" @onclick='() => SetTheme("light")'></Icon>
+    <button type="button" title="Switch to light mode" aria-label="Switch to light mode"
+            class="rounded-md p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:hover:bg-slate-800"
+            @onclick='() => SetTheme("light")'>
+        <Icon CssClass="text-xl" Style="Icon.IconStyle.LightMode" />
+    </button>
 }
 @if (_currentTheme == "light")
 {
-    <Icon CssClass="cursor-pointer text-slate-500" Style="Icon.IconStyle.DarkMode" @onclick='() => SetTheme("dark")'></Icon>
+    <button type="button" title="Switch to dark mode" aria-label="Switch to dark mode"
+            class="rounded-md p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:hover:bg-slate-800"
+            @onclick='() => SetTheme("dark")'>
+        <Icon CssClass="text-xl" Style="Icon.IconStyle.DarkMode" />
+    </button>
 }
 
 @* <select @onchange="OnThemeChanged" value="@_currentTheme" class="p-2 text-slate-400">

@@ -8,12 +8,14 @@
                            IconStyle="Icon.IconStyle.Mail" @bind-Value="model.Recipient" Required="true" />
 
                 <FormInput Type="number"
-                           HelpText="Minimum SMS credit quantity to transfer is 50 sms credit."
+                           HelpText="Minimum SMS credit quantity to transfer is 50 SMS credits."
                            Label="Credits"
                            PlaceHolder="Enter amount to transfer"
                            Required="true"
-                           @bind-Value="model.Credits"
-                           @oninput="OnCreditChanged" />
+                           Min="50"
+                           Max="@maxTransferCredits"
+                           step="1"
+                           @bind-Value="model.Credits" />
                 @if (model.Credits > 0 && model.Credits < 50)
                 {
                     <p class="mt-1 text-xs font-semibold text-red-500">
@@ -53,6 +55,7 @@
     private TransferRequest model = new();
 
     private double newBalance => currentBalance - model.Credits;
+    private int maxTransferCredits => Math.Max(50, (int)Math.Floor(currentBalance));
     private bool canSubmit => !string.IsNullOrWhiteSpace(model.Recipient)
         && model.Credits >= 50 && model.Credits <= currentBalance;
 
@@ -117,11 +120,4 @@
         }
     }
 
-    private void OnCreditChanged(ChangeEventArgs e)
-    {
-        if (int.TryParse(e.Value?.ToString(), out int credits))
-        {
-            model.Credits = credits;
-        }
-    }
 }

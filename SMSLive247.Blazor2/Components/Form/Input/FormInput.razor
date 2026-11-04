@@ -92,8 +92,8 @@
 
     // validation parameters
     [Parameter] public bool Required { get; set; } = false;
-    [Parameter] public TValue? Min { get; set; }
-    [Parameter] public TValue? Max { get; set; }
+    [Parameter] public object? Min { get; set; }
+    [Parameter] public object? Max { get; set; }
 
     [Parameter] public string InvalidMessage { get; set; } = "Please enter a valid {0}.";
     [Parameter] public string RequiredMessage { get; set; } = "The {0} field is required.";
@@ -141,20 +141,15 @@
         [MaybeNullWhen(false)] out TValue result,
         [NotNullWhen(false)] out string? validationErrorMessage)
     {
-        try
+        if (BindConverter.TryConvertTo<TValue>(value, System.Globalization.CultureInfo.CurrentCulture, out result))
         {
-            result = value is null ? default : (TValue)(object)value;
-
             validationErrorMessage = null;
             return true;
         }
-        catch (Exception ex)
-        {
-            result = default!;
-            validationErrorMessage = ex.Message;
-            return false;
-        }
 
+        result = default!;
+        validationErrorMessage = string.Format(InvalidMessage, Label ?? Type ?? "value");
+        return false;
     }
 
     private async Task OnBlur(FocusEventArgs e)
