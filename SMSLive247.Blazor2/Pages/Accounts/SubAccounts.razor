@@ -28,7 +28,7 @@
                 </Column>
                 <Column Header="Balance" Align="right">
                     <div class="inline-flex items-center justify-end gap-1.5">
-                        <span>@context.Credits.ToString("#,##0.##")</span>
+                        <span>@context.WalletBalance.ToString("#,##0.##")</span>
                         <button type="button"
                                 @onclick="() => transferModal.Show(Main.Account, context)"
                                 class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-brand-600 transition-colors cursor-pointer"

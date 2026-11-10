@@ -18,7 +18,7 @@
                         </button>
                     </header>
 
-                    <main class="@bodyHeightCss overflow-y-auto px-4 py-4 dark:bg-grey-900 text-slate-500 dark:text-slate-200" style="@bodyStyle">
+                    <main class="@bodyHeightCss @(BodyScrollable ? "overflow-y-auto" : "overflow-visible") px-4 py-4 dark:bg-grey-900 text-slate-500 dark:text-slate-200" style="@bodyStyle">
                         @Body
                     </main>
 
@@ -42,6 +42,8 @@
     [Parameter] public RenderFragment? Body { get; set; }
     [Parameter] public RenderFragment? Footer { get; set; }
     [Parameter] public ModalSize Size { get; set; } = ModalSize.Medium;
+    [Parameter] public bool BodyScrollable { get; set; } = true;
+    [Parameter] public bool FixedHeight { get; set; }
     // [Parameter] public string CssClass { get; set; } = "";
     // [Parameter] public string BodyCssClass { get; set; } = "";
     // [Parameter] public string FooterCssClass { get; set; } = "";
@@ -61,9 +63,11 @@
     };
     private string panelStyle => Size == ModalSize.Full
         ? "width:75vw;max-width:calc(100vw - 2rem);height:75vh;display:flex;flex-direction:column;"
-        : "";
-    private string bodyStyle => Size == ModalSize.Full ? "min-height:0;flex:1;" : "";
-    private string bodyHeightCss => Size == ModalSize.Full ? "" : "max-h-[70vh]";
+        : FixedHeight
+            ? "height:500px;min-height:500px;max-height:calc(100dvh - 2rem);display:flex;flex-direction:column;"
+            : "";
+    private string bodyStyle => Size == ModalSize.Full || FixedHeight ? "min-height:0;flex:1;" : "";
+    private string bodyHeightCss => Size == ModalSize.Full || FixedHeight || !BodyScrollable ? "" : "max-h-[70vh]";
 
     private async Task OnClose()
     {

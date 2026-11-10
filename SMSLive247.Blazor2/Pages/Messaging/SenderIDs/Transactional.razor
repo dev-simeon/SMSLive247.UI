@@ -1,56 +1,152 @@
 @using SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
 
-<p class="mb-5 text-slate-500">Transactional sender IDs are for expected service messages linked to a customer action, such as OTPs, receipts, account alerts, appointment updates and delivery notifications. Do not use them for promotions, offers or marketing. Network whitelisting, approval and coverage depend on the operators.</p>
+<p class="mb-5 text-slate-500 dark:text-slate-400">Transactional sender IDs are for expected service messages linked to a customer action, such as OTPs, receipts, account alerts, appointment updates and delivery notifications. Do not use them for promotions, offers or marketing. Network whitelisting, approval and coverage depend on the operators.</p>
 
-
-<PageBody>
-    <HeaderLeft>
-        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ApplyFilters" InstantSearch="true">
-            <FormSelect TValue="string" @bind-Value="searchStatus" @bind-Value:after="OnStatusChanged" IsEmbedded="true">
-                <option value="">All Statuses</option>
-                <option value="APPROVED">Approved</option>
-                <option value="PENDING">Pending</option>
-                <option value="REJECTED">Rejected</option>
-            </FormSelect>
-        </SearchBox>
-    </HeaderLeft>
-    <HeaderRight>
-        <Button Icon="Icon.IconStyle.PlusCircle" hidden Text="Add Transaction Sender ID" OnClick="() => requestModal.Show()" />
-    </HeaderRight>
-    <ChildContent>
-        <Table Items="filteredItems" EmptyMessage="No transactional sender ID requests found">
-            <Columns>
-                <Column Header="Sender ID">@context.SenderID</Column>
-                <Column Header="Uploaded Documents" Width="45%">
-                    @if (context.Files is { Count: > 0 })
+<div class="transactional-layout flex flex-col items-stretch gap-6 lg:flex-row">
+    <aside class="col-4 min-w-0 w-full space-y-6 lg:flex-[4_1_0%]">
+        <Card>
+            <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100">Certificate of Incorporation (CAC)</h2>
+            @if (HasApprovedTransactionalId)
+            {
+                <div class="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300">Your CAC is locked because a transactional sender ID using it has been approved. It will be reused for future requests.</div>
+            }
+            @if (ExistingCacDocument is { } existingCac)
+            {
+                <div class="mt-3 flex items-center justify-between gap-3 text-sm">
+                    <span class="text-slate-500 dark:text-slate-400">CAC document uploaded</span>
+                    @if (TryGetDownloadUrl(existingCac, out var cacUrl))
                     {
-                        <div class="flex flex-wrap gap-2">
-                            @foreach (var file in context.Files)
-                            {
-                                if (TryGetDownloadUrl(file, out var downloadUrl))
-                                {
-                                    <a href="@downloadUrl" download="@GetFileName(file)" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/60" title="Download @GetFileName(file)">
-                                        <Icon Style="Icon.IconStyle.Download" /><span class="max-w-40 truncate">@GetFileName(file)</span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="inline-flex min-h-8 items-center rounded-md bg-slate-100 px-2.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300" title="The API returned a file reference, but not a downloadable URL.">@GetFileName(file)</span>
-                                }
-                            }
-                        </div>
+                        <a href="@cacUrl" target="_blank" rel="noopener noreferrer" class="shrink-0 font-medium text-brand-600 underline-offset-2 hover:underline dark:text-blue-400">View document</a>
                     }
-                    else { <span class="text-sm text-slate-400">No documents attached</span> }
-                </Column>
-                <Column Header="Status"><Badge Variant="Badge.StatusVariant.SenderIdRequest" Value="@(context.Status ?? "rejected")" /></Column>
-                <Column Header="Date Requested"><FormatDate DateTime="@context.DateRequested"></FormatDate></Column>
-                <Column><Actions OnDelete="() => HandleDelete(context)" /></Column>
-            </Columns>
-        </Table>
-    </ChildContent>
-</PageBody>
+                    else
+                    {
+                        <span class="max-w-48 truncate text-slate-600 dark:text-slate-300" title="@GetFileName(existingCac)">@GetFileName(existingCac)</span>
+                    }
+                </div>
+            }
+            else if (cacFile is not null)
+            {
+                <div class="mt-3 flex items-center justify-between gap-3 text-sm">
+                    <span class="flex min-w-0 items-center gap-2 text-emerald-700 dark:text-emerald-400"><Icon Style="Icon.IconStyle.CheckCircle" /> <span class="truncate">CAC document uploaded</span></span>
+                    <button type="button" class="shrink-0 font-medium text-brand-600 no-underline hover:text-brand-700 hover:no-underline dark:text-blue-400" @onclick="ViewSelectedCac">View document</button>
+                </div>
+            }
+            @if (!HasApprovedTransactionalId && ExistingCacDocument is null && cacFile is null)
+            {
+                <InputFile id="transactional-cac" accept=".pdf,application/pdf" aria-label="Upload Certificate of Incorporation PDF" OnChange="SelectCacFile" class="peer sr-only" />
+                <label for="transactional-cac" class="mt-4 flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 transition hover:border-brand-500 hover:bg-blue-50 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800">
+                    <span class="min-w-0 truncate font-medium">@(cacFile is null ? "Choose CAC PDF" : cacFile.Name)</span>
+                    <span class="shrink-0 rounded-md bg-blue-50 px-3 py-1.5 font-semibold text-brand-700 dark:bg-slate-800 dark:text-blue-300">Browse</span>
+                </label>
+                <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">PDF only, up to 15 MB.</p>
+            }
 
-<CorporateRequestModal @ref="requestModal" OnCompleted="OnRefresh" />
+            <label for="transactional-license" class="mt-4 flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+                <input id="transactional-license" type="checkbox" @bind="requiresLicense" @bind:after="OnLicenseRequirementChanged" disabled="@HasApprovedTransactionalId" class="shrink-0 rounded border-slate-300 text-brand-600 focus:ring-brand-500 disabled:cursor-not-allowed disabled:opacity-60" />
+                <span>Does your business require an operating licence?</span>
+            </label>
+            @if (ExistingLicenseDocument is { } existingLicense)
+            {
+                <div class="mt-2 flex items-center justify-between gap-3 text-sm">
+                    <span class="text-slate-500 dark:text-slate-400">Licence document uploaded</span>
+                    @if (TryGetDownloadUrl(existingLicense, out var licenseUrl))
+                    {
+                        <a href="@licenseUrl" target="_blank" rel="noopener noreferrer" class="shrink-0 font-medium text-brand-600 underline-offset-2 hover:underline dark:text-blue-400">View document</a>
+                    }
+                    else
+                    {
+                        <span class="max-w-48 truncate text-slate-600 dark:text-slate-300" title="@GetFileName(existingLicense)">@GetFileName(existingLicense)</span>
+                    }
+                </div>
+            }
+            @if (requiresLicense)
+            {
+                @if (!HasApprovedTransactionalId)
+                {
+                    <InputFile id="transactional-license-file" accept=".pdf,application/pdf" aria-label="Upload operating licence PDF" OnChange="SelectLicenseFile" class="peer sr-only" />
+                    <label for="transactional-license-file" class="mt-2 flex min-h-12 w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 transition hover:border-brand-500 hover:bg-blue-50 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800">
+                        <span class="min-w-0 truncate font-medium">@(licenseFile is null ? "Choose operating licence PDF" : licenseFile.Name)</span>
+                        <span class="shrink-0 rounded-md bg-blue-50 px-3 py-1.5 font-semibold text-brand-700 dark:bg-slate-800 dark:text-blue-300">Browse</span>
+                    </label>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">PDF only, up to 15 MB.</p>
+                }
+            }
+
+            <Button CssClass="mt-5 w-full" Icon="Icon.IconStyle.FileText" Text="Upload documents" IsDisabled="@(!CanRequestTransactionalId)" OnClick="OpenRequest" />
+        </Card>
+        <Card>
+            <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100">Authorization letter samples</h2>
+            <ul class="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-500 marker:text-brand-600 dark:text-slate-400 dark:marker:text-blue-400">
+                <li>Download the authorization letter for each network.</li>
+                <li>Complete each letter on your organization's letterhead.</li>
+                <li>Have each letter signed and stamped by an authorized representative.</li>
+                <li>Scan and upload the completed letters as PDF files.</li>
+            </ul>
+            <div class="mt-4 grid grid-cols-2 gap-x-4 gap-y-2">
+                @foreach (var network in Networks)
+                {
+                    <button type="button" class="inline-flex items-center gap-2 py-1 text-sm font-medium text-brand-600 no-underline hover:text-brand-700 hover:no-underline focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:text-blue-400 dark:hover:text-blue-300" @onclick="() => DownloadAuthorizationTemplate(network)">
+                        <Icon Style="Icon.IconStyle.Download" /> @network sample
+                    </button>
+                }
+            </div>
+        </Card>
+    </aside>
+
+    <section class="col-8 min-w-0 w-full lg:flex-[8_1_0%]">
+        <PageBody>
+            <HeaderLeft>
+                <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ApplyFilters" InstantSearch="true">
+                    <FormSelect TValue="string" @bind-Value="searchStatus" @bind-Value:after="OnStatusChanged" IsEmbedded="true">
+                        <option value="">All Statuses</option>
+                        <option value="APPROVED">Approved</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="REJECTED">Rejected</option>
+                    </FormSelect>
+                </SearchBox>
+            </HeaderLeft>
+            <HeaderRight>
+                @if (HasCacDocument || HasApprovedTransactionalId)
+                {
+                    <Button Icon="Icon.IconStyle.PlusCircle" Text="Request Sender ID" IsDisabled="@(!CanRequestTransactionalId)" OnClick="OpenRequest" />
+                }
+            </HeaderRight>
+            <ChildContent>
+                <Table Items="filteredItems" EmptyMessage="No transactional sender ID requests found">
+                    <Columns>
+                        <Column Header="Sender ID">@context.SenderID</Column>
+                        <Column Header="Uploaded Documents" Width="45%">
+                            @if (context.Files is { Count: > 0 })
+                            {
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach (var file in context.Files)
+                                    {
+                                        if (TryGetDownloadUrl(file, out var downloadUrl))
+                                        {
+                                            <a href="@downloadUrl" download="@GetFileName(file)" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-8 items-center gap-1.5 rounded-md border border-blue-200 bg-blue-50 px-2.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/50 dark:text-blue-300 dark:hover:bg-blue-900/60" title="Download @GetFileName(file)">
+                                                <Icon Style="Icon.IconStyle.Download" /><span class="max-w-40 truncate">@GetFileName(file)</span>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="inline-flex min-h-8 items-center rounded-md bg-slate-100 px-2.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300" title="The API returned a file reference, but not a downloadable URL.">@GetFileName(file)</span>
+                                        }
+                                    }
+                                </div>
+                            }
+                            else { <span class="text-sm text-slate-400">No documents attached</span> }
+                        </Column>
+                        <Column Header="Status"><Badge Variant="Badge.StatusVariant.SenderIdRequest" Value="@(context.Status ?? "rejected")" /></Column>
+                        <Column Header="Date Requested"><FormatDate DateTime="@context.DateRequested"></FormatDate></Column>
+                        <Column><Actions OnDelete="() => HandleDelete(context)" /></Column>
+                    </Columns>
+                </Table>
+            </ChildContent>
+        </PageBody>
+    </section>
+</div>
+
+<CorporateRequestModal @ref="requestModal" CacFile="cacFile" LicenseFile="licenseFile" RequiresLicense="requiresLicense" HasApprovedTransactionalId="HasApprovedTransactionalId" OnCompleted="OnRefresh" />
 
 @code {
     [Parameter] public IReadOnlyList<SenderIdResponse> Items { get; set; } = Array.Empty<SenderIdResponse>();
@@ -60,8 +156,32 @@
     private string? searchQuery;
     private List<SenderIdResponse> filteredItems = [];
     private CorporateRequestModal requestModal = new();
+    private IBrowserFile? cacFile;
+    private IBrowserFile? licenseFile;
+    private bool requiresLicense;
+    private bool licenseRequirementInitialized;
+    private static readonly string[] Networks = ["MTN", "Airtel", "Glo", "9mobile"];
+    private bool HasApprovedTransactionalId => Items.Any(x => string.Equals(x.Status, "APPROVED", StringComparison.OrdinalIgnoreCase));
+    private string? ExistingCacDocument => FindBusinessDocument(["CAC_", "Certificate"]);
+    private string? ExistingLicenseDocument => FindBusinessDocument(["License", "Licence"]);
+    private bool HasCacDocument => ExistingCacDocument is not null || cacFile is not null;
+    private bool CanRequestTransactionalId => HasApprovedTransactionalId || (HasCacDocument && (!requiresLicense || licenseFile is not null || ExistingLicenseDocument is not null));
 
-    protected override void OnParametersSet() => ApplyFilters();
+    protected override void OnParametersSet()
+    {
+        ApplyFilters();
+        if (!licenseRequirementInitialized)
+        {
+            requiresLicense = ExistingLicenseDocument is not null;
+            licenseRequirementInitialized = true;
+        }
+    }
+
+    private string? FindBusinessDocument(string[] markers) => Items
+        .OrderByDescending(item => string.Equals(item.Status, "APPROVED", StringComparison.OrdinalIgnoreCase))
+        .ThenByDescending(item => item.DateRequested)
+        .SelectMany(item => item.Files ?? [])
+        .FirstOrDefault(file => markers.Any(marker => GetFileName(file).Contains(marker, StringComparison.OrdinalIgnoreCase)));
 
     private void ApplyFilters()
     {
@@ -78,6 +198,96 @@
         ApplyFilters();
         return Task.CompletedTask;
     }
+
+    private async Task SelectCacFile(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        if (!Path.GetExtension(file.Name).Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            cacFile = null;
+            await alert.Error("Upload your Certificate of Incorporation as a PDF file.", "PDF file required");
+            return;
+        }
+        if (file.Size > 15 * 1024 * 1024)
+        {
+            cacFile = null;
+            await alert.Error("The CAC document must be 15 MB or smaller.", "File too large");
+            return;
+        }
+        cacFile = file;
+    }
+
+    private async Task SelectLicenseFile(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        if (!Path.GetExtension(file.Name).Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            licenseFile = null;
+            await alert.Error("Upload your operating licence as a PDF file.", "PDF file required");
+            return;
+        }
+        if (file.Size > 15 * 1024 * 1024)
+        {
+            licenseFile = null;
+            await alert.Error("The operating licence must be 15 MB or smaller.", "File too large");
+            return;
+        }
+        licenseFile = file;
+    }
+
+    private void OnLicenseRequirementChanged()
+    {
+        if (!requiresLicense)
+            licenseFile = null;
+    }
+
+    private void OpenRequest()
+    {
+        if (CanRequestTransactionalId)
+            requestModal.Show();
+    }
+
+    private async Task ViewSelectedCac()
+    {
+        if (cacFile is null)
+            return;
+
+        try
+        {
+            await using var stream = cacFile.OpenReadStream(15 * 1024 * 1024);
+            using var streamReference = new DotNetStreamReference(stream);
+            var opened = await js.InvokeAsync<bool>("openPdfFromStream", cacFile.Name, streamReference);
+            if (!opened)
+                await alert.Error("Allow pop-ups to view the CAC document.", "Unable to open document");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"The CAC document could not be opened. {ex.Message}", "Unable to open document");
+        }
+    }
+
+    private async Task DownloadAuthorizationTemplate(string network)
+    {
+        var document = BuildAuthorizationTemplate(network);
+        await using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(document));
+        using var streamReference = new DotNetStreamReference(stream);
+        await js.InvokeVoidAsync("downloadFileFromStream", $"{network}-Whitelist-Authorization-Template.doc", streamReference);
+    }
+
+    private static string BuildAuthorizationTemplate(string network) => $"""
+        <!doctype html>
+        <html><head><meta charset="utf-8"><title>{network} Sender ID Whitelisting Authorization</title></head>
+        <body style="font-family:Arial,sans-serif;line-height:1.6;margin:2.5cm;color:#111">
+          <p style="text-align:center"><strong>[PRINT ON YOUR ORGANIZATION'S LETTERHEAD]</strong></p>
+          <p>[Date]</p><p>The Management<br>{network}<br>Nigeria</p>
+          <p><strong>Subject: Authorization to whitelist sender ID [SENDER ID]</strong></p>
+          <p>We, <strong>[REGISTERED BUSINESS NAME]</strong> (RC/Registration No. [REGISTRATION NUMBER]), authorize the whitelisting of sender ID <strong>[SENDER ID]</strong> on the {network} network for transactional messages relating to our organization's services.</p>
+          <p>The sender ID will be used only for service communications such as account notifications, transaction updates and other messages initiated in connection with our customers' use of our services. It will not be used for unsolicited promotional or marketing messages.</p>
+          <p>We confirm that we own or are authorized to use this sender ID and accept responsibility for messages sent using it. Please contact us using the details below if further verification is required.</p>
+          <p>Yours faithfully,</p><p style="margin-top:2.5cm">______________________________<br>[AUTHORIZED SIGNATORY NAME]<br>[TITLE / POSITION]<br>[PHONE NUMBER] · [EMAIL ADDRESS]</p>
+          <p><strong>Organization stamp</strong></p>
+        </body></html>
+        """;
 
     private static bool TryGetDownloadUrl(string? file, out string url)
     {

@@ -1,0 +1,59 @@
+<div role="status" class="flex items-center gap-3 rounded-lg p-3 @containerCss @CssClass">
+    <Icon Style="@IconStyle" CssClass="@iconClass" />
+    <div class="min-w-0">
+        @if (!string.IsNullOrWhiteSpace(Title))
+        {
+            <h3 class="font-semibold @titleCss">@Title</h3>
+        }
+        <div class="@MessageClass @messageCss">
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    public enum NoticeVariant { Info, Warning, Success }
+
+    [Parameter] public NoticeVariant Variant { get; set; } = NoticeVariant.Info;
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string CssClass { get; set; } = "";
+    [Parameter] public string MessageClass { get; set; } = "text-base leading-6";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private Icon.IconStyle IconStyle => Variant switch
+    {
+        NoticeVariant.Warning => Icon.IconStyle.AlertCircle,
+        NoticeVariant.Success => Icon.IconStyle.CheckCircle,
+        _ => Icon.IconStyle.Info
+    };
+
+    private string iconClass => $"shrink-0 {iconCss}";
+
+    private string containerCss => Variant switch
+    {
+        NoticeVariant.Warning => "bg-amber-50 dark:bg-amber-950/30",
+        NoticeVariant.Success => "bg-emerald-50 dark:bg-emerald-950/30",
+        _ => "bg-blue-50 dark:bg-blue-950/30"
+    };
+
+    private string iconCss => Variant switch
+    {
+        NoticeVariant.Warning => "text-amber-600 dark:text-amber-300",
+        NoticeVariant.Success => "text-emerald-600 dark:text-emerald-300",
+        _ => "text-blue-600 dark:text-blue-300"
+    };
+
+    private string titleCss => Variant switch
+    {
+        NoticeVariant.Warning => "text-amber-900 dark:text-amber-200",
+        NoticeVariant.Success => "text-emerald-900 dark:text-emerald-200",
+        _ => "text-blue-900 dark:text-blue-200"
+    };
+
+    private string messageCss => Variant switch
+    {
+        NoticeVariant.Warning => "text-amber-800 dark:text-amber-300",
+        NoticeVariant.Success => "text-emerald-800 dark:text-emerald-300",
+        _ => "text-blue-800 dark:text-blue-300"
+    };
+}

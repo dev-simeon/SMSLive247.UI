@@ -14,7 +14,7 @@ namespace SMSLive247.UI.Shared
 
         public void UpdateCredits(double credits)
         {
-            Account.Credits = credits;
+            Account.WalletBalance = credits;
             Reload();
         }
     }

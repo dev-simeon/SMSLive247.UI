@@ -189,7 +189,7 @@
             model.SenderID = string.Empty;
             model.DeliveryTime = null;
             sendResetKey++;
-            await RefreshBalanceAsync(res.CreditBalance);
+            await RefreshBalanceAsync(res.WalletCharge);
 
             var reply = deliveryTime.HasValue
                 ? "Your message has been scheduled."
@@ -226,7 +226,7 @@
         try
         {
             var account = await apiClient.AccountGetAsync("self");
-            MainAccount.UpdateCredits(account.Result.Credits);
+            MainAccount.UpdateCredits(account.Result.WalletBalance);
         }
         catch (ApiException ex)
         {
@@ -250,8 +250,8 @@
 
         message += "<br>";
 
-        message += $"Total SMS units charged: {res.CreditsCharged:#,##0} <br>";
-        //message += $"Current SMS balance: {res.CreditBalance}";
+        message += $"Total SMS units charged: {res.WalletCharge:#,##0} <br>";
+        //message += $"Current SMS balance: {res.WalletBalance}";
      
         return message;
     }

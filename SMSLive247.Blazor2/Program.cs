@@ -32,6 +32,7 @@ public partial class Program
             });
 
         builder.Services.AddScoped<AlertService>();
+        builder.Services.AddScoped<MaintenanceNoticeClient>();
         //builder.Services.AddTransient<AuthDelegateHandler>();
         //builder.Services.AddTransient<CacheDelegateHandler>();
 

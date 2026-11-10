@@ -63,7 +63,7 @@
                     </span>
                     <div class="flex min-w-0 flex-col justify-center">
                         <p class="leading-none font-bold tracking-widest text-[10px] text-slate-400 uppercase">Credits Charged</p>
-                        <p class="mt-1.5 truncate text-sm leading-none font-bold text-slate-700">@batch.CreditsCharged.ToString("N2")</p>
+                        <p class="mt-1.5 truncate text-sm leading-none font-bold text-slate-700">@batch.WalletCharge.ToString("N2")</p>
                     </div>
                 </div>
 
@@ -394,7 +394,7 @@
                 {
                     Id = msg.MessageID ?? $"{msg.BatchID}-{list.Count}",
                     PhoneNumber = msg.PhoneNumber ?? "—",
-                    CreditsCharged = msg.CreditsCharged,
+                    CreditsCharged = msg.WalletCharge,
                     DateSubmitted = msg.DateSubmitted,
                     Status = "UNKNOWN",
                     SmscID = "—",
@@ -410,7 +410,7 @@
                     {
                         Id = $"{msg.MessageID ?? msg.BatchID.ToString()}-{i}",
                         PhoneNumber = msg.PhoneNumber ?? "—",
-                        CreditsCharged = msg.CreditsCharged / (reports.Count > 0 ? reports.Count : 1),
+                        CreditsCharged = msg.WalletCharge / (reports.Count > 0 ? reports.Count : 1),
                         DateSubmitted = msg.DateSubmitted,
                         Status = rep.Status ?? "UNKNOWN",
                         SmscID = rep.SmscID ?? "—",

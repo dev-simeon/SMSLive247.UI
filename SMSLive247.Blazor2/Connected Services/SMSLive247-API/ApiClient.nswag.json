@@ -2535,10 +2535,20 @@
             "type": "string",
             "readOnly": true
           },
-          "credits": {
+          "wallet": {
+            "type": "string",
+            "readOnly": true
+          },
+          "walletBalance": {
             "type": "number",
             "readOnly": true,
             "format": "double"
+          },
+          "credits": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double",
+            "deprecated": true
           },
           "timeZone": {
             "type": "integer",
@@ -3115,14 +3125,18 @@
             "readOnly": true,
             "format": "double"
           },
-          "fxCurrency": {
-            "type": "string",
-            "readOnly": true
-          },
           "fxRate": {
             "type": "number",
             "readOnly": true,
             "format": "double"
+          },
+          "fxCurrency": {
+            "type": "string",
+            "readOnly": true
+          },
+          "wallet": {
+            "type": "string",
+            "readOnly": true
           },
           "dateCreated": {
             "type": "string",
@@ -3247,6 +3261,10 @@
             "type": "string"
           },
           "creditsCharged": {
+            "type": "number",
+            "format": "double"
+          },
+          "nairaCharged": {
             "type": "number",
             "format": "double"
           },
@@ -3474,21 +3492,32 @@
             "readOnly": true,
             "format": "int64"
           },
+          "dateSubmitted": {
+            "type": "string",
+            "readOnly": true,
+            "format": "date-time"
+          },
           "creditsCharged": {
             "type": "number",
             "readOnly": true,
-            "format": "double"
+            "format": "double",
+            "deprecated": true
           },
           "creditBalance": {
             "type": "number",
             "readOnly": true,
             "format": "double",
+            "deprecated": true,
             "nullable": true
           },
-          "dateSubmitted": {
-            "type": "string",
+          "walletCharge": {
+            "type": "number",
             "readOnly": true,
-            "format": "date-time"
+            "format": "double"
+          },
+          "wallet": {
+            "type": "string",
+            "readOnly": true
           },
           "status": {
             "type": "string",
@@ -3570,13 +3599,24 @@
           "creditsCharged": {
             "type": "number",
             "readOnly": true,
-            "format": "double"
+            "format": "double",
+            "deprecated": true
           },
           "creditBalance": {
             "type": "number",
             "readOnly": true,
             "format": "double",
+            "deprecated": true,
             "nullable": true
+          },
+          "walletCharge": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "wallet": {
+            "type": "string",
+            "readOnly": true
           },
           "reports": {
             "type": "array",
@@ -3730,7 +3770,8 @@
           },
           "credits": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "deprecated": true
           },
           "remarks": {
             "type": "string",
@@ -3766,7 +3807,17 @@
           "credits": {
             "type": "number",
             "readOnly": true,
+            "format": "double",
+            "deprecated": true
+          },
+          "walletCharge": {
+            "type": "number",
+            "readOnly": true,
             "format": "double"
+          },
+          "wallet": {
+            "type": "string",
+            "readOnly": true
           },
           "remarks": {
             "type": "string",
@@ -3842,11 +3893,6 @@
             "type": "integer",
             "readOnly": true,
             "format": "int64"
-          },
-          "creditsCharged": {
-            "type": "number",
-            "readOnly": true,
-            "format": "double"
           },
           "dateSubmitted": {
             "type": "string",

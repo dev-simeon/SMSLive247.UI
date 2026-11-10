@@ -46,7 +46,7 @@
                     Available Credits
                 </p>
                 <span class="text-4xl font-black text-slate-900 transition-colors group-hover:text-brand-600 dark:text-slate-200">
-                    @FormatNumber(account?.Credits ?? 0)
+                    @FormatNumber(account?.WalletBalance ?? 0)
                 </span>
                 <span class="mt-4 flex items-center gap-2 text-sm font-bold tracking-wide text-brand-600 uppercase transition-colors group-hover:text-brand-700">
                     Top Up Now
@@ -229,7 +229,7 @@
         ? "0000"
         : account.AccountID.Replace("MA-", "", StringComparison.OrdinalIgnoreCase);
 
-    private bool LowBalance => (account?.Credits ?? 0) < 500;
+    private bool LowBalance => (account?.WalletBalance ?? 0) < 500;
 
     protected override async Task OnInitializedAsync()
     {

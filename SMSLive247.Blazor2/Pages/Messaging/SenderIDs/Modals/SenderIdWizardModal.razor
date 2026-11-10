@@ -1,6 +1,9 @@
 @namespace SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
 
 <Modal Title="@Title"
+       Size="@Size"
+       BodyScrollable="@BodyScrollable"
+       FixedHeight="@FixedHeight"
        IsVisible="IsVisible"
        IsVisibleChanged="IsVisibleChanged">
     <Body>
@@ -48,7 +51,7 @@
             }
             else
             {
-                <Button Text="Back" Style="ColorStyle.Secondary" CssClass="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700" Icon="Icon.IconStyle.ArrowLeft" IsDisabled="IsBusy" OnClick="OnBack" />
+                <Button Text="Back" Style="ColorStyle.Secondary" CssClass="dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700" Icon="Icon.IconStyle.ChevronLeft" IsDisabled="IsBusy" OnClick="OnBack" />
             }
             <div class="flex items-center gap-3">
                 <Button Text="@PrimaryText" Icon="@PrimaryIcon" IsBusy="IsBusy" IsDisabled="IsPrimaryDisabled" OnClick="OnPrimary" />
@@ -59,6 +62,9 @@
 
 @code {
     [Parameter] public string Title { get; set; } = "";
+    [Parameter] public Modal.ModalSize Size { get; set; } = Modal.ModalSize.Medium;
+    [Parameter] public bool BodyScrollable { get; set; } = true;
+    [Parameter] public bool FixedHeight { get; set; }
     [Parameter] public string Description { get; set; } = "";
     [Parameter] public IReadOnlyList<string> Steps { get; set; } = Array.Empty<string>();
     [Parameter] public int CurrentStep { get; set; }

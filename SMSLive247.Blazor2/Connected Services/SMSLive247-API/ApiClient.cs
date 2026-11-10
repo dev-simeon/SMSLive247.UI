@@ -5441,10 +5441,21 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public string AccountName { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("credits")]
+        [System.Text.Json.Serialization.JsonPropertyName("wallet")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double Credits { get; set; } = default!;
+        public string Wallet { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("walletBalance")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double WalletBalance { get; set; } = default!;
+
+        //[System.Text.Json.Serialization.JsonPropertyName("credits")]
+
+        //[System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        //[System.Obsolete]
+        //public double Credits { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("timeZone")]
 
@@ -6081,15 +6092,20 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public double Fee { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("fxRate")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double FxRate { get; set; } = default!;
+
         [System.Text.Json.Serialization.JsonPropertyName("fxCurrency")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public string FxCurrency { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("fxRate")]
+        [System.Text.Json.Serialization.JsonPropertyName("wallet")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double FxRate { get; set; } = default!;
+        public string Wallet { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("dateCreated")]
 
@@ -6249,6 +6265,11 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public double CreditsCharged { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("nairaCharged")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double NairaCharged { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("matchNetworkId")]
 
@@ -6497,20 +6518,32 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public long TotalProcessed { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("creditsCharged")]
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double CreditsCharged { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("creditBalance")]
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double? CreditBalance { get; set; } = default!;
-
         [System.Text.Json.Serialization.JsonPropertyName("dateSubmitted")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public System.DateTimeOffset DateSubmitted { get; set; } = default!;
+
+        //[System.Text.Json.Serialization.JsonPropertyName("creditsCharged")]
+
+        //[System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        //[System.Obsolete]
+        //public double CreditsCharged { get; set; } = default!;
+
+        //[System.Text.Json.Serialization.JsonPropertyName("creditBalance")]
+
+        //[System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        //[System.Obsolete]
+        //public double? CreditBalance { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("walletCharge")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double WalletCharge { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("wallet")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string Wallet { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
 
@@ -6597,15 +6630,27 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public System.DateTimeOffset DateSubmitted { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("creditsCharged")]
+        //[System.Text.Json.Serialization.JsonPropertyName("creditsCharged")]
+
+        //[System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        //[System.Obsolete]
+        //public double CreditsCharged { get; set; } = default!;
+
+        //[System.Text.Json.Serialization.JsonPropertyName("creditBalance")]
+
+        //[System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        //[System.Obsolete]
+        //public double? CreditBalance { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("walletCharge")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double CreditsCharged { get; set; } = default!;
+        public double WalletCharge { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("creditBalance")]
+        [System.Text.Json.Serialization.JsonPropertyName("wallet")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double? CreditBalance { get; set; } = default!;
+        public string Wallet { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("reports")]
 
@@ -6769,6 +6814,7 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonPropertyName("credits")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.Never)]   
+        [System.Obsolete]
         public int Credits { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("remarks")]
@@ -6807,10 +6853,21 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public string RecipientName { get; set; } = default!;
 
-        [System.Text.Json.Serialization.JsonPropertyName("credits")]
+        //[System.Text.Json.Serialization.JsonPropertyName("credits")]
+
+        //[System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        //[System.Obsolete]
+        //public double Credits { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("walletCharge")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double Credits { get; set; } = default!;
+        public double WalletCharge { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("wallet")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public string Wallet { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("remarks")]
 
@@ -6896,11 +6953,6 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public long TotalFailed { get; set; } = default!;
-
-        [System.Text.Json.Serialization.JsonPropertyName("creditsCharged")]
-
-        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public double CreditsCharged { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("dateSubmitted")]
 

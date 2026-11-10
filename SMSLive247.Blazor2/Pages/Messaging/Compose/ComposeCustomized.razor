@@ -509,7 +509,7 @@
             phoneColumn = null;
             currentStep = 1;
             sendResetKey++;
-            await RefreshBalanceAsync(response?.CreditBalance);
+            await RefreshBalanceAsync(response?.WalletCharge);
             await alert.Success(scheduledDeliveryTime.HasValue ? "Your personalized messages have been scheduled." : "Your personalized messages are being processed.", "Message Created");
         }
         catch (ApiException ex)
@@ -541,7 +541,7 @@
         try
         {
             var account = await apiClient.AccountGetAsync("self");
-            MainAccount.UpdateCredits(account.Result.Credits);
+            MainAccount.UpdateCredits(account.Result.WalletBalance);
         }
         catch (ApiException ex)
         {

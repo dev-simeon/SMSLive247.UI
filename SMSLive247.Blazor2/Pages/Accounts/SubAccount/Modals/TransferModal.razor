@@ -46,7 +46,7 @@
     private TransferRequest model = new() { Credits = 50 };
 
     private bool parentToChild = true;
-    private double senderOldBalance => parentToChild ? parentAccount?.Credits ?? 0 : childAccount?.Credits ?? 0;
+    private double senderOldBalance => parentToChild ? parentAccount?.WalletBalance ?? 0 : childAccount?.WalletBalance ?? 0;
     private double senderNewBalance => senderOldBalance - model.Credits;
 
 

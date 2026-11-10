@@ -7,11 +7,12 @@
 <CascadingValue Value="@self" Name="MainAccount">
 
     <div class="flex h-screen flex-col overflow-hidden bg-gray-100 dark:bg-gray-900">
+        <MaintenanceBanner />
         <div class="flex flex-1 overflow-hidden">
             <Sidebar @bind-IsOpen="sidebarOpen"></Sidebar>
             <div class="flex min-w-0 flex-1 flex-col overflow-hidden transition-all duration-300">
                 <Header OnMenuClick="() => setSidebarOpen(true)" 
-                    AvailableCredits="@self?.Account?.Credits"></Header>
+                    AvailableCredits="@self?.Account?.WalletBalance"></Header>
 
                 <main class="flex-1 space-y-8 overflow-y-auto scroll-smooth p-4 sm:p-6">
                     <Alert />

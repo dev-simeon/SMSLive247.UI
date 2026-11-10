@@ -79,7 +79,7 @@
         try
         {
             var response = await apiClient.AccountGetAsync("self");
-            currentBalance = response.Result.Credits;
+            currentBalance = response.Result.WalletBalance;
         }
         catch (ApiException ex)
         {

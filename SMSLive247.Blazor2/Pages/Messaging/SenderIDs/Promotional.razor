@@ -1,6 +1,10 @@
 @using SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
 
-<p class="mb-5 text-slate-500">Promotional sender IDs are for opted-in campaigns, offers, product announcements and marketing. Do not use them for OTPs, payment receipts, account alerts or service updates; those belong on the Transactional tab. Choose a name that identifies your organization. Network operators review each request, and approval is not guaranteed.</p>
+<p class="mb-3 text-slate-500">Promotional sender IDs are for opted-in campaigns, offers, product announcements and marketing.</p>
+<Notice Variant="Notice.NoticeVariant.Info" CssClass="mb-3">
+    Do not use them for OTPs, payment receipts, account alerts or service updates; those belong on the Transactional tab.
+</Notice>
+<p class="mb-5 text-slate-500">Choose a name that identifies your organization. Network operators review each request, and approval is not guaranteed.</p>
 
 
 <PageBody>
@@ -15,7 +19,7 @@
         </SearchBox>
     </HeaderLeft>
     <HeaderRight>
-        <Button Icon="Icon.IconStyle.PlusCircle" Text="Add Promotional Sender ID" OnClick="() => requestModal.Show()" />
+        <Button Icon="Icon.IconStyle.PlusCircle" Text="Request Sender ID" OnClick="() => requestModal.Show()" />
     </HeaderRight>
     <ChildContent>
         <Table Items="filteredItems" EmptyMessage="No promotional sender ID requests found">
