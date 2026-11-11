@@ -27,15 +27,16 @@
                     </button>
                 </Column>
                 <Column Header="Balance" Align="right">
-                    <div class="inline-flex items-center justify-end gap-1.5">
-                        <span>@context.WalletBalance.ToString("#,##0.##")</span>
-                        <button type="button"
-                                @onclick="() => transferModal.Show(Main.Account, context)"
-                                class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-brand-600 transition-colors cursor-pointer"
-                                title="Transfer credits">
-                            <Icon Style="Icon.IconStyle.Refresh" FontSize="1.3rem" />
-                        </button>
-                    </div>
+                    @context.WalletBalance.ToString("#,##0.##")
+                </Column>
+                <Column Header="Transfer Credits">
+                    <button type="button"
+                            @onclick="() => transferModal.Show(Main.Account, context)"
+                            class="inline-flex h-9 w-44 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 text-white shadow-sm transition-colors hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-white dark:bg-blue-600 dark:hover:bg-blue-500 dark:focus:ring-offset-gray-900"
+                            title="Transfer credits">
+                        <Icon Style="Icon.IconStyle.ArrowRightLeft" FontWeight="300" />
+                        <span>Transfer Credits</span>
+                    </button>
                 </Column>
                 <Column Header="Status">
                     <Badge Variant="Badge.StatusVariant.ActiveInactive"
@@ -49,7 +50,9 @@
                 </Column>
                 <Column Align="right">
                     <Actions EditLink="@Const.Routes.Account.SubAccountDetailsUrl(context.AccountID)"
-                             OnDelete="e => DeleteSubAccount(context)" />
+                             OnDelete="e => DeleteSubAccount(context)">
+                            @* <Icon Style="Icon.IconStyle.ArrowRightLeft" /> *@
+                    </Actions>
                 </Column>
             </Columns>
         </Table>

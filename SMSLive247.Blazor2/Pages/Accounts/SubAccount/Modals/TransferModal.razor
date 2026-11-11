@@ -25,7 +25,7 @@
                        PlaceHolder="Enter amount to transfer"
                        Required="true"
                        min="50"
-                       @bind-Value="model.Credits"
+                       @bind-Value="model.Value"
                        @oninput="OnCreditChanged" />
 
             
@@ -43,18 +43,18 @@
     private bool isVisible = false;
     private AccountResponse? parentAccount;
     private AccountResponse? childAccount;
-    private TransferRequest model = new() { Credits = 50 };
+    private TransferRequest model = new() { Value = 50 };
 
     private bool parentToChild = true;
     private double senderOldBalance => parentToChild ? parentAccount?.WalletBalance ?? 0 : childAccount?.WalletBalance ?? 0;
-    private double senderNewBalance => senderOldBalance - model.Credits;
+    private double senderNewBalance => senderOldBalance - model.Value;
 
 
     public void Show(AccountResponse parent, AccountResponse child)
     {
         parentAccount = parent;
         childAccount = child;
-        model.Credits = 50;
+        model.Value = 50;
         model.Recipient = childAccount.AccountID;
         model.Remarks = $"Transfer from {parentAccount.AccountName} to {childAccount.AccountName}";
 
@@ -71,14 +71,14 @@
     {
         try
         {
-            if (model.Credits < 50)
+            if (model.Value < 50)
                 throw new Exception("Minimum SMS credit quantity to transfer is 50.");
 
-            if (model.Credits > senderOldBalance)
+            if (model.Value > senderOldBalance)
                 throw new Exception("Insufficient balance for this transfer.");
 
             if (!parentToChild)
-                model.Credits = -model.Credits;
+                model.Value = -model.Value;
 
             await apiClient.TransferCreditAsync(model);
             await alert.Success("Credits transferred successfully.");
@@ -103,7 +103,7 @@
     {
         if (int.TryParse(e.Value?.ToString(), out int credits))
         {
-            model.Credits = credits;
+            model.Value = credits;
         }
     }
 }

@@ -15,14 +15,14 @@
                            Min="50"
                            Max="@maxTransferCredits"
                            step="1"
-                           @bind-Value="model.Credits" />
-                @if (model.Credits > 0 && model.Credits < 50)
+                           @bind-Value="model.Value" />
+                @if (model.Value > 0 && model.Value < 50)
                 {
                     <p class="mt-1 text-xs font-semibold text-red-500">
                         Amount must be at least 50 credits.
                     </p>
                 }
-                @if (model.Credits > currentBalance)
+                @if (model.Value > currentBalance)
                 {
                     <p class="mt-1 text-xs font-semibold text-red-500">
                         Insufficient balance to transfer this amount.
@@ -54,14 +54,14 @@
     private double currentBalance;
     private TransferRequest model = new();
 
-    private double newBalance => currentBalance - model.Credits;
+    private double newBalance => currentBalance - model.Value;
     private int maxTransferCredits => Math.Max(50, (int)Math.Floor(currentBalance));
     private bool canSubmit => !string.IsNullOrWhiteSpace(model.Recipient)
-        && model.Credits >= 50 && model.Credits <= currentBalance;
+        && model.Value >= 50 && model.Value <= currentBalance;
 
     public async Task Show()
     {
-        model.Credits = 100;
+        model.Value = 100;
         await FetchData();
 
         isVisible = true;
@@ -101,7 +101,7 @@
             isSubmitting = true;
             var response = await apiClient.TransferCreditAsync(model);
 
-            await alert.Success($"Your transfer of {model.Credits:#,##0} to {model.Recipient} was successful.");
+            await alert.Success($"Your transfer of {model.Value:#,##0} to {model.Recipient} was successful.");
             await OnCompleted.InvokeAsync();
         }
         catch (ApiException ex)
