@@ -1,4 +1,4 @@
-﻿<Modal Title="Transfer SMS Credits" @bind-IsVisible="isVisible">
+﻿<Modal Title="Transfer Balance" @bind-IsVisible="isVisible">
 
     <Body>
         <EditForm id="Transfer" Model="model" OnValidSubmit="BeginTransfer" class="space-y-6">
@@ -21,7 +21,7 @@
             </div>
 
             <FormInput Type="number"
-                       Label="Credits"
+                       Label="Value"
                        PlaceHolder="Enter amount to transfer"
                        Required="true"
                        min="50"
@@ -33,7 +33,7 @@
         </EditForm>
     </Body>
     <Footer>
-        <Button IsSubmit="true" Text="Transfer Credits" form="Transfer" />
+        <Button IsSubmit="true" Text="Transfer" form="Transfer" />
     </Footer>
 </Modal>
 

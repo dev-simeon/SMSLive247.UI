@@ -9,7 +9,7 @@
     <HeaderRight>
         @if (Sub.Account != null)
         {
-            <Button Text="Transfer Credits..." OnClick="() => transferModal.Show(Main.Account, Sub.Account)" />
+            <Button Text="Transfer Balance..." OnClick="() => transferModal.Show(Main.Account, Sub.Account)" />
         }
     </HeaderRight>
 
@@ -25,8 +25,8 @@
                 <Column Header="Recipient">
                     @context.RecipientName
                 </Column>
-                <Column Header="Credits">
-                    <FormatNumber Number="@context.WalletCharge"></FormatNumber>
+                <Column Header="Value Transferred" Width="180px">
+                    <FormatBalance Wallet="@context.Wallet" Balance="@context.WalletCharge" Title="Value Transferred" />
                 </Column>
                 <Column Header="Status">
                     <Badge Style="ColorStyle.Success" Value="TRANSFERRED" />

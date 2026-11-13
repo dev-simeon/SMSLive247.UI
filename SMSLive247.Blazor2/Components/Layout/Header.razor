@@ -19,13 +19,17 @@
     </div>
 
     <div class="ml-auto flex items-center gap-4">
-        @* Credits Pill *@
-        <div class="hidden items-center gap-4 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-1.5 sm:flex">
-            <FormatCredit Credits="@(AvailableCredits ?? 0_000)" Title="Available Credits" />
-        </div>
+        @if (Account is not null)
+        {
+            @* Credits Pill *@
+            <div class="hidden items-center gap-4 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-1.5 sm:flex">
+                <FormatBalance Wallet="Account.Wallet" Balance="Account.WalletBalance" Title="Available Credits" />
+            </div>
+        }
+        
 
         @* Actions *@
-        <Button Icon="Icon.IconStyle.CreditCard" Text="Buy Credits" 
+        <Button Icon="Icon.IconStyle.CreditCard" Text="Top Up" 
                 OnClick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)" />
 
         <ThemeToggle></ThemeToggle>
@@ -41,5 +45,5 @@
 
 @code {
     [Parameter] public EventCallback OnMenuClick { get; set; }
-    [Parameter] public double? AvailableCredits { get; set; }  
+    [Parameter] public AccountResponse? Account { get; set; }  
 }

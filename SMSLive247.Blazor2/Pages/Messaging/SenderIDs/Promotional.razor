@@ -37,7 +37,7 @@
                 </Column>
                 <Column Header="Date Requested"><FormatDate DateTime="@context.DateRequested"></FormatDate></Column>
                 <Column Header="Date Approved">
-                    @if (context.DateDecided.HasValue) { <FormatDate DateTime="context.DateDecided.Value.DateTime"></FormatDate> }
+                    @if (context.DateDecided.HasValue) { <FormatDate DateTime="context.DateDecided.Value"></FormatDate> }
                     else { <span class="text-slate-400">Pending Approval</span> }
                 </Column>
                 <Column Header="Status"><Badge Variant="Badge.StatusVariant.SenderIdRequest" Value="@(context.Status ?? "rejected")" /></Column>

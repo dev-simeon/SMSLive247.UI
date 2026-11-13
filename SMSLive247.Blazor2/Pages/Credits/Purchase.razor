@@ -5,15 +5,68 @@
 <PageTitle>SMSLive247 - Buy Credits</PageTitle>
 
 <PageHeader 
-    Title="Buy SMS Credits"
-    SubTitle="Purchase SMS credits instantly. Enter the quantity you need below.">
+    Title="@(IsCashWallet ? "Fund your wallet" : "Buy SMS Credits")"
+    SubTitle="@(IsCashWallet ? "Purchase messaging credits securely via bank transfer, debit card, or USSD." : "Purchase SMS credits instantly. Enter the quantity you need below.")">
 </PageHeader>
 
 <div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
-    @* Left Column: Calculator *@
-    <div class="lg:col-span-4">
-        <div class="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-black">
-            <div class="flex-1 space-y-6">
+    <div class="@(IsCashWallet ? "lg:col-span-7" : "lg:col-span-4")">
+        <div class="flex h-full flex-col rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm lg:p-7 dark:border-slate-700 dark:bg-black">
+            <div class="flex-1 space-y-7">
+                @if (IsCashWallet)
+                {
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between gap-3">
+                            <label for="custom-funding-amount" class="block text-sm font-medium text-slate-800 dark:text-slate-200">Amount to add</label>
+                            <span class="whitespace-nowrap rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-400 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-400">Minimum top-up: ₦@MinimumFundingAmount.ToString("#,##0")</span>
+                        </div>
+                        <div class="relative rounded-xl">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-lg font-normal text-slate-400 dark:text-slate-400">₦</span>
+                            <input id="custom-funding-amount" type="number" min="@MinimumFundingAmount" step="50"
+                                   @bind="selectedFundingAmount" @bind:event="oninput" @bind:after="InvalidateCashQuote" disabled="@isCalculating"
+                                   class="block w-full rounded-xl border border-slate-300 py-3.5 pl-11 pr-24 font-sans text-xl font-normal tracking-tight text-slate-900 outline-none placeholder:text-slate-400 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 disabled:opacity-60 dark:bg-gray-900 dark:text-slate-200 dark:ring-slate-700"
+                                   placeholder="0.00" />
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><span class="rounded bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-400">NGN</span></span>
+                        </div>
+                        @if (selectedFundingAmount > 0 && selectedFundingAmount < MinimumFundingAmount)
+                        {
+                            <p class="text-sm text-red-600 dark:text-red-400">Enter at least ₦1,000 to continue.</p>
+                        }
+                    </div>
+                    <div>
+                        <p class="mb-2.5 text-xs font-medium uppercase tracking-wider text-slate-400">Quick amounts</p>
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            @foreach (var amount in fundingPresets)
+                            {
+                                var selected = selectedFundingAmount == amount;
+                                <button type="button" @onclick="() => SetFundingAmount(amount)" aria-pressed="@selected"
+                                        disabled="@isCalculating"
+                                        class="relative flex min-h-[68px] flex-col items-center justify-center rounded-xl border px-3 py-3 text-center text-sm font-normal tabular-nums transition-colors disabled:cursor-not-allowed disabled:opacity-60 @(selected ? "border-2 border-brand-600 bg-brand-50/50 text-brand-700 ring-2 ring-brand-500/10 dark:bg-blue-950/40 dark:text-blue-300" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800")">
+                                    <span>₦@amount.ToString("#,##0")</span>
+                                    @if (selected)
+                                    {
+                                        <span class="absolute -top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-[10px] text-white">✓</span>
+                                    }
+                                </button>
+                            }
+                        </div>
+                    </div>
+                    <button @onclick="HandleCashFunding" disabled="@(!IsFundingAmountValid || isCalculating)"
+                            class="flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand-600 px-6 py-4 text-base font-medium text-white shadow-lg shadow-brand-600/30 transition-all hover:bg-brand-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60">
+                        @if (isCalculating)
+                        {
+                            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            <span>Calculating...</span>
+                        }
+                        else
+                        {
+                            <span>Proceed to Pay ₦@SelectedFundingAmount.ToString("#,##0")</span>
+                            <Icon Style="Icon.IconStyle.ChevronRight" CssClass="text-base" />
+                        }
+                    </button>
+                }
+                else
+                {
                 <div>
                     <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
                         Quantity/Credits
@@ -54,19 +107,54 @@
                     <p class="m-0 leading-5">Transaction charges would be added at checkout.</p>
                 </div>
 
-                <button @onclick="HandleProceedPayment"
-                        class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 font-sans text-sm font-normal text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-600 active:scale-95">
-                    <span class="leading-none">
-                        Proceed to Payment
-                    </span>
-                    <Icon Style="Icon.IconStyle.ChevronRight" CssClass="text-base leading-none" />
-                </button>
+                    <button @onclick="HandleProceedPayment" disabled="@isCalculating"
+                            class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 font-sans text-sm font-normal text-white shadow-lg shadow-brand-500/30 transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60">
+                        @if (isCalculating)
+                        {
+                            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            <span>Calculating...</span>
+                        }
+                        else
+                        {
+                            <span>Proceed to Payment</span>
+                            <Icon Style="Icon.IconStyle.ChevronRight" CssClass="text-base" />
+                        }
+                    </button>
+                }
             </div>
         </div>
     </div>
 
-    @* Right Column: Pricing Tiers *@
-    <div class="lg:col-span-8">
+    <div class="@(IsCashWallet ? "lg:col-span-5" : "lg:col-span-8")">
+        @if (IsCashWallet)
+        {
+            <div class="space-y-5">
+                <div class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-black">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-4 dark:border-slate-700">
+                        <div class="flex items-center gap-2">
+                            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600"><Icon Style="Icon.IconStyle.Info" CssClass="text-base" /></span>
+                            <div><h2 class="text-base font-medium text-slate-800 dark:text-slate-200">Payment Summary</h2><p class="text-sm text-slate-500 dark:text-slate-400">Review your top-up breakdown</p></div>
+                        </div>
+                    </div>
+                    <dl class="space-y-3.5 text-sm text-slate-700 dark:text-slate-300">
+                        <div class="flex items-center justify-between gap-4"><dt>Current balance</dt><dd class="tabular-nums font-medium text-slate-800 dark:text-slate-200">₦@((MainAccount?.Account.WalletBalance ?? 0).ToString("#,##0.00"))</dd></div>
+                        <div class="flex items-center justify-between gap-4"><dt>Amount to add</dt><dd class="tabular-nums font-medium text-slate-800 dark:text-slate-200">₦@SelectedFundingAmount.ToString("#,##0.00")</dd></div>
+                        @if (cashFundingQuote is not null)
+                        {
+                            <div class="flex items-center justify-between gap-4"><dt>VAT</dt><dd class="tabular-nums text-slate-700 dark:text-slate-300">₦@cashFundingQuote.TaxAmount.ToString("#,##0.00")</dd></div>
+                            <div class="flex items-baseline justify-between gap-4 border-t border-dashed border-slate-200 pt-4 dark:border-slate-700"><dt><span class="block text-base font-medium text-slate-800 dark:text-slate-200">Total payable</span><span class="text-sm text-slate-500 dark:text-slate-400">Includes applicable VAT</span></dt><dd class="text-lg font-medium tabular-nums text-slate-800 dark:text-slate-200">₦@cashFundingQuote.TotalAmount.ToString("#,##0.00")</dd></div>
+                            <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-300"><span>Wallet balance after funding</span><span class="tabular-nums font-medium text-slate-800 dark:text-slate-200">₦@((MainAccount?.Account.WalletBalance + cashFundingQuote.SubTotal ?? cashFundingQuote.SubTotal).ToString("#,##0.00"))</span></div>
+                        }
+                        else
+                        {
+                            <div class="flex items-baseline justify-between gap-4 border-t border-dashed border-slate-200 pt-4 dark:border-slate-700"><dt><span class="block text-base font-medium text-slate-800 dark:text-slate-200">Total payable</span><span class="text-sm text-slate-500 dark:text-slate-400">VAT confirmed at checkout</span></dt><dd class="text-right text-sm text-slate-500 dark:text-slate-400">After review</dd></div>
+                        }
+                    </dl>
+                </div>
+            </div>
+        }
+        else
+        {
         <div class="flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-black">
             <div class="border-b border-slate-200 bg-slate-50/50 p-5 dark:border-slate-700 dark:bg-gray-900">
                 <h3 class="text-sm font-bold tracking-wider text-slate-900 uppercase dark:text-slate-200">
@@ -105,6 +193,7 @@
                 </table>
             </div>
         </div>
+        }
     </div>
 </div>
 
@@ -126,15 +215,27 @@
                 <Column Header="Reference">
                     @context.Reference
                 </Column>
-                <Column Header="Quantity">
-                    <FormatNumber Number="@context.Quantity"></FormatNumber>
-                </Column>
-                <Column Header="Price">
-                    <FormatNumber Currency="@context.Price"></FormatNumber>
-                </Column>
-                <Column Header="Amount">
-                    <FormatNumber Currency="@context.Amount"></FormatNumber>
-                </Column>
+                @if (IsCashWallet)
+                {
+                    <Column Header="Amount">
+                        <FormatNumber Currency="@context.SubTotal"></FormatNumber>
+                    </Column>
+                    <Column Header="Total">
+                        <FormatNumber Currency="@context.TotalAmount"></FormatNumber>
+                    </Column>
+                }
+                else
+                {
+                    <Column Header="Quantity">
+                        <FormatNumber Number="@context.Quantity"></FormatNumber>
+                    </Column>
+                    <Column Header="Unit Price">
+                        <FormatNumber Currency="@context.Price"></FormatNumber>
+                    </Column>
+                    <Column Header="Amount">
+                        <FormatNumber Currency="@context.SubTotal"></FormatNumber>
+                    </Column>
+                }
                 <Column Header="Status">
                     @{
                         var style = !string.IsNullOrEmpty(context.Error)
@@ -170,7 +271,18 @@
     private PurchaseModal purchaseModal = new();
 
     private long quantity = 10000;
+    private double selectedFundingAmount = 5000;
+    private bool isCalculating;
+    private PriceCalcResponse? cashFundingQuote;
     private List<PriceSlotResponse> pricingTiers = new();
+    private static readonly double[] fundingPresets = [2500, 5000, 10000, 25000, 50000, 100000];
+    private const double MinimumFundingAmount = 1000;
+    private const double VatRate = 0.075;
+
+    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
+    private bool IsCashWallet => MainAccount is not null && !string.Equals(MainAccount.Account.Wallet, "SMS", StringComparison.OrdinalIgnoreCase);
+    private double SelectedFundingAmount => selectedFundingAmount;
+    private bool IsFundingAmountValid => double.IsFinite(SelectedFundingAmount) && SelectedFundingAmount >= MinimumFundingAmount;
 
     private PriceSlotResponse? CurrentTier => pricingTiers?.FirstOrDefault(t => IsTierActive(t)) ?? pricingTiers?.FirstOrDefault();
     
@@ -184,7 +296,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await FetchPricing();
+        if (!IsCashWallet)
+            await FetchPricing();
 
         ds.Callback = new((PageState p, FilterState? f) =>
         {
@@ -205,6 +318,10 @@
                 pricingTiers = res.Result.ToList();
             }
         }
+        catch (ApiException ex)
+        {
+            await alert.Error("Failed to load pricing data: " + ex.FriendlyErrorMessage);
+        }
         catch (Exception ex)
         {
             await alert.Error("Failed to load pricing data: " + ex.Message);
@@ -213,6 +330,9 @@
 
     private async Task HandleProceedPayment()
     {
+        if (isCalculating)
+            return;
+
         if (quantity < 500)
         {
             await alert.Error("Minimum SMS credit quantity to purchase is 500.");
@@ -221,15 +341,77 @@
 
         try
         {
-            var response = await apiClient.PriceCalculateAsync(null, quantity, "N");
+            isCalculating = true;
+            var response = await apiClient.PriceCalculateAsync(quantity, null, "N");
             if (response.Result != null)
             {
-                purchaseModal.Show(response.Result);
+                purchaseModal.Show(response.Result, cashWallet: false);
             }
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error("Failed to calculate cost: " + ex.FriendlyErrorMessage);
         }
         catch (Exception ex)
         {
             await alert.Error("Failed to calculate cost: " + ex.Message);
+        }
+        finally
+        {
+            isCalculating = false;
+        }
+    }
+
+    private void SetFundingAmount(double amount)
+    {
+        selectedFundingAmount = amount;
+        cashFundingQuote = null;
+    }
+
+    private void InvalidateCashQuote() => cashFundingQuote = null;
+
+    private async Task HandleCashFunding()
+    {
+        if (isCalculating)
+            return;
+
+        var amount = SelectedFundingAmount;
+        if (amount < MinimumFundingAmount)
+        {
+            await alert.Error($"The minimum wallet top-up is ₦{MinimumFundingAmount:#,##0}.");
+            return;
+        }
+
+        if (cashFundingQuote is not null)
+        {
+            purchaseModal.Show(cashFundingQuote, cashWallet: true);
+            return;
+        }
+
+        try
+        {
+            isCalculating = true;
+            var response = await apiClient.PriceCalculateAsync(null, amount, "N");
+            if (response.Result is null)
+                throw new InvalidOperationException("The pricing service returned no calculation.");
+
+            cashFundingQuote = response.Result;
+            cashFundingQuote.SubTotal = amount;
+            cashFundingQuote.TaxAmount = Math.Round(amount * VatRate, 2, MidpointRounding.AwayFromZero);
+            cashFundingQuote.TotalAmount = cashFundingQuote.SubTotal + cashFundingQuote.TaxAmount;
+            purchaseModal.Show(cashFundingQuote, cashWallet: true);
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"Unable to calculate wallet funding. {ex.Message}");
+        }
+        finally
+        {
+            isCalculating = false;
         }
     }
 

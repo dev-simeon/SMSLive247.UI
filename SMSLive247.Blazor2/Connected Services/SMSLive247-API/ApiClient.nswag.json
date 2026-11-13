@@ -1067,19 +1067,19 @@
         "operationId": "PriceCalculate",
         "parameters": [
           {
-            "name": "Amount",
-            "in": "query",
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
             "name": "Quantity",
             "in": "query",
             "schema": {
               "type": "integer",
               "format": "int64"
+            }
+          },
+          {
+            "name": "TotalAmount",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "double"
             }
           },
           {
@@ -2847,20 +2847,15 @@
         "additionalProperties": false,
         "required": [
           "providerID",
-          "quantity"
+          "totalAmount"
         ],
         "properties": {
           "providerID": {
             "type": "string"
           },
-          "quantity": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "amount": {
+          "totalAmount": {
             "type": "number",
-            "format": "double",
-            "nullable": true
+            "format": "double"
           },
           "fxCurrency": {
             "type": "string",
@@ -3040,16 +3035,21 @@
           },
           "quantity": {
             "type": "integer",
+            "readOnly": true,
             "format": "int64"
           },
-          "amount": {
+          "subTotal": {
             "type": "number",
             "readOnly": true,
             "format": "double"
           },
-          "fee": {
+          "taxAmount": {
             "type": "number",
             "readOnly": true,
+            "format": "double"
+          },
+          "totalAmount": {
+            "type": "number",
             "format": "double"
           },
           "fxCurrency": {
@@ -3115,12 +3115,17 @@
             "readOnly": true,
             "format": "double"
           },
-          "amount": {
+          "subTotal": {
             "type": "number",
             "readOnly": true,
             "format": "double"
           },
-          "fee": {
+          "taxAmount": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "totalAmount": {
             "type": "number",
             "readOnly": true,
             "format": "double"

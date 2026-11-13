@@ -94,12 +94,24 @@ else if (status == "success" && purchase != null)
                                 </span>
                             </div>
 
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500">Credits Purchased</span>
-                                <span class="font-medium text-slate-900">
-                                    @(purchase.Quantity.ToString("#,##0")) SMS
-                                </span>
-                            </div>
+                            @if (string.Equals(purchase.Wallet, "SMS", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">Credits Purchased</span>
+                                    <span class="font-medium text-slate-900">@(purchase.Quantity.ToString("#,##0")) SMS</span>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">Wallet funded</span>
+                                    <span class="font-medium text-slate-900">₦ @purchase.SubTotal.ToString("#,##0.00")</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500">VAT</span>
+                                    <span class="font-medium text-slate-900">₦ @purchase.TaxAmount.ToString("#,##0.00")</span>
+                                </div>
+                            }
 
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-slate-500">Payment Method</span>
@@ -111,7 +123,7 @@ else if (status == "success" && purchase != null)
                             <div class="border-t border-slate-200 pt-3 flex justify-between items-center">
                                 <span class="font-semibold text-slate-700">Amount Paid</span>
                                 <span class="text-lg font-bold text-slate-900">
-                                    @((purchase.Amount + purchase.Fee).ToString("₦ #,##0.00"))
+                                    @purchase.TotalAmount.ToString("₦ #,##0.00")
                                 </span>
                             </div>
                         </div>
@@ -137,6 +149,8 @@ else if (status == "success" && purchase != null)
     private string status = "loading";
     private Guid transactionId = Guid.Empty;
     private PurchaseResponse? purchase;
+
+    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
 
 
     public Guid GetTransactionId(IEnumerable<string> queryParams)
@@ -175,6 +189,7 @@ else if (status == "success" && purchase != null)
             {
                 purchase = data;
                 status = "success";
+                await RefreshWalletBalance();
             }
             else
             {
@@ -186,6 +201,24 @@ else if (status == "success" && purchase != null)
         {
             // Verification failed
             status = "failed";
+        }
+    }
+
+    private async Task RefreshWalletBalance()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync("self");
+            if (response.Result is not null)
+                MainAccount?.UpdateBalance(response.Result.WalletBalance);
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error($"Payment was verified, but the displayed balance could not be refreshed. {ex.FriendlyErrorMessage}");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"Payment was verified, but the displayed balance could not be refreshed. {ex.Message}");
         }
     }
 }

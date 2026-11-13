@@ -1,0 +1,16 @@
+﻿<div class="flex justify-between gap-1">
+    <span class="text-brand-400"
+          title="@Title">
+        <WalletIcon Wallet="@Wallet" />
+
+    </span>
+    <span class="font-bold text-slate-600 dark:text-slate-400">
+        @Balance.ToString("#,##0.00")
+    </span>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public required double Balance { get; set; }
+    [Parameter, EditorRequired] public required string Wallet { get; set; }
+    [Parameter, EditorRequired] public required string? Title { get; set; }  
+}

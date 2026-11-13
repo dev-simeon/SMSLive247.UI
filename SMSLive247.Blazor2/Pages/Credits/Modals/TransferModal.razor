@@ -1,4 +1,4 @@
-﻿<Modal Title="Transfer Credit" @bind-IsVisible="isVisible">
+﻿<Modal Title="Transfer Balance" @bind-IsVisible="isVisible">
 
     <Body>
         <EditForm id="wf3" Model="@model" OnValidSubmit="HandleSubmit" class="space-y-6">
@@ -9,7 +9,7 @@
 
                 <FormInput Type="number"
                            HelpText="Minimum SMS credit quantity to transfer is 50 SMS credits."
-                           Label="Credits"
+                           Label="Value"
                            PlaceHolder="Enter amount to transfer"
                            Required="true"
                            Min="50"

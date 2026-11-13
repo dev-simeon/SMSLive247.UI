@@ -12,10 +12,12 @@ namespace SMSLive247.UI.Shared
             OnChange?.Invoke();
         }
 
-        public void UpdateCredits(double credits)
+        public void UpdateBalance(double balance)
         {
-            Account.WalletBalance = credits;
+            Account.WalletBalance = balance;
             Reload();
         }
+
+        public void UpdateCredits(double credits) => UpdateBalance(credits);
     }
 }

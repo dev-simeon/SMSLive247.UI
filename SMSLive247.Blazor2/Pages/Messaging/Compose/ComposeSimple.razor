@@ -250,8 +250,17 @@
 
         message += "<br>";
 
-        message += $"Total SMS units charged: {res.WalletCharge:#,##0} <br>";
-        //message += $"Current SMS balance: {res.WalletBalance}";
+        @if(res.Wallet == "SMS")
+        {
+            message += $"Total SMS units charged: {res.WalletCharge:#,##0} <br>";
+            //message += $"Current SMS balance: {res.WalletBalance}";
+        }
+        else
+        {
+            message += $"Total Wallet charge: N{res.WalletCharge:#,##0} <br>";
+            //message += $"Current Wallet balance: {res.WalletBalance}";
+
+        }
      
         return message;
     }

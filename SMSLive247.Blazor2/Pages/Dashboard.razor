@@ -43,7 +43,7 @@
                     @onclick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)"
                     class="group flex w-full flex-col items-center justify-center bg-slate-50/50 p-6 text-center transition-colors hover:bg-slate-100 dark:bg-gray-900 dark:hover:bg-slate-800 sm:w-64 sm:p-8">
                 <p class="mb-2 text-xs font-bold tracking-widest text-slate-400 uppercase">
-                    Available Credits
+                    Wallet Balance
                 </p>
                 <span class="text-4xl font-black text-slate-900 transition-colors group-hover:text-brand-600 dark:text-slate-200">
                     @FormatNumber(account?.WalletBalance ?? 0)
@@ -181,9 +181,11 @@
                                     <Icon Style="@GetPurchaseIcon(purchase)" CssClass="inline-flex items-center justify-center leading-none text-[16px]" />
                                 </div>
                                 <div class="min-w-0 flex-1">
-                                    <p class="truncate text-xs leading-tight font-bold text-slate-800 dark:text-slate-200">Credits Purchase</p>
-                                    <p class="font-medium text-[10px] text-slate-400">
-                                        @FormatDate(purchase.DateCreated)
+                                    <p class="truncate text-xs leading-tight font-bold text-slate-800 dark:text-slate-200">
+                                        @GetPurchaseStatusText(purchase)
+                                    </p>
+                                    <p class="truncate font-medium text-[10px] text-slate-400">
+                                        @GetPurchaseTypeText(purchase) · @FormatDate(purchase.DateCreated)
                                     </p>
                                 </div>
                                 <p class="@GetPurchaseQuantityClass(purchase)">
@@ -273,6 +275,16 @@
     private static bool PurchaseHasSucceeded(PurchaseResponse purchase) =>
         !PurchaseHasFailed(purchase) && purchase.IsPaid;
 
+    private static string GetPurchaseStatusText(PurchaseResponse purchase) =>
+        PurchaseHasFailed(purchase) ? "Purchase failed"
+        : PurchaseHasSucceeded(purchase) ? "Purchase succeeded"
+        : "Purchase pending";
+
+    private static string GetPurchaseTypeText(PurchaseResponse purchase) =>
+        string.Equals(purchase.Wallet, "SMS", StringComparison.OrdinalIgnoreCase)
+            ? "SMS credits"
+            : "Cash wallet top-up";
+
     private static Icon.IconStyle GetPurchaseIcon(PurchaseResponse purchase)
     {
         if (PurchaseHasFailed(purchase))
@@ -307,6 +319,12 @@
 
     private static string FormatPurchaseQuantity(PurchaseResponse purchase)
     {
+        if (!string.Equals(purchase.Wallet, "SMS", StringComparison.OrdinalIgnoreCase))
+        {
+            var amount = $"₦ {purchase.TotalAmount:#,##0.00}";
+            return PurchaseHasSucceeded(purchase) ? $"+{amount}" : amount;
+        }
+
         var quantity = purchase.Quantity.ToString("#,##0");
         return PurchaseHasSucceeded(purchase) ? $"+{quantity}" : quantity;
     }

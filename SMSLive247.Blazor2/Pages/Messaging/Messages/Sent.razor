@@ -33,8 +33,8 @@
                         </div>
                     </button>
                 </Column>
-                <Column Header="Credits" Width="100px" Align="right">
-                    <FormatCredit Credits="@context.WalletCharge" Title="Credits Charged" />
+                <Column Header="Charged" Width="100px" Align="right">
+                    <FormatBalance Wallet="@context.Wallet" Balance="@context.WalletCharge" Title="Total Charged" />
                 </Column>
                 <Column>
                     <Actions OnView="() => deliveryReport.Show(context.BatchID)"

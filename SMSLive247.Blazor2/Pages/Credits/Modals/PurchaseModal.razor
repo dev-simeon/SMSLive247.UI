@@ -9,14 +9,17 @@
             <div class="space-y-6">
                 <section class="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-gray-900">
                     <dl class="space-y-3 text-sm">
-                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Quantity</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@price.Quantity.ToString("#,##0") credits</dd></div>
-                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Credit price</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Price)</dd></div>
-                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Amount</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Amount)</dd></div>
-                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Transaction fee</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Fee)</dd></div>
+                        @if (!isCashWallet)
+                        {
+                            <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Quantity</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@price.Quantity.ToString("#,##0") credits</dd></div>
+                            <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Unit price</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Price)</dd></div>
+                        }
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">@(isCashWallet ? "Amount" : "Subtotal")</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.SubTotal)</dd></div>
+                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">VAT</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.TaxAmount)</dd></div>
                     </dl>
                     <div class="mt-4 flex items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
                         <span class="font-bold text-slate-900 dark:text-slate-100">Total amount</span>
-                        <span class="text-xl font-bold text-brand-600">@formatCurrency(price.Amount + price.Fee)</span>
+                        <span class="text-xl font-bold text-brand-600">@formatCurrency(price.TotalAmount)</span>
                     </div>
                 </section>
 
@@ -50,18 +53,28 @@
 
                 <div class="flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/50">
                     <Icon Style="Icon.IconStyle.Info" CssClass="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
-                    <p class="text-xs leading-relaxed text-blue-800 dark:text-blue-200">SMS credits are added after the payment is confirmed by the payment provider.</p>
+                    <p class="text-xs leading-relaxed text-blue-800 dark:text-blue-200">@(isCashWallet ? "Your wallet is funded after the payment is confirmed by the payment provider." : "SMS credits are added after the payment is confirmed by the payment provider.")</p>
                 </div>
             </div>
         }
         else if (showBankAccount && bankAccount != null)
         {
             <div class="space-y-5">
+                @if (isCashWallet && price is not null)
+                {
+                    <section class="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-gray-900">
+                        <dl class="space-y-3 text-sm">
+                            <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Wallet top-up</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.SubTotal)</dd></div>
+                            <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">VAT (7.5%)</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.TaxAmount)</dd></div>
+                            <div class="flex justify-between gap-4 border-t border-slate-200 pt-3 dark:border-slate-700"><dt class="font-semibold text-slate-800 dark:text-slate-200">Amount to transfer</dt><dd class="font-semibold text-slate-800 dark:text-slate-200">@formatCurrency(price.TotalAmount)</dd></div>
+                        </dl>
+                    </section>
+                }
                 @if (!string.IsNullOrWhiteSpace(bankAccount.AccountNumber))
                 {
                     <div class="flex items-start gap-3 px-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
                         <Icon Style="Icon.IconStyle.Info" CssClass="mt-1 shrink-0 text-blue-600 dark:text-blue-300" />
-                        <p>Your SMS units will be credited automatically after the transfer is confirmed. Save this dedicated account for future wallet top-ups.</p>
+                        <p>@(isCashWallet ? "Your wallet is funded automatically after the transfer is confirmed. Save this dedicated account for future top-ups." : "Your SMS units will be credited automatically after the transfer is confirmed. Save this dedicated account for future wallet top-ups.")</p>
                     </div>
 
                     <section class="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-black">
@@ -126,7 +139,7 @@
                 }
                 else
                 {
-                    <Button Text="Done" OnClick="Close" />
+                    <Button Text="Done" OnClick="CloseBankAccount" />
                 }
             }
             else
@@ -150,6 +163,8 @@
     private bool isLoadingBankAccount;
     private bool showBankAccount;
     private bool accountCopied;
+    private bool isCashWallet;
+    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
     private PriceCalcResponse? price;
     private DedicatedAccountResponse? bankAccount;
     private string selectedMethod = "BANK_TRANSFER";
@@ -176,10 +191,11 @@
 
     private static string formatCurrency(double amount) => $"₦ {amount:#,##0.00}";
 
-    public void Show(PriceCalcResponse priceDetails)
+    public void Show(PriceCalcResponse priceDetails, bool cashWallet = false, string paymentMethod = "BANK_TRANSFER")
     {
         price = priceDetails;
-        selectedMethod = "BANK_TRANSFER";
+        isCashWallet = cashWallet;
+        selectedMethod = paymentMethod == "PAYSTACK" ? "PAYSTACK" : "BANK_TRANSFER";
         showBankAccount = false;
         bankAccount = null;
         accountCopied = false;
@@ -212,7 +228,12 @@
         try
         {
             isProcessingPayment = true;
-            var request = new InitPaymentRequest { ProviderID = provider, Quantity = price.Quantity };
+            var request = new InitPaymentRequest
+            {
+                ProviderID = provider,
+                TotalAmount = price.TotalAmount,
+                FxCurrency = string.IsNullOrWhiteSpace(price.FxCurrency) ? "N" : price.FxCurrency
+            };
             var response = (await apiClient.PurchaseBeginAsync(request)).Result;
             var authorizationUrl = response?.AuthorizationUrl;
 
@@ -289,6 +310,28 @@
         showBankAccount = false;
         selectedMethod = "BANK_TRANSFER";
         accountCopied = false;
+    }
+
+    private async Task CloseBankAccount()
+    {
+        try
+        {
+            var response = await apiClient.AccountGetAsync("self");
+            if (response.Result is not null)
+                MainAccount?.UpdateBalance(response.Result.WalletBalance);
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error($"Could not refresh your wallet balance. {ex.FriendlyErrorMessage}");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"Could not refresh your wallet balance. {ex.Message}");
+        }
+        finally
+        {
+            Close();
+        }
     }
 
     private void Close()

@@ -29,13 +29,15 @@
                 <Column Header="Balance" Align="right">
                     @context.WalletBalance.ToString("#,##0.##")
                 </Column>
-                <Column Header="Transfer Credits">
+                <Column Header="Transfer Balance">
                     <button type="button"
                             @onclick="() => transferModal.Show(Main.Account, context)"
-                            class="inline-flex h-9 w-44 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 text-white shadow-sm transition-colors hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-white dark:bg-blue-600 dark:hover:bg-blue-500 dark:focus:ring-offset-gray-900"
-                            title="Transfer credits">
+                            class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 
+                            text-white shadow-sm transition-colors hover:bg-brand-600 focus:outline-none focus:ring-2 
+                            focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-white dark:bg-blue-600 
+                            dark:hover:bg-blue-500 dark:focus:ring-offset-gray-900">
                         <Icon Style="Icon.IconStyle.ArrowRightLeft" FontWeight="300" />
-                        <span>Transfer Credits</span>
+                        <span>Transfer...</span>
                     </button>
                 </Column>
                 <Column Header="Status">

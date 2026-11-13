@@ -26,15 +26,8 @@
                     @context.LastName
                 </Column>
                 <Column Header="Balance">
-                    <div class="flex items-center justify-between">
-                        <span class="font-medium text-slate-900">
-                            <FormatNumber Number="@context.WalletBalance"></FormatNumber>
-                        </span>
-                        @* <Button Type="Button.Style.SECONDARY" OnClick="() => transferModal.Show(context)" 
-                            CssClass="text-xs px-2 py-1">
-                            Add/Remove Credit
-                        </Button> *@
-                    </div>
+                    <FormatBalance Balance="@context.WalletBalance" Wallet="@context.Wallet" Title="Balance"></FormatBalance>
+
                 </Column>
                 <Column Header="Status">
                     @if (context.Active)
@@ -50,7 +43,7 @@
                         </span>
                     }
                 </Column>
-                <Column Header="ddd">
+                <Column>
                     <Actions OnEdit="() => subUserModal.Show(Sub.Account, context)"
                              OnDelete="() => DeleteSubUser(context)">
                     </Actions>

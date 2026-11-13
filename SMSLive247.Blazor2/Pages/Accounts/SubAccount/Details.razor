@@ -16,10 +16,10 @@
 
             <!-- Far Right: Edit Profile only -->
             <div class="ml-auto flex items-center gap-4">
-                <FormatCredit Credits="@Sub.Account.WalletBalance" Title="Current Credit Balance" />
+                <FormatBalance Wallet="@Sub.Account.Wallet" Balance="@Sub.Account.WalletBalance" Title="Current Credit Balance" />
 
                 <Button Style="ColorStyle.Info"
-                        Text="Add Credits..."
+                        Text="Transfer Balance..."
                         Icon="Icon.IconStyle.ArrowRightLeft"
                         OnClick="() => transferModal.Show(Main.Account, Sub.Account)" />
 
