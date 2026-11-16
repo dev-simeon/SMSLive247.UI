@@ -362,3 +362,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/SMSLive247.Blazor2/wwwroot/css/tailwind.css
