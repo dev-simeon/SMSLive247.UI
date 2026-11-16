@@ -10,14 +10,12 @@
 
                     <FormRow Cols="2">
                         <FormInput Label="First Name"
-                                   PlaceHolder="First Name"
-                                   @bind-Value="updateModel.FirstName"
-                                   Required="true" />
+                                   PlaceHolder="Hassan"
+                                   @bind-Value="updateModel.FirstName" />
 
                         <FormInput Label="Last Name"
-                                   PlaceHolder="Last Name"
-                                   @bind-Value="updateModel.LastName"
-                                   Required="true" />
+                                   PlaceHolder="Edet"
+                                   @bind-Value="updateModel.LastName" />
                     </FormRow>
 
                     <FormRow Cols="2">
@@ -30,8 +28,7 @@
                         <FormInput Label="Phone Number"
                                    Type="tel"
                                    PlaceHolder="e.g. 08030000000"
-                                   @bind-Value="updateModel.Phone"
-                                   Required="true" />
+                                   @bind-Value="updateModel.Phone" />
                     </FormRow>
 
                     <FormRow Cols="2">
@@ -54,8 +51,10 @@
                                     @(updateModel.Active == true ? "Active" : "Inactive")
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-0.5">
-                                @(updateModel.Active == true ? "This sub-account is enabled and can send messages." : "This sub-account is disabled and cannot perform operations.")
+                            <p class="text-sm text-slate-500 mt-0.5">
+                                @(updateModel.Active == true 
+                                ? "This sub-account is enabled and can send messages." 
+                                : "This sub-account is disabled and cannot perform operations.")
                             </p>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer select-none ml-4" title="Toggle status">
@@ -98,39 +97,36 @@ else
 
                     <FormRow Cols="2">
                         <FormInput Label="First Name"
-                                   PlaceHolder="First Name"
-                                   @bind-Value="createModel.FirstName"
-                                   Required="true" />
+                                   PlaceHolder="Hassan"
+                                   @bind-Value="createModel.FirstName" />
+
                         <FormInput Label="Last Name"
-                                   PlaceHolder="Last Name"
-                                   @bind-Value="createModel.LastName"
-                                   Required="true" />
+                                   PlaceHolder="Edet"
+                                   @bind-Value="createModel.LastName" />
                     </FormRow>
 
                     <FormRow Cols="2">
-                        <FormInput Label="Email Address"
-                                   Type="email"
+                        <FormInput Label="Email Address" Type="email"
                                    PlaceHolder="email@example.com"
                                    @bind-Value="createModel.Email"
                                    Required="true" />
-                        <FormInput Label="Phone Number"
-                                   Type="tel"
+
+                        <FormInput Label="Phone Number" Type="tel"
                                    PlaceHolder="e.g. 08030000000"
-                                   @bind-Value="createModel.Phone"
-                                   Required="true" />
+                                   @bind-Value="createModel.Phone" />
                     </FormRow>
 
                     <FormRow Cols="2">
                         <FormSelect Label="Country Code"
                                     Variant="FormSelect<int>.SelectVariant.Country"
                                     @bind-Value="createModel.CountryCode" />
+
                         <FormSelect Label="Time Zone (GMT Offset)"
                                     Variant="FormSelect<int>.SelectVariant.TimeZone"
                                     @bind-Value="createModel.TimeZone" />
                     </FormRow>
 
-                    <FormInput Label="Password"
-                               Type="password"
+                    <FormInput Label="Password" Type="password"
                                PlaceHolder="••••••••"
                                @bind-Value="createModel.Password"
                                Required="true"

@@ -11,7 +11,8 @@
 
         @* Mobile Logo *@
         <div class="flex items-center lg:hidden">
-            <img src="/smslive-logo-2.png" alt="SMSLive247" class="h-8 w-auto" />
+            <img src="/smslive-logo-2.png" class="h-12 w-auto block dark:hidden" alt="SMSLive247" />
+            <img src="/smslive-logo-1.png" class="h-12 w-auto hidden dark:block" alt="SMSLive247" />
         </div>
 
         @* Breadcrumb *@
@@ -23,23 +24,17 @@
         {
             @* Credits Pill *@
             <div class="hidden items-center gap-4 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-1.5 sm:flex">
-                <FormatBalance Wallet="Account.Wallet" Balance="Account.WalletBalance" Title="Available Credits" />
+                <FormatBalance Wallet="@Account.Wallet" 
+                               Balance="@Account.WalletBalance" 
+                               Title="Available Balance" />
             </div>
         }
         
-
         @* Actions *@
         <Button Icon="Icon.IconStyle.CreditCard" Text="Top Up" 
                 OnClick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)" />
 
         <ThemeToggle></ThemeToggle>
-
-@* 
-        <button class="relative p-2 text-slate-400 transition-colors hover:text-slate-600">
-            <Icon Style="Icon.IconStyle.Bell" />
-            <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full border-2 border-white bg-red-500"></span>
-        </button> *@
-
     </div>
 </header>
 

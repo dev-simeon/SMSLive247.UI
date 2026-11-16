@@ -14,20 +14,21 @@
         <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="Add Sub-Account" Icon="Icon.IconStyle.PlusCircle" OnClick="() => createOrEditModal.Show()" />
+        <Button Text="Create Sub-Account" Icon="Icon.IconStyle.PlusCircle" OnClick="() => createOrEditModal.Show()" />
     </HeaderRight>
 
     <ChildContent>
         <Table DataSource="ds">
             <Columns>
-                <Column Header="Sub-Account Name">
+                <Column Header="Account Name">
                     <button @onclick="() => nav.NavigateTo(Const.Routes.Account.SubAccountDetailsUrl(context.AccountID))"
                             class="font-medium text-brand-600 hover:text-brand-700 hover:underline text-left transition-colors">
                         @context.AccountName
                     </button>
                 </Column>
-                <Column Header="Balance" Align="right">
-                    @context.WalletBalance.ToString("#,##0.##")
+                <Column Header="Balance">
+                    <FormatBalance Wallet="@context.Wallet" Balance="@context.WalletBalance" Title="Wallet Balance" />
+                    @* <Icon Style="Icon.IconStyle.ArrowRightLeft" FontWeight="300" /> *@
                 </Column>
                 <Column Header="Transfer Balance">
                     <button type="button"
@@ -44,7 +45,7 @@
                     <Badge Variant="Badge.StatusVariant.ActiveInactive"
                            Value="@(context.Active ? "ACTIVE" : "DISABLED")" />
                 </Column>
-                <Column Header="Date Created" Width="150px">
+                <Column Header="Date Created" Width="160px">
                     <FormatDate DateTime="@context.DateCreated" />
                 </Column>
                 <Column Header="Account ID">

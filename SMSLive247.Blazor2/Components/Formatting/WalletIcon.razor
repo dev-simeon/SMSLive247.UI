@@ -8,9 +8,9 @@
         <path d="M15 9.5c3.5.2 6 1.5 6 3.1v4c0 1.66-2.69 3-6 3-1.15 0-2.22-.16-3.12-.44" />
     </svg>
 }
-else
+else if (Wallet == "CASH")
 {
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <!-- Banknote outline -->
         <rect x="2" y="5" width="20" height="14" rx="2" />
@@ -26,10 +26,8 @@ else
         <path d="M5 8h.01" />
         <path d="M19 16h.01" />
     </svg>
-
 }
 
 @code {
     [Parameter, EditorRequired] public required string Wallet { get; set; }
-
 }

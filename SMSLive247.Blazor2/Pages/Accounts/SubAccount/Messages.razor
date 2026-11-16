@@ -24,7 +24,7 @@
                     <span class="">@context.SenderID?.ToUpper()</span>
                 </Column>
                 <Column Header="Message">
-                    <p class="max-w-md truncate" title="@context.MessageText">@context.MessageText</p>
+                    <p class="max-w-md wrap-break-word">@context.MessageText</p>
                 </Column>
                 <Column Header="Delivery">
                     <button type="button" @onclick='() => nav.NavigateTo($"/messaging/{context.BatchID}")' class="block w-full text-end transition-opacity hover:opacity-75">
@@ -36,7 +36,7 @@
                         </div>
                     </button>
                 </Column>
-                <Column Header="Charged" Width="100px" Align="right">
+                <Column Header="Cost" Width="100px" Align="right">
                     <FormatBalance Wallet="@context.Wallet" Balance="@context.WalletCharge" Title="Total Charged" />
                 </Column>
                 <Column>

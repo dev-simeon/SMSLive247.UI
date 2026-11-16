@@ -11,19 +11,19 @@
     <ChildContent>
         <Table DataSource="ds">
             <Columns>
-                <Column Header="Date / Time" Width="180px">
+                <Column Header="Date / Time" Width="170px">
                     <FormatDate DateTime="@context.DateSubmitted"></FormatDate>
                 </Column>
-                <Column Header="Status">
+                <Column Header="Status" Width="100px">
                     <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@context.Status" />
                 </Column>
-                <Column Header="Sender" Width="100px">
+                <Column Header="Sender" Width="140px">
                     <strong>@context.SenderID</strong>
                 </Column>
                 <Column Header="Message">
                     <p class="max-w-md wrap-break-word">@context.MessageText</p>
                 </Column>
-                <Column Header="Delivery">
+                <Column Header="Delivery" Width="100px">
                     <button type="button" @onclick="() => deliveryReport.Show(context.BatchID)" class="block w-full text-end transition-opacity hover:opacity-75">
                         <div class="text-end font-mono text-xs text-nowrap text-emerald-600 uppercase" title="Total Processed">
                             @context.TotalProcessed.ToString("#,##0") PASS
@@ -33,10 +33,10 @@
                         </div>
                     </button>
                 </Column>
-                <Column Header="Charged" Width="100px" Align="right">
+                <Column Header="Cost" Width="100px">
                     <FormatBalance Wallet="@context.Wallet" Balance="@context.WalletCharge" Title="Total Charged" />
                 </Column>
-                <Column>
+                <Column Width="60px">
                     <Actions OnView="() => deliveryReport.Show(context.BatchID)"
                              OnDelete="e => HandleDelete(context)">
                     </Actions>

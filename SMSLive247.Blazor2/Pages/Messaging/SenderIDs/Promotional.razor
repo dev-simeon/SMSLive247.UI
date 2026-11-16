@@ -1,11 +1,12 @@
 @using SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
 
-<p class="mb-3 text-slate-500">Promotional sender IDs are for opted-in campaigns, offers, product announcements and marketing.</p>
-<Notice Variant="Notice.NoticeVariant.Info" CssClass="mb-3">
+<p>Promotional sender IDs are for opted-in campaigns, offers, product announcements and marketing.
+    Choose a name that identifies your organization. Network operators review each request, and approval is not guaranteed.
+</p>
+
+<Notice Variant="Notice.NoticeVariant.Info">
     Do not use them for OTPs, payment receipts, account alerts or service updates; those belong on the Transactional tab.
 </Notice>
-<p class="mb-5 text-slate-500">Choose a name that identifies your organization. Network operators review each request, and approval is not guaranteed.</p>
-
 
 <PageBody>
     <HeaderLeft>
@@ -35,10 +36,18 @@
                         }
                     </div>
                 </Column>
-                <Column Header="Date Requested"><FormatDate DateTime="@context.DateRequested"></FormatDate></Column>
+                <Column Header="Date Requested">
+                    <FormatDate DateTime="@context.DateRequested"></FormatDate>
+                </Column>
                 <Column Header="Date Approved">
-                    @if (context.DateDecided.HasValue) { <FormatDate DateTime="context.DateDecided.Value"></FormatDate> }
-                    else { <span class="text-slate-400">Pending Approval</span> }
+                    @if (context.DateDecided.HasValue) 
+                    { 
+                        <FormatDate DateTime="context.DateDecided.Value"></FormatDate> 
+                    }
+                    else 
+                    { 
+                        <span class="text-slate-400">Pending Approval</span> 
+                    }
                 </Column>
                 <Column Header="Status"><Badge Variant="Badge.StatusVariant.SenderIdRequest" Value="@(context.Status ?? "rejected")" /></Column>
                 <Column><Actions OnDelete="() => HandleDelete(context)" /></Column>
@@ -47,16 +56,16 @@
     </ChildContent>
 </PageBody>
 
-<RequestModal @ref="requestModal" OnCompleted="OnRefresh" />
+<PromotionalModal @ref="requestModal" OnCompleted="OnRefresh" />
 
 @code {
-    [Parameter] public IReadOnlyList<SenderIdResponse> Items { get; set; } = Array.Empty<SenderIdResponse>();
+    [Parameter] public IReadOnlyList<SenderIdResponse> Items { get; set; } = [];
     [Parameter] public EventCallback OnRefresh { get; set; }
 
     private string? searchStatus;
     private string? searchQuery;
     private List<SenderIdResponse> filteredItems = [];
-    private RequestModal requestModal = new();
+    private PromotionalModal requestModal = new();
 
     protected override void OnParametersSet() => ApplyFilters();
 
@@ -74,36 +83,42 @@
         filteredItems = filtered.ToList();
     }
 
-    private Task OnStatusChanged()
+    private void OnStatusChanged()
     {
         ApplyFilters();
-        return Task.CompletedTask;
     }
 
     private static bool IsRejected(SenderIdResponse item) => string.Equals(item.Status, "REJECTED", StringComparison.OrdinalIgnoreCase);
 
     private static string GetSenderIdRejectionReason(string value) => value switch
     {
-        "SAMPLE_TOO_BRIEF" => "The sender ID was rejected because the submitted sample message is too brief to adequately verify the sender ID.",
-        "GENERIC_SENDERID" => "The sender ID was rejected because it is too generic and does not clearly identify the business, organization, or service using it.",
-        "OTP_NOT_ALLOWED" => "The sender ID was rejected because OTP messages are not allowed for promotional sender IDs.",
-        "WELL_KNOWN_BRAND" => "The sender ID was rejected because it appears to represent a well-known brand. Additional verification or authorization may be required.",
+        "SAMPLE_TOO_BRIEF"  => "The sender ID was rejected because the submitted sample message is too brief to adequately verify the sender ID.",
+        "GENERIC_SENDERID"  => "The sender ID was rejected because it is too generic and does not clearly identify the business, organization, or service using it.",
+        "OTP_NOT_ALLOWED"   => "The sender ID was rejected because OTP messages are not allowed for promotional sender IDs.",
+        "WELL_KNOWN_BRAND"  => "The sender ID was rejected because it appears to represent a well-known brand. Additional verification or authorization may be required.",
         "GOVERNMENT_AGENCY" => "The sender ID was rejected because it appears to represent a government agency. Appropriate authorization or verification may be required.",
-        "TRANSACTIONAL" => "The sender ID was rejected because it is intended for transactional messages, which are not allowed under the current sender ID requirements.",
-        _ => "The sender ID was rejected because it does not meet the sender ID requirements."
+        "TRANSACTIONAL"     => "The sender ID was rejected because it is intended for transactional messages, which are not allowed under the current sender ID requirements.",
+        _                   => "The sender ID was rejected because it does not meet the sender ID requirements."
     };
 
     private async Task HandleDelete(SenderIdResponse item)
     {
         if (!await alert.Confirm($"Are you sure you want to delete [{item.SenderID}]?", "Delete Sender ID"))
             return;
+
         try
         {
             await apiClient.SenderIdDeleteAsync(item.SenderID);
             await alert.Success("Sender ID deleted successfully.", "Deleted");
             await OnRefresh.InvokeAsync();
         }
-        catch (ApiException ex) { await alert.Error(ex.FriendlyErrorMessage); }
-        catch (Exception ex) { await alert.Error($"An error occurred while deleting the sender ID. {ex.Message}"); }
+        catch (ApiException ex)
+        { 
+            await alert.Error(ex.FriendlyErrorMessage); 
+        }
+        catch (Exception ex) 
+        { 
+            await alert.Error($"An error occurred while deleting the sender ID. {ex.Message}");
+        }
     }
 }

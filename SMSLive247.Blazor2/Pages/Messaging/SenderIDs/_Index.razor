@@ -27,10 +27,10 @@
         try
         {
             var response = await apiClient.SenderIdListAsync(1, 500);
-            var items = response.Result?.ToList() ?? [];
+            var senderIds = response.Result?.ToList() ?? [];
 
-            transactional = items.Where(x => IsTransactional(x)).ToList();
-            promotional = items.Where(x => !IsTransactional(x)).ToList();
+            transactional = senderIds.Where(x => IsTransactional(x)).ToList();
+            promotional = senderIds.Where(x => !IsTransactional(x)).ToList();
 
 
         }
@@ -44,7 +44,7 @@
         }
     }
 
-    private static bool IsTransactional(SenderIdResponse item) =>
-       string.Equals(item.RouteType, "CORPORATE", StringComparison.OrdinalIgnoreCase) ||
-       string.Equals(item.Purpose, "Transactional", StringComparison.OrdinalIgnoreCase);
+    private static bool IsTransactional(SenderIdResponse senderId) =>
+       string.Equals(senderId.RouteType, "CORPORATE", StringComparison.OrdinalIgnoreCase) ||
+       string.Equals(senderId.Purpose, "Transactional", StringComparison.OrdinalIgnoreCase);
 }

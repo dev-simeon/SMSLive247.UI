@@ -146,7 +146,7 @@
     </section>
 </div>
 
-<CorporateRequestModal @ref="requestModal" CacFile="cacFile" LicenseFile="licenseFile" RequiresLicense="requiresLicense" HasApprovedTransactionalId="HasApprovedTransactionalId" OnCompleted="OnRefresh" />
+<TransactionalModal @ref="requestModal" CacFile="cacFile" LicenseFile="licenseFile" RequiresLicense="requiresLicense" HasApprovedTransactionalId="HasApprovedTransactionalId" OnCompleted="OnRefresh" />
 
 @code {
     [Parameter] public IReadOnlyList<SenderIdResponse> Items { get; set; } = Array.Empty<SenderIdResponse>();
@@ -155,7 +155,7 @@
     private string? searchStatus;
     private string? searchQuery;
     private List<SenderIdResponse> filteredItems = [];
-    private CorporateRequestModal requestModal = new();
+    private TransactionalModal requestModal = new();
     private IBrowserFile? cacFile;
     private IBrowserFile? licenseFile;
     private bool requiresLicense;

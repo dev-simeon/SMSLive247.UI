@@ -1,5 +1,5 @@
 (function () {
-    window.LoadTawk = function (propertyId) {
+    window.loadTawk = function (propertyId) {
         if (!propertyId || document.getElementById("tawk-script")) {
             return;
         }
@@ -41,7 +41,7 @@
         return false;
     };
 
-    window.LoadTawk(window.tawkToPropertyId);
+    window.loadTawk(window.tawkToPropertyId);
 })();
 
 

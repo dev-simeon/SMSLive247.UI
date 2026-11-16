@@ -4,16 +4,15 @@
         <EditForm id="Transfer" Model="model" OnValidSubmit="BeginTransfer" class="space-y-6">
             <div>
                 <label class="mb-2 block text-sm font-medium text-slate-700">Transfer Direction</label>
-                <InputRadioGroup @bind-Value="parentToChild" class="flex flex-col gap-2">
-                    <div class="flex items-center gap-2">
-                        <InputRadio id="toChild" Value="@true" />
-                        <label for="toChild" class="text-sm text-slate-700">
+                <InputRadioGroup @bind-Value="parentToChild">
+                    <div class="ml-5">
+                        <label for="toChild" class="text-slate-700 block mb-2">
+                            <InputRadio id="toChild" Value="@true" />
                             @parentAccount?.AccountName → @childAccount?.AccountName
                         </label>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <InputRadio id="toParent" Value="@false" />
-                        <label for="toParent" class="text-sm text-slate-700">
+
+                        <label for="toParent" class="text-slate-700 block">
+                            <InputRadio id="toParent" Value="@false" />
                             @childAccount?.AccountName → @parentAccount?.AccountName
                         </label>
                     </div>
@@ -21,10 +20,9 @@
             </div>
 
             <FormInput Type="number"
-                       Label="Value"
-                       PlaceHolder="Enter amount to transfer"
-                       Required="true"
-                       min="50"
+                       Label="Value to Transfer"
+                       PlaceHolder="Enter value to transfer"
+                       Required="true" min="50"
                        @bind-Value="model.Value"
                        @oninput="OnCreditChanged" />
 
