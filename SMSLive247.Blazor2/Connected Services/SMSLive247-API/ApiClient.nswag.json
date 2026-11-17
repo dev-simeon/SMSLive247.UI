@@ -256,6 +256,36 @@
         }
       }
     },
+    "/api/v5/accounts/{accountId}/convert": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "AccountConvert",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v5/auth": {
       "post": {
         "tags": [
@@ -2543,12 +2573,6 @@
             "type": "number",
             "readOnly": true,
             "format": "double"
-          },
-          "credits": {
-            "type": "number",
-            "readOnly": true,
-            "format": "double",
-            "deprecated": true
           },
           "timeZone": {
             "type": "integer",

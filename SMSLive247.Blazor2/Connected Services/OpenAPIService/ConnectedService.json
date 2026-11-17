@@ -14,7 +14,7 @@
     "GenerateTypeScriptClient": false,
     "GenerateCSharpController": false,
     "OpenApiToCSharpClientCommand": {
-      "ClientBaseClass": "",
+      "ClientBaseClass": null,
       "ConfigurationClass": null,
       "GenerateClientClasses": true,
       "GenerateClientInterfaces": false,
@@ -44,7 +44,7 @@
       "UseRequestAndResponseSerializationSettings": false,
       "SerializeTypeInformation": false,
       "QueryNullValue": "",
-      "ClassName": "ApiClient",
+      "ClassName": "{controller}ApiClient",
       "OperationGenerationMode": 4,
       "AdditionalNamespaceUsages": [],
       "AdditionalContractNamespaceUsages": [],

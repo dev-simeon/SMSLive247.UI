@@ -1,0 +1,17 @@
+.theme-option-active {
+    background-color: var(--color-brand-500);
+    color: #fff;
+}
+
+.theme-option-active:hover {
+    background-color: var(--color-brand-600);
+}
+
+.dark .theme-option-active {
+    background-color: var(--color-brand-600);
+    color: #fff;
+}
+
+.dark .theme-option-active:hover {
+    background-color: var(--color-brand-700);
+}

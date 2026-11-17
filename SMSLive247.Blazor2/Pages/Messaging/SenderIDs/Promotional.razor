@@ -1,12 +1,14 @@
 @using SMSLive247.Blazor.Pages.Messaging.SenderIDs.Modals
 
-<p>Promotional sender IDs are for opted-in campaigns, offers, product announcements and marketing.
+<p class="mb-4">Promotional sender IDs are for opted-in campaigns, offers, product announcements and marketing.
     Choose a name that identifies your organization. Network operators review each request, and approval is not guaranteed.
 </p>
 
-<Notice Variant="Notice.NoticeVariant.Info">
-    Do not use them for OTPs, payment receipts, account alerts or service updates; those belong on the Transactional tab.
-</Notice>
+<div class="mt-4 mb-6">
+    <Notice Variant="Notice.NoticeVariant.Warning">
+        Do not use them for OTPs, payment receipts, account alerts or service updates; those belong on the Transactional tab.
+    </Notice>
+</div>
 
 <PageBody>
     <HeaderLeft>

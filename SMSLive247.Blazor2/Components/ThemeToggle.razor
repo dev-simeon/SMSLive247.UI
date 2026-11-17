@@ -1,41 +1,75 @@
-﻿@inject IJSRuntime JS
+@inject IJSRuntime JS
 @implements IAsyncDisposable
 
-@if (_currentTheme == "light")
-{
-    <button type="button" title="Switch to dark mode"
-            class="rounded-md p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:hover:bg-slate-800"
-            @onclick='() => SetTheme("dark")'>
-        <Icon CssClass="text-xl" Style="Icon.IconStyle.DarkMode" />
+<div class="relative">
+    <button type="button"
+            title="Theme: @ThemeLabel"
+            aria-label="Theme: @ThemeLabel"
+            aria-haspopup="menu"
+            aria-expanded="@_isMenuOpen"
+            class="inline-flex h-10 items-center gap-1 rounded-lg px-2 text-slate-700 transition-colors hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-slate-200 dark:hover:bg-slate-800"
+            @onclick="ToggleMenu">
+        <Icon CssClass="text-xl" Style="@CurrentThemeIcon" />
+        <Icon CssClass="text-base" Style="Icon.IconStyle.ChevronDown" />
     </button>
-}
-@if(_currentTheme == "dark")
-{
-    <button type="button" title="Switch to system mode"
-            class="rounded-md p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:hover:bg-slate-800"
-            @onclick='() => SetTheme("system")'>
-        <Icon CssClass="text-xl" Style="Icon.IconStyle.Bell" />
-    </button>
-}
-@if (_currentTheme == "system")
-{
-    <button type="button" title="Switch to light mode"
-            class="rounded-md p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:hover:bg-slate-800"
-            @onclick='() => SetTheme("light")'>
-        <Icon CssClass="text-xl" Style="Icon.IconStyle.LightMode" />
-    </button>
-}
 
-@* <select @onchange="OnThemeChanged" value="@_currentTheme" class="p-2 text-slate-400">
-    <option value="system">System</option>
-    <option value="light" >Light </option>
-    <option value="dark"  >Dark  </option>
-</select> *@
+    @if (_isMenuOpen)
+    {
+        <div role="menu" aria-label="Color theme"
+             class="absolute right-0 z-50 mt-2 w-40 rounded-xl border border-slate-200 bg-white p-1 shadow-xl dark:border-slate-700 dark:bg-gray-900">
+            <button type="button" role="menuitemradio" aria-checked='@(_currentTheme == "light")'
+                    class="flex h-10 w-full items-center gap-2 rounded-lg px-3 text-left text-sm transition-colors @ThemeOptionClass("light")"
+                    @onclick='() => SelectTheme("light")'>
+                <Icon CssClass="text-lg" Style="Icon.IconStyle.LightMode" />
+                <span>Light</span>
+                @if (_currentTheme == "light")
+                {
+                    <Icon CssClass="ml-auto text-base" Style="Icon.IconStyle.CheckCircle" />
+                }
+            </button>
+            <button type="button" role="menuitemradio" aria-checked='@(_currentTheme == "dark")'
+                    class="flex h-10 w-full items-center gap-2 rounded-lg px-3 text-left text-sm transition-colors @ThemeOptionClass("dark")"
+                    @onclick='() => SelectTheme("dark")'>
+                <Icon CssClass="text-lg" Style="Icon.IconStyle.DarkMode" />
+                <span>Dark</span>
+                @if (_currentTheme == "dark")
+                {
+                    <Icon CssClass="ml-auto text-base" Style="Icon.IconStyle.CheckCircle" />
+                }
+            </button>
+            <button type="button" role="menuitemradio" aria-checked='@(_currentTheme == "system")'
+                    class="flex h-10 w-full items-center gap-2 rounded-lg px-3 text-left text-sm transition-colors @ThemeOptionClass("system")"
+                    @onclick='() => SelectTheme("system")'>
+                <Icon CssClass="text-lg" Style="Icon.IconStyle.Contrast" />
+                <span>Auto</span>
+                @if (_currentTheme == "system")
+                {
+                    <Icon CssClass="ml-auto text-base" Style="Icon.IconStyle.CheckCircle" />
+                }
+            </button>
+        </div>
+    }
+</div>
 
 @code {
     private IJSObjectReference? _module;
     private string _currentTheme = "system";
+    private bool _isMenuOpen;
     private DotNetObjectReference<ThemeToggle>? _dotNetRef;
+
+    private string ThemeLabel => _currentTheme switch
+    {
+        "light" => "Light",
+        "dark" => "Dark",
+        _ => "Auto"
+    };
+
+    private Icon.IconStyle CurrentThemeIcon => _currentTheme switch
+    {
+        "light" => Icon.IconStyle.LightMode,
+        "dark" => Icon.IconStyle.DarkMode,
+        _ => Icon.IconStyle.Contrast
+    };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -49,18 +83,20 @@
         }
     }
 
-    private async Task OnThemeChanged(ChangeEventArgs e)
+    private string ThemeOptionClass(string theme) => _currentTheme == theme
+        ? "theme-option-active"
+        : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800";
+
+    private void ToggleMenu() => _isMenuOpen = !_isMenuOpen;
+
+    private async Task SelectTheme(string theme)
     {
-        _currentTheme = e.Value?.ToString() ?? "system";
-        if (_module != null)
-            await _module.InvokeVoidAsync("setTheme", _currentTheme);
+        _isMenuOpen = false;
+        await SetTheme(theme);
     }
 
     [JSInvokable]
-    public void OnSystemThemeChanged(bool isDark)
-    {
-        StateHasChanged(); // re-render if you show a live indicator
-    }
+    public void OnSystemThemeChanged(bool isDark) => StateHasChanged();
 
     public async Task SetTheme(string theme)
     {
