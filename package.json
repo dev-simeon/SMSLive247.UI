@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/dev-simeon/SMSLive247.UI#readme",
   "dependencies": {
-    "@tailwindcss/cli": "^4.3.3",
+    "@tailwindcss/cli": "^4.3.5",
     "tailwindcss": "^4.3.3"
   }
 }

@@ -1,8 +1,8 @@
 namespace SMSLive247.UI.Services;
 
-public sealed class MaintenanceNoticeClient
+public sealed class SiteNoticeClient
 {
-    private static readonly MaintenanceNotice Notice = new()
+    private static readonly SiteNotice Notice = new()
     {
         Id = "maintenance-2026-11-07",
         Title = "Scheduled maintenance",
@@ -13,11 +13,11 @@ public sealed class MaintenanceNoticeClient
     };
 
     // Mock implementation shaped like the planned active-maintenance API response.
-    public Task<MaintenanceNotice?> GetActiveAsync(CancellationToken cancellationToken = default)
+    public Task<SiteNotice?> GetActiveAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var now = DateTimeOffset.UtcNow;
-        MaintenanceNotice? active = now >= Notice.PublishedAtUtc && now < Notice.EndsAtUtc
+        SiteNotice? active = now >= Notice.PublishedAtUtc && now < Notice.EndsAtUtc
             ? Notice
             : null;
 
@@ -25,7 +25,7 @@ public sealed class MaintenanceNoticeClient
     }
 }
 
-public sealed class MaintenanceNotice
+public sealed class SiteNotice
 {
     public string Id { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;

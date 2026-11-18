@@ -2,7 +2,7 @@
 @implements IDisposable
 @inject ProtectedLocalStorage BrowserStorage
 @inject ProtectedSessionStorage SessionStorage
-@inject MaintenanceNoticeClient NoticeClient
+@inject SiteNoticeClient NoticeClient
 
 @if (notice is not null && !isDismissed)
 {
@@ -23,7 +23,7 @@
 
 @code {
     private const string StorageKey = "maintenance-notice:v1";
-    private MaintenanceNotice? notice;
+    private SiteNotice? notice;
     private bool isDismissed;
     private CancellationTokenSource? expiryTokenSource;
 
@@ -40,7 +40,7 @@
     {
         try
         {
-            var cached = await BrowserStorage.GetAsync<MaintenanceNotice>(StorageKey);
+            var cached = await BrowserStorage.GetAsync<SiteNotice>(StorageKey);
             if (cached.Success && IsNotExpired(cached.Value))
             {
                 notice = cached.Value!;
@@ -87,7 +87,7 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task<bool> IsDismissedAsync(MaintenanceNotice value)
+    private async Task<bool> IsDismissedAsync(SiteNotice value)
     {
         var dismissed = await SessionStorage.GetAsync<bool>($"maintenance-dismissed:{value.Id}");
         return dismissed.Success && dismissed.Value;
@@ -102,12 +102,12 @@
         await SessionStorage.SetAsync($"maintenance-dismissed:{notice.Id}", true);
     }
 
-    private static bool IsNotExpired(MaintenanceNotice? value) =>
+    private static bool IsNotExpired(SiteNotice? value) =>
         value is not null
         && !string.IsNullOrWhiteSpace(value.Message)
         && DateTimeOffset.UtcNow < value.EndsAtUtc;
 
-    private void ScheduleExpiry(MaintenanceNotice? value)
+    private void ScheduleExpiry(SiteNotice? value)
     {
         expiryTokenSource?.Cancel();
         expiryTokenSource?.Dispose();
@@ -115,7 +115,7 @@
         _ = ClearAtExpiryAsync(value!, expiryTokenSource.Token);
     }
 
-    private async Task ClearAtExpiryAsync(MaintenanceNotice value, CancellationToken cancellationToken)
+    private async Task ClearAtExpiryAsync(SiteNotice value, CancellationToken cancellationToken)
     {
         try
         {
