@@ -10,7 +10,7 @@
   },
   "codeGenerators": {
     "openApiToCSharpClient": {
-      "clientBaseClass": "",
+      "clientBaseClass": null,
       "configurationClass": null,
       "generateClientClasses": true,
       "generateClientInterfaces": false,
@@ -40,7 +40,7 @@
       "useRequestAndResponseSerializationSettings": false,
       "serializeTypeInformation": false,
       "queryNullValue": "",
-      "className": "ApiClient",
+      "className": "{controller}ApiClient",
       "operationGenerationMode": "SingleClientFromOperationId",
       "additionalNamespaceUsages": [],
       "additionalContractNamespaceUsages": [],
