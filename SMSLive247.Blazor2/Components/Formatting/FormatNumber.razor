@@ -1,6 +1,6 @@
 ﻿@typeparam TValue where TValue : struct
 
-<div class="text-end text-nowrap pe-4">
+<div class="text-end text-nowrap">
     @if (!Currency.Equals(default(TValue)))
     {
         @FormatValueAsString(Currency, $"{Symbol} {Format}")

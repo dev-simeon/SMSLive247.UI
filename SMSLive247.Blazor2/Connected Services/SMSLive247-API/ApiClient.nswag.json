@@ -4,11 +4,6 @@
     "title": "SMSLive247 API",
     "version": "v5"
   },
-  "servers": [
-    {
-      "url": "https://api.smslive247.com"
-    }
-  ],
   "paths": {
     "/api/v5/accounts": {
       "get": {
@@ -1102,6 +1097,14 @@
             "schema": {
               "type": "integer",
               "format": "int64"
+            }
+          },
+          {
+            "name": "SubAmount",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "double"
             }
           },
           {

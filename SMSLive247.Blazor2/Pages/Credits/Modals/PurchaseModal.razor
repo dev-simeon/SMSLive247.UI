@@ -4,22 +4,27 @@
 <Modal Title="@(showBankAccount ? "Bank transfer details" : "Review your purchase")"
        @bind-IsVisible="isVisible" Size="Modal.ModalSize.Medium">
     <Body>
-        @if (price != null && !showBankAccount)
+        @if (!showBankAccount)
         {
             <div class="space-y-6">
                 <section class="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-gray-900">
                     <dl class="space-y-3 text-sm">
-                        @if (!isCashWallet)
-                        {
-                            <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Quantity</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@price.Quantity.ToString("#,##0") credits</dd></div>
-                            <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Unit price</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.Price)</dd></div>
-                        }
-                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">@(isCashWallet ? "Amount" : "Subtotal")</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.SubTotal)</dd></div>
-                        <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">VAT</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.TaxAmount)</dd></div>
+                        <div class="flex justify-between gap-4">
+                            <dt class="text-slate-500 dark:text-slate-400">
+                                Sub Total
+                            </dt>
+                            <dd class="font-medium text-slate-700 dark:text-slate-200">
+                                @formatCurrency(quote.SubTotal)
+                            </dd>
+                        </div>
+                        <div class="flex justify-between gap-4">
+                            <dt class="text-slate-500 dark:text-slate-400">VAT</dt>
+                            <dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(quote.TaxAmount)</dd>
+                        </div>
                     </dl>
                     <div class="mt-4 flex items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
-                        <span class="font-bold text-slate-900 dark:text-slate-100">Total amount</span>
-                        <span class="text-xl font-bold text-brand-600">@formatCurrency(price.TotalAmount)</span>
+                        <span class="font-bold text-slate-900 dark:text-slate-100">Total Amount</span>
+                        <span class="text-xl font-bold text-brand-600">@formatCurrency(quote.TotalAmount)</span>
                     </div>
                 </section>
 
@@ -50,32 +55,17 @@
                         }
                     </div>
                 </section>
-
-                <div class="flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/50">
-                    <Icon Style="Icon.IconStyle.Info" CssClass="mt-0.5 shrink-0 text-blue-600 dark:text-blue-300" />
-                    <p class="text-xs leading-relaxed text-blue-800 dark:text-blue-200">@(isCashWallet ? "Your wallet is funded after the payment is confirmed by the payment provider." : "SMS credits are added after the payment is confirmed by the payment provider.")</p>
-                </div>
             </div>
         }
         else if (showBankAccount && bankAccount != null)
         {
             <div class="space-y-5">
-                @if (isCashWallet && price is not null)
-                {
-                    <section class="rounded-lg border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-gray-900">
-                        <dl class="space-y-3 text-sm">
-                            <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">Wallet top-up</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.SubTotal)</dd></div>
-                            <div class="flex justify-between gap-4"><dt class="text-slate-500 dark:text-slate-400">VAT (7.5%)</dt><dd class="font-medium text-slate-700 dark:text-slate-200">@formatCurrency(price.TaxAmount)</dd></div>
-                            <div class="flex justify-between gap-4 border-t border-slate-200 pt-3 dark:border-slate-700"><dt class="font-semibold text-slate-800 dark:text-slate-200">Amount to transfer</dt><dd class="font-semibold text-slate-800 dark:text-slate-200">@formatCurrency(price.TotalAmount)</dd></div>
-                        </dl>
-                    </section>
-                }
                 @if (!string.IsNullOrWhiteSpace(bankAccount.AccountNumber))
                 {
-                    <div class="flex items-start gap-3 px-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                        <Icon Style="Icon.IconStyle.Info" CssClass="mt-1 shrink-0 text-blue-600 dark:text-blue-300" />
-                        <p>@(isCashWallet ? "Your wallet is funded automatically after the transfer is confirmed. Save this dedicated account for future top-ups." : "Your SMS units will be credited automatically after the transfer is confirmed. Save this dedicated account for future wallet top-ups.")</p>
-                    </div>
+                   <Notice Variant="Notice.NoticeVariant.Info">
+                        <p>Your balance is updated automatically after the transfer is confirmed.</p>
+                        <p>Save this dedicated account for future top-ups.</p>
+                    </Notice>
 
                     <section class="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-black">
                         <dl>
@@ -159,13 +149,14 @@
     [Parameter] public EventCallback OnCompleted { get; set; }
 
     private bool isVisible;
+    private PriceCalcResponse quote;
     private bool isProcessingPayment;
     private bool isLoadingBankAccount;
     private bool showBankAccount;
     private bool accountCopied;
-    private bool isCashWallet;
+    // private bool isCashWallet;
     [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
-    private PriceCalcResponse? price;
+    // private PriceCalcResponse? price;
     private DedicatedAccountResponse? bankAccount;
     private string selectedMethod = "BANK_TRANSFER";
 
@@ -191,11 +182,10 @@
 
     private static string formatCurrency(double amount) => $"₦ {amount:#,##0.00}";
 
-    public void Show(PriceCalcResponse priceDetails, bool cashWallet = false, string paymentMethod = "BANK_TRANSFER")
+    public void Show(PriceCalcResponse price)
     {
-        price = priceDetails;
-        isCashWallet = cashWallet;
-        selectedMethod = paymentMethod == "PAYSTACK" ? "PAYSTACK" : "BANK_TRANSFER";
+        this.quote = price;
+        selectedMethod = "BANK_TRANSFER";
         showBankAccount = false;
         bankAccount = null;
         accountCopied = false;
@@ -218,12 +208,6 @@
 
     private async Task BeginCheckout(string provider)
     {
-        if (price == null)
-        {
-            await alert.Error("Purchase details are not available. Please try again.");
-            return;
-        }
-
         var checkoutStarted = false;
         try
         {
@@ -231,8 +215,7 @@
             var request = new InitPaymentRequest
             {
                 ProviderID = provider,
-                TotalAmount = price.TotalAmount,
-                FxCurrency = string.IsNullOrWhiteSpace(price.FxCurrency) ? "N" : price.FxCurrency
+                TotalAmount = quote.TotalAmount,
             };
             var response = (await apiClient.PurchaseBeginAsync(request)).Result;
             var authorizationUrl = response?.AuthorizationUrl;

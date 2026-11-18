@@ -1,0 +1,183 @@
+﻿@layout MainLayout
+@using SMSLive247.Blazor.Pages.Credits.Modals
+
+<PageTitle>SMSLive247 - Buy Credits</PageTitle>
+
+<PageHeader Title="Buy SMS Credits"
+            SubTitle="Purchase SMS credits instantly. Enter the quantity you need below.">
+</PageHeader>
+
+<div class="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-12">
+    <div class="lg:col-span-4">
+        <div class="flex h-full flex-col rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm lg:p-7 dark:border-slate-700 dark:bg-black">
+            <div class="flex-1 space-y-7">
+                    <div>
+                        <label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                            Quantity/Credits
+                        </label>
+                        <div class="relative">
+                            <input type="number"
+                                   @bind="quantity" @bind:event="oninput"
+                                   min="500"
+                                   class="block w-full rounded-lg border-0 py-3 pr-16 pl-4 font-mono text-slate-900 ring-1 ring-slate-300 outline-none ring-inset placeholder:text-slate-400 focus:ring-2 focus:ring-brand-500 focus:ring-inset sm:text-sm dark:bg-gray-900 dark:text-slate-200 dark:ring-slate-700"
+                                   placeholder="e.g. 10000" />
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                <span class="font-bold text-slate-500 text-[10px]">
+                                    CREDITS
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-gray-900">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-slate-500 dark:text-slate-400">Unit Price</span>
+                            <span class="font-bold text-slate-800 dark:text-slate-200">
+                                ₦ @(currentTier?.Price.ToString("0.00") ?? "0.00")
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between border-t border-slate-200 pt-4 dark:border-slate-700">
+                            <span class="font-normal text-slate-500 dark:text-slate-400">
+                                Total Amount
+                            </span>
+                            <span class="text-xl font-bold text-brand-600">
+                                ₦ @totalCost.ToString("#,##0.00")
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 p-3 text-sm font-normal text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
+                        <Icon Style="Icon.IconStyle.Info" CssClass="shrink-0 text-base" />
+                        <p class="m-0 leading-5">Transaction charges would be added at checkout.</p>
+                    </div>
+
+                    <button @onclick="ProceedToPayment" disabled="@isBusy"
+                            class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 font-sans text-sm font-normal text-white shadow-lg shadow-brand-500/30 transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60">
+                        @if (isBusy)
+                        {
+                            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            <span>Calculating...</span>
+                        }
+                        else
+                        {
+                            <span>Proceed to Payment</span>
+                            <Icon Style="Icon.IconStyle.ChevronRight" CssClass="text-base" />
+                        }
+                    </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="lg:col-span-8">
+            <div class="flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-black">
+                <div class="border-b border-slate-200 bg-slate-50/50 p-5 dark:border-slate-700 dark:bg-gray-900">
+                    <h3 class="text-sm font-bold tracking-wider text-slate-900 uppercase dark:text-slate-200">
+                        Volume Pricing Guide
+                    </h3>
+                </div>
+                <div class="flex-1 overflow-x-auto">
+                    <table class="w-full border-collapse text-left">
+                        <thead>
+                            <tr class="border-b border-slate-200 bg-slate-50 font-bold tracking-widest text-slate-500 text-[10px] uppercase dark:border-slate-700 dark:bg-gray-900 dark:text-slate-400">
+                                <th class="px-6 py-4">Min Qty</th>
+                                <th class="px-6 py-4">Max Qty</th>
+                                <th class="px-6 py-4 text-right">Price (₦)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                            @if (pricingTiers != null)
+                            {
+                                @foreach (var tier in pricingTiers)
+                                {
+                                    bool isActive = IsTierActive(tier);
+                                    <tr class="transition-colors @(isActive ? "bg-brand-50 border-l-4 border-l-brand-500 dark:bg-brand-800" : "hover:bg-slate-50 dark:hover:bg-slate-800")">
+                                        <td class="px-6 py-4 text-sm font-medium @(isActive ? "text-brand-700 dark:text-brand-100" : "text-slate-600 dark:text-slate-400")">
+                                            @tier.MinQuantity.ToString("#,##0")
+                                        </td>
+                                        <td class="px-6 py-4 text-sm @(isActive ? "text-brand-700 dark:text-brand-100" : "text-slate-600 dark:text-slate-400")">
+                                            @(tier.MaxQuantity == 0 ? "Unlimited" : tier.MaxQuantity.ToString("#,##0"))
+                                        </td>
+                                        <td class="px-6 py-4 text-right text-sm font-bold @(isActive ? "text-brand-700 dark:text-brand-100" : "text-slate-900 dark:text-slate-200")">
+                                            @tier.Price.ToString("0.00")
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+</div>
+
+<PurchaseModal @ref="purchaseModal" OnCompleted="StateHasChanged" />
+
+@code {
+    private long quantity = 10000;
+    private bool isBusy;
+    private List<PriceSlotResponse> pricingTiers = [];
+    private PurchaseModal purchaseModal = new();
+
+    private PriceSlotResponse? currentTier => pricingTiers.FirstOrDefault(t => IsTierActive(t)) ?? pricingTiers.FirstOrDefault();
+
+    private double totalCost => quantity * (currentTier?.Price ?? 0);
+
+    private bool IsTierActive(PriceSlotResponse tier)
+    {
+        long max = tier.MaxQuantity == 0 ? long.MaxValue : tier.MaxQuantity;
+        return quantity >= tier.MinQuantity && quantity <= max;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchPriceList();
+    }
+
+    private async Task FetchPriceList()
+    {
+        try
+        {
+            var res = await apiClient.PriceListAsync();
+            pricingTiers = res.Result.ToList();
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error("Failed to load pricing data: " + ex.FriendlyErrorMessage);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error("Failed to load pricing data: " + ex.Message);
+        }
+    }
+
+    private async Task ProceedToPayment()
+    {
+        if (isBusy)
+            return;
+
+        if (quantity < 500)
+        {
+            await alert.Error("Minimum SMS credit quantity to purchase is 500.");
+            return;
+        }
+
+        try
+        {
+            isBusy = true;
+            var response = await apiClient.PriceCalculateAsync(quantity, null, null, "");
+            purchaseModal.Show(response.Result);
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error("Failed to calculate cost: " + ex.FriendlyErrorMessage);
+        }
+        catch (Exception ex)
+        {
+            await alert.Error("Failed to calculate cost: " + ex.Message);
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+}
