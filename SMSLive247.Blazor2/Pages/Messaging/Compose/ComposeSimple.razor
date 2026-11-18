@@ -101,8 +101,9 @@
 </Loading>
 
 <SelectContacts     @ref="contactsModal"    OnSelected="(items) => model?.UpdateContacts(items)" />
-<SelectRawNumbers   @ref="rawNumbersModal"  OnSelected="(items) => model?.UpdateNumbers(items)" CountryCode="234" />
 <SelectBulkfiles    @ref="bulkfilesModal"   OnSelected="(items) => model?.UpdateBulkfiles(items)" />
+<SelectRawNumbers   @ref="rawNumbersModal"  OnSelected="(items) => model?.UpdateNumbers(items)" 
+                    CountryCode="MainAccount?.Account.CountryCode ?? 234" />
 
 @code {
     private SelectContacts contactsModal = new();
@@ -147,10 +148,13 @@
             var messages = new List<string>();
             if (model?.CountRecipients() is not > 0)
                 messages.Add("Please select at least one recipient");
+
             if (string.IsNullOrWhiteSpace(model?.SenderID))
                 messages.Add("Please select a sender ID");
+
             if (string.IsNullOrWhiteSpace(model?.MessageText))
                 messages.Add("Please enter a message");
+
             return messages;
         }
     }
@@ -251,16 +255,11 @@
         message += "<br>";
 
         @if(res.Wallet == "SMS")
-        {
             message += $"Total SMS units charged: {res.WalletCharge:#,##0} <br>";
             //message += $"Current SMS balance: {res.WalletBalance}";
-        }
         else
-        {
             message += $"Total Wallet charge: N{res.WalletCharge:#,##0} <br>";
             //message += $"Current Wallet balance: {res.WalletBalance}";
-
-        }
      
         return message;
     }
