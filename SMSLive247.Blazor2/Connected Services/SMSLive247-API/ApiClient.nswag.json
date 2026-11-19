@@ -3183,6 +3183,10 @@
             "type": "boolean",
             "readOnly": true
           },
+          "status": {
+            "type": "string",
+            "readOnly": true
+          },
           "error": {
             "type": "string",
             "readOnly": true,

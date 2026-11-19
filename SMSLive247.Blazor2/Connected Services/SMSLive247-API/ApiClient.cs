@@ -6197,10 +6197,15 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public string Reference { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("isPaid")]
+        //[System.Text.Json.Serialization.JsonPropertyName("isPaid")]
+
+        //[System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        //public bool IsPaid { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
-        public bool IsPaid { get; set; }
+        public string Status { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("error")]
 

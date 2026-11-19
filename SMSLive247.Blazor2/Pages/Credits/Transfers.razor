@@ -22,7 +22,7 @@
     <ChildContent>
         <Table DataSource="ds">
             <Columns>
-                <Column Header="Request Date" Width="180px">
+                <Column Header="Request Date" >
                     <FormatDate DateTime="@context.DateCreated"></FormatDate>
                 </Column>
                 <Column Header="Sender">
@@ -31,11 +31,14 @@
                 <Column Header="Recipient">
                     @context.RecipientName
                 </Column>
-                <Column Header="Value Transferred" Width="180px">
+                <Column Header="Value Sent" Width="120px">
                     <FormatBalance Wallet="@context.Wallet" Balance="@context.WalletCharge" Title="Value Transferred" />
                 </Column>
+                <Column Header="Transfer ID">
+                    <p class="font-mono">@Guid.NewGuid()</p>
+                </Column>
                 <Column Header="Status">
-                    <Badge Style="ColorStyle.Success" Value="TRANSFERRED" />
+                    <Badge Style="ColorStyle.Success" Value="SUCCESSFUL" />
                 </Column>
             </Columns>
         </Table>

@@ -16,24 +16,31 @@
     <ChildContent>
         <Table Items="accounts">
             <Columns>
-                <Column Header="Account" Width="25%">
-                    @context.AccountName
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated" />
                 </Column>
                 <Column Header="Type">
                     @if (context.Phone == "main")
                     {
-                        <Badge Style="ColorStyle.Danger" Value="MAIN ACCOUNT" />
+                        <Badge Style="ColorStyle.Warning" Value="MAIN ACCOUNT" />
                     }
                     else
                     {
                         <Badge Style="ColorStyle.Info" Value="SUB ACCOUNT" />
                     }
                 </Column>
+                <Column Header="Account">
+                    @context.AccountName
+                </Column>
+                <Column Header="Status">
+                    <Badge Variant="Badge.StatusVariant.ActiveInactive"
+                           Value="@(context.Active ? "ACTIVE" : "DISABLED")" />
+                </Column>
+                <Column Header="Balance">
+                    <FormatBalance Wallet="@context.Wallet" Balance="@context.WalletBalance" Title="Wallet Balance" />
+                </Column>
                 <Column Header="API Key">
                     <ApiKeyDisplay Account="@context" OnReset="ReloadData" />
-                </Column>
-                <Column Header="Date Created" Width="160px">
-                    <FormatDate DateTime="@context.DateCreated" />
                 </Column>
             </Columns>
         </Table>

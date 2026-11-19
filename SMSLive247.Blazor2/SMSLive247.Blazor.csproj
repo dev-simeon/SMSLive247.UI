@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pages\Credits\Shared\**" />
+    <Content Remove="Pages\Credits\Shared\**" />
+    <EmbeddedResource Remove="Pages\Credits\Shared\**" />
+    <None Remove="Pages\Credits\Shared\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="Connected Services\OpenAPIService\ConnectedService.json" />
   </ItemGroup>
 
@@ -21,10 +28,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\Credits\Shared\" />
   </ItemGroup>
 
 </Project>

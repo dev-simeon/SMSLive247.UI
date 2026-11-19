@@ -12,8 +12,8 @@
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-black sm:flex-row lg:col-span-2">
-            <div class="flex flex-1 flex-col justify-between border-b border-slate-100 p-6 dark:border-slate-700 sm:border-r sm:border-b-0 sm:p-8">
+        <div class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm sm:flex-row lg:col-span-2 dark:border-slate-700 dark:bg-black">
+            <div class="flex flex-1 flex-col justify-between border-b border-slate-100 p-6 sm:border-r sm:border-b-0 sm:p-8 dark:border-slate-700">
                 <div>
                     <div class="mb-4 flex items-center gap-3">
                         <div>
@@ -40,7 +40,7 @@
             </div>
 
             <button type="button"
-                    @onclick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)"
+                    @onclick="() => nav.NavigateTo(Const.Routes.Wallet.Purchase)"
                     class="group flex w-full flex-col items-center justify-center bg-slate-50/50 p-6 text-center transition-colors hover:bg-slate-100 dark:bg-gray-900 dark:hover:bg-slate-800 sm:w-64 sm:p-8">
                 <p class="mb-2 text-xs font-bold tracking-widest text-slate-400 uppercase">
                     Wallet Balance
@@ -127,7 +127,7 @@
                                         @(string.IsNullOrWhiteSpace(batch.SenderID) ? "-" : batch.SenderID)
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@batch.Status" ShowDot="true" />
+                                        <Badge Variant="Badge.StatusVariant.BatchMessage" Value="@batch.Status" />
                                     </td>
                                     <td class="px-6 py-4 text-right text-xs font-medium whitespace-nowrap text-slate-500 dark:text-slate-400">
                                         @FormatDate(batch.DateSubmitted)
@@ -184,7 +184,7 @@
                 </div>
 
                 <button type="button"
-                        @onclick="() => nav.NavigateTo(Const.Routes.Wallet.BuyCredits)"
+                        @onclick="() => nav.NavigateTo(Const.Routes.Wallet.Purchase)"
                         class="mt-6 flex w-full items-center justify-center gap-2 py-2 text-[10px] font-bold leading-none tracking-widest text-brand-500 uppercase hover:underline">
                     Purchase History
                     <Icon Style="Icon.IconStyle.ChevronRight" CssClass="inline-flex translate-y-px items-center justify-center leading-none text-[14px]" />
@@ -260,7 +260,7 @@
         !string.IsNullOrWhiteSpace(purchase.Error);
 
     private static bool PurchaseHasSucceeded(PurchaseResponse purchase) =>
-        !PurchaseHasFailed(purchase) && purchase.IsPaid;
+        !PurchaseHasFailed(purchase) && purchase.Status == "PAID";
 
     private static string GetPurchaseStatusText(PurchaseResponse purchase) =>
         PurchaseHasFailed(purchase) ? "Purchase failed"

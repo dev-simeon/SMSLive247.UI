@@ -45,7 +45,7 @@ namespace SMSLive247.UI.Shared
 
             public static class Wallet
             {
-                public const string BuyCredits = "/credits/purchase";
+                public const string Purchase = "/credits/purchase";
                 public const string PurchaseComplete = "/credits/purchase-complete";
                 public const string Deposits = "/credits/deposits";
                 public const string Transfers = "/credits/transfers";
@@ -101,7 +101,7 @@ namespace SMSLive247.UI.Shared
                 Title = "Wallet",
                 Items =
                 [
-                    new NavItem { Title = "Buy", Url = Routes.Wallet.BuyCredits, Icon = Icon.IconStyle.CreditCard },
+                    new NavItem { Title = "Buy", Url = Routes.Wallet.Purchase, Icon = Icon.IconStyle.CreditCard },
                     //new NavItem { Title = "Deposit", Url = Routes.Wallet.Deposits, Icon = Icon.IconStyle.ArrowRightLeft },
                     new NavItem { Title = "Transfers", Url = Routes.Wallet.Transfers, Icon = Icon.IconStyle.ArrowRightLeft },
                     new NavItem { Title = "Pricing", Url = Routes.Wallet.Pricing, Icon = Icon.IconStyle.Tag }

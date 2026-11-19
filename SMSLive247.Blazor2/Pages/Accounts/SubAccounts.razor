@@ -20,15 +20,21 @@
     <ChildContent>
         <Table DataSource="ds">
             <Columns>
+                <Column Header="Date Created">
+                    <FormatDate DateTime="@context.DateCreated" />
+                </Column>
                 <Column Header="Account Name">
                     <button @onclick="() => nav.NavigateTo(Const.Routes.Account.SubAccountDetailsUrl(context.AccountID))"
                             class="font-medium text-brand-600 hover:text-brand-700 hover:underline text-left transition-colors">
                         @context.AccountName
                     </button>
                 </Column>
+                <Column Header="Status">
+                    <Badge Variant="Badge.StatusVariant.ActiveInactive"
+                           Value="@(context.Active ? "ACTIVE" : "DISABLED")" />
+                </Column>
                 <Column Header="Balance">
                     <FormatBalance Wallet="@context.Wallet" Balance="@context.WalletBalance" Title="Wallet Balance" />
-                    @* <Icon Style="Icon.IconStyle.ArrowRightLeft" FontWeight="300" /> *@
                 </Column>
                 <Column Header="Transfer Balance">
                     <button type="button"
@@ -41,20 +47,12 @@
                         <span>Transfer...</span>
                     </button>
                 </Column>
-                <Column Header="Status">
-                    <Badge Variant="Badge.StatusVariant.ActiveInactive"
-                           Value="@(context.Active ? "ACTIVE" : "DISABLED")" />
-                </Column>
-                <Column Header="Date Created" Width="160px">
-                    <FormatDate DateTime="@context.DateCreated" />
-                </Column>
                 <Column Header="Account ID">
-                    @context.AccountID
+                    <p class="font-mono">@context.AccountID</p>
                 </Column>
                 <Column Align="right">
                     <Actions EditLink="@Const.Routes.Account.SubAccountDetailsUrl(context.AccountID)"
                              OnDelete="e => DeleteSubAccount(context)">
-                            @* <Icon Style="Icon.IconStyle.ArrowRightLeft" /> *@
                     </Actions>
                 </Column>
             </Columns>

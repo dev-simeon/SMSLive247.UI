@@ -6,21 +6,27 @@
     @Value
 </span>
  *@
-<span class="rounded-md px-2 py-1 text-xs font-bold whitespace-nowrap @colorCss">
-    @Value
+<span class="rounded-md px-2 py-1 text-xs font-bold whitespace-nowrap @calc.Color">
+    @calc.Text
 </span>
 
 @code {
-    public enum StatusVariant { ActiveInactive, SenderIdRequest, BatchMessage, DeliveryReport, None }
+    public enum StatusVariant { ActiveInactive, SenderIdRequest, BatchMessage, DeliveryReport, PurchaseStatus, None }
 
     [Parameter] public StatusVariant Variant { get; set; } = StatusVariant.None;
     [Parameter] public ColorStyle Style { get; set; } = ColorStyle.Primary;
     [Parameter] public string Value { get; set; } = string.Empty;
-    [Parameter] public bool ShowDot { get; set; } = true;
 
-    private string colorCss => GetColorStyleFromVariant().ToTailwindCss();
+    private (string Color, string Text) calc
+    {
+        get
+        {
+            var (colorCss, textValue) = GetColorStyleFromVariant();
+            return (colorCss.ToTailwindCss(), textValue);
+        }
+    }
 
-    private ColorStyle GetColorStyleFromVariant()
+    private (ColorStyle, string) GetColorStyleFromVariant()
     {
         return Variant switch
         {
@@ -28,58 +34,71 @@
             StatusVariant.BatchMessage      => MapBatchMessageStatus(Value),
             StatusVariant.SenderIdRequest   => MapSenderIdRequestStatus(Value),
             StatusVariant.DeliveryReport    => MapDeliveryReportStatus(Value),
-            _                               => Style,
+            StatusVariant.PurchaseStatus    => MapPurchaseStatus(Value),
+            _                               => (Style, Value),
         };
     }
 
-    private static ColorStyle MapActiveInactiveStatus(string value)
+    private static (ColorStyle, string) MapPurchaseStatus(string value)
     {
         return value.ToUpperInvariant() switch
         {
-            "ACTIVE"    => ColorStyle.Success,
-            "ENABLED"   => ColorStyle.Success,
-            "INACTIVE"  => ColorStyle.Danger,
-            "DISABLED"  => ColorStyle.Danger,
-            _           => ColorStyle.Secondary
+            "PAID"      => (ColorStyle.Success,   "SUCCESS"),
+            "PENDING"   => (ColorStyle.Warning,   "PENDING"),
+            "FAILED"    => (ColorStyle.Danger,    "FAILED"),
+            "CANCELLED" => (ColorStyle.Danger,    "CANCELLED"),
+            _           => (ColorStyle.Secondary, "UNKNOWN")
         };
     }
 
-    private static ColorStyle MapBatchMessageStatus(string value)
+    private static (ColorStyle, string) MapActiveInactiveStatus(string value)
     {
         return value.ToUpperInvariant() switch
         {
-            "COMPLETED"     => ColorStyle.Success,
-            "RUNNING"       => ColorStyle.Warning,
-            "PAUSED"        => ColorStyle.Info,
-            "ABORTED"       => ColorStyle.Danger,
-            _               => ColorStyle.Secondary
+            "ACTIVE"    => (ColorStyle.Success,   "ACTIVE"),
+            "ENABLED"   => (ColorStyle.Success,   "ENABLED"),
+            "INACTIVE"  => (ColorStyle.Danger,    "INACTIVE"),
+            "DISABLED"  => (ColorStyle.Danger,    "DISABLED"),
+            _           => (ColorStyle.Secondary, "UNKNOWN")
         };
     }
 
-    private static ColorStyle MapSenderIdRequestStatus(string value)
+    private static (ColorStyle, string) MapBatchMessageStatus(string value)
     {
         return value.ToUpperInvariant() switch
         {
-            "APPROVED"  => ColorStyle.Success,
-            "PENDING"   => ColorStyle.Warning,
-            "DELETED"   => ColorStyle.Info,
-            "REJECTED"  => ColorStyle.Danger,
-            _           => ColorStyle.Secondary
+            "COMPLETED"     => (ColorStyle.Success,   "COMPLETED"),
+            "RUNNING"       => (ColorStyle.Warning,   "RUNNING"),
+            "PAUSED"        => (ColorStyle.Info,      "PAUSED"),
+            "ABORTED"       => (ColorStyle.Danger,    "ABORTED"),
+            _               => (ColorStyle.Secondary, "UNKNOWN")
         };
     }
 
-    private static ColorStyle MapDeliveryReportStatus(string value)
+    private static (ColorStyle, string) MapSenderIdRequestStatus(string value)
     {
         return value.ToUpperInvariant() switch
         {
-            "DELIVRD" => ColorStyle.Success,
-            "ACCEPTD" => ColorStyle.Info,
-            "ENROUTE" => ColorStyle.Info,
-            "UNKNOWN" => ColorStyle.Info,
-            "EXPIRED" => ColorStyle.Warning,
-            "UNDELIV" => ColorStyle.Danger,
-            "REJECTD" => ColorStyle.Danger,
-            _         => ColorStyle.Secondary
+            "APPROVED"  => (ColorStyle.Success,   "APPROVED"),
+            "PENDING"   => (ColorStyle.Warning,   "PENDING"),
+            "DELETED"   => (ColorStyle.Info,      "DELETED"),
+            "REJECTED"  => (ColorStyle.Danger,    "REJECTED"),
+            _           => (ColorStyle.Secondary, "UNKNOWN")
+        };
+    }
+
+    private static (ColorStyle, string) MapDeliveryReportStatus(string value)
+    {
+        return value.ToUpperInvariant() switch
+        {
+            "DELIVRD" => (ColorStyle.Success,   "DELIVRD"),
+            "ACCEPTD" => (ColorStyle.Info,      "ACCEPTD"),
+            "ENROUTE" => (ColorStyle.Info,      "ENROUTE"),
+            "UNKNOWN" => (ColorStyle.Info,      "UNKNOWN"),
+            "EXPIRED" => (ColorStyle.Warning,   "EXPIRED"),
+            "UNDELIV" => (ColorStyle.Danger,    "UNDELIV"),
+            "REJECTD" => (ColorStyle.Danger,    "REJECTD"),
+            _         => (ColorStyle.Secondary, "UNKNOWN")
         };
     }
 }
