@@ -4,70 +4,88 @@
 
 <PageTitle>SMSLive247 - Purchase</PageTitle>
 
-<Loading NullCheckObject="MainAccount">
-    @(isCashWallet ? @<PurchaseCash /> : @<PurchaseSMS />)
-</Loading>
+@if (isCashWallet)
+{
+    <PageHeader Title="Fund your Wallet"
+                SubTitle="Purchase messaging credits securely via bank transfer, debit card, or USSD.">
+    </PageHeader>
+}
+else
+{
+    <PageHeader Title="Buy SMS Credits"
+                SubTitle="Purchase SMS credits instantly. Enter the quantity you need below.">
+    </PageHeader>
+}
 
-<PageBody>
-    <HeaderLeft>
-        <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
-    </HeaderLeft>
+<Tabs>
+    <TabPage Title="@title" Icon="Icon.IconStyle.CreditCard">
+        <Loading NullCheckObject="MainAccount">
+            @(isCashWallet ?@<PurchaseCash /> : @<PurchaseSMS />)
+        </Loading>
+    </TabPage>
+    <TabPage Title="Purchase History" Icon="Icon.IconStyle.FileSpreadsheet">
+        <PageBody>
+            <HeaderLeft>
+                <SearchBox @bind-SearchTerm="searchQuery" OnSearch="ReloadData" />
+            </HeaderLeft>
 
-    <ChildContent>
-        <Table DataSource="ds">
-            <Columns>
-                <Column Header="Date Created">
-                    <FormatDate DateTime="@context.DateCreated"></FormatDate>
-                </Column>
-                <Column Header="Provider ID">
-                    @context.ProviderID
-                </Column>
-                @if (isCashWallet)
-                {
-                    <Column Header="Sub Total" Align="right">
-                        <FormatNumber Currency="@context.SubTotal"></FormatNumber>
-                    </Column>
-                    <Column Header="Tax Amount" Align="right">
-                        <FormatNumber Currency="@context.TaxAmount"></FormatNumber>
-                    </Column>
-                    <Column Header="Total Amount" Align="right">
-                        <FormatNumber Currency="@context.TotalAmount"></FormatNumber>
-                    </Column>
-                }
-                else
-                {
-                    <Column Header="Quantity" Align="right">
-                        <FormatNumber Number="@context.Quantity"></FormatNumber>
-                    </Column>
-                    <Column Header="Unit Price" Align="right">
-                        <FormatNumber Currency="@context.Price"></FormatNumber>
-                    </Column>
-                    <Column Header="Tax Amount" Align="right">
-                        <FormatNumber Currency="@context.TaxAmount"></FormatNumber>
-                    </Column>
-                    <Column Header="Total Amount" Align="right">
-                        <FormatNumber Currency="@context.TotalAmount"></FormatNumber>
-                    </Column>
-                }
-                <Column Header="Reference">
-                    <p class="font-mono">@context.Reference</p>
-                </Column>
-                <Column Header="Status">
-                    <Badge Value="@context.Status" Variant="Badge.StatusVariant.PurchaseStatus" />
-                </Column>
-            </Columns>
-        </Table>
-    </ChildContent>
+            <ChildContent>
+                <Table DataSource="ds">
+                    <Columns>
+                        <Column Header="Date Created">
+                            <FormatDate DateTime="@context.DateCreated"></FormatDate>
+                        </Column>
+                        <Column Header="Provider ID">
+                            @context.ProviderID
+                        </Column>
+                        @if (isCashWallet)
+                        {
+                            <Column Header="Sub Total" Align="right">
+                                <FormatNumber Currency="@context.SubTotal"></FormatNumber>
+                            </Column>
+                            <Column Header="Tax Amount" Align="right">
+                                <FormatNumber Currency="@context.TaxAmount"></FormatNumber>
+                            </Column>
+                            <Column Header="Total Amount" Align="right">
+                                <FormatNumber Currency="@context.TotalAmount"></FormatNumber>
+                            </Column>
+                        }
+                        else
+                        {
+                            <Column Header="Quantity" Align="right">
+                                <FormatNumber Number="@context.Quantity"></FormatNumber>
+                            </Column>
+                            <Column Header="Unit Price" Align="right">
+                                <FormatNumber Currency="@context.Price"></FormatNumber>
+                            </Column>
+                            <Column Header="Tax Amount" Align="right">
+                                <FormatNumber Currency="@context.TaxAmount"></FormatNumber>
+                            </Column>
+                            <Column Header="Total Amount" Align="right">
+                                <FormatNumber Currency="@context.TotalAmount"></FormatNumber>
+                            </Column>
+                        }
+                        <Column Header="Reference">
+                            <p class="font-mono">@context.Reference</p>
+                        </Column>
+                        <Column Header="Status">
+                            <Badge Value="@context.Status" Variant="Badge.StatusVariant.PurchaseStatus" />
+                        </Column>
+                    </Columns>
+                </Table>
+            </ChildContent>
 
-    <FooterLeft>
-        <Paging PageNumber="ds.PageState.PageNumber"
-                PageSize="ds.PageState.PageSize"
-                TotalRecords="ds.PageState.TotalCount"
-                PageNumberChanged="OnPageChange"
-                PageSizeChanged="OnPageSizeChange">
-        </Paging>
-    </FooterLeft>
-</PageBody>
+            <FooterLeft>
+                <Paging PageNumber="ds.PageState.PageNumber"
+                        PageSize="ds.PageState.PageSize"
+                        TotalRecords="ds.PageState.TotalCount"
+                        PageNumberChanged="OnPageChange"
+                        PageSizeChanged="OnPageSizeChange">
+                </Paging>
+            </FooterLeft>
+        </PageBody>
+    </TabPage>
+</Tabs>
 
 <PurchaseModal @ref="purchaseModal" OnCompleted="ReloadData" />
 
@@ -78,6 +96,7 @@
     private PurchaseModal purchaseModal = new();
     private ApiDataSource<PurchaseResponse> ds = new();
     private bool isCashWallet => MainAccount is not null && MainAccount.Account.Wallet != "SMS";
+    private string title => isCashWallet ? "Topup Now" : "Buy Now";
 
 
     protected override async Task OnInitializedAsync()

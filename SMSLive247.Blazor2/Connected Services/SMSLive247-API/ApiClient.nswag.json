@@ -1061,334 +1061,6 @@
         }
       }
     },
-    "/api/v5/credits/pricing": {
-      "get": {
-        "tags": [
-          "Credit Pricing"
-        ],
-        "operationId": "PriceList",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PriceSlotResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/credits/pricing/calc": {
-      "get": {
-        "tags": [
-          "Credit Pricing"
-        ],
-        "operationId": "PriceCalculate",
-        "parameters": [
-          {
-            "name": "Quantity",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "SubAmount",
-            "in": "query",
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "name": "TotalAmount",
-            "in": "query",
-            "schema": {
-              "type": "number",
-              "format": "double"
-            }
-          },
-          {
-            "name": "FxCurrency",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PriceCalcResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/credits/coverage": {
-      "get": {
-        "tags": [
-          "Credit Pricing"
-        ],
-        "operationId": "CoverageList",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CoverageResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/credits/purchase": {
-      "get": {
-        "tags": [
-          "Credit Purchase"
-        ],
-        "operationId": "PurchaseList",
-        "parameters": [
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 1000.0,
-              "minimum": 1.0
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 500.0,
-              "minimum": 5.0
-            }
-          },
-          {
-            "name": "SearchText",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PurchaseResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Credit Purchase"
-        ],
-        "operationId": "PurchaseBegin",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitPaymentRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitPaymentRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitPaymentRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InitPaymentResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/credits/purchase/complete/{transactionId}": {
-      "get": {
-        "tags": [
-          "Credit Purchase"
-        ],
-        "operationId": "PurchaseComplete",
-        "parameters": [
-          {
-            "name": "transactionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PurchaseResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/credits/purchase/dedicated": {
-      "get": {
-        "tags": [
-          "Credit Purchase"
-        ],
-        "operationId": "GetDedicatedAccount",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/DedicatedAccountResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v5/credits/transfer": {
-      "get": {
-        "tags": [
-          "Credit Transfer"
-        ],
-        "operationId": "TransferList",
-        "parameters": [
-          {
-            "name": "PageNumber",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 1000.0,
-              "minimum": 1.0
-            }
-          },
-          {
-            "name": "PageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "maximum": 500.0,
-              "minimum": 5.0
-            }
-          },
-          {
-            "name": "SearchText",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/TransferResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Credit Transfer"
-        ],
-        "operationId": "TransferCredit",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TransferRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TransferRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/TransferRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TransferResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v5/tokens/sms": {
       "post": {
         "tags": [
@@ -1847,6 +1519,105 @@
         }
       }
     },
+    "/api/v5/credits/pricing": {
+      "get": {
+        "tags": [
+          "Pricing"
+        ],
+        "operationId": "PriceList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PriceSlotResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/pricing/calc": {
+      "get": {
+        "tags": [
+          "Pricing"
+        ],
+        "operationId": "PriceCalculate",
+        "parameters": [
+          {
+            "name": "Quantity",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "SubAmount",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "TotalAmount",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          {
+            "name": "FxCurrency",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceCalcResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/routes": {
+      "get": {
+        "tags": [
+          "Pricing"
+        ],
+        "operationId": "RouteList",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RouteResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v5/routes/{routeId}": {
       "get": {
         "tags": [
@@ -1921,7 +1692,7 @@
         "tags": [
           "Routing"
         ],
-        "operationId": "RouteList",
+        "operationId": "RouteList2",
         "responses": {
           "200": {
             "description": "OK",
@@ -2484,6 +2255,235 @@
           }
         }
       }
+    },
+    "/api/v5/credits/purchase": {
+      "get": {
+        "tags": [
+          "Wallet Purchase"
+        ],
+        "operationId": "PurchaseList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PurchaseResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Wallet Purchase"
+        ],
+        "operationId": "PurchaseBegin",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitPaymentRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitPaymentRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitPaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InitPaymentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/purchase/complete/{transactionId}": {
+      "post": {
+        "tags": [
+          "Wallet Purchase"
+        ],
+        "operationId": "PurchaseComplete",
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/purchase/dedicated": {
+      "get": {
+        "tags": [
+          "Wallet Purchase"
+        ],
+        "operationId": "GetDedicatedAccount",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DedicatedAccountResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v5/credits/transfer": {
+      "get": {
+        "tags": [
+          "Wallet Transfer"
+        ],
+        "operationId": "TransferList",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransferResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Wallet Transfer"
+        ],
+        "operationId": "TransferCredit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2772,30 +2772,6 @@
           }
         }
       },
-      "CoverageResponse": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "countryID": {
-            "type": "integer",
-            "readOnly": true,
-            "format": "int32"
-          },
-          "networkID": {
-            "type": "integer",
-            "readOnly": true,
-            "format": "int32"
-          },
-          "countryName": {
-            "type": "string",
-            "readOnly": true
-          },
-          "networkName": {
-            "type": "string",
-            "readOnly": true
-          }
-        }
-      },
       "DedicatedAccountResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -2993,6 +2969,39 @@
           },
           "prefixes": {
             "type": "string"
+          }
+        }
+      },
+      "NetworkResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "networkID": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "networkCode": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "networkName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "countryCode": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int32"
+          },
+          "countryName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "prefixes": {
+            "type": "string",
+            "readOnly": true
           }
         }
       },
@@ -3313,6 +3322,42 @@
           },
           "matchRouteType": {
             "$ref": "#/components/schemas/RouteTypeEnum"
+          }
+        }
+      },
+      "RouteResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "routeID": {
+            "type": "integer",
+            "readOnly": true,
+            "format": "int64"
+          },
+          "routeName": {
+            "type": "string",
+            "readOnly": true
+          },
+          "routeTypeID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "providerID": {
+            "type": "string",
+            "readOnly": true
+          },
+          "smsCharge": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "cashCharge": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "network": {
+            "$ref": "#/components/schemas/NetworkResponse"
           }
         }
       },
@@ -3933,19 +3978,13 @@
       "name": "Batch Message"
     },
     {
-      "name": "Credit Pricing"
-    },
-    {
-      "name": "Credit Purchase"
-    },
-    {
-      "name": "Credit Transfer"
-    },
-    {
       "name": "One Time Password"
     },
     {
       "name": "Phone Book"
+    },
+    {
+      "name": "Pricing"
     },
     {
       "name": "Routing"
@@ -3958,6 +3997,12 @@
     },
     {
       "name": "Voice Call"
+    },
+    {
+      "name": "Wallet Purchase"
+    },
+    {
+      "name": "Wallet Transfer"
     }
   ]
 }

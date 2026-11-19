@@ -1,10 +1,13 @@
 @attribute [Route(Const.Routes.Support.Coverage)]
+@attribute [Route(Const.Routes.Wallet.Pricing)]
+
 @layout MainLayout
 
 <PageTitle>SMSLive247 - Coverage</PageTitle>
 
-<PageHeader Title="Global Network Coverage"
-            SubTitle="Search and view comprehensive network coverage and termination rates for supported countries." />
+<PageHeader Title="Network Coverage and Pricing"
+            SubTitle="Search and view network coverage and termination prices for supported countries." />
+
 
 <PageBody>
     <HeaderLeft>
@@ -15,22 +18,37 @@
     </HeaderRight>
 
     <ChildContent>
-        @if (!hasSearched)
-        {
-            <div class="flex min-h-48 items-center justify-center px-4 text-center">
-                <p class="text-sm text-slate-500 dark:text-slate-400">Search for a country or network to see coverage results.</p>
-            </div>
-        }
-        else if (filteredItems is { Count: > 0 })
+        @if (filteredItems is { Count: > 0 })
         {
             <Table Items="filteredItems" AllowSelect="false">
                 <Columns>
+                    <Column Header="Route ID">
+                        @context.RouteID
+                    </Column>
                     <Column Header="Country">
-                        <span class="text-sm font-medium text-slate-900 dark:text-slate-100">@context.CountryName</span>
+                        @context.Network.CountryName
                     </Column>
-                    <Column Header="Network Operator">
-                        <span class="text-sm font-medium text-slate-600 dark:text-slate-300">@context.NetworkName</span>
+                    <Column Header="Network">
+                        @context.Network.NetworkName
                     </Column>
+                    <Column Header="Traffic Type">
+                        @context.RouteTypeID
+                    </Column>
+
+                    @if(MainAccount != null && MainAccount.Account.Wallet == "SMS")
+                    {
+                        <Column Header="SMS Charge">
+                            @* <FormatBalance Wallet="SMS" Balance="@context.SmsCharge" Title="" /> *@
+                            <b>@context.SmsCharge</b> Units per SMS message (160 chars)
+                        </Column>
+                    }
+                    else
+                    {
+                        <Column Header="Cash Charge">
+                            <b>@context.CashCharge</b> Naira per SMS message (160 chars)
+                            @* <FormatBalance Wallet="CASH" Balance="@context.CashCharge" Title="" /> *@
+                        </Column>
+                    }
                 </Columns>
             </Table>
         }
@@ -47,17 +65,20 @@
 </PageBody>
 
 @code {
-    private string searchText = "";
-    private List<CoverageResponse>? items;
-    private List<CoverageResponse>? filteredItems;
-    private bool hasSearched;
+    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
+
+    private string searchText = "Nigeria";
+    private List<RouteResponse>? items;
+    private List<RouteResponse>? filteredItems;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var response = await apiClient.CoverageListAsync();
+            var response = await apiClient.RouteListAsync();
             items = response.Result?.ToList() ?? [];
+            items = items.Where(x => x.RouteTypeID == "PROMOTIONAL").ToList();
+            ApplySearch();
         }
         catch (ApiException ex)
         {
@@ -69,24 +90,20 @@
             items = [];
             await alert.Error($"An error occurred while fetching coverage information. {ex.Message}");
         }
-        finally
-        {
-            filteredItems = [];
-        }
     }
 
     private void ApplySearch()
     {
-        hasSearched = !string.IsNullOrWhiteSpace(searchText);
         if (string.IsNullOrWhiteSpace(searchText))
         {
-            filteredItems = [];
+            filteredItems = items;
         }
         else
         {
+
             filteredItems = (items ?? []).Where(x =>
-                   (x.CountryName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
-                || (x.NetworkName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false))
+                   (x.RouteName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (x.ProviderID?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false))
                 .ToList();
         }
     }
