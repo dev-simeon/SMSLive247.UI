@@ -82,7 +82,7 @@
                                 <dd class="flex items-center gap-2 text-right font-mono text-lg font-bold tracking-wider text-blue-700 dark:text-blue-300">
                                     <span>@bankAccount.AccountNumber</span>
                                     <button type="button" aria-label="Copy account number" title="Copy account number" @onclick="CopyAccountNumber"
-                                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-brand-600 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:text-blue-300 dark:hover:bg-slate-800">
+                                            class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-brand-600 transition hover:bg-blue-50 focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-blue-300 dark:hover:bg-slate-800">
                                         <Icon Style="@(accountCopied ? Icon.IconStyle.CheckCircle : Icon.IconStyle.Copy)" CssClass="text-lg" />
                                     </button>
                                 </dd>
@@ -155,7 +155,7 @@
     private bool showBankAccount;
     private bool accountCopied;
     // private bool isCashWallet;
-    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
+    [CascadingParameter(Name = "MainAccount")] public required AccountState State { get; set; }
     // private PriceCalcResponse? price;
     private DedicatedAccountResponse? bankAccount;
     private string selectedMethod = "BANK_TRANSFER";
@@ -300,8 +300,9 @@
         try
         {
             var response = await apiClient.AccountGetAsync("self");
+
             if (response.Result is not null)
-                MainAccount?.UpdateBalance(response.Result.WalletBalance);
+                State.UpdateBalance(response.Result.WalletBalance);
         }
         catch (ApiException ex)
         {

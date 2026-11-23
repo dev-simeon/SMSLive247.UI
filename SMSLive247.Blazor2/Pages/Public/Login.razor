@@ -2,16 +2,16 @@
 
 @if (isCheckingSession)
 {
-    <Loading CssClass="min-h-[60vh]" Size="lg" Message="Checking your session..." />
+    <Loading BoolCheck="false" Message="Checking your session..." />
 }
 else
 {
 <SectionContent SectionName="page-branding">
     <div class="relative z-10 max-w-lg">
-        <h1 class="mb-6 text-4xl leading-tight font-bold">
+        <h1 class="text-4xl/tight mb-6 font-bold">
             Reliable Bulk SMS for Every Business.
         </h1>
-        <p class="mb-8 text-lg leading-relaxed text-slate-100">
+        <p class="text-lg/relaxed mb-8 text-slate-100">
             Scale your communication with high-volume workflows, sub-account
             management, and real-time delivery analytics tailored for large
             organizations.
@@ -64,7 +64,7 @@ else
             <input id="remember-me"
                    name="remember-me"
                    type="checkbox"
-                   class="h-4 w-4 rounded border-slate-200 text-brand-500 focus:ring-brand-500" />
+                   class="size-4 rounded border-slate-200 text-brand-500 focus:ring-brand-500" />
             <label class="ml-2 block text-slate-600"
                    for="remember-me">
                 Remember me for 30 days
@@ -90,7 +90,7 @@ else
         <div class="w-full border-t border-slate-200"></div>
     </div>
     <div class="relative flex justify-center text-sm">
-        <span class="bg-white dark:bg-slate-900 px-2 text-slate-500 transition-colors">
+        <span class="bg-white px-2 text-slate-500 transition-colors dark:bg-slate-900">
             Or continue with
         </span>
     </div>

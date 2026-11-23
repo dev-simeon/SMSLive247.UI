@@ -6660,6 +6660,11 @@ namespace SMSLive247.OpenApi
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public System.DateTimeOffset DateSubmitted { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("walletBalance")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double? WalletBalance { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("walletCharge")]
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
@@ -6754,6 +6759,11 @@ namespace SMSLive247.OpenApi
 
         [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
         public System.DateTimeOffset DateSubmitted { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("walletBalance")]
+
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]   
+        public double? WalletBalance { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("walletCharge")]
 

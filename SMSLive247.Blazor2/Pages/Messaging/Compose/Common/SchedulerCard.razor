@@ -1,26 +1,26 @@
-﻿@inject NavigationManager nav
+﻿@typeparam TRequest
 
 <Card HeaderText="When to send">
     <div class="flex flex-col gap-3">
         <label class="group flex cursor-pointer items-center gap-3">
-            <input type="radio" name="@scheduleRadioGroup"
+            <input type="radio" name="@radioGroup"
                    class="size-4 border-slate-300 text-brand-600 focus:ring-brand-500"
-                   checked="@(!deliveryTime.HasValue)" @onchange="() => deliveryTime = null" />
+                   checked="@(!Model.DeliveryTime.HasValue)" @onchange="() => Model.DeliveryTime = null" />
             <span class="text-slate-500 group-hover:text-brand-600">
                 Send Immediately
             </span>
         </label>
         <label class="group flex cursor-pointer items-center gap-3">
-            <input type="radio" name="@scheduleRadioGroup"
+            <input type="radio" name="@radioGroup"
                    class="size-4 border-slate-300 text-brand-600 focus:ring-brand-500"
-                   checked="@deliveryTime.HasValue" @onchange="() => deliveryTime = DateTime.Now" />
+                   checked="@Model.DeliveryTime.HasValue" @onchange="() => Model.DeliveryTime = DateTime.Now" />
             <span class="text-slate-500 group-hover:text-brand-600">
                 Schedule for Later
             </span>
         </label>
     </div>
 
-    @if (deliveryTime.HasValue)
+    @if (Model.DeliveryTime.HasValue)
     {
         <div class="animate-in slide-in-from-top-2 pt-2">
             <div class="mb-2 flex items-center justify-between">
@@ -34,97 +34,18 @@
                 <div class="flex size-10 shrink-0 items-center justify-center rounded-l-lg border-y border-l border-slate-200 bg-slate-50 text-slate-400">
                     <Icon Style="Icon.IconStyle.Clock" CssClass="text-base" />
                 </div>
-                <input type="datetime-local" @bind="deliveryTime" 
+                <input type="datetime-local" @bind="Model.DeliveryTime"
                        min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
                        class="w-full rounded-r-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500" />
             </div>
-            <div class="mt-2 text-sm text-slate-500">Your time zone is: West/Central Africa GMT +1</div>
+            <div class="mt-2 text-sm text-slate-500">Your time zone is: @timeZoneString </div>
         </div>
     }
-</Card>
-
-<Card>
-    <div class="flex flex-col gap-3">
-        <div class="mt-2 text-left text-sm text-red-500">
-            @foreach (var message in validationMessages)
-            {
-                <p>@message</p>
-            }
-        </div>
-
-        @if (deliveryTime.HasValue)
-        {
-            <Button IsBusy="IsSending"
-                    Text="Queue Message"
-                    Icon="Icon.IconStyle.Clock"
-                    IsDisabled="@(!allowSend)"
-                    OnClick="ScheduledSubmit"
-                    CssClass="w-full py-3">
-            </Button>
-        }
-        else
-        {
-            <Button IsBusy="IsSending"
-                    Text="Send SMS Now!"
-                    Icon="Icon.IconStyle.Mail"
-                    IsDisabled="@(!allowSend)"
-                    OnClick="ImmediateSubmit"
-                    CssClass="w-full py-3">
-            </Button>
-        }
-
-        <div class="mt-2 text-center text-sm text-slate-500">
-            Total Recipients: <strong>@totalRecipients.ToString("N0")</strong>
-        </div>
-    </div>
 </Card>
 
 @code {
-    [Parameter] public bool IsSending { get; set; }
-    [Parameter] public int ResetKey { get; set; }
-    [Parameter] public BaseComposeModel? Model { get; set; }
-    [Parameter] public long? TotalRecipients { get; set; }
-    [Parameter] public IReadOnlyList<string>? ValidationMessages { get; set; }
-    [Parameter] public EventCallback<DateTimeOffset?> OnSubmit { get; set; }
+    [Parameter, EditorRequired] public required BaseComposeModel<TRequest> Model { get; set; }
 
-    private DateTime? deliveryTime;
-    private int lastResetKey;
-    private readonly string scheduleRadioGroup = $"scheduleOption-{Guid.NewGuid():N}";
-    private long totalRecipients => TotalRecipients ?? Model?.CountRecipients() ?? 0;
-    private IReadOnlyList<string> validationMessages => ValidationMessages ?? GetModelValidationMessages();
-    private bool allowSend => totalRecipients > 0 && validationMessages.Count == 0;
-
-    protected override void OnParametersSet()
-    {
-        if (ResetKey != lastResetKey)
-        {
-            deliveryTime = null;
-            lastResetKey = ResetKey;
-        }
-    }
-
-    private IReadOnlyList<string> GetModelValidationMessages()
-    {
-        var messages = new List<string>();
-        if (totalRecipients == 0)
-            messages.Add("Please select at least one recipient");
-        if (string.IsNullOrWhiteSpace(Model?.SenderID))
-            messages.Add("Please select a sender ID");
-        if (string.IsNullOrWhiteSpace(Model?.MessageText))
-            messages.Add("Please enter a message");
-        return messages;
-    }
-
-    private Task ImmediateSubmit(MouseEventArgs e)
-    {
-        return OnSubmit.InvokeAsync(null);
-    }
-
-    private Task ScheduledSubmit(MouseEventArgs e)
-    {
-        if (!deliveryTime.HasValue)
-            return alert.Error("Choose a delivery date and time, or send the message immediately.", "Compose Message");
-
-        return OnSubmit.InvokeAsync(new DateTimeOffset(deliveryTime.Value));
-    }
+    private readonly string radioGroup = $"r-{Guid.NewGuid():N}";
+    private readonly string timeZoneString = " West/Central Africa GMT +1";
 }

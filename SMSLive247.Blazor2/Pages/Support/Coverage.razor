@@ -34,19 +34,16 @@
                     <Column Header="Traffic Type">
                         @context.RouteTypeID
                     </Column>
-
-                    @if(MainAccount != null && MainAccount.Account.Wallet == "SMS")
+                    @if(State.Account.Wallet == "SMS")
                     {
                         <Column Header="SMS Charge">
-                            @* <FormatBalance Wallet="SMS" Balance="@context.SmsCharge" Title="" /> *@
                             <b>@context.SmsCharge</b> Units per SMS message (160 chars)
                         </Column>
                     }
-                    else
+                    @if (State.Account.Wallet == "CASH")
                     {
                         <Column Header="Cash Charge">
                             <b>@context.CashCharge</b> Naira per SMS message (160 chars)
-                            @* <FormatBalance Wallet="CASH" Balance="@context.CashCharge" Title="" /> *@
                         </Column>
                     }
                 </Columns>
@@ -65,46 +62,46 @@
 </PageBody>
 
 @code {
-    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
+    [CascadingParameter(Name = "MainAccount")] public required AccountState State { get; set; }
 
     private string searchText = "Nigeria";
-    private List<RouteResponse>? items;
-    private List<RouteResponse>? filteredItems;
+    private List<RouteResponse> items =[];
+    private List<RouteResponse> filteredItems = [];
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             var response = await apiClient.RouteListAsync();
-            items = response.Result?.ToList() ?? [];
-            items = items.Where(x => x.RouteTypeID == "PROMOTIONAL").ToList();
-            ApplySearch();
+
+            if (response.Result is not null)
+            {
+                items = response.Result.Where(x => x.RouteTypeID == "PROMOTIONAL").ToList();
+                ApplySearch();
+            }
         }
         catch (ApiException ex)
         {
-            items = [];
             await alert.Error(ex.FriendlyErrorMessage);
         }
         catch (Exception ex)
         {
-            items = [];
             await alert.Error($"An error occurred while fetching coverage information. {ex.Message}");
+        }
+        finally
+        {
+            items = [];
         }
     }
 
     private void ApplySearch()
     {
         if (string.IsNullOrWhiteSpace(searchText))
-        {
             filteredItems = items;
-        }
         else
-        {
-
-            filteredItems = (items ?? []).Where(x =>
-                   (x.RouteName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
-                || (x.ProviderID?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false))
-                .ToList();
-        }
+            filteredItems = items
+            .Where(x => (x.RouteName.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                     || (x.ProviderID.Contains(searchText, StringComparison.OrdinalIgnoreCase)))
+            .ToList();
     }
 }

@@ -69,7 +69,7 @@ else if (status == "success" && purchase != null)
     <div class="flex min-h-125 flex-1 items-center justify-center p-6 md:p-8">
         <div class="mx-auto w-full max-w-xl space-y-6">
             <div class="relative overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl">
-                <div aria-hidden class="pointer-events-none absolute inset-0 opacity-[0.07]"
+                <div class="pointer-events-none absolute inset-0 opacity-[0.07]"
                      style="background-image: radial-gradient(#136dec 1px, transparent 1px), radial-gradient(#10b981 1px, transparent 1px); background-size: 20px 20px; background-position: 0 0, 10px 10px;">
                 </div>
 
@@ -95,14 +95,14 @@ else if (status == "success" && purchase != null)
                                 </span>
                             </div>
 
-                            @if (string.Equals(purchase.Wallet, "SMS", StringComparison.OrdinalIgnoreCase))
+                            @if (purchase.Wallet == "SMS")
                             {
                                 <div class="flex items-center justify-between text-sm">
                                     <span class="text-slate-500">Credits Purchased</span>
                                     <span class="font-medium text-slate-900">@(purchase.Quantity.ToString("#,##0")) SMS</span>
                                 </div>
                             }
-                            else
+                            @if (purchase.Wallet == "CASH")
                             {
                                 <div class="flex items-center justify-between text-sm">
                                     <span class="text-slate-500">Wallet funded</span>
@@ -151,7 +151,7 @@ else if (status == "success" && purchase != null)
     private Guid transactionId = Guid.Empty;
     private PurchaseResponse? purchase;
 
-    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
+    [CascadingParameter(Name = "MainAccount")] public required AccountState State { get; set; }
 
 
     public Guid GetTransactionId(IEnumerable<string> queryParams)
@@ -212,7 +212,7 @@ else if (status == "success" && purchase != null)
             var response = await apiClient.AccountGetAsync("self");
 
             if (response.Result is not null)
-                MainAccount?.UpdateBalance(response.Result.WalletBalance);
+                State.UpdateBalance(response.Result.WalletBalance);
         }
         catch (ApiException ex)
         {

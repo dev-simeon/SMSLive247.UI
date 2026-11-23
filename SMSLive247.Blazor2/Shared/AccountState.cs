@@ -7,17 +7,27 @@ namespace SMSLive247.UI.Shared
         public AccountResponse Account { get; private set; } = account;
         public event Action? OnChange;
 
-        public void Reload()
+        public void StateHasChanged()
         {
             OnChange?.Invoke();
         }
 
-        public void UpdateBalance(double balance)
+        public void UpdateAccount(AccountResponse? account)
         {
-            Account.WalletBalance = balance;
-            Reload();
+            if (account is null)
+                return;
+
+            Account = account;
+            StateHasChanged();
         }
 
-        public void UpdateCredits(double credits) => UpdateBalance(credits);
+        public void UpdateBalance(double? balance)
+        {
+            if (balance is null)
+                return;
+
+            Account.WalletBalance = balance.Value;
+            StateHasChanged();
+        }
     }
 }

@@ -1,149 +1,11 @@
-using CsvHelper;
 using System.Data;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Globalization;
 using SMSLive247.UI.Services;
-using SMSLive247.OpenApi;
 
 namespace SMSLive247.Blazor.Pages.ViewModels
 {
-    public abstract class BaseComposeModel
-    {
-        public bool IsBusy { get; set; }
-        public string ClearMessage() => MessageText = string.Empty;
-        public string CounterText() => MessageText.CountSmsMessages(5);
-        public List<SenderIdResponse> SenderIds { get; protected set; } = [];
-
-        public DateTime? DeliveryTime { get; set; }  
-        public string SenderID { get; set; } = string.Empty;
-        public string MessageText { get; set; } = string.Empty;
-        public string DeliveryEmail { get; set; } = string.Empty;
-        //public string RouteID { get; set; } = string.Empty;
-
-        public abstract long CountRecipients();
-    }
-
-    public class ComposeSimpleModel : BaseComposeModel
-    {
-        public List<ContactModel> Contacts { get; private set; } = [];
-        public List<ContactModel> BatchFiles { get; private set; } = [];
-        public List<ContactModel> Numbers { get; private set; } = [];
-
-        public void UpdateContacts(List<ContactModel> items) => Contacts = items;
-        public void UpdateBulkfiles(List<ContactModel> items) =>  BatchFiles = items;
-        public void UpdateNumbers(List<ContactModel> items) => Numbers = items;
-
-        public override long CountRecipients()
-        {
-            int c1 = Contacts.Where(x => x.Selected).Sum(x => x.Count);
-            int c2 = Numbers.Where(x => x.Selected).Sum(x => x.Count);
-            int c3 = BatchFiles.Where(x => x.Selected).Sum(x => x.Count);
-            return c1 + c2 + c3;
-        }
-
-        public ComposeSimpleModel(
-                IEnumerable<SenderIdResponse> senderIds,
-                IEnumerable<ContactResponse> contacts,
-                IEnumerable<BatchFileResponse> batchFiles)
-        {
-            SenderIds = senderIds.ToList();
-            Contacts = contacts.Select(x => new ContactModel(x)).ToList();
-
-            BatchFiles = batchFiles
-                //.Where(x => x.FileType.ToLower() != "csv")
-               .Where(x => !string.Equals(x.FileType, "csv", StringComparison.OrdinalIgnoreCase))
-               .Select(x => new ContactModel(x))
-               .ToList();
-
-            //Request.DeliveryTime = DateTime.Now;
-        }
-
-        public SmsBatchRequest CreateRequest()
-        {
-            return new SmsBatchRequest()
-            {
-                BatchFileIDs = BatchFiles.Where(x => x.Selected).Select(x => x.Key).ToList(),
-                PhoneNumbers = Contacts.Where(x => x.Selected).Select(x => x.Key).ToList(),
-                RawNumbers = string.Join(",", Numbers),
-                DeliveryTime = base.DeliveryTime,
-                DeliveryEmail = base.DeliveryEmail,
-                MessageText = base.MessageText,
-                SenderID = base.SenderID,
-                //RouteID = string.Empty,
-            };
-        }
-
-    }
-
-    public class ComposeTemplateModel : BaseComposeModel
-    {
-        public int PhoneNumberColumn { get; set; }
-        public string BatchFileID { get; set; } = string.Empty;
-
-        public List<BatchFileResponse> BatchCsvFiles { get; set; } = [];
-        public List<DataColumn> DataColumns => dataTable.Columns.Cast<DataColumn>().ToList();
-        public List<DataRow> DataRows => dataTable.Rows.Cast<DataRow>().ToList();
-        public bool IsValidPhoneColumn => dataTable.IsPhoneNumberColumn(PhoneNumberColumn);
-
-        private readonly DataTable dataTable = new();
-
-        public ComposeTemplateModel(
-            IEnumerable<SenderIdResponse> senderIds,
-            IEnumerable<BatchFileResponse> batchFiles)
-        {
-            SenderIds = senderIds.ToList();
-            UpdateBatchFiles(batchFiles);
-        }
-
-        public void UpdateBatchFiles(IEnumerable<BatchFileResponse> batchFiles)
-        {
-            BatchCsvFiles = batchFiles.Where(x =>
-            {
-                var type = x.FileType?.ToLowerInvariant();
-                return type == "csv" || type == "xls" || type == "xlsx" || type == "xlx";
-            }).OrderByDescending(x => x.DateCreated).ToList();
-        }
-
-        public SmsBatchCsvRequest CreateRequest()
-        {
-            return new SmsBatchCsvRequest()
-            {
-                BatchFileID = "22",
-                PhoneNumberColumn = 0,
-                DeliveryTime = base.DeliveryTime,
-                DeliveryEmail = base.DeliveryEmail,
-                MessageText = base.MessageText,
-                SenderID = base.SenderID,
-                //RouteID = string.Empty,
-            };
-        }
-
-        public void LoadData(Stream stream, string batchId)
-        {
-            using var reader = new StreamReader(stream);
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            using var dr = new CsvDataReader(csv);
-
-            dataTable.Columns.Clear(); // ??
-            dataTable.Load(dr);
-            // Detect the column index for phone numbers
-            PhoneNumberColumn = dataTable.DetectPhoneNumberColumn();
-            BatchFileID = batchId;
-        }
-
-        public void ClearData()
-        {
-            dataTable.Clear();
-        }
-
-        public override long CountRecipients()
-        {
-            return DataRows.Count;
-        }
-    }
-
     public static class ComposeExtensions
     {
         public static List<T> DeepClone<T>(IEnumerable<T> source)
@@ -274,13 +136,9 @@ namespace SMSLive247.Blazor.Pages.ViewModels
                 }
                 var intExtendedTable = strExtendedTable.IndexOf(cPlainText);
                 if (intExtendedTable != -1)
-                {
                     cntGSMOutput += 2;
-                }
                 else
-                {
                     cntGSMOutput += 8;
-                }
             }
             return cntGSMOutput;
         }
@@ -302,7 +160,6 @@ namespace SMSLive247.Blazor.Pages.ViewModels
             while (!(p < 0))
             {
                 p = sr.Read();
-                //U.InputStream.ReadByte
                 //if char code is numeric
                 if (p >= 48 & p <= 57)
                 {
@@ -338,6 +195,5 @@ namespace SMSLive247.Blazor.Pages.ViewModels
 
             return bulkNumbers.Distinct().ToList();
         }
-
     }
 }

@@ -1,0 +1,153 @@
+﻿@if (CurrentStep == stepNumber)
+{
+    <Card HeaderText="Step 2 of 3: Select Phone Column">
+        <HeaderRight>
+            <button type="button" @onclick="() => CurrentStepChanged.InvokeAsync(stepNumber -1)"
+            class="text-sm font-medium text-slate-500 hover:text-brand-500 hover:underline">
+                &larr; Back to Choose Sheet
+            </button>
+        </HeaderRight>
+        <ChildContent>
+            <div class="space-y-6">
+                <!-- Sheet summary info -->
+                <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+                    <div class="flex min-w-0 items-center gap-3">
+                        <div class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                            <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-lg" />
+                        </div>
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-bold text-slate-900">@Model.SelectedFile?.Description</p>
+                            <p class="mt-0.5 font-mono text-xs text-slate-500">
+                                @Model.SelectedFile?.TotalNumbers.ToString("N0") rows 
+                                &bull; 
+                                @Model.ColumnNames.Count columns &bull; showing first @Model.PreviewRows.Count
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phone Column Active Indicator Banner -->
+                <div class="flex flex-col items-start justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50/80 px-4 py-2.5 text-xs text-brand-900 sm:flex-row sm:items-center">
+                    <div class="flex items-center gap-2 font-medium">
+                        <Icon Style="Icon.IconStyle.Phone" CssClass="shrink-0 text-sm text-brand-600" />
+                        <span>
+                            Recipient Phone Column: 
+                            <strong class="font-bold text-slate-900">
+                                Column @GetColumnLetter(Model.PhoneColumn) 
+                                &mdash;
+                                @(Model.PhoneColumn.HasValue && Model.PhoneColumn >= 0 && Model.PhoneColumn < Model.ColumnNames.Count ? Model.ColumnNames[Model.PhoneColumn.Value] : "None")" 
+                            </strong>
+                        </span>
+                    </div>
+                    <span class="text-[11px] text-brand-700 italic">
+                        Click any column header below to change
+                    </span>
+                </div>
+
+                <!-- Interactive Spreadsheet Preview Table -->
+                @if (Model.PreviewRows.Count > 0)
+                {
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                        <table class="w-full border-collapse text-left text-sm text-slate-600">
+                            <thead>
+                                <!-- Letter row: A, B, C... -->
+                                <tr class="border-b border-slate-200 bg-slate-100/80 font-mono text-[11px] text-slate-400">
+                                    <th class="w-12 border-r border-slate-200 bg-slate-200/60 px-3 py-1.5 text-center">#</th>
+                                    @for (var i = 0; i < Model.ColumnNames.Count; i++)
+                                    {
+                                        var isSelectedCol = Model.PhoneColumn == i;
+                                        <th class="border-r border-slate-200 px-4 py-1.5 text-center font-bold last:border-r-0 @(isSelectedCol ? "bg-brand-100 text-brand-700" : "")">
+                                            @GetColumnLetter(i)
+                                        </th>
+                                    }
+                                </tr>
+                                <!-- Column names header row (Clickable) -->
+                                <tr class="border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700">
+                                    <th class="w-12 border-r border-slate-200 bg-slate-100 px-3 py-2.5 text-center text-slate-400"></th>
+                                    @for (var i = 0; i < Model.ColumnNames.Count; i++)
+                                    {
+                                        var colIndex = i;
+                                        var isSelectedCol = Model.PhoneColumn == colIndex;
+                                        <th @onclick="() => PhoneColumnIndexChanged(colIndex)"
+                                        title="Click to select '@Model.ColumnNames[colIndex]' as the recipient phone number column"
+                                        class="px-4 py-2.5 border-r border-slate-200 last:border-r-0 cursor-pointer select-none transition-colors @(isSelectedCol ? "bg-brand-50 text-brand-700 ring-2 ring-inset ring-brand-500" : "hover:bg-slate-100 text-slate-700")">
+                                            <div class="flex items-center justify-between gap-2">
+                                                <span class="truncate">@Model.ColumnNames[colIndex]</span>
+                                                @if (isSelectedCol)
+                                                {
+                                                    <span class="flex items-center gap-1 rounded bg-brand-500 px-1.5 py-0.5 font-bold tracking-wider text-[10px] text-white uppercase">
+                                                        <Icon Style="Icon.IconStyle.Phone" CssClass="text-[10px]" /> Recipient
+                                                    </span>
+                                                }
+                                            </div>
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white font-sans">
+                                @for (var r = 0; r < Model.PreviewRows.Count; r++)
+                                {
+                                    var row = Model.PreviewRows[r];
+                                    <tr class="hover:bg-slate-50/70">
+                                        <td class="w-12 border-r border-slate-200 bg-slate-50/80 px-3 py-2 text-center font-mono text-xs text-slate-400">
+                                            @(r + 1)
+                                        </td>
+                                        @for (var i = 0; i < Model.ColumnNames.Count; i++)
+                                        {
+                                            var isSelectedCol = Model.PhoneColumn == i;
+                                            <td class="max-w-[200px] truncate border-r border-slate-100 px-4 py-2 last:border-r-0 @(isSelectedCol ? "bg-brand-50/30 font-medium text-slate-900" : "")"
+                                            title="@row.GetValueOrDefault(Model.ColumnNames[i], "")">
+                                                @row.GetValueOrDefault(Model.ColumnNames[i], "")
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <!-- Footer prompt to advance to Step 3 -->
+                <div class="mt-8 flex flex-col items-center justify-between gap-4 rounded-xl border border-slate-200/80 bg-slate-50 p-4 sm:flex-row">
+                    <div class="flex items-center gap-2.5 text-sm text-slate-600">
+                        <Icon Style="Icon.IconStyle.CheckCircle" CssClass="shrink-0 text-lg text-emerald-500" />
+                        <span class="font-medium">Phone column confirmed! Ready to compose and personalize your template message.</span>
+                    </div>
+                    <Button 
+                        Text="Continue"
+                        IconAlign="Align.Right"
+                        Icon="Icon.IconStyle.ChevronRight"
+                        IsDisabled="@(Model.PhoneColumn is null)"
+                        OnClick="() => CurrentStepChanged.InvokeAsync(stepNumber + 1)" />
+                </div>
+            </div>
+        </ChildContent>
+    </Card>
+}
+
+@code {
+    private const int stepNumber = 2;
+    [Parameter, EditorRequired] public required int CurrentStep { get; set; }
+    [Parameter, EditorRequired] public required ComposeTemplateModel Model { get; set; }
+    [Parameter, EditorRequired] public required EventCallback<int> CurrentStepChanged { get; set; }
+    [Parameter, EditorRequired] public required EventCallback OnModelChanged { get; set; }
+
+    private async Task PhoneColumnIndexChanged(int index)
+    {
+        Model.SetPhoneColumn(index);
+        await OnModelChanged.InvokeAsync();
+    }
+
+    private static string GetColumnLetter(int? index)
+    {
+        if (!index.HasValue || index.Value < 0) return "-";
+        int i = index.Value;
+        string columnLetter = "";
+        while (i >= 0)
+        {
+            columnLetter = (char)('A' + (i % 26)) + columnLetter;
+            i = (i / 26) - 1;
+        }
+        return columnLetter;
+    }
+}

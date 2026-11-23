@@ -10,7 +10,7 @@
                 SubTitle="Purchase messaging credits securely via bank transfer, debit card, or USSD.">
     </PageHeader>
 }
-else
+@if (isSmsWallet)
 {
     <PageHeader Title="Buy SMS Credits"
                 SubTitle="Purchase SMS credits instantly. Enter the quantity you need below.">
@@ -19,9 +19,9 @@ else
 
 <Tabs>
     <TabPage Title="@title" Icon="Icon.IconStyle.CreditCard">
-        <Loading NullCheckObject="MainAccount">
-            @(isCashWallet ?@<PurchaseCash /> : @<PurchaseSMS />)
-        </Loading>
+
+        @(isCashWallet ?@<PurchaseCash /> : @<PurchaseSMS />)
+
     </TabPage>
     <TabPage Title="Purchase History" Icon="Icon.IconStyle.FileSpreadsheet">
         <PageBody>
@@ -50,7 +50,7 @@ else
                                 <FormatNumber Currency="@context.TotalAmount"></FormatNumber>
                             </Column>
                         }
-                        else
+                        @if (isSmsWallet)
                         {
                             <Column Header="Quantity" Align="right">
                                 <FormatNumber Number="@context.Quantity"></FormatNumber>
@@ -90,13 +90,16 @@ else
 <PurchaseModal @ref="purchaseModal" OnCompleted="ReloadData" />
 
 @code {
-    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
+    [CascadingParameter(Name = "MainAccount")] public required AccountState State { get; set; }
 
     private string? searchQuery;
-    private PurchaseModal purchaseModal = new();
+    private PurchaseModal? purchaseModal;
     private ApiDataSource<PurchaseResponse> ds = new();
-    private bool isCashWallet => MainAccount is not null && MainAccount.Account.Wallet != "SMS";
-    private string title => isCashWallet ? "Topup Now" : "Buy Now";
+
+    private bool isCashWallet => State.Account.Wallet == "CASH";
+    private bool isSmsWallet => State.Account.Wallet == "SMS";
+
+    private string title => isCashWallet ? "Topup Now" : isSmsWallet ? "Buy Now" : "[Unexpected Value]";
 
 
     protected override async Task OnInitializedAsync()

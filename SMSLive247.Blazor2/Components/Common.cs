@@ -2,6 +2,8 @@
 {
     public enum ColorStyle { Primary, Secondary, Success, Warning, Info, Danger, Light, Dark }
 
+    public enum Align { Default, Left, Right }
+
     public static class ColorStyleExtensions
     {
         public static string ToTailwindCss(this ColorStyle colorStyle)

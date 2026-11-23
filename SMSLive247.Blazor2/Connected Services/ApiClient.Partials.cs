@@ -32,21 +32,37 @@ namespace SMSLive247.OpenApi
         }
     }
 
+    public class SubAccountClient(HttpClient httpClient) : ApiClient(httpClient)
+    {
+        public SubAccountClient Impersonate(AccountResponse? account)
+        {
+            var apiKey = "fail-safely-by-sending-useless-api-key";
+            try
+            {
+                apiKey = (new Guid(account!.Key!)).ToString();
+            }
+            finally
+            {
+                httpClient.DefaultRequestHeaders.Authorization
+                    = new AuthenticationHeaderValue("Bearer", apiKey);
+            }
+            return this;
+        }
+    }
+
     public partial class AccountResponse
     {
         public string Initials => $"{FirstName?.Trim().FirstOrDefault()}{LastName?.Trim().FirstOrDefault()}";
         public string FullName => $"{FirstName} {LastName}";
     }
 
-    //public partial class SmsBatchCsvRequest
-    //{
-    //    //public int PhoneNumberColumn { get; set; }
-    //}
-
     public partial class FileParameter
     {
         public FileParameter(IBrowserFile file)
             : this(file.OpenReadStream(), file.Name, file.ContentType) { }
+
+        public FileParameter(IBrowserFile file, string? filename)
+            : this(file.OpenReadStream(), filename ?? file.Name, file.ContentType) { }
     }
 
     public partial class ApiException

@@ -3578,6 +3578,12 @@
             "readOnly": true,
             "format": "date-time"
           },
+          "walletBalance": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double",
+            "nullable": true
+          },
           "walletCharge": {
             "type": "number",
             "readOnly": true,
@@ -3663,6 +3669,12 @@
             "type": "string",
             "readOnly": true,
             "format": "date-time"
+          },
+          "walletBalance": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double",
+            "nullable": true
           },
           "walletCharge": {
             "type": "number",

@@ -15,7 +15,7 @@
                     <label class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-600 sm:w-auto @(isUploading ? "opacity-75 pointer-events-none" : "")">
                         @if (isUploading)
                         {
-                            <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            <span class="inline-block size-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                             <span>Uploading...</span>
                         }
                         else
@@ -64,11 +64,11 @@
                                                    checked="@isSelected"
                                                    id="tf-@f.BatchFileID"
                                                    @onchange="() => selectedId = f.BatchFileID"
-                                                   class="accent-brand-500 h-4 w-4 border-slate-300 focus:ring-brand-500" />
+                                                   class="accent-brand-500 size-4 border-slate-300 focus:ring-brand-500" />
                                         </td>
                                         <td class="px-4 py-3">
                                             <div class="flex items-center gap-2.5">
-                                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                                                <div class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
                                                     <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="text-base" />
                                                 </div>
                                                 <label for="tf-@f.BatchFileID" class="max-w-xs cursor-pointer truncate font-medium text-slate-900" title="@f.Description">
@@ -110,38 +110,32 @@
 @code {
     private const long MaxFileBytes = 20 * 1024 * 1024;
 
-    [Parameter] public List<BatchFileResponse>? Files { get; set; }
+    [Parameter, EditorRequired] public required ComposeTemplateModel Model { get; set; }
     [Parameter, EditorRequired] public EventCallback<BatchFileResponse> OnSelected { get; set; }
-    [Parameter] public EventCallback<List<BatchFileResponse>> OnFilesUpdated { get; set; }
 
     private bool isVisible;
     private bool isUploading;
     private string? selectedId;
     private string searchTerm = string.Empty;
 
-    private List<BatchFileResponse> allFilesList => Files ?? new();
-
     private List<BatchFileResponse> filteredFiles
     {
         get
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return allFilesList.OrderByDescending(x => x.DateCreated).ToList();
+                return Model.BatchFiles.OrderByDescending(x => x.DateCreated).ToList();
 
-            return allFilesList
+            return Model.BatchFiles
                 .Where(x => x.Description != null && x.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(x => x.DateCreated)
                 .ToList();
         }
     }
 
-    public void Show(string? currentId = null, List<BatchFileResponse>? updatedFiles = null)
+    public void Show()
     {
-        selectedId = currentId;
-        if (updatedFiles != null)
-        {
-            Files = updatedFiles;
-        }
+        // allFilesList = model.BatchFiles;
+        selectedId = Model.SelectedFile?.BatchFileID;
         searchTerm = string.Empty;
         isVisible = true;
         StateHasChanged();
@@ -155,7 +149,7 @@
 
     public async Task Confirm()
     {
-        var file = allFilesList.FirstOrDefault(x => x.BatchFileID == selectedId);
+        var file = Model.BatchFiles.FirstOrDefault(x => x.BatchFileID == selectedId);
         if (file != null)
         {
             await OnSelected.InvokeAsync(file);
@@ -172,41 +166,28 @@
 
     private async Task HandleDirectUpload(InputFileChangeEventArgs e)
     {
-        var file = e.File;
-        if (file == null) return;
+        if (e.File == null) return;
 
         isUploading = true;
         StateHasChanged();
 
         try
         {
-            await using var stream = file.OpenReadStream(MaxFileBytes);
-            using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms);
-            ms.Position = 0;
-
-            var fileParam = new FileParameter(ms, file.Name, file.ContentType);
+            var fileParam = new FileParameter(e.File);
             var result = await apiClient.BatchFileCreateAsync(234, fileParam);
 
             // Re-fetch files from API to get the fully registered list
             var listResponse = await apiClient.BatchFileListAsync();
             var updatedList = listResponse.Result?.ToList() ?? new();
 
-            Files = updatedList;
-            if (OnFilesUpdated.HasDelegate)
-            {
-                await OnFilesUpdated.InvokeAsync(updatedList);
-            }
+            Model.UpdateBatchFiles(updatedList);
 
             // Auto-select the newly uploaded file in the list
             if (result?.Result != null)
-            {
                 selectedId = result.Result.BatchFileID;
-            }
+
             else if (updatedList.Any())
-            {
                 selectedId = updatedList.First().BatchFileID;
-            }
 
             await alert.Success("File uploaded successfully and added to the list.");
         }

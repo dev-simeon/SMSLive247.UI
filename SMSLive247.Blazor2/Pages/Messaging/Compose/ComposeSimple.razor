@@ -1,7 +1,11 @@
-@using SMSLive247.Blazor.Pages.Messaging.Compose.Modals
+@using SMSLive247.Blazor.Pages.Messaging.Compose.Simple
 @using SMSLive247.Blazor.Pages.Messaging.Compose.Common
 
 <Loading NullCheckObject="model" Message="Loading compose options...">
+    @{
+        ComposeSimpleModel context = model ?? throw new ArgumentNullException(nameof(model));
+    }
+    
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
         <!-- Main Column (col-lg-8) -->
@@ -11,16 +15,16 @@
             <Card HeaderText="Select Recipients">
                 <HeaderRight>
                     <span class="rounded bg-brand-50 px-2.5 py-1 text-xs text-slate-500">
-                        Total Recipients: @model.CountRecipients().ToString("N0")
+                        Total Recipients: @context.CountRecipients().ToString("N0")
                     </span>
                 </HeaderRight>
                 <ChildContent>
-                    <RecipientList Caption="Raw Numbers" Recipients="model.Numbers"
-                                   OnClick="() => rawNumbersModal.Show(model.Numbers)">
+                    <RecipientList Caption="Raw Numbers" Recipients="context.Numbers"
+                                   OnClick="() => rawNumbersModal.Show(context.Numbers)">
                         <Button Text="Paste..."
                                 Icon="Icon.IconStyle.PenSquare"
                                 Style="ColorStyle.Secondary"
-                                OnClick="() => rawNumbersModal.Show(model.Numbers)"
+                                OnClick="() => rawNumbersModal.Show(context.Numbers)"
                                 CssClass="w-[160px]">
                         </Button>
                         <p class="mt-1 text-slate-500">
@@ -28,12 +32,12 @@
                         </p>
                     </RecipientList>
 
-                    <RecipientList Caption="From Contacts" Recipients="model.Contacts"
-                                   OnClick="() => contactsModal.Show(model.Contacts)">
+                    <RecipientList Caption="From Contacts" Recipients="context.Contacts"
+                                   OnClick="() => contactsModal.Show(context.Contacts)">
                         <Button Text="Contacts..."
                                 Icon="Icon.IconStyle.Users"
                                 Style="ColorStyle.Secondary"
-                                OnClick="() => contactsModal.Show(model.Contacts)"
+                                OnClick="() => contactsModal.Show(context.Contacts)"
                                 CssClass="w-[160px]">
                         </Button>
                         <p class="mt-1 text-slate-500">
@@ -41,12 +45,12 @@
                         </p>
                     </RecipientList>
 
-                    <RecipientList Caption="From Bulk Files" Recipients="model.BatchFiles"
-                                   OnClick="() => bulkfilesModal.Show(model.BatchFiles)">
+                    <RecipientList Caption="From Bulk Files" Recipients="context.BatchFiles"
+                                   OnClick="() => bulkfilesModal.Show(context.BatchFiles)">
                         <Button Text="Bulk Files..."
                                 Icon="Icon.IconStyle.FileText"
                                 Style="ColorStyle.Secondary"
-                                OnClick="() => bulkfilesModal.Show(model.BatchFiles)"
+                                OnClick="() => bulkfilesModal.Show(context.BatchFiles)"
                                 CssClass="w-[160px]">
                         </Button>
                         <p class="mt-1 text-slate-500">
@@ -61,7 +65,7 @@
             <Card HeaderText="Type your Message here">
                 <HeaderRight>
                     <span class="rounded bg-brand-50 px-2.5 py-1 text-xs text-slate-500">
-                        @model.CounterText()
+                        @context.CounterText()
                     </span>
                 </HeaderRight>
                 <ChildContent>
@@ -69,13 +73,14 @@
                                TValue="string"
                                PlaceHolder="Type your message here..."
                                maxlength="918"
-                               @bind-Value="model.MessageText" />
+                               @bind-Value="context.MessageText" />
 
                     <div class="mt-1 flex items-center justify-between">
                         <span class="text-sm text-slate-500">Messages longer than 160 characters are charged per page.</span>
-                        @if (!string.IsNullOrWhiteSpace(model.MessageText))
+                        @if (!string.IsNullOrWhiteSpace(context.MessageText))
                         {
-                            <button type="button" class="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600" @onclick="() => model.ClearMessage()">
+                            <button class="flex items-center gap-1 text-sm font-medium text-red-500 hover:text-red-600"
+                                    type="button" @onclick="() => context.ClearMessage()">
                                 <Icon Style="Icon.IconStyle.Close" CssClass="text-xs" /> Clear
                             </button>
                         }
@@ -87,32 +92,25 @@
         <!-- Side Column (col-lg-4) -->
         <div class="lg:col-span-1">
             <div class="sticky top-6 flex flex-col gap-6">
-                <!-- Sender ID Card -->
-                <SenderIdCard Model="@model" SenderIDChanged="SenderIdChanged"></SenderIdCard>
-                <!-- Schedule Card -->
-                <SchedulerCard TotalRecipients="@(model?.CountRecipients() ?? 0)"
-                               ValidationMessages="@SchedulerValidationMessages"
-                               IsSending="@(model?.IsBusy ?? false)"
-                               ResetKey="@sendResetKey"
-                               OnSubmit="SendMessageCore" />
-            </div>                
+                <SenderIdCard Model="@model" OnChanged="(id) => StateHasChanged()" />
+                <SchedulerCard Model="@model" />
+                <SubmitCard Model="@model" ApiSubmit="apiClient.SmsBatchCreateAsync" />
+            </div>
         </div>
     </div>
 </Loading>
 
 <SelectContacts     @ref="contactsModal"    OnSelected="(items) => model?.UpdateContacts(items)" />
 <SelectBulkfiles    @ref="bulkfilesModal"   OnSelected="(items) => model?.UpdateBulkfiles(items)" />
-<SelectRawNumbers   @ref="rawNumbersModal"  OnSelected="(items) => model?.UpdateNumbers(items)" 
-                    CountryCode="MainAccount?.Account.CountryCode ?? 234" />
+<SelectRawNumbers   @ref="rawNumbersModal"  OnSelected="(items) => model?.UpdateNumbers(items)" CountryCode="State.Account.CountryCode" />
 
 @code {
+    [CascadingParameter(Name = "MainAccount")] public required AccountState State { get; set; }
+
     private SelectContacts contactsModal = new();
     private SelectBulkfiles bulkfilesModal = new();
     private SelectRawNumbers rawNumbersModal = new();
     private ComposeSimpleModel? model;
-    private int sendResetKey;
-
-    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -134,133 +132,5 @@
         {
             await alert.Error($"An error occurred while initializing the compose page. {ex.Message}");
         }
-    }
-
-    private async Task SenderIdChanged(string senderId)
-    {
-        StateHasChanged();
-    }
-
-    private IReadOnlyList<string> SchedulerValidationMessages
-    {
-        get
-        {
-            var messages = new List<string>();
-            if (model?.CountRecipients() is not > 0)
-                messages.Add("Please select at least one recipient");
-
-            if (string.IsNullOrWhiteSpace(model?.SenderID))
-                messages.Add("Please select a sender ID");
-
-            if (string.IsNullOrWhiteSpace(model?.MessageText))
-                messages.Add("Please enter a message");
-
-            return messages;
-        }
-    }
-
-    private async Task SendMessageCore(DateTimeOffset? deliveryTime)
-    {
-        if (model is null)
-        {
-            await alert.Error("model should not be null");
-            return;
-        }
-
-        try
-        {
-            model.IsBusy = true;
-            await InvokeAsync(StateHasChanged);
-
-            if (string.IsNullOrWhiteSpace(model.SenderID))
-                throw new Exception("Choose an approved sender ID.");
-
-            if (string.IsNullOrWhiteSpace(model.MessageText))
-                throw new Exception("Enter a message.");
-
-            if (model.CountRecipients() == 0)
-                throw new Exception("Add recipients");
-
-            var request = model.CreateRequest();
-            request.DeliveryTime = deliveryTime;
-            var result = await apiClient.SmsBatchCreateAsync(request);
-            var res = result.Result;
-
-            model.Numbers.Clear();
-            model.Contacts.ForEach(contact => contact.Selected = false);
-            model.BatchFiles.ForEach(file => file.Selected = false);
-            model.MessageText = string.Empty;
-            model.SenderID = string.Empty;
-            model.DeliveryTime = null;
-            sendResetKey++;
-            await RefreshBalanceAsync(res.WalletCharge);
-
-            var reply = deliveryTime.HasValue
-                ? "Your message has been scheduled."
-                : GetMessageStatistics(res);
-
-            await alert.Success(reply, "Message Created");
-        }
-        catch (ApiException ex)
-        {
-            await alert.Error(ex.FriendlyErrorMessage, "Unable to Send Message");
-        }
-        catch (Exception ex)
-        {
-            await alert.Error(ex.Message, "Unable to Send Message");
-        }
-        finally
-        {
-            model.IsBusy = false;
-            await InvokeAsync(StateHasChanged);
-        }
-    }
-
-    private async Task RefreshBalanceAsync(double? creditBalance)
-    {
-        if (MainAccount is null)
-            return;
-
-        if (creditBalance.HasValue)
-        {
-            MainAccount.UpdateCredits(creditBalance.Value);
-            return;
-        }
-
-        try
-        {
-            var account = await apiClient.AccountGetAsync("self");
-            MainAccount.UpdateCredits(account.Result.WalletBalance);
-        }
-        catch (ApiException ex)
-        {
-            await alert.Error($"The message was submitted, but the balance could not be refreshed. {ex.FriendlyErrorMessage}", "Balance not refreshed");
-        }
-        catch (Exception ex)
-        {
-            await alert.Error($"The message was submitted, but the balance could not be refreshed. {ex.Message}", "Balance not refreshed");
-        }
-    }
-
-    public static string GetMessageStatistics(SmsBatchResponse res)
-    {
-        var message = "";
-
-        if (res.TotalProcessed > 0)
-            message += $"{res.TotalProcessed:#,##0} message/s was submitted for immediate delivery. <br>";
-
-        if (res.TotalFailed > 0)
-            message += $"{res.TotalFailed:#,##0} message/s failed. <br>";
-
-        message += "<br>";
-
-        @if(res.Wallet == "SMS")
-            message += $"Total SMS units charged: {res.WalletCharge:#,##0} <br>";
-            //message += $"Current SMS balance: {res.WalletBalance}";
-        else
-            message += $"Total Wallet charge: N{res.WalletCharge:#,##0} <br>";
-            //message += $"Current Wallet balance: {res.WalletBalance}";
-     
-        return message;
     }
 }

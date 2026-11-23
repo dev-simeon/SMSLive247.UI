@@ -49,7 +49,7 @@
                             class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3.5 font-sans text-sm font-normal text-white shadow-lg shadow-brand-500/30 transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60">
                         @if (isBusy)
                         {
-                            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            <span class="size-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                             <span>Calculating...</span>
                         }
                         else
@@ -110,7 +110,7 @@
     private long quantity = 10000;
     private bool isBusy;
     private List<PriceSlotResponse> pricingTiers = [];
-    private PurchaseModal purchaseModal = new();
+    private PurchaseModal? purchaseModal;
 
     private PriceSlotResponse? currentTier => pricingTiers.FirstOrDefault(t => IsTierActive(t)) ?? pricingTiers.FirstOrDefault();
 
@@ -159,7 +159,7 @@
         {
             isBusy = true;
             var response = await apiClient.PriceCalculateAsync(quantity, null, null, "");
-            purchaseModal.Show(response.Result);
+            purchaseModal?.Show(response.Result);
         }
         catch (ApiException ex)
         {

@@ -15,55 +15,51 @@ namespace SMSLive247.UI.Shared
             public const string NotFound = "/not-found";
 
             public const string Dashboard = "/";
-            //public const string Home = "/";  
 
             public static class Legal
             {
-                public const string Terms = "/legal/terms.txt";
+                public const string Terms   = "/legal/terms.txt";
                 public const string Privacy = "/legal/privacy.txt";
             }
 
             public static class Messaging
             {
-                public const string Compose = "/messaging/compose";
-                public const string Messages = "/messaging/messages";
-                public const string MessageDetails = "/messaging/messages/{id}";
-                public const string Contacts = "/messaging/contacts";
-                public const string SenderIds = "/messaging/sender-ids";
+                public const string Compose         = "/messaging/compose";
+                public const string Messages        = "/messaging/messages";
+                public const string MessageDetails  = "/messaging/messages/{id}";
+                public const string Contacts        = "/messaging/contacts";
+                public const string SenderIds       = "/messaging/sender-ids";
                 public static string MessageDetailsUrl(long id) => MessageDetails.Replace("{id}", id.ToString());
             }
 
             public static class Account
             {
-                //public const string Dashboard = "/account/dashboard";
-                public const string SubAccounts = "/account/sub-accounts";
-                public const string SubAccountDetails = "/account/sub-accounts/{id}";
-                public const string Profile = "/account/profile";
+                public const string SubAccounts         = "/account/sub-accounts";
+                public const string SubAccountDetails   = "/account/sub-accounts/{id}";
+                public const string Profile             = "/account/profile";
                 public static string SubAccountDetailsUrl(string id) => SubAccountDetails.Replace("{id}", id.ToString());
-                public static string SubAccountDetailsUrl(Guid id) => SubAccountDetails.Replace("{id}", id.ToString());
             }
 
             public static class Wallet
             {
-                public const string Purchase = "/credits/purchase";
-                public const string PurchaseComplete = "/credits/purchase-complete";
-                public const string Deposits = "/credits/deposits";
-                public const string Transfers = "/credits/transfers";
-                public const string Pricing = "/credits/pricing";
-                public const string PurchaseSuccess = "/credits/purchase/success";
+                public const string Purchase            = "/credits/purchase";
+                public const string PurchaseComplete    = "/credits/purchase/complete";
+                public const string Deposits            = "/credits/deposits";
+                public const string Transfers           = "/credits/transfers";
+                public const string Pricing             = "/credits/pricing";
             }
 
             public static class Support
             {
-                public const string Coverage = "/support/coverage";
-                public const string ContactUs = "/support/contact-us";
-                public const string Tickets = "/support/tickets";
+                public const string Coverage    = "/support/coverage";
+                public const string ContactUs   = "/support/contact-us";
+                public const string Tickets     = "/support/tickets";
             }
 
             public static class Developer
             {
-                public const string ApiDocs = "/developer/api-docs";
-                public const string ApiKeys = "/developer/api-keys";
+                public const string ApiDocs     = "/developer/api-docs";
+                public const string ApiKeys     = "/developer/api-keys";
             }
         }
 
@@ -73,7 +69,7 @@ namespace SMSLive247.UI.Shared
             {
                 Items =
                 [
-                    new NavItem { Title = "Dashboard", Url = Routes.Dashboard, Icon = Icon.IconStyle.Home }
+                    new NavItem { Title = "Dashboard",  Url = Routes.Dashboard,             Icon = Icon.IconStyle.Home }
                 ]
             },
             new NavItem
@@ -81,10 +77,10 @@ namespace SMSLive247.UI.Shared
                 Title = "Messaging",
                 Items =
                 [
-                    new NavItem { Title = "Compose", Url = Routes.Messaging.Compose, Icon = Icon.IconStyle.PenSquare },
-                    new NavItem { Title = "Messages", Url = Routes.Messaging.Messages, Icon = Icon.IconStyle.Mail },
-                    new NavItem { Title = "Contacts", Url = Routes.Messaging.Contacts, Icon = Icon.IconStyle.Users },
-                    new NavItem { Title = "Sender IDs", Url = Routes.Messaging.SenderIds, Icon = Icon.IconStyle.Verified }
+                    new NavItem { Title = "Compose",    Url = Routes.Messaging.Compose,     Icon = Icon.IconStyle.PenSquare },
+                    new NavItem { Title = "Messages",   Url = Routes.Messaging.Messages,    Icon = Icon.IconStyle.Mail },
+                    new NavItem { Title = "Contacts",   Url = Routes.Messaging.Contacts,    Icon = Icon.IconStyle.Users },
+                    new NavItem { Title = "Sender IDs", Url = Routes.Messaging.SenderIds,   Icon = Icon.IconStyle.Verified }
                 ]
             },
             new NavItem
@@ -92,8 +88,8 @@ namespace SMSLive247.UI.Shared
                 Title = "Accounts",
                 Items =
                 [
-                    new NavItem { Title = "Sub-Accounts", Url = Routes.Account.SubAccounts, Icon = Icon.IconStyle.Network },
-                    new NavItem { Title = "My Profile", Url = Routes.Account.Profile, Icon = Icon.IconStyle.User }
+                    new NavItem { Title = "Sub-Accounts",   Url = Routes.Account.SubAccounts, Icon = Icon.IconStyle.Network },
+                    new NavItem { Title = "My Profile", Url = Routes.Account.Profile,   Icon = Icon.IconStyle.User }
                 ]
             },
             new NavItem
@@ -101,10 +97,9 @@ namespace SMSLive247.UI.Shared
                 Title = "Wallet",
                 Items =
                 [
-                    new NavItem { Title = "Buy", Url = Routes.Wallet.Purchase, Icon = Icon.IconStyle.CreditCard },
-                    //new NavItem { Title = "Deposit", Url = Routes.Wallet.Deposits, Icon = Icon.IconStyle.ArrowRightLeft },
-                    new NavItem { Title = "Transfers", Url = Routes.Wallet.Transfers, Icon = Icon.IconStyle.ArrowRightLeft },
-                    new NavItem { Title = "Pricing", Url = Routes.Wallet.Pricing, Icon = Icon.IconStyle.Tag }
+                    new NavItem { Title = "Buy/Topup",  Url = Routes.Wallet.Purchase,   Icon = Icon.IconStyle.CreditCard },
+                    new NavItem { Title = "Transfers",  Url = Routes.Wallet.Transfers,  Icon = Icon.IconStyle.ArrowRightLeft },
+                    new NavItem { Title = "Pricing",    Url = Routes.Wallet.Pricing,    Icon = Icon.IconStyle.Tag }
                 ]
             },
             new NavItem
@@ -112,8 +107,8 @@ namespace SMSLive247.UI.Shared
                 Title = "Developers",
                 Items =
                 [
-                    new NavItem { Title = "API Keys", Url = Routes.Developer.ApiKeys, Icon = Icon.IconStyle.Terminal },
-                    new NavItem { Title = "API Docs", Url = Routes.Developer.ApiDocs, Icon = Icon.IconStyle.BookOpen }
+                    new NavItem { Title = "API Keys", Url = Routes.Developer.ApiKeys,   Icon = Icon.IconStyle.Terminal },
+                    new NavItem { Title = "API Docs", Url = Routes.Developer.ApiDocs,   Icon = Icon.IconStyle.BookOpen }
                 ]
             },
             new NavItem
@@ -121,17 +116,16 @@ namespace SMSLive247.UI.Shared
                 Title = "Support",
                 Items =
                 [
-                    //new Item { Title = "Tickets", Url = "/support/tickets", Icon = Icon.IconStyle.HelpCircle },
                     new NavItem { Title = "Contact Us", Url = Routes.Support.ContactUs, Icon = Icon.IconStyle.HelpCircle },
-                    new NavItem { Title = "Coverage", Url = Routes.Support.Coverage, Icon = Icon.IconStyle.Globe }
+                    new NavItem { Title = "Coverage",   Url = Routes.Support.Coverage,  Icon = Icon.IconStyle.Globe }
                 ]
             }
         ];
 
         public class NavItem
         {
-            public string? Title { get; init; }
             public string? Url { get; init; }
+            public string? Title { get; init; }
             public Icon.IconStyle? Icon { get; init; }
             public List<NavItem> Items { get; init; } = [];
         }
