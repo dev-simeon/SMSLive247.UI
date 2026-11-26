@@ -251,36 +251,6 @@
         }
       }
     },
-    "/api/v5/accounts/{accountId}/convert": {
-      "post": {
-        "tags": [
-          "Account"
-        ],
-        "operationId": "AccountConvert",
-        "parameters": [
-          {
-            "name": "accountId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AccountResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v5/auth": {
       "post": {
         "tags": [
@@ -2256,6 +2226,78 @@
         }
       }
     },
+    "/api/v5/credits/conversions": {
+      "get": {
+        "tags": [
+          "Wallet Conversion"
+        ],
+        "operationId": "ConversionPreview",
+        "parameters": [
+          {
+            "name": "PageNumber",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 1000.0,
+              "minimum": 1.0
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "maximum": 500.0,
+              "minimum": 5.0
+            }
+          },
+          {
+            "name": "SearchText",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversionResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Wallet Conversion"
+        ],
+        "operationId": "ConversionBegin",
+        "parameters": [
+          {
+            "name": "password",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v5/credits/purchase": {
       "get": {
         "tags": [
@@ -2769,6 +2811,24 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "ConversionResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "newWallet": {
+            "type": "string",
+            "readOnly": true
+          },
+          "newBalance": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double"
+          },
+          "account": {
+            "$ref": "#/components/schemas/AccountResponse"
           }
         }
       },
@@ -3578,6 +3638,12 @@
             "readOnly": true,
             "format": "date-time"
           },
+          "walletBalance": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double",
+            "nullable": true
+          },
           "walletCharge": {
             "type": "number",
             "readOnly": true,
@@ -3663,6 +3729,12 @@
             "type": "string",
             "readOnly": true,
             "format": "date-time"
+          },
+          "walletBalance": {
+            "type": "number",
+            "readOnly": true,
+            "format": "double",
+            "nullable": true
           },
           "walletCharge": {
             "type": "number",
@@ -3997,6 +4069,9 @@
     },
     {
       "name": "Voice Call"
+    },
+    {
+      "name": "Wallet Conversion"
     },
     {
       "name": "Wallet Purchase"

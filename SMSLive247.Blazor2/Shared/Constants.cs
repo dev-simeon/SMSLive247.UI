@@ -50,6 +50,7 @@ namespace SMSLive247.UI.Shared
                 public const string Deposits = "/credits/deposits";
                 public const string Transfers = "/credits/transfers";
                 public const string Pricing = "/credits/pricing";
+                public const string ConvertToNaira = "/credits/convert-to-naira";
                 public const string PurchaseSuccess = "/credits/purchase/success";
             }
 
@@ -102,6 +103,7 @@ namespace SMSLive247.UI.Shared
                 Items =
                 [
                     new NavItem { Title = "Buy", Url = Routes.Wallet.Purchase, Icon = Icon.IconStyle.CreditCard },
+                    new NavItem { Title = "Switch to Naira", Url = Routes.Wallet.ConvertToNaira, Icon = Icon.IconStyle.ArrowRightLeft },
                     //new NavItem { Title = "Deposit", Url = Routes.Wallet.Deposits, Icon = Icon.IconStyle.ArrowRightLeft },
                     new NavItem { Title = "Transfers", Url = Routes.Wallet.Transfers, Icon = Icon.IconStyle.ArrowRightLeft },
                     new NavItem { Title = "Pricing", Url = Routes.Wallet.Pricing, Icon = Icon.IconStyle.Tag }

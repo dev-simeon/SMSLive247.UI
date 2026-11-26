@@ -22,6 +22,13 @@
     <div class="ml-auto flex items-center gap-4">
         @if (Account is not null)
         {
+            @if (Account.Wallet == "SMS")
+            {
+                <Button Icon="Icon.IconStyle.CurrencyExchange" Text="Convert to Naira" Style="ColorStyle.Warning"
+                        OnClick="() => nav.NavigateTo(Const.Routes.Wallet.ConvertToNaira)"
+                        CssClass="px-3 sm:px-4 font-semibold shadow-md" />
+            }
+
             @* Credits Pill *@
             <div class="hidden items-center gap-4 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-1.5 sm:flex">
                 <FormatBalance Wallet="@Account.Wallet" 

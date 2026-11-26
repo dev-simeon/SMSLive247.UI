@@ -2,7 +2,7 @@
 {
     <button @attributes="AdditionalAttributes"
             type="submit" disabled="@(IsBusy || IsDisabled)"
-            class="flex min-h-[37.6px] min-w-30 transform items-center justify-center gap-2 rounded-lg border border-transparent px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @colorCss @CssClass">
+            class="flex min-h-[37.6px] min-w-30 transform items-center justify-center gap-2 rounded-lg border border-transparent px-5 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @colorCss @CssClass">
         @ButtonContent
     </button>
 }
@@ -10,7 +10,7 @@ else
 {
     <button @attributes="AdditionalAttributes" @onclick="HandleClick"
             type="button" disabled="@(IsBusy || IsDisabled)"
-            class="flex min-h-[37.6px] min-w-30 transform items-center justify-center gap-2 rounded-lg border border-transparent px-5 shadow-sm transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @colorCss @CssClass">
+            class="flex min-h-[37.6px] min-w-30 transform items-center justify-center gap-2 rounded-lg border border-transparent px-5 shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 @colorCss @CssClass">
         @ButtonContent
     </button>
 }
@@ -55,14 +55,14 @@ else
     {
         return Style switch
         {
-            ColorStyle.Primary => "hover:bg-brand-600 focus:ring-brand-500",
-            ColorStyle.Secondary => "hover:bg-slate-50 dark:hover:bg-slate-800 focus:ring-slate-300 dark:focus:ring-slate-600 border-slate-200 dark:border-slate-900 ",
-            ColorStyle.Success => "hover:bg-green-600 focus:ring-green-500",
-            ColorStyle.Warning => "hover:bg-amber-600 focus:ring-amber-500",
-            ColorStyle.Info => "hover:bg-blue-600  focus:ring-blue-500",
-            ColorStyle.Danger => "hover:bg-red-600   focus:ring-red-500",
-            ColorStyle.Light => "hover:bg-gray-200  focus:ring-gray-300",
-            ColorStyle.Dark => "hover:bg-gray-900  focus:ring-gray-500",
+            ColorStyle.Primary => "hover:bg-brand-600 focus-visible:ring-brand-500",
+            ColorStyle.Secondary => "hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-slate-300 dark:focus-visible:ring-slate-600 border-slate-200 dark:border-slate-900 ",
+            ColorStyle.Success => "hover:bg-green-600 focus-visible:ring-green-500",
+            ColorStyle.Warning => "hover:bg-amber-600 focus-visible:ring-amber-500",
+            ColorStyle.Info => "hover:bg-blue-600 focus-visible:ring-blue-500",
+            ColorStyle.Danger => "hover:bg-red-600 focus-visible:ring-red-500",
+            ColorStyle.Light => "hover:bg-gray-200 focus-visible:ring-gray-300",
+            ColorStyle.Dark => "hover:bg-gray-900 focus-visible:ring-gray-500",
             _ => ""
         };
     }

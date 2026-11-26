@@ -41,6 +41,12 @@ else
     <p class="mt-2 text-slate-500">
         Please enter your details to access your dashboard.
     </p>
+    @if (ConversionComplete)
+    {
+        <Notice Variant="Notice.NoticeVariant.Success" Title="Conversion submitted" CssClass="mt-4 text-left">
+            Your Naira conversion was submitted successfully. For your security, you have been signed out. Log in again to continue.
+        </Notice>
+    }
 </div>
 
 <EditForm Model="@model" OnValidSubmit="LoginAsync" FormName="f1" class="space-y-6">
@@ -111,6 +117,7 @@ else
 
 @code {
     [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    [SupplyParameterFromQuery] public bool ConversionComplete { get; set; }
 
     private bool isBusy = false;
     private bool isCheckingSession = true;

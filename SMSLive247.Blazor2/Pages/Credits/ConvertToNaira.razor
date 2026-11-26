@@ -1,0 +1,257 @@
+@attribute [Route(Const.Routes.Wallet.ConvertToNaira)]
+@layout MainLayout
+@inject SubAccountClient subClient
+@inject AuthenticationStateProvider auth
+@inject NavigationManager nav
+
+<PageTitle>Switch to Naira Billing</PageTitle>
+
+<div class="w-full max-w-full space-y-5 pb-8 lg:max-w-[70%]">
+    <div class="pb-2">
+        <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Review your Naira conversion</h1>
+        <p class="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">You can choose to move from credit-based usage to a Naira cash wallet now. Review the billing changes, account scope, and permanent effect before continuing.</p>
+    </div>
+
+    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-700 dark:bg-black">
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-white">What you’re agreeing to</h2>
+        <div class="mt-4 grid gap-3 sm:grid-cols-3">
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-gray-900">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Standard SMS rate</p>
+                <p class="mt-1 text-2xl font-semibold tabular-nums text-slate-900 dark:text-white">₦6.55</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">per SMS page of up to 160 characters</p>
+                <p class="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">Longer messages use multiple pages and are charged for each page at this rate.</p>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-gray-900">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Billing model</p>
+                <p class="mt-2 font-semibold text-slate-900 dark:text-white">Naira cash wallet</p>
+                <p class="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">Top-ups add Naira to your wallet instead of buying credit units. Message charges are deducted from your cash balance as you send.</p>
+            </div>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-gray-900">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Accounts included</p>
+                <p class="mt-2 font-semibold text-slate-900 dark:text-white">Your whole account</p>
+                <p class="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">Your main account, every sub-account, and every sub-user under those accounts are included. You cannot convert only part of the account hierarchy.</p>
+            </div>
+        </div>
+
+        <div class="mt-5">
+            <h3 class="text-base font-semibold text-slate-900 dark:text-white">Account balance conversion</h3>
+            <p class="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">The proposed Naira balance is the cash amount that would replace each account’s current credit balance. These figures come from the conversion preview service.</p>
+        </div>
+
+        <div class="mt-3 h-80 overflow-auto rounded-lg border border-slate-200 dark:border-slate-700">
+            <table class="w-full text-left text-sm" style="min-width: 640px">
+                <thead class="sticky top-0 z-10 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:bg-gray-900 dark:text-slate-400">
+                    <tr>
+                        <th scope="col" class="px-4 py-3">Account / type</th>
+                        <th scope="col" class="px-4 py-3 text-right">Current credit balance</th>
+                        <th scope="col" class="px-4 py-3 text-right">Proposed Naira balance</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white dark:divide-slate-800 dark:bg-black">
+                    @if (isLoadingAccounts)
+                    {
+                        <tr><td colspan="3" class="h-64 text-center text-sm text-slate-500 dark:text-slate-400"><span class="inline-flex items-center gap-3"><span class="h-5 w-5 animate-spin rounded-full border-2 border-brand-500 border-t-transparent"></span>Loading associated accounts…</span></td></tr>
+                    }
+                    else if (conversionAccounts.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3" class="h-64 px-6 text-center">
+                                <p class="text-sm text-slate-600 dark:text-slate-300">Your associated account balances could not be loaded.</p>
+                                <button type="button" @onclick="LoadConversionPreview" class="mt-2 text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-blue-300">Try again</button>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var conversion in conversionAccounts)
+                        {
+                            var account = conversion.Account!;
+                            var isMainAccount = account.AccountID == MainAccount?.Account.AccountID;
+                            var accountType = isMainAccount
+                                ? "Main account"
+                                : accountTypes.GetValueOrDefault(account.AccountID, "Associated account");
+                            var accountLevel = isMainAccount ? 0 : accountType == "Sub-user" ? 2 : 1;
+                            var leftPadding = accountLevel switch { 0 => "16px", 1 => "36px", _ => "56px" };
+                            <tr class="h-14 hover:bg-slate-50 dark:hover:bg-gray-900">
+                                <td class="px-4 py-3" style="padding-left:@leftPadding">
+                                    <span class="inline-flex items-center gap-2">
+                                        @if (isMainAccount) { <Icon Style="Icon.IconStyle.Home" CssClass="text-lg text-brand-600 dark:text-blue-300" /> }
+                                        else if (accountLevel == 2) { <Icon Style="Icon.IconStyle.User" CssClass="text-lg text-slate-400" /> }
+                                        else { <Icon Style="Icon.IconStyle.Network" CssClass="text-lg text-slate-400" /> }
+                                        <span class="font-medium text-slate-800 dark:text-slate-200">@(account.AccountName ?? account.FullName ?? account.Email ?? "Associated account")</span>
+                                        <span class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500 dark:bg-slate-800 dark:text-slate-400">@accountType</span>
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-right tabular-nums text-slate-700 dark:text-slate-300">@account.WalletBalance.ToString("#,##0.##")</td>
+                                <td class="px-4 py-3 text-right font-medium tabular-nums text-slate-800 dark:text-slate-200">
+                                    @($"₦{conversion.NewBalance:#,##0.00}")
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (!isLoadingAccounts && conversionAccounts.Count > 0 && !hasLoadedPreview)
+        {
+            <div class="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500 dark:text-slate-400">
+                <span>The proposed balances could not be loaded. Try again before converting.</span>
+                <button type="button" @onclick="LoadConversionPreview" class="font-medium text-brand-600 hover:text-brand-700 dark:text-blue-300">Retry preview</button>
+            </div>
+        }
+
+        <Notice Variant="Notice.NoticeVariant.Warning" Title="This change is permanent. Naira billing is optional for now." CssClass="mt-4" MessageClass="text-sm leading-6">
+            <p>After the final conversion is completed, your accounts will no longer use credit-unit billing and cannot be switched back. Credit-based usage is expected to be deprecated, after which Naira billing will become compulsory. You may keep using the current system until then if you do not convert now.</p>
+        </Notice>
+    </section>
+
+    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-700 dark:bg-black">
+        <label class="flex cursor-pointer items-start gap-3">
+            <input type="checkbox" @bind="hasAcceptedConsequences" disabled="@isSubmittingConversion" class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 disabled:cursor-not-allowed dark:border-slate-600 dark:bg-gray-900" />
+            <span class="text-sm leading-6 text-slate-700 dark:text-slate-300"><strong class="font-semibold text-slate-900 dark:text-white">I understand and agree.</strong> I have reviewed the ₦6.55 charge per SMS page, understand that top-ups and message usage will be billed in Naira, acknowledge that my main account, all sub-accounts, and all sub-users will be converted together, and understand that this change is permanent.</span>
+        </label>
+
+        <div class="mt-4 grid gap-2 sm:max-w-md">
+            <label for="conversion-password" class="text-sm font-medium text-slate-700 dark:text-slate-300">Confirm your account password</label>
+            <input id="conversion-password" type="password" @bind="accountPassword" autocomplete="current-password" disabled="@isSubmittingConversion"
+                   class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 disabled:opacity-60 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-100"
+                   placeholder="Enter your current password" />
+            <p class="text-xs leading-5 text-slate-500 dark:text-slate-400">Your password is required to authorize this permanent conversion.</p>
+        </div>
+
+        <div class="mt-5 flex flex-col items-start gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+            <Button Text="Convert all balances" Icon="Icon.IconStyle.CurrencyExchange" IsBusy="@isSubmittingConversion"
+                    IsDisabled="@(!hasAcceptedConsequences || string.IsNullOrWhiteSpace(accountPassword) || !hasLoadedPreview || isSubmittingConversion)"
+                    OnClick="BeginConversionAsync" title="Confirm and convert all account balances" />
+        </div>
+    </section>
+</div>
+
+@code {
+    private const int PreviewPageSize = 500;
+
+    [CascadingParameter(Name = "MainAccount")] private AccountState? MainAccount { get; set; }
+
+    private bool hasAcceptedConsequences;
+    private bool isLoadingAccounts;
+    private bool hasLoadedPreview;
+    private bool hasAttemptedLoad;
+    private bool isSubmittingConversion;
+    private string accountPassword = string.Empty;
+    private List<ConversionResponse> conversionAccounts = [];
+    private Dictionary<string, string> accountTypes = [];
+    private Dictionary<string, int> accountOrder = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (MainAccount is not null && !hasAttemptedLoad)
+        {
+            hasAttemptedLoad = true;
+            await LoadConversionPreview();
+        }
+    }
+
+    private async Task LoadConversionPreview()
+    {
+        isLoadingAccounts = true;
+        hasLoadedPreview = false;
+        conversionAccounts = [];
+        accountTypes.Clear();
+        accountOrder.Clear();
+        try
+        {
+            await LoadAccountTypes();
+
+            for (var page = 1; ; page++)
+            {
+                var previews = (await apiClient.ConversionPreviewAsync(page, PreviewPageSize, null)).Result?.ToList() ?? [];
+                conversionAccounts.AddRange(previews.Where(preview => preview.Account is not null));
+
+                if (previews.Count < PreviewPageSize)
+                    break;
+            }
+
+            conversionAccounts = conversionAccounts
+                .OrderBy(preview => accountOrder.GetValueOrDefault(preview.Account!.AccountID, int.MaxValue))
+                .ThenBy(preview => preview.Account!.AccountName)
+                .ToList();
+            hasLoadedPreview = conversionAccounts.Count > 0;
+        }
+        catch (ApiException ex)
+        {
+            conversionAccounts.Clear();
+            await alert.Error($"Unable to load account balances. {ex.FriendlyErrorMessage}");
+        }
+        catch (Exception)
+        {
+            conversionAccounts.Clear();
+            await alert.Error("Unable to load account balances. Please try again.");
+        }
+        finally
+        {
+            isLoadingAccounts = false;
+        }
+    }
+
+    private async Task LoadAccountTypes()
+    {
+        var order = 0;
+        if (MainAccount is not null)
+            accountOrder[MainAccount.Account.AccountID] = order++;
+
+        for (var page = 1; ; page++)
+        {
+            var subAccounts = (await apiClient.AccountsListAsync(page, 100, null)).Result?.ToList() ?? [];
+            foreach (var subAccount in subAccounts)
+            {
+                accountTypes[subAccount.AccountID] = "Sub-account";
+                accountOrder[subAccount.AccountID] = order++;
+
+                var subUserClient = subClient.Impersonate(subAccount);
+                for (var subUserPage = 1; ; subUserPage++)
+                {
+                    var subUsers = (await subUserClient.AccountsListAsync(subUserPage, 100, null)).Result?.ToList() ?? [];
+                    foreach (var subUser in subUsers)
+                    {
+                        accountTypes[subUser.AccountID] = "Sub-user";
+                        accountOrder[subUser.AccountID] = order++;
+                    }
+
+                    if (subUsers.Count < 100)
+                        break;
+                }
+            }
+
+            if (subAccounts.Count < 100)
+                break;
+        }
+    }
+
+    private async Task BeginConversionAsync()
+    {
+        if (!hasAcceptedConsequences || string.IsNullOrWhiteSpace(accountPassword) || !hasLoadedPreview || isSubmittingConversion)
+            return;
+
+        isSubmittingConversion = true;
+        try
+        {
+            // The generated API contract currently sends this value as a query parameter.
+            await apiClient.ConversionBeginAsync(accountPassword);
+            await ((Authentication.SmsAuthProvider)auth).ClearAuthenticationState();
+            nav.NavigateTo($"{Const.Routes.Login}?conversionComplete=true", forceLoad: true);
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error($"Unable to start the Naira conversion. {ex.FriendlyErrorMessage}");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error($"Unable to start the Naira conversion. {ex.Message}");
+        }
+        finally
+        {
+            isSubmittingConversion = false;
+        }
+    }
+}
