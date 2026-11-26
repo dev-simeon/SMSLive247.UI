@@ -47,6 +47,7 @@ namespace SMSLive247.UI.Shared
                 public const string Deposits            = "/credits/deposits";
                 public const string Transfers           = "/credits/transfers";
                 public const string Pricing             = "/credits/pricing";
+                public const string ConvertToNaira       = "/credits/convert-to-naira";
             }
 
             public static class Support
