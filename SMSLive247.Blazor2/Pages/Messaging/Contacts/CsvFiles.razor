@@ -5,7 +5,7 @@
         <SearchBox Placeholder="Search files..." @bind-SearchTerm="searchQuery" />
     </HeaderLeft>
     <HeaderRight>
-        <Button Text="Upload CSV/Excel" Icon="Icon.IconStyle.FileSpreadsheet" @onclick="HandleUpload" />
+        <Button Text="Upload CSV/Excel" Icon="Icon.IconStyle.FileSpreadsheet" @onclick="() => uploadModal?.Show()" />
     </HeaderRight>
 
     <ChildContent>
@@ -13,8 +13,8 @@
             <Columns>
                 <Column Header="File / Description">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                            <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="h-5 w-5" />
+                        <div class="flex size-10 shrink-0 items-center justify-center rounded-lg">
+                            <Icon Style="Icon.IconStyle.FileSpreadsheet" CssClass="size-5" />
                         </div>
                         <div>
                             <p>@(string.IsNullOrEmpty(context.Description) ? "—" : context.Description)</p>
@@ -45,7 +45,7 @@
         </FooterLeft>
     </PageBody>
 
-<BulkFileModal @ref="uploadModal" ForCSV="true" OnCompleted="FetchFiles" />
+<BulkFileModal @ref="uploadModal" ForCSV="true" OnCompleted="FetchFiles" ExistingFiles="[]" />
 
 @code {
     private string? searchQuery;
@@ -53,7 +53,7 @@
     private int pageSize = 25;
 
     private bool isLoading = false;
-    private BulkFileModal uploadModal = new();
+    private BulkFileModal? uploadModal;
     private List<BatchFileResponse>? files;
 
     protected override async Task OnInitializedAsync()
@@ -111,11 +111,6 @@
         }
     }
 
-    private void HandleUpload()
-    {
-        uploadModal.Show();
-    }
-
     private async Task HandleDownload(BatchFileResponse file)
     {
         try
@@ -131,8 +126,9 @@
     private async Task HandleDelete(BatchFileResponse file)
     {
         var desc = string.IsNullOrEmpty(file.Description) ? file.BatchFileID : file.Description;
+        var confirm = await alert.Confirm($"Are you sure you want to delete file '{desc}'?", "Confirm Delete");
 
-        if (await alert.Confirm($"Are you sure you want to delete file '{desc}'?", "Confirm Delete"))
+        if (confirm)
         {
             try
             {

@@ -9,13 +9,13 @@
                     <div class="space-y-2">
                         <div class="flex items-center justify-between gap-3">
                             <label for="custom-funding-amount" class="block text-sm font-medium text-slate-800 dark:text-slate-200">Amount to add</label>
-                            <span class="whitespace-nowrap rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-400 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-400">Minimum top-up: ₦@minimumFundingAmount.ToString("#,##0")</span>
+                            <span class="rounded border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium whitespace-nowrap text-slate-400 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-400">Minimum top-up: ₦@minimumFundingAmount.ToString("#,##0")</span>
                         </div>
                         <div class="relative rounded-xl">
                             <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-lg font-normal text-slate-400 dark:text-slate-400">₦</span>
                             <input id="custom-funding-amount" type="number" min="@minimumFundingAmount" step="50"
                                    @bind="fundingAmount" @bind:event="oninput" disabled="@isBusy"
-                                   class="block w-full rounded-xl border border-slate-300 py-3.5 pl-11 pr-24 font-sans text-xl font-normal tracking-tight text-slate-900 outline-none placeholder:text-slate-400 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 disabled:opacity-60 dark:bg-gray-900 dark:text-slate-200 dark:ring-slate-700"
+                                   class="block w-full rounded-xl border border-slate-300 py-3.5 pr-24 pl-11 font-sans text-xl font-normal tracking-tight text-slate-900 outline-none placeholder:text-slate-400 focus:border-brand-600 focus:ring-4 focus:ring-brand-500/10 disabled:opacity-60 dark:bg-gray-900 dark:text-slate-200 dark:ring-slate-700"
                                    placeholder="0.00" />
                             <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"><span class="rounded bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-400">NGN</span></span>
                         </div>
@@ -25,18 +25,18 @@
                         }
                     </div>
                     <div>
-                        <p class="mb-2.5 text-xs font-medium uppercase tracking-wider text-slate-400">Quick amounts</p>
+                        <p class="mb-2.5 text-xs font-medium tracking-wider text-slate-400 uppercase">Quick amounts</p>
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
                             @foreach (var amount in fundingPresets)
                             {
                                 var selected = fundingAmount == amount;
                                 <button type="button" @onclick="() => SetFundingAmount(amount)" aria-pressed="@selected"
                                         disabled="@isBusy"
-                                        class="relative flex min-h-[68px] flex-col items-center justify-center rounded-xl border px-3 py-3 text-center text-sm font-normal tabular-nums transition-colors disabled:cursor-not-allowed disabled:opacity-60 @(selected ? "border-2 border-brand-600 bg-brand-50/50 text-brand-700 ring-2 ring-brand-500/10 dark:bg-blue-950/40 dark:text-blue-300" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800")">
+                                        class="relative flex min-h-[68px] flex-col items-center justify-center rounded-xl border p-3 text-center text-sm font-normal tabular-nums transition-colors disabled:cursor-not-allowed disabled:opacity-60 @(selected ? "border-2 border-brand-600 bg-brand-50/50 text-brand-700 ring-2 ring-brand-500/10 dark:bg-blue-950/40 dark:text-blue-300" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800")">
                                     <span>₦@amount.ToString("#,##0")</span>
                                     @if (selected)
                                     {
-                                        <span class="absolute -top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600 text-[10px] text-white">✓</span>
+                                        <span class="absolute -top-2 right-2 flex size-4 items-center justify-center rounded-full bg-brand-600 text-[10px] text-white">✓</span>
                                     }
                                 </button>
                             }
@@ -46,7 +46,7 @@
                             class="flex w-full items-center justify-center gap-2.5 rounded-xl bg-brand-600 px-6 py-4 text-base font-medium text-white shadow-lg shadow-brand-600/30 transition-all hover:bg-brand-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60">
                         @if (isBusy)
                         {
-                            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            <span class="size-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                             <span>Calculating...</span>
                         }
                         else
@@ -64,18 +64,18 @@
                 <div class="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-black">
                     <div class="flex items-center gap-2 border-b border-slate-100 pb-4 dark:border-slate-700">
                         <div class="flex items-center gap-2">
-                            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600"><Icon Style="Icon.IconStyle.Info" CssClass="text-base" /></span>
+                            <span class="flex size-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600"><Icon Style="Icon.IconStyle.Info" CssClass="text-base" /></span>
                             <div><h2 class="text-base font-medium text-slate-800 dark:text-slate-200">Payment Summary</h2><p class="text-sm text-slate-500 dark:text-slate-400">Review your top-up breakdown</p></div>
                         </div>
                     </div>
                     <dl class="space-y-3.5 text-sm text-slate-700 dark:text-slate-300">
-                        <div class="flex items-center justify-between gap-4"><dt>Current balance</dt><dd class="tabular-nums font-medium text-slate-800 dark:text-slate-200">₦@((MainAccount?.Account.WalletBalance ?? 0).ToString("#,##0.00"))</dd></div>
-                        <div class="flex items-center justify-between gap-4"><dt>Amount to add</dt><dd class="tabular-nums font-medium text-slate-800 dark:text-slate-200">₦@SelectedFundingAmount.ToString("#,##0.00")</dd></div>
+                        <div class="flex items-center justify-between gap-4"><dt>Current balance</dt><dd class="font-medium text-slate-800 tabular-nums dark:text-slate-200">₦@((MainAccount?.Account.WalletBalance ?? 0).ToString("#,##0.00"))</dd></div>
+                        <div class="flex items-center justify-between gap-4"><dt>Amount to add</dt><dd class="font-medium text-slate-800 tabular-nums dark:text-slate-200">₦@SelectedFundingAmount.ToString("#,##0.00")</dd></div>
                         @if (cashFundingQuote is not null)
                         {
-                            <div class="flex items-center justify-between gap-4"><dt>VAT</dt><dd class="tabular-nums text-slate-700 dark:text-slate-300">₦@cashFundingQuote.TaxAmount.ToString("#,##0.00")</dd></div>
-                            <div class="flex items-baseline justify-between gap-4 border-t border-dashed border-slate-200 pt-4 dark:border-slate-700"><dt><span class="block text-base font-medium text-slate-800 dark:text-slate-200">Total payable</span><span class="text-sm text-slate-500 dark:text-slate-400">Includes applicable VAT</span></dt><dd class="text-lg font-medium tabular-nums text-slate-800 dark:text-slate-200">₦@cashFundingQuote.TotalAmount.ToString("#,##0.00")</dd></div>
-                            <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-300"><span>Wallet balance after funding</span><span class="tabular-nums font-medium text-slate-800 dark:text-slate-200">₦@((MainAccount?.Account.WalletBalance + cashFundingQuote.SubTotal ?? cashFundingQuote.SubTotal).ToString("#,##0.00"))</span></div>
+                            <div class="flex items-center justify-between gap-4"><dt>VAT</dt><dd class="text-slate-700 tabular-nums dark:text-slate-300">₦@cashFundingQuote.TaxAmount.ToString("#,##0.00")</dd></div>
+                            <div class="flex items-baseline justify-between gap-4 border-t border-dashed border-slate-200 pt-4 dark:border-slate-700"><dt><span class="block text-base font-medium text-slate-800 dark:text-slate-200">Total payable</span><span class="text-sm text-slate-500 dark:text-slate-400">Includes applicable VAT</span></dt><dd class="text-lg font-medium text-slate-800 tabular-nums dark:text-slate-200">₦@cashFundingQuote.TotalAmount.ToString("#,##0.00")</dd></div>
+                            <div class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-gray-900 dark:text-slate-300"><span>Wallet balance after funding</span><span class="font-medium text-slate-800 tabular-nums dark:text-slate-200">₦@((MainAccount?.Account.WalletBalance + cashFundingQuote.SubTotal ?? cashFundingQuote.SubTotal).ToString("#,##0.00"))</span></div>
                         }
                         else
                         {
@@ -91,7 +91,7 @@
 <PurchaseModal @ref="purchaseModal" OnCompleted="StateHasChanged" />
 
 @code {
-    private PurchaseModal purchaseModal = new();
+    private PurchaseModal? purchaseModal;
     private bool isBusy;
     private double fundingAmount = 5000;
     //private PriceCalcResponse? quote;
@@ -128,7 +128,7 @@
         {
             isBusy = true;
             var response = await apiClient.PriceCalculateAsync(null, amount, null, "");
-            purchaseModal.Show(response.Result);
+            purchaseModal?.Show(response.Result);
         }
         catch (ApiException ex)
         {

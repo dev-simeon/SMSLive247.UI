@@ -1,0 +1,139 @@
+﻿@typeparam TRequest
+
+<Card>
+    <div class="flex flex-col gap-3">
+        <div class="mt-2 text-left text-sm text-red-500">
+            @foreach (var message in errorMessages)
+            {
+                <p>@message</p>
+            }
+        </div>
+
+        @if (Model.DeliveryTime.HasValue)
+        {
+            <Button IsBusy="Model.IsBusy"
+                    Text="Queue Message"
+                    Icon="Icon.IconStyle.Clock"
+                    IsDisabled="@(!allowSend)"
+                    OnClick="ScheduledSubmit"
+                    CssClass="w-full py-3">
+            </Button>
+        }
+        else
+        {
+            <Button IsBusy="Model.IsBusy"
+                    Text="Send SMS Now!"
+                    Icon="Icon.IconStyle.Mail"
+                    IsDisabled="@(!allowSend)"
+                    OnClick="ImmediateSubmit"
+                    CssClass="w-full py-3">
+            </Button>
+        }
+
+        <div class="mt-2 text-center text-sm text-slate-500">
+            Total Recipients: <strong>@Model.CountRecipients().ToString("N0")</strong>
+        </div>
+    </div>
+</Card>
+
+@code {
+    [CascadingParameter(Name = "MainAccount")] public required AccountState State { get; set; }
+
+    [Parameter, EditorRequired] public required BaseComposeModel<TRequest> Model { get; set; }
+    [Parameter, EditorRequired] public required Func<TRequest, Task<SwaggerResponse<SmsBatchResponse>>> ApiSubmit { get; set; }
+
+    private IReadOnlyList<string> errorMessages => Model.GetErrorMessages();
+    private bool allowSend => errorMessages.Count == 0;
+
+    private Task ImmediateSubmit(MouseEventArgs e)
+    {
+        return SendMessageCore(null);
+    }
+
+    private Task ScheduledSubmit(MouseEventArgs e)
+    {
+        if (!Model.DeliveryTime.HasValue)
+            return alert.Error("Choose a delivery date and time, or send the message immediately.", "Compose Message");
+
+        return SendMessageCore(Model.DeliveryTime.Value);
+    }
+
+    private async Task SendMessageCore(DateTimeOffset? deliveryTime)
+    {
+        if (Model is null)
+        {
+            await alert.Error("model should not be null");
+            return;
+        }
+
+        try
+        {
+            Model.IsBusy = true;
+            await InvokeAsync(StateHasChanged);
+
+            if (string.IsNullOrWhiteSpace(Model.SenderId))
+                throw new Exception("Choose an approved sender ID.");
+
+            if (string.IsNullOrWhiteSpace(Model.MessageText))
+                throw new Exception("Enter a message.");
+
+            if (Model.CountRecipients() == 0)
+                throw new Exception("Add recipients");
+
+            var request = Model.ToRequest(deliveryTime);
+            var result = await ApiSubmit.Invoke(request);
+            var response = result.Result;
+
+            State.UpdateBalance(response.WalletBalance);
+
+            //reset the model after sending the message
+            // model.ClearSelection(); // thismay be annoying
+
+            var message = deliveryTime.HasValue
+                ? "Your message has been scheduled."
+                : GetMessageStatistics(response);
+
+            await alert.Success(message, "Message Created");
+        }
+        catch (ApiException ex)
+        {
+            await alert.Error(ex.FriendlyErrorMessage, "Unable to Send Message");
+        }
+        catch (Exception ex)
+        {
+            await alert.Error(ex.Message, "Unable to Send Message");
+        }
+        finally
+        {
+            Model.IsBusy = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private static string GetMessageStatistics(SmsBatchResponse res)
+    {
+        var message = "";
+
+        if (res.TotalProcessed > 0)
+            message += $"{res.TotalProcessed:#,##0} message/s was submitted for immediate delivery. <br>";
+
+        if (res.TotalFailed > 0)
+            message += $"{res.TotalFailed:#,##0} message/s failed. <br>";
+
+        message += "<br>";
+
+        if (res.Wallet == "SMS")
+        {
+            message += $"Total SMS units charged: {res.WalletCharge:#,##0} <br>";
+            message += $"Current SMS balance: {res.WalletBalance:#,##0}";
+        }
+
+        if(res.Wallet == "CASH")
+        {
+            message += $"Total Wallet charge: N{res.WalletCharge:#,##0} <br>";
+            message += $"Current Wallet balance: N{res.WalletBalance:#,##0}";
+        }
+
+        return message;
+    }
+}

@@ -38,7 +38,7 @@
                 </Column>
                 <Column Header="Transfer Balance">
                     <button type="button"
-                            @onclick="() => transferModal.Show(Main.Account, context)"
+                            @onclick="() => transferModal.Show(State.Account, context)"
                             class="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 
                             text-white shadow-sm transition-colors hover:bg-brand-600 focus:outline-none focus:ring-2 
                             focus:ring-brand-500 focus:ring-offset-2 focus:ring-offset-white dark:bg-blue-600 
@@ -72,7 +72,7 @@
 <TransferModal @ref="transferModal" OnCompleted="ReloadData" />
 
 @code {
-    [CascadingParameter(Name = "MainAccount")] private AccountState Main { get; set; } = null!;
+    [CascadingParameter(Name = "MainAccount")] public required AccountState State { get; set; }
 
     private string? searchQuery;
     private ApiDataSource<AccountResponse> ds = new();

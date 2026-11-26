@@ -2,10 +2,10 @@
     <Body>
         <div class="space-y-5">
             <FormInput Type="file"
-                       HelpText="@supportedFormatsText"
                        Label="Select File"
-                       accept="@acceptedFileTypes"
+                       HelpText="@supportedFormatsText"
                        OnFileChange="FileSelected"
+                       accept="@acceptedFileTypes"
                        @bind-Value="selectedFile" />
 
             @if (ForCSV)
@@ -38,7 +38,6 @@
 
                 @if (!isMergeMode)
                 {
-
                     <FormInput Label="New File Name"
                                PlaceHolder="e.g New Customers"
                                @bind-Value="newFileName" />
@@ -58,7 +57,7 @@
             }
 
             <p class="flex items-center gap-1.5 text-xs text-slate-500">
-                <Icon Style="Icon.IconStyle.Info" CssClass="mt-px h-3.5 w-3.5 shrink-0" />
+                <Icon Style="Icon.IconStyle.Info" CssClass="mt-px size-3.5 shrink-0" />
                 Note: Duplicate numbers will be removed.
             </p>
         </div>
@@ -80,28 +79,26 @@
 
 @code {
     private const long maxFileBytes = 20 * 1024 * 1024;
+    [CascadingParameter(Name = "MainAccount")] public required AccountState State { get; set; }
 
-    [Parameter] public bool ForCSV { get; set; }
-    [Parameter] public EventCallback OnCompleted { get; set; }
-    [Parameter] public EventCallback<BatchFileResponse> OnFileUploaded { get; set; }
-    [Parameter] public List<BatchFileResponse> ExistingFiles { get; set; } = [];
+    [Parameter, EditorRequired] public bool ForCSV { get; set; }
+    [Parameter, EditorRequired] public EventCallback OnCompleted { get; set; }
+    [Parameter, EditorRequired] public List<BatchFileResponse> ExistingFiles { get; set; } = [];
 
     private bool isVisible;
     private bool isMergeMode;
     private bool isSubmitting;
-    private int countryCode = 234;
     private string newFileName = string.Empty;
     private string mergeFileId = string.Empty;
     private IBrowserFile? selectedFile;
 
-    private string modalTitle => ForCSV ? "Upload CSV / Excel File" : "Upload Bulk File";
-    private string acceptedFileTypes => ForCSV ? ".csv,.xls,.xlsx,.xlx" : ".txt,.text";
+    private string modalTitle           => ForCSV ? "Upload CSV / Excel File" : "Upload Bulk File";
+    private string acceptedFileTypes    => ForCSV ? ".csv,.xls,.xlsx,.xlx" : ".txt,.text";
     private string supportedFormatsText => "Supported formats: " + acceptedFileTypes.Replace(".", "").Replace(",", ", ").ToUpperInvariant();
 
-    public void Show(int cCode = 234)
+    public void Show()
     {
         isMergeMode = false;
-        countryCode = cCode;
         selectedFile = null;
         newFileName = string.Empty;
         mergeFileId = string.Empty;
@@ -118,55 +115,37 @@
     private async Task HandleUpload()
     {
         if (selectedFile == null)
-        {
-            await alert.Error("Please select a file first.", "Validation Error");
-            return;
-        }
-
-        isSubmitting = true;
-        StateHasChanged();
+            throw new SystemException("Please select a file first.");
 
         try
         {
-            await using var stream = selectedFile.OpenReadStream(maxFileBytes);
-            using var ms = new MemoryStream();
-            await stream.CopyToAsync(ms);
-            ms.Position = 0;
+            isSubmitting = true;
+            StateHasChanged();
 
-            var ext = Path.GetExtension(selectedFile.Name);
-            var fileNameToSend = string.IsNullOrWhiteSpace(newFileName) 
-                ? selectedFile.Name 
-                : (newFileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase) ? newFileName : $"{newFileName}{ext}");
-
-            var file = new FileParameter(ms, fileNameToSend, selectedFile.ContentType);
+            var countryCode = State.Account.CountryCode;
+            var file = new FileParameter(selectedFile, newFileName);
 
             if (!ForCSV && isMergeMode)
             {
                 if (string.IsNullOrWhiteSpace(mergeFileId))
-                {
-                    await alert.Error("Please select an existing file to merge into.", "Validation Error");
-                    return;
-                }
+                    throw new SystemException("Please select an existing file to merge into.");
 
-                await apiClient.BatchFileUpdateAsync(mergeFileId, countryCode, file);
+                var response = await apiClient.BatchFileUpdateAsync(mergeFileId, countryCode, file);
                 await alert.Success("File merged successfully.");
-                isVisible = false;
                 await OnCompleted.InvokeAsync();
+                isVisible = false;
             }
             else
             {
                 var response = await apiClient.BatchFileCreateAsync(countryCode, file);
                 await alert.Success("File uploaded successfully.");
+                await OnCompleted.InvokeAsync();
                 isVisible = false;
-                if (OnFileUploaded.HasDelegate && response?.Result != null)
-                {
-                    await OnFileUploaded.InvokeAsync(response.Result);
-                }
-                else
-                {
-                    await OnCompleted.InvokeAsync();
-                }
             }
+        }
+        catch (SystemException ex)
+        {
+            await alert.Error(ex.Message, "Validation Error");
         }
         catch (Exception ex)
         {
@@ -181,11 +160,10 @@
 
     private void FileSelected(InputFileChangeEventArgs e)
     {
+        if (e.File != null && string.IsNullOrWhiteSpace(newFileName))
+            newFileName = Path.GetFileNameWithoutExtension(e.File.Name);
+
         selectedFile = e.File;
-        if (selectedFile != null && string.IsNullOrWhiteSpace(newFileName))
-        {
-            newFileName = Path.GetFileNameWithoutExtension(selectedFile.Name);
-        }
         StateHasChanged();
     }
 }

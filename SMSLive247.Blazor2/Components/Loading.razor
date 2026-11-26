@@ -4,11 +4,11 @@
 }
 else
 {
-    <div class="flex items-center justify-center py-6 @CssClass">
+    <div class="flex items-center justify-center py-6">
         <div class="flex flex-col items-center gap-2.5">
-            <div class="relative @SpinnerDimensions">
-                <div class="absolute inset-0 @SpinnerDimensions animate-ping rounded-full border border-brand-100 opacity-25"></div>
-                <div class="@SpinnerDimensions animate-spin rounded-full border-2 border-brand-100 border-t-brand-500"></div>
+            <div class="relative size-7">
+                <div class="absolute inset-0 size-7 animate-ping rounded-full border border-brand-100 opacity-25"></div>
+                <div class="size-7 animate-spin rounded-full border-2 border-brand-100 border-t-brand-500"></div>
             </div>
 
             @if (!string.IsNullOrWhiteSpace(Message))
@@ -23,27 +23,27 @@ else
 
 @code {
     [Parameter] public bool BoolCheck { get; set; } = false;
-    [Parameter] public object? NullCheckObject { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter] public string Message { get; set; } = "Loading...";
-    [Parameter] public string CssClass { get; set; } = "";
-    [Parameter] public string Size { get; set; } = "sm";
+    // [Parameter] public string CssClass { get; set; } = "";
+    // [Parameter] public string Size { get; set; } = "sm";
+    [Parameter] public object? NullCheckObject { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; } = default!;
 
     private bool IsReady => BoolCheck || NullCheckObject != null;
 
-    private string SpinnerDimensions => Size switch
-    {
-        "xs" => "h-5 w-5",
-        "md" => "h-9 w-9",
-        "lg" => "h-12 w-12",
-        _ => "h-7 w-7"
-    };
+    // private string SpinnerDimensions => Size switch
+    // {
+    //     "xs" => "size-5",
+    //     "md" => "size-9",
+    //     "lg" => "size-12",
+    //     _    => "size-7"
+    // };
 
-    private string BorderWidth => Size switch
-    {
-        "xs" => "border",
-        "md" => "border-4",
-        "lg" => "border-4",
-        _ => "border-2"
-    };
+    // private string BorderWidth => Size switch
+    // {
+    //     "xs" => "border",
+    //     "md" => "border-4",
+    //     "lg" => "border-4",
+    //     _ => "border-2"
+    // };
 }

@@ -5,8 +5,9 @@ public sealed class PagingState
     public int PageSize { get; set; } = 25;
     public int CurrentPage { get; set; } = 1;
     public int? TotalRecords { get; set; }
-    public int? TotalPages => TotalRecords.HasValue
-        ? (int)Math.Ceiling((decimal)TotalRecords / (PageSize <= 0 ? 1 : PageSize)) : null;
+    public int? TotalPages => TotalRecords.HasValue 
+        ? (int)Math.Ceiling((decimal)TotalRecords / (PageSize <= 0 ? 1 : PageSize))
+        : null;
 }
 
 public static class PaginationExtensions
@@ -36,17 +37,5 @@ public static class PaginationExtensions
             return int.TryParse(value, out var result)
                 ? result : errorValue;
         }
-
-        //int GetHeaderValue(string headerKey, int errorValue)
-        //{
-        //    if (source.Headers.Keys.Contains(headerKey))
-        //    {
-        //        var value = source.Headers[headerKey].FirstOrDefault();
-
-        //        if (int.TryParse(value, out int valid))
-        //            return valid;
-        //    }
-        //    return errorValue;
-        //}
     }
 }

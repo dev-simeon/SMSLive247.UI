@@ -1,0 +1,31 @@
+@inject IJSRuntime JS
+
+<div contenteditable="true" @ref="editorRef" class="h-56 py-2.5 @baseCss">
+    @((MarkupString)content)
+</div>
+
+@code {
+    private string content = "";
+    private ElementReference editorRef;
+    private string baseCss = "block w-full appearance-none rounded-lg border border-slate-200 px-3 text-slate-900 placeholder-slate-400 dark:text-slate-400 dark:placeholder-slate-700 dark:bg-black transition-all focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none";
+
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Set the default content once. Blazor doesn't own the div's
+            // contents, so later re-renders won't wipe what the user typed.
+            await JS.InvokeVoidAsync("Reflect.set", editorRef, "innerHTML", "hello, world!");
+        }
+    }
+
+    public async Task InsertHtmlContentAsync(string outerHtml)
+    {
+        var html = await JS.InvokeAsync<string>("Reflect.get", editorRef, "innerHTML");
+        content = html + outerHtml;
+    }
+
+}

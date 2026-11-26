@@ -1,17 +1,17 @@
 @attribute [Route(Const.Routes.Account.SubAccountDetails)]
+@inject NavigationManager nav
 @layout MainLayout
 
-@inject NavigationManager nav
 
 <PageTitle>Sub-Account Details</PageTitle>
 
-@if (subAccount is not null && state is not null)
+@if (subAccount is not null && subAccountState is not null)
 {
     <BackLink Location="@Const.Routes.Account.SubAccounts"
               Title="Back to Sub-Accounts">
     </BackLink>
 
-    <CascadingValue Name="SubAccount" Value="@state">
+    <CascadingValue Name="SubAccount" Value="@subAccountState">
         <Details OnUpdated="ReloadData" />
 
         <Tabs>
@@ -51,9 +51,9 @@ else
 @code {
     [Parameter] public string? id { get; set; }
 
-    private AccountState? state;
     private string? errorMessage;
-    private AccountResponse? subAccount => state?.Account;
+    private AccountState? subAccountState;
+    private AccountResponse? subAccount => subAccountState?.Account;
 
     protected override async Task OnInitializedAsync()
     {
@@ -71,7 +71,7 @@ else
             }
 
             var response = await apiClient.AccountGetAsync(id);
-            state = new(response.Result);
+            subAccountState = new(response.Result);
             errorMessage = null;
         }
         catch (Exception ex)

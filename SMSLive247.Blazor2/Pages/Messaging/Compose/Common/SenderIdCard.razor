@@ -1,20 +1,22 @@
+@typeparam TRequest
+
 <Card HeaderText="From">
     <div class="flex rounded-lg border border-slate-300
-        bg-white shadow-sm focus-within:border-brand-500 focus-within:ring-brand-500/30 focus-within:ring-4">
-        <div class="flex rounded-l-lg w-10 items-center justify-center bg-slate-50 text-slate-400">
+        bg-white shadow-sm focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/30">
+        <div class="flex w-10 items-center justify-center rounded-l-lg bg-slate-50 text-slate-400">
             <Icon Style="Icon.IconStyle.User" CssClass="text-lg" />
         </div>
-        <div class="w-full sm:max-w-xs rounded-r-lg">
+        <div class="w-full rounded-r-lg sm:max-w-xs">
             @{
-                var senderIds = Model?.SenderIds ?? [];
-                var approved = senderIds.Where(x => x.Status == "APPROVED").ToList();
-                var others = senderIds.Where(x => x.Status != "APPROVED").ToList() ?? [];
+                var senderIds = Model.SenderIds;
+                var approved  = senderIds.Where(x => x.Status == "APPROVED").ToList();
+                var others    = senderIds.Where(x => x.Status != "APPROVED").ToList();
             }
             <FormSelect TValue="string" 
                         Required="true" 
                         IsEmbedded="true"
                         class="text-slate-900 dark:text-slate-100"
-                        @bind-Value="Model.SenderID" 
+                        @bind-Value="Model.SenderId" 
                         @bind-Value:after="HandleChange"
                         IconStyle="Icon.IconStyle.ChevronDown" >
                 <option value="" class="bg-white text-slate-900 dark:bg-slate-800 dark:text-slate-100">-Select Sender ID-</option>
@@ -47,12 +49,12 @@
 </Card>
 
 @code {
-    [Parameter] public BaseComposeModel? Model { get; set; }
-    [Parameter] public EventCallback<string> SenderIDChanged { get; set; } 
+    [Parameter, EditorRequired] public required BaseComposeModel<TRequest> Model { get; set; }
+    [Parameter, EditorRequired] public required EventCallback<string> OnChanged { get; set; } 
 
     public async Task HandleChange()
     {
-        if (SenderIDChanged.HasDelegate)
-            await SenderIDChanged.InvokeAsync(Model?.SenderID ?? "");
+        if (OnChanged.HasDelegate)
+            await OnChanged.InvokeAsync(Model.SenderId);
     }
 }

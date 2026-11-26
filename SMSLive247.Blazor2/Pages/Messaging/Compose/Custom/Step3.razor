@@ -1,0 +1,64 @@
+﻿@if (CurrentStep == stepNumber)
+{
+    <Card HeaderText="Step 3 of 3: Compose Message">
+        <HeaderRight>
+            <button type="button" @onclick="() => CurrentStepChanged.InvokeAsync(2)"
+            class="text-sm font-med0ium text-slate-500 hover:text-brand-500 hover:underline">
+                &larr; Back to Phone Column
+            </button>
+        </HeaderRight>
+        <ChildContent>
+            <div class="space-y-4">
+                <!-- Available Fields right above the message box -->
+                @if (Model.ColumnNames.Any() == true)
+                {
+                    <div class="mb-1.5">
+                        <span class="text-sm font-normal">Click a field below to insert it into your message</span>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+                        @foreach (var header in Model.ColumnNames)
+                        {
+                            <button type="button"
+                            @onclick="() => AddPlaceholder(header)"
+                            class="inline-flex w-auto items-center gap-1.5 rounded-sm bg-brand-500 px-2.5 py-1 text-sm uppercase font-mono font-medium text-slate-100 hover:bg-brand-600 transition-all">
+                                <span>@Placeholder(header)</span>
+                            </button>
+                        }
+                    </div>
+                }
+
+                <!-- Full-width Message Template Editor -->
+                <div class="w-full">
+                    <ContentEditor
+                        @ref="templateEditor1" 
+                        @bind-Value="Model.MessageText" 
+                        @bind-Value:after="OnModelChanged.InvokeAsync" />
+                </div>
+            </div>
+        </ChildContent>
+    </Card>
+}
+
+@code {
+    private const int stepNumber = 3;
+    [Parameter, EditorRequired] public required int CurrentStep { get; set; }
+    [Parameter, EditorRequired] public required ComposeTemplateModel Model { get; set; }
+    [Parameter, EditorRequired] public required EventCallback<int> CurrentStepChanged { get; set; }
+    [Parameter, EditorRequired] public required EventCallback OnModelChanged { get; set; }
+
+    private ContentEditor?  templateEditor1;
+    private ContentEditor2? templateEditor2;
+
+    private async Task AddPlaceholder(string fieldName)
+    {
+        if (templateEditor1 != null)
+        {
+            fieldName = fieldName.Replace(" ", "");
+            var cssClass = "bg-brand-100 text-brand-700 px-2 py-0.5 rounded-sm text-sm uppercase inline-block align-middle select-none";
+            var chipHtml = $"<span contenteditable=false data-value='{{{fieldName}}}' class='{cssClass}'>{fieldName}</span>";
+            await templateEditor1.InsertHtmlContentAsync(chipHtml);
+        }
+    }
+
+    private string Placeholder(string header) => $"{{{System.Text.RegularExpressions.Regex.Replace(header, @"\s+", "")}}}";
+}

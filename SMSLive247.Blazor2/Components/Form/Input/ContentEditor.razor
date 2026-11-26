@@ -1,0 +1,52 @@
+@inject IJSRuntime JS
+
+<div id="@editorId"
+     contenteditable="true"
+     class="h-56 py-2.5 @baseCss"
+     placeholder="@Placeholder" 
+     @ref="editorElement">
+</div>
+
+@code {
+    private string baseCss = "block w-full appearance-none rounded-lg border border-slate-200 px-3 text-slate-900 placeholder-slate-400 dark:text-slate-400 dark:placeholder-slate-700 dark:bg-black transition-all focus:ring-brand-500/30 focus:border-brand-500 focus:ring-4 focus:outline-none";
+
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Type your message here...";
+
+    private bool isInitialized = false;
+    private ElementReference editorElement;
+    private DotNetObjectReference<ContentEditor>? objRef;
+    private string editorId = "editor-" + Guid.NewGuid().ToString("N");
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("ContentEditor.initialize", editorId, objRef);
+            isInitialized = true;
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnContentChanged(string rawText)
+    {
+        if (Value != rawText)
+        {
+            Value = rawText;
+            await ValueChanged.InvokeAsync(rawText);
+        }
+    }
+
+    public async Task InsertHtmlContentAsync(string outerHtml)
+    {
+        if (isInitialized) 
+            await JS.InvokeVoidAsync("ContentEditor.insertChip", editorId, outerHtml);
+    }
+
+    public void Dispose()
+    {
+        objRef?.Dispose();
+    }
+}

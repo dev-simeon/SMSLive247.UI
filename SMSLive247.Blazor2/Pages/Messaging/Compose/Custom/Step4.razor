@@ -1,0 +1,66 @@
+﻿@using System.Text.RegularExpressions
+
+@if (CurrentStep == 3)
+{
+    <Card HeaderText="Preview Messages">
+        <ChildContent>
+            @if (!Model.PreviewRows.Any() || string.IsNullOrWhiteSpace(Model.MessageText))
+            {
+                <p class="py-6 text-center text-slate-400">
+                    Compose a message above to preview personalized messages with data from your sheet.
+                </p>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-100 text-xs tracking-wider text-slate-400 uppercase">
+                                <th class="w-12 px-3 py-2.5 text-center">#</th>
+                                <th class="w-36 px-3 py-2.5">Phone </th>
+                                <th class="w-auto px-3 py-2.5">Message</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y-0">
+                            @foreach (var row in Model.PreviewRows.Take(3).Select((value, index) => new { value, index }))
+                            {
+                                <tr class="transition-colors hover:bg-slate-100/70">
+                                    <td class="px-2 py-1.5 text-center text-sm font-medium text-slate-400">
+                                        @(row.index + 1)
+                                    </td>
+                                    <td class="px-2 py-1.5 font-mono text-sm font-medium text-brand-600">
+                                        @PhoneFor(row.value)
+                                    </td>
+                                    <td class="wrap-break-words px-2 py-1.5 text-sm whitespace-pre-wrap text-slate-700">
+                                        @ResolvePlaceholders(Model.MessageText, row.value)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </ChildContent>
+    </Card>
+}
+
+@code {
+    private const int stepNumber = 4;
+    [Parameter, EditorRequired] public required int CurrentStep { get; set; }
+    [Parameter, EditorRequired] public required ComposeTemplateModel Model { get; set; }
+    [Parameter, EditorRequired] public required EventCallback<int> CurrentStepChanged { get; set; }
+
+    private string PhoneFor(Dictionary<string, string> row) => Model.PhoneColumn is int index 
+        && index >= 0 && index < Model.ColumnNames.Count 
+        && row.TryGetValue(Model.ColumnNames[index], out var number)
+        ? number : "No phone number";
+
+    private string ResolvePlaceholders(string value, Dictionary<string, string> row)
+    {
+        foreach (var header in Model.ColumnNames)
+            value = Regex.Replace(value, $@"\{{\s*{Regex.Escape(header.Replace(" ", ""))}\s*\}}", 
+            row.GetValueOrDefault(header, ""), RegexOptions.IgnoreCase);
+        return value;
+    }
+
+}

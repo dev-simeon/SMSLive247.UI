@@ -4,7 +4,7 @@
 
 @implements IDisposable
 
-<CascadingValue Value="@self" Name="MainAccount">
+<CascadingValue Value="@state" Name="MainAccount">
 
     <div class="flex h-screen flex-col overflow-hidden bg-gray-100 dark:bg-gray-900">
         <SiteBanner />
@@ -12,7 +12,7 @@
             <Sidebar @bind-IsOpen="sidebarOpen"></Sidebar>
             <div class="flex min-w-0 flex-1 flex-col overflow-hidden transition-all duration-300">
                 <Header OnMenuClick="() => setSidebarOpen(true)" 
-                    Account="@self?.Account"></Header>
+                    Account="@state?.Account"></Header>
 
                 <main class="flex-1 space-y-4 overflow-y-auto scroll-smooth p-4 sm:p-6">
                     <Alert />
@@ -32,15 +32,15 @@
 
 @code {
     private bool sidebarOpen = false;
-    private AccountState? self;
+    private AccountState? state;
 
     protected override async Task OnInitializedAsync()
     {
        try
         {
             var response = await apiClient.AccountGetAsync("self");
-            self = new(response.Result);
-            self.OnChange += HandleAccountStateChanged;
+            state = new(response.Result);
+            state.OnChange += HandleAccountStateChanged;
         }
         catch (ApiException ex)
         {
@@ -58,8 +58,8 @@
 
     public void Dispose()
     {
-        if (self is not null)
-            self.OnChange -= HandleAccountStateChanged;
+        if (state is not null)
+            state.OnChange -= HandleAccountStateChanged;
     }
 
     private void setSidebarOpen(bool value)

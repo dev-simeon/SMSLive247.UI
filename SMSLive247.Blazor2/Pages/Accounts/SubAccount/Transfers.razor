@@ -47,7 +47,7 @@
 <TransferModal @ref="transferModal" OnCompleted="ReloadData"></TransferModal>
 
 @code {
-    [CascadingParameter(Name = "SubAccount")] public required AccountState Sub { get; set; }
+    [CascadingParameter(Name =  "SubAccount")] public required AccountState Sub  { get; set; }
     [CascadingParameter(Name = "MainAccount")] public required AccountState Main { get; set; }
 
     private string? searchQuery;
